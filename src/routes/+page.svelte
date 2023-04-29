@@ -23,7 +23,7 @@
 				<p>{pokemon.pokemon_v2_pokemontypes_aggregate.nodes[1].pokemon_v2_type.name}</p>
 			{/if}
 			<img
-				src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${
+				src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
 					index + 1
 				}.png`}
 				alt={pokemon.name}
