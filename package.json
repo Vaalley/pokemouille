@@ -25,6 +25,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"graphql-request": "^6.0.0"
+		"graphql-request": "^6.0.0",
+		"node-cache": "^5.1.2"
 	}
 }

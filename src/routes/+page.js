@@ -1,4 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
+// import NodeCache from "node-cache";
+// const myCache = new NodeCache({ stdTTL: 60 });
+
+// myCache.set("hello", "world");
 
 const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 	headers: {
@@ -7,7 +11,7 @@ const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 	},
 });
 
-export async function load() {
+export async function load({ fetch }) {
 	const countData = await fetch("https://pokeapi.co/api/v2/pokedex/1/").then(res => res.json());
 	const count = countData.pokemon_entries.length - 2;
 	const data = await fetchAllPokemon(count);

@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>A Basic Title</title>
+	<title>🐸 Pokémouille</title>
 	<!-- <link rel="icon" href="" /> -->
 </svelte:head>
 
