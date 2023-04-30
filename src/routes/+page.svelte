@@ -14,7 +14,7 @@
 
 <h1>Welcome to Pokemouille</h1>
 
-<div class="grid grid-cols-3 justify-between gap-y-28 text-center">
+<div class="grid grid-cols-3 justify-between gap-y-28 text-center -md:grid-cols-2">
 	{#each pokemon as pokemon, index}
 		<div class="w-48">
 			<h2>{capitalize(pokemon.name)}</h2>
@@ -23,6 +23,7 @@
 				<p>{pokemon.pokemon_v2_pokemontypes_aggregate.nodes[1].pokemon_v2_type.name}</p>
 			{/if}
 			<img
+				class="mx-auto"
 				src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
 					index + 1
 				}.png`}
