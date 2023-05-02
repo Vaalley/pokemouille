@@ -1,25 +1,13 @@
-# A basic template for any project using SvelteKit and TailwindCSS
+# Pokémouille
 
-This is a basic template for any project using SvelteKit and TailwindCSS. To start using it, just clone the repository and run the following commands:
-
-`pnpm install`
-
-`pnpm run dev`
+Pokémouille is a pokedex app that allows users to easily search for and view information about different Pokemon. This app is open-source and open to contributions from the community.
 
 ## Features
 
-- SvelteKit [https://kit.svelte.dev/]
+- Search for Pokemon by name or Pokedex number (TODO)
+- View information about each Pokemon, including its type, abilities, and stats (TODO)
+- Dark mode for comfortable viewing in low-light environments (TODO)
 
-- TailwindCSS [https://tailwindcss.com/]
+## License
 
-- PostCSS [https://postcss.org/]
-
-- minireset.css [https://jgthms.com/minireset.css/]
-
-## Contributions
-
-Contributions are welcome! Please open an issue or submit a PR.
-
-## Author
-
-[Valentin Musset](https://github.com/vaalley)
+Licensed under the MIT license. SEE [LICENSE](LICENSE)
