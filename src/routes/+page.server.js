@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import NodeCache from 'node-cache';
-const myCache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
+export const _myCache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
 
 const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 	headers: {
@@ -10,15 +10,15 @@ const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 });
 
 export async function load() {
-	if (myCache.get('pokemon') == undefined) {
-		myCache.set('pokemon', await fetchAllPokemon());
+	if (_myCache.get('pokemon') == undefined) {
+		_myCache.set('pokemon', await fetchAllPokemon());
 		console.log('cache miss, retrieved pokemon');
 	} else {
 		console.log('cache hit');
 	}
 
 	return {
-		pokemon: myCache.get('pokemon'),
+		pokemon: _myCache.get('pokemon'),
 		status: 200,
 	};
 }

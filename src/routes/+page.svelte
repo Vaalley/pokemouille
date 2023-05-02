@@ -1,6 +1,7 @@
 <script>
 	export let data;
 	import { capitalize } from '$lib/utils';
+	import SearchBar from '../components/SearchBar.svelte';
 
 	let pokemon = data.pokemon.pokemon_v2_pokemon;
 
@@ -12,7 +13,7 @@
 	<!-- <link rel="icon" href="" /> -->
 </svelte:head>
 
-<h1>Welcome to Pokemouille</h1>
+<h1 class="text-7xl text-center mt-8 mb-16 underline">Welcome to Pokémouille</h1>
 
 <div class="grid grid-cols-3 justify-between gap-y-28 text-center -md:grid-cols-2">
 	{#each pokemon as pokemon, index}
@@ -32,3 +33,4 @@
 		</div>
 	{/each}
 </div>
+<SearchBar {data} />
