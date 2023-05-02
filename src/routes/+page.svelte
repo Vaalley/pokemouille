@@ -2,7 +2,7 @@
 	export let data;
 	import { capitalize } from '$lib/utils';
 
-	let pokemon = data.pokemon;
+	let pokemon = data.pokemon.pokemon_v2_pokemon;
 
 	// console.log(pokemon);
 </script>
@@ -16,7 +16,7 @@
 
 <div class="grid grid-cols-3 justify-between gap-y-28 text-center -md:grid-cols-2">
 	{#each pokemon as pokemon, index}
-		<div class="w-48">
+		<div class="w-48 mx-auto">
 			<h2>{capitalize(pokemon.name)}</h2>
 			<p>{pokemon.pokemon_v2_pokemontypes_aggregate.nodes[0].pokemon_v2_type.name}</p>
 			{#if pokemon.pokemon_v2_pokemontypes_aggregate.nodes[1]}
