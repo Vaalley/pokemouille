@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import { capitalize } from '$lib/utils';
+	import { capitalize, hyphenRemover } from '$lib/utils';
 
 	let pokemon = data.pokemon;
 	// console.log(pokemon);
@@ -28,13 +28,13 @@
 
 <ul>
 	{#each pokemon.abilities as ability}
-		<li>{capitalize(ability.ability.name)}</li>
+		<li>{hyphenRemover(capitalize(ability.ability.name))}</li>
 	{/each}
 </ul>
 
 <ul>
 	{#each pokemon.stats as stat}
-		<li>{capitalize(stat.stat.name)}: {stat.base_stat}</li>
+		<li>{hyphenRemover(capitalize(stat.stat.name))}: {stat.base_stat}</li>
 	{/each}
 </ul>
 
