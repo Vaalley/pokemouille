@@ -1,8 +1,8 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { capitalize } from '$lib/utils';
 	export let data;
-
-	// console.log(data);
 
 	let showSearchBar = false;
 	let inputEl;
@@ -23,7 +23,15 @@
 		if (searchTerm) {
 			matchingPokemon = pokemonData
 				.filter((pokemon) => pokemon.name.toLowerCase().includes(searchTerm))
-				.slice(0, 10);
+				.slice(0, 10)
+				.map((pokemon) => {
+					const slug = pokemon.name.toLowerCase().replace(/ /g, '-');
+					console.log(slug);
+					return {
+						...pokemon,
+						slug
+					};
+				});
 		} else {
 			matchingPokemon = [];
 		}
@@ -53,7 +61,16 @@
 		{#if matchingPokemon.length}
 			<ul>
 				{#each matchingPokemon as pokemon}
-					<li>{pokemon.name}</li>
+					<a href={`/${pokemon.slug}`} on:click|preventDefault={() => goto(`/${pokemon.slug}`)}>
+						<li class="flex items-center gap-6 text-xl font-semibold h-16">
+							<img
+								class="my-[-6px] h-14"
+								src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
+								alt={pokemon.name}
+							/>
+							{capitalize(pokemon.name)}
+						</li>
+					</a>
 				{/each}
 			</ul>
 		{/if}
