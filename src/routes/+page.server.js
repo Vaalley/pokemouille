@@ -1,6 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 import NodeCache from 'node-cache';
-export const _myCache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
+
+const cache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
 
 const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 	headers: {
@@ -10,23 +11,36 @@ const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 });
 
 export async function load() {
-	if (_myCache.get('pokemon') == undefined) {
-		_myCache.set('pokemon', await fetchAllPokemon());
-		console.log('cache miss, retrieved pokemon');
-	} else {
-		console.log('cache hit');
+	try {
+		const pokemon = await getPokemon();
+		return {
+			pokemon,
+			status: 200,
+		};
+	} catch (error) {
+		console.log(error);
+		return {
+			pokemon: null,
+			status: 500,
+		};
 	}
+}
 
-	return {
-		pokemon: _myCache.get('pokemon'),
-		status: 200,
-	};
+async function getPokemon() {
+	let pokemon = cache.get('pokemon');
+	if (pokemon) {
+		console.log('cache hit');
+		return pokemon;
+	}
+	console.log('cache miss, fetching pokemon');
+	pokemon = await fetchAllPokemon();
+	cache.set('pokemon', pokemon);
+	return pokemon;
 }
 
 async function fetchAllPokemon() {
 	const countData = await fetch("https://pokeapi.co/api/v2/pokedex/1/").then(res => res.json());
 	const count = countData.pokemon_entries.length - 2;
-	// console.log(count);
 	try {
 		const query = `
 		query allPokemon {
@@ -48,6 +62,6 @@ async function fetchAllPokemon() {
 `;
 		return await client.request(query);
 	} catch (error) {
-		console.error(error);
+		throw new Error('Error fetching pokemon data');
 	}
 }
