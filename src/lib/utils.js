@@ -8,8 +8,9 @@ const keepHyphen = [
 	'Chi-yu'
 ]
 export function hyphenRemover(str) {
-	// If the string contains an hyphan and isn't in the keepHyphen array, return the string without the hyphen and with a space instead
+	// If the str contains an hyphen and isn't in the keepHyphen array, return the string without the hyphen and with a space instead if it's in the keepHyphen array return with the hyphen
 	if (str.includes('-') && !keepHyphen.includes(str)) {
 		return str.replace('-', ' ');
 	}
+	return str;
 }
