@@ -15,7 +15,7 @@
 
 <h1 class="text-7xl text-center mt-8 mb-16 underline">Welcome to Pokémouille</h1>
 
-<div class="grid grid-cols-3 justify-between gap-y-28 text-center -md:grid-cols-2">
+<!-- <div class="grid grid-cols-3 justify-between gap-y-28 text-center -md:grid-cols-2">
 	{#each pokemon as pokemon, index}
 		<div class="w-48 mx-auto">
 			<h2>{capitalize(pokemon.name)}</h2>
@@ -32,5 +32,5 @@
 			/>
 		</div>
 	{/each}
-</div>
+</div> -->
 <SearchBar {data} />
