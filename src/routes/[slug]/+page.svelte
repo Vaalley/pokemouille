@@ -1,9 +1,10 @@
 <script>
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
+	import SearchBar from '../../components/SearchBar.svelte';
 
 	let pokemon = data.pokemon;
-	// console.log(pokemon);
+	console.log(pokemon);
 </script>
 
 <svelte:head>
@@ -12,7 +13,11 @@
 
 <ul>
 	<h1>{capitalize(pokemon.name)}</h1>
-	<img src={pokemon.sprites.front_default} alt={pokemon.name} />
+	<img
+		class="h-48"
+		src={pokemon.sprites.other['official-artwork'].front_default}
+		alt={pokemon.name}
+	/>
 </ul>
 
 <ul>
@@ -37,6 +42,7 @@
 		<li>{hyphenRemover(capitalize(stat.stat.name))}: {stat.base_stat}</li>
 	{/each}
 </ul>
+<SearchBar {data} />
 
 <style>
 	ul {
