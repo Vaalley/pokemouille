@@ -2,7 +2,6 @@ import NodeCache from 'node-cache';
 
 const cache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
 
-
 export async function load({ params }) {
 	const { slug } = params;
 
@@ -11,13 +10,13 @@ export async function load({ params }) {
 
 		return {
 			pokemonInfo: pokemon,
-			status: 200,
+			status: 200
 		};
 	} catch (error) {
 		console.error(error);
 		return {
 			status: 500,
-			error: 'Failed to fetch data from PokeAPI',
+			error: 'Failed to fetch data from PokeAPI'
 		};
 	}
 }

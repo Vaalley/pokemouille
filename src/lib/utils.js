@@ -3,10 +3,7 @@ export function capitalize(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const keepHyphen = [
-	'Wo-Chien',
-	'Chi-yu'
-]
+const keepHyphen = ['Wo-Chien', 'Chi-yu'];
 export function hyphenRemover(str) {
 	// If the str contains an hyphen and isn't in the keepHyphen array, return the string without the hyphen and with a space instead if it's in the keepHyphen array return with the hyphen
 	if (str.includes('-') && !keepHyphen.includes(str)) {
