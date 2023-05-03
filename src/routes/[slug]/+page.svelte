@@ -4,9 +4,8 @@
 	import SearchBar from '../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
-	let searchbarData = data;
 
-	// console.log(searchbarData);
+	// console.log(pokemonInfo);
 </script>
 
 <svelte:head>
@@ -33,14 +32,14 @@
 		</ul>
 
 		<ul>
-			<li class="underline">Types:</li>
+			<li class="underline">Type(s):</li>
 			{#each pokemonInfo.types as type}
 				<li>{capitalize(type.type.name)}</li>
 			{/each}
 		</ul>
 
 		<ul>
-			<li class="underline">Abilities:</li>
+			<li class="underline">Ability(ies):</li>
 			{#each pokemonInfo.abilities as ability}
 				<li>{hyphenRemover(capitalize(ability.ability.name))}</li>
 			{/each}
@@ -53,7 +52,7 @@
 			{/each}
 		</ul>
 	</div>
-	<SearchBar data={searchbarData} />
+	<!-- TODO: Add the search bar and make it work just like in the homepage (using sveltekit stores?) -->
 </div>
 
 <style>
