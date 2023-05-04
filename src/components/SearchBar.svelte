@@ -14,7 +14,6 @@
 			showSearchBar = false;
 		} else if (/^[a-zA-Z]$/.test(event.key)) {
 			showSearchBar = true;
-			inputEl.focus();
 		}
 	}
 
