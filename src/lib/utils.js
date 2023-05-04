@@ -1,13 +1,13 @@
-// Write a function that takes a string and returns that string with the first letter of the first word capitalized.
 export function capitalize(str) {
+	if (!str) return str; // Return the original string if it's empty or falsy
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 const keepHyphen = ['Wo-Chien', 'Chi-yu'];
+const keepHyphenSet = new Set(keepHyphen);
 export function hyphenRemover(str) {
-	// If the str contains an hyphen and isn't in the keepHyphen array, return the string without the hyphen and with a space instead if it's in the keepHyphen array return with the hyphen
-	if (str.includes('-') && !keepHyphen.includes(str)) {
-		return str.replace('-', ' ');
+	if (str.indexOf('-') !== -1 && !keepHyphenSet.has(str)) {
+		return str.split('-').join(' ');
 	}
 	return str;
 }
