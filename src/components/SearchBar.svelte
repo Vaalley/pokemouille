@@ -7,7 +7,7 @@
 	let showSearchBar = false;
 	let inputEl;
 	let matchingPokemon = [];
-	let pokemonData = data.pokemon.pokemon_v2_pokemon;
+	let pokemonData = data;
 
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' || event.type === 'click') {

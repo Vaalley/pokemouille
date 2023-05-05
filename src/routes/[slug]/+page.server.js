@@ -1,13 +1,17 @@
 import { getPokemonInfo } from '$lib/cacheInfo.js';
+import { getPokemon } from '$lib/cache.js';
+import { fetchAllPokemon } from '$lib/pokeapi.js';
 
 export async function load({ params }) {
 	const { slug } = params;
 
 	try {
-		const pokemon = await getPokemonInfo(slug);
+		const pokemonInfo = await getPokemonInfo(slug);
+		const pokemon = await getPokemon(fetchAllPokemon);
 
 		return {
-			pokemonInfo: pokemon,
+			pokemonInfo,
+			pokemon,
 			status: 200
 		};
 	} catch (error) {

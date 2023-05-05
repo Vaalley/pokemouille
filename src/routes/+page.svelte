@@ -33,4 +33,4 @@
 		</div>
 	{/each}
 </div> -->
-<SearchBar {data} />
+<SearchBar data={pokemon} />
