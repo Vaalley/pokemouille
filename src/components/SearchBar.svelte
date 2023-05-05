@@ -60,7 +60,12 @@
 		{#if matchingPokemon.length}
 			<ul>
 				{#each matchingPokemon as pokemon}
-					<a href={`/${pokemon.slug}`} on:click|preventDefault={() => goto(`/${pokemon.slug}`)}>
+					<a
+						href={`/${pokemon.slug}`}
+						on:click|preventDefault={() => {
+							goto(`/${pokemon.slug}`);
+						}}
+					>
 						<li class="flex items-center gap-6 text-xl font-semibold h-16">
 							<img
 								class="my-[-6px] h-14"
