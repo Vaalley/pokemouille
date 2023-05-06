@@ -10,12 +10,12 @@
 </script>
 
 <svelte:head>
-	<title>{capitalize(pokemonInfo.name)}</title>
+	<title>{capitalize(hyphenRemover(pokemonInfo.name))}</title>
 </svelte:head>
 
 <div class="flex flex-col items-center">
 	<h1 class="text-7xl text-center mt-8 mb-16 underline font-medium">
-		{capitalize(pokemonInfo.name)}
+		{capitalize(hyphenRemover(pokemonInfo.name))}
 	</h1>
 	<ul>
 		<img
@@ -42,20 +42,20 @@
 		<ul>
 			<li class="underline">Ability(ies):</li>
 			{#each pokemonInfo.abilities as ability}
-				<li>{hyphenRemover(capitalize(ability.ability.name))}</li>
+				<li>{capitalize(hyphenRemover(ability.ability.name))}</li>
 			{/each}
 		</ul>
 
 		<ul>
 			<li class="underline">Stats:</li>
 			{#each pokemonInfo.stats as stat}
-				<li>{hyphenRemover(capitalize(stat.stat.name))}: {stat.base_stat}</li>
+				<li>{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}</li>
 			{/each}
 		</ul>
 	</div>
 	<ul class="grid grid-cols-3 justify-between w-1/2 text-center text-xl font-medium">
 		{#each pokemonInfo.moves as move}
-			<li>{capitalize(move.move.name)}</li>
+			<li>{capitalize(hyphenRemover(move.move.name))}</li>
 		{/each}
 	</ul>
 	<SearchBar data={pokemon} />

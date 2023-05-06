@@ -1,7 +1,11 @@
 export function capitalize(str) {
-	if (!str) return str; // Return the original string if it's empty or falsy
-	return str.charAt(0).toUpperCase() + str.slice(1);
+	if (!str) return str;
+	return str
+		.split(' ')
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
 }
+
 
 const keepHyphen = ['Wo-Chien', 'Chi-yu'];
 const keepHyphenSet = new Set(keepHyphen);

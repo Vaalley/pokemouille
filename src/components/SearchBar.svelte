@@ -64,6 +64,10 @@
 						href={`/${pokemon.slug}`}
 						on:click|preventDefault={() => {
 							goto(`/${pokemon.slug}`);
+							// Reload the page on a  1 sec timeout
+							setTimeout(() => {
+								window.location.reload();
+							}, 500);
 						}}
 					>
 						<li class="flex items-center gap-6 text-xl font-semibold h-16">
