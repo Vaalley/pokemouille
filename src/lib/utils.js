@@ -7,7 +7,7 @@ export function capitalize(str) {
 }
 
 
-const keepHyphen = ['Wo-Chien', 'Chi-yu'];
+const keepHyphen = ['wo-chien', 'chi-yu'];
 const keepHyphenSet = new Set(keepHyphen);
 export function hyphenRemover(str) {
 	if (str.indexOf('-') !== -1 && !keepHyphenSet.has(str)) {

@@ -1,7 +1,7 @@
 <script>
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
-	import SearchBar from '../../components/SearchBar.svelte';
+	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
 	let pokemon = data.pokemon.pokemon_v2_pokemon;

@@ -1,7 +1,7 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { capitalize } from '$lib/utils';
+	import { capitalize, hyphenRemover } from '$lib/utils';
 	export let data;
 
 	let showSearchBar = false;
@@ -61,13 +61,13 @@
 			<ul>
 				{#each matchingPokemon as pokemon}
 					<a
-						href={`/${pokemon.slug}`}
+						href={`/pokemon/${pokemon.slug}`}
 						on:click|preventDefault={() => {
-							goto(`/${pokemon.slug}`);
+							goto(`/pokemon/${pokemon.slug}`);
 							// Reload the page on a  1 sec timeout
 							setTimeout(() => {
 								window.location.reload();
-							}, 500);
+							}, 1000);
 						}}
 					>
 						<li class="flex items-center gap-6 text-xl font-semibold h-16">
@@ -76,7 +76,7 @@
 								src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
 								alt={pokemon.name}
 							/>
-							{capitalize(pokemon.name)}
+							{capitalize(hyphenRemover(pokemon.name))}
 						</li>
 					</a>
 				{/each}
