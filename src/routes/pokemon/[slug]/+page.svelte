@@ -4,7 +4,7 @@
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
-	let searchData = data.pokemonInfo;
+	let searchData = data.searchData;
 
 	// console.log(pokemon);
 </script>

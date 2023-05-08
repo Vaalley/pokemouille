@@ -7,11 +7,11 @@ export async function load({ params }) {
 
 	try {
 		const abilityInfo = await getAbilityInfo(slug);
-		const pokemon = await getPokemon(fetchAllPokemon);
+		const searchData = await getPokemon(fetchAllPokemon);
 
 		return {
 			abilityInfo,
-			pokemon,
+			searchData,
 			status: 200
 		};
 	} catch (error) {

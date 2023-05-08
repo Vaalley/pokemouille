@@ -3,9 +3,9 @@ import { fetchAllPokemon } from '$lib/searchFetch.js';
 
 export async function load() {
 	try {
-		const pokemon = await getPokemon(fetchAllPokemon);
+		const searchData = await getPokemon(fetchAllPokemon);
 		return {
-			pokemon,
+			searchData,
 			status: 200
 		};
 	} catch (error) {

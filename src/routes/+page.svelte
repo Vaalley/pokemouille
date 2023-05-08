@@ -2,7 +2,7 @@
 	export let data;
 	import SearchBar from '../components/SearchBar.svelte';
 
-	let searchData = data.pokemon;
+	let searchData = data.searchData;
 
 	// console.log(pokemon);
 </script>

@@ -65,6 +65,44 @@
 		}
 	}
 
+	function updateMatching(event) {
+		const searchTerm = event.target.value.toLowerCase();
+		if (searchTerm) {
+			let countPokemon = 0;
+			let countAbility = 0;
+			matchingPokemon = pokemonData.filter((pokemon) => {
+				if (countPokemon >= 5) {
+					return false;
+				}
+				const name = pokemon.name.toLowerCase();
+				if (name.startsWith(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					pokemon.slug = slug;
+					countPokemon++;
+					return true;
+				}
+				return false;
+			});
+
+			matchingAbility = abilityData.filter((ability) => {
+				if (countAbility >= 5) {
+					return false;
+				}
+				const name = ability.name.toLowerCase();
+				if (name.startsWith(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					ability.slug = slug;
+					countAbility++;
+					return true;
+				}
+				return false;
+			});
+		} else {
+			matchingPokemon = [];
+			matchingAbility = [];
+		}
+	}
+
 	onMount(() => {
 		document.addEventListener('keydown', toggleSearchBar);
 		document.addEventListener('click', toggleSearchBar);
@@ -84,8 +122,9 @@
 			placeholder="Search..."
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
-			on:input={(updateMatchingPokemon, updateMatchingAbility)}
+			on:input={updateMatching}
 		/>
+
 		{#if matchingPokemon.length}
 			<ul>
 				{#each matchingPokemon as pokemon}
