@@ -16,9 +16,6 @@ async function fetchAllPokemon() {
 			pokemon_v2_pokemon(order_by: {id: asc}, limit: ${count}) {
 				name
 				id
-				pokemon_v2_pokemonsprites {
-					sprites
-				}
 				pokemon_v2_pokemontypes_aggregate {
 					nodes {
 						pokemon_v2_type {
@@ -27,7 +24,11 @@ async function fetchAllPokemon() {
 					}
 				}
 			}
-		}		
+			pokemon_v2_ability {
+				id
+				name
+			}
+		}
 `;
 		return await client.request(query);
 	} catch (error) {

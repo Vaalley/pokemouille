@@ -20,17 +20,20 @@
 	function updateMatchingPokemon(event) {
 		const searchTerm = event.target.value.toLowerCase();
 		if (searchTerm) {
-			matchingPokemon = pokemonData
-				.filter((pokemon) => pokemon.name.toLowerCase().includes(searchTerm))
-				.slice(0, 10)
-				.map((pokemon) => {
-					const slug = pokemon.name.toLowerCase().replace(/ /g, '-');
-					console.log(slug);
-					return {
-						...pokemon,
-						slug
-					};
-				});
+			let count = 0;
+			matchingPokemon = pokemonData.filter((pokemon) => {
+				if (count >= 10) {
+					return false;
+				}
+				const name = pokemon.name.toLowerCase();
+				if (name.startsWith(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					pokemon.slug = slug;
+					count++;
+					return true;
+				}
+				return false;
+			});
 		} else {
 			matchingPokemon = [];
 		}
