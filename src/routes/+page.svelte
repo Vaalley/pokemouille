@@ -2,7 +2,7 @@
 	export let data;
 	import SearchBar from '../components/SearchBar.svelte';
 
-	let pokemon = data.pokemon.pokemon_v2_pokemon;
+	let searchData = data.pokemon;
 
 	// console.log(pokemon);
 </script>
@@ -32,4 +32,4 @@
 		</div>
 	{/each}
 </div> -->
-<SearchBar data={pokemon} />
+<SearchBar data={searchData} />

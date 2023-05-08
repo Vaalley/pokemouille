@@ -7,7 +7,11 @@
 	let showSearchBar = false;
 	let inputEl;
 	let matchingPokemon = [];
-	let pokemonData = data;
+	let matchingAbility = [];
+	let pokemonData = data.pokemon_v2_pokemon;
+	let abilityData = data.pokemon_v2_ability;
+
+	console.log(abilityData);
 
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' || event.type === 'click') {
@@ -39,6 +43,28 @@
 		}
 	}
 
+	function updateMatchingAbility(event) {
+		const searchTerm = event.target.value.toLowerCase();
+		if (searchTerm) {
+			let count = 0;
+			matchingAbility = abilityData.filter((ability) => {
+				if (count >= 10) {
+					return false;
+				}
+				const name = ability.name.toLowerCase();
+				if (name.startsWith(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					ability.slug = slug;
+					count++;
+					return true;
+				}
+				return false;
+			});
+		} else {
+			matchingAbility = [];
+		}
+	}
+
 	onMount(() => {
 		document.addEventListener('keydown', toggleSearchBar);
 		document.addEventListener('click', toggleSearchBar);
@@ -58,7 +84,7 @@
 			placeholder="Search..."
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
-			on:input={updateMatchingPokemon}
+			on:input={(updateMatchingPokemon, updateMatchingAbility)}
 		/>
 		{#if matchingPokemon.length}
 			<ul>
@@ -80,6 +106,32 @@
 								alt={pokemon.name}
 							/>
 							{capitalize(hyphenRemover(pokemon.name))}
+						</li>
+					</a>
+				{/each}
+			</ul>
+		{/if}
+
+		{#if matchingAbility.length}
+			<ul>
+				{#each matchingAbility as ability}
+					<a
+						href={`/ability/${ability.slug}`}
+						on:click|preventDefault={() => {
+							goto(`/ability/${ability.slug}`);
+							// Reload the page on a 1 sec timeout
+							setTimeout(() => {
+								window.location.reload();
+							}, 1000);
+						}}
+					>
+						<li class="flex items-center gap-6 text-xl font-semibold h-16">
+							<img
+								class="my-[-6px] h-14"
+								src="https://archives.bulbagarden.net/media/upload/5/5b/TM_artwork_RTDX.png"
+								alt={ability.name}
+							/>
+							{capitalize(hyphenRemover(ability.name))}
 						</li>
 					</a>
 				{/each}

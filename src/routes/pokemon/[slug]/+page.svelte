@@ -4,7 +4,7 @@
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
-	let pokemon = data.pokemon.pokemon_v2_pokemon;
+	let searchData = data.pokemonInfo;
 
 	// console.log(pokemon);
 </script>
@@ -60,7 +60,7 @@
 			<li>{capitalize(hyphenRemover(move.move.name))}</li>
 		{/each}
 	</ul>
-	<SearchBar data={pokemon} />
+	<SearchBar data={searchData} />
 </div>
 
 <style>
