@@ -15,3 +15,9 @@ export function hyphenRemover(str) {
 	}
 	return str;
 }
+
+// a function that takes a string parameter that looks like this "https://pokeapi.co/api/v2/ability/34/" and returns the id at the end of the string
+export function getIdFromUrl(url) {
+	const parts = url.split('/');
+	return parts[parts.length - 2];
+}

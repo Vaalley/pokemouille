@@ -64,7 +64,7 @@
 						href={`/pokemon/${pokemon.slug}`}
 						on:click|preventDefault={() => {
 							goto(`/pokemon/${pokemon.slug}`);
-							// Reload the page on a  1 sec timeout
+							// Reload the page on a 1 sec timeout
 							setTimeout(() => {
 								window.location.reload();
 							}, 1000);

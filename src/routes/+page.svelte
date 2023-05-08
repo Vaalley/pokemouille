@@ -1,6 +1,5 @@
 <script>
 	export let data;
-	import { capitalize } from '$lib/utils';
 	import SearchBar from '../components/SearchBar.svelte';
 
 	let pokemon = data.pokemon.pokemon_v2_pokemon;

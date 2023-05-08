@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover } from '$lib/utils';
+	import { capitalize, hyphenRemover, getIdFromUrl } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
@@ -42,7 +42,9 @@
 		<ul>
 			<li class="underline">Ability(ies):</li>
 			{#each pokemonInfo.abilities as ability}
-				<li>{capitalize(hyphenRemover(ability.ability.name))}</li>
+				<a href={`/ability/${getIdFromUrl(ability.ability.url)}`}>
+					<li>{capitalize(hyphenRemover(ability.ability.name))}</li>
+				</a>
 			{/each}
 		</ul>
 

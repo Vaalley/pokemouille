@@ -1,5 +1,5 @@
-import { getPokemon } from '$lib/cache.js';
-import { fetchAllPokemon } from '$lib/pokeapi.js';
+import { getPokemon } from '$lib/searchCache.js';
+import { fetchAllPokemon } from '$lib/searchFetch.js';
 
 export async function load() {
 	try {

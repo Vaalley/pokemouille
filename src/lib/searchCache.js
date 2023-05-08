@@ -1,5 +1,5 @@
 import NodeCache from 'node-cache';
-import { fetchAllPokemon } from '$lib/pokeapi.js';
+import { fetchAllPokemon } from '$lib/searchFetch.js';
 
 const cache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
 
