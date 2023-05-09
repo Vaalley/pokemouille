@@ -11,7 +11,7 @@
 	let pokemonData = data.pokemon_v2_pokemon;
 	let abilityData = data.pokemon_v2_ability;
 
-	console.log(abilityData);
+	// console.log(abilityData);
 
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' || event.type === 'click') {
@@ -29,8 +29,8 @@
 				if (count >= 10) {
 					return false;
 				}
-				const name = pokemon.name.toLowerCase();
-				if (name.startsWith(searchTerm)) {
+				const name = pokemon.name.toLowerCase().replace(/-/g, '');
+				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					pokemon.slug = slug;
 					count++;
@@ -51,8 +51,8 @@
 				if (count >= 10) {
 					return false;
 				}
-				const name = ability.name.toLowerCase();
-				if (name.startsWith(searchTerm)) {
+				const name = ability.name.toLowerCase().replace(/-/g, '');
+				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					ability.slug = slug;
 					count++;
@@ -68,35 +68,8 @@
 	function updateMatching(event) {
 		const searchTerm = event.target.value.toLowerCase();
 		if (searchTerm) {
-			let countPokemon = 0;
-			let countAbility = 0;
-			matchingPokemon = pokemonData.filter((pokemon) => {
-				if (countPokemon >= 5) {
-					return false;
-				}
-				const name = pokemon.name.toLowerCase();
-				if (name.startsWith(searchTerm)) {
-					const slug = name.replace(/ /g, '-');
-					pokemon.slug = slug;
-					countPokemon++;
-					return true;
-				}
-				return false;
-			});
-
-			matchingAbility = abilityData.filter((ability) => {
-				if (countAbility >= 5) {
-					return false;
-				}
-				const name = ability.name.toLowerCase();
-				if (name.startsWith(searchTerm)) {
-					const slug = name.replace(/ /g, '-');
-					ability.slug = slug;
-					countAbility++;
-					return true;
-				}
-				return false;
-			});
+			updateMatchingPokemon(event);
+			updateMatchingAbility(event);
 		} else {
 			matchingPokemon = [];
 			matchingAbility = [];
@@ -132,10 +105,10 @@
 						href={`/pokemon/${pokemon.slug}`}
 						on:click|preventDefault={() => {
 							goto(`/pokemon/${pokemon.slug}`);
-							// Reload the page on a 1 sec timeout
+							// Reload the page on a x sec timeout
 							setTimeout(() => {
 								window.location.reload();
-							}, 1000);
+							}, 500);
 						}}
 					>
 						<li class="flex items-center gap-6 text-xl font-semibold h-16">
