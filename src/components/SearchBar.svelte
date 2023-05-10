@@ -51,7 +51,7 @@
 				if (count >= 10) {
 					return false;
 				}
-				const name = ability.name.toLowerCase().replace(/-/g, '');
+				const name = ability.name.toLowerCase();
 				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					ability.slug = slug;
@@ -68,8 +68,33 @@
 	function updateMatching(event) {
 		const searchTerm = event.target.value.toLowerCase();
 		if (searchTerm) {
-			updateMatchingPokemon(event);
-			updateMatchingAbility(event);
+			let count = 0;
+			matchingPokemon = [];
+			matchingAbility = [];
+			for (const pokemon of pokemonData) {
+				if (count >= 10) {
+					break;
+				}
+				const name = pokemon.name.toLowerCase().replace(/-/g, '');
+				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					pokemon.slug = slug;
+					matchingPokemon.push(pokemon);
+					count++;
+				}
+			}
+			for (const ability of abilityData) {
+				if (count >= 10) {
+					break;
+				}
+				const name = ability.name.toLowerCase();
+				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					ability.slug = slug;
+					matchingAbility.push(ability);
+					count++;
+				}
+			}
 		} else {
 			matchingPokemon = [];
 			matchingAbility = [];
