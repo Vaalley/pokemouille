@@ -28,6 +28,10 @@ async function fetchAllPokemon() {
 				id
 				name
 			}
+			pokemon_v2_move {
+				name
+				id
+			}
 		}
 `;
 		return await client.request(query);

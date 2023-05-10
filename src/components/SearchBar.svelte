@@ -8,8 +8,10 @@
 	let inputEl;
 	let matchingPokemon = [];
 	let matchingAbility = [];
+	let matchingMove = [];
 	let pokemonData = data.pokemon_v2_pokemon;
 	let abilityData = data.pokemon_v2_ability;
+	let moveData = data.pokemon_v2_move;
 
 	// console.log(abilityData);
 
@@ -21,49 +23,49 @@
 		}
 	}
 
-	function updateMatchingPokemon(event) {
-		const searchTerm = event.target.value.toLowerCase();
-		if (searchTerm) {
-			let count = 0;
-			matchingPokemon = pokemonData.filter((pokemon) => {
-				if (count >= 10) {
-					return false;
-				}
-				const name = pokemon.name.toLowerCase().replace(/ /g, '-');
-				if (name.includes(searchTerm)) {
-					const slug = name.replace(/ /g, '-');
-					pokemon.slug = slug;
-					count++;
-					return true;
-				}
-				return false;
-			});
-		} else {
-			matchingPokemon = [];
-		}
-	}
+	// function updateMatchingPokemon(event) {
+	// 	const searchTerm = event.target.value.toLowerCase();
+	// 	if (searchTerm) {
+	// 		let count = 0;
+	// 		matchingPokemon = pokemonData.filter((pokemon) => {
+	// 			if (count >= 10) {
+	// 				return false;
+	// 			}
+	// 			const name = pokemon.name.toLowerCase().replace(/ /g, '-');
+	// 			if (name.includes(searchTerm)) {
+	// 				const slug = name.replace(/ /g, '-');
+	// 				pokemon.slug = slug;
+	// 				count++;
+	// 				return true;
+	// 			}
+	// 			return false;
+	// 		});
+	// 	} else {
+	// 		matchingPokemon = [];
+	// 	}
+	// }
 
-	function updateMatchingAbility(event) {
-		const searchTerm = event.target.value.toLowerCase();
-		if (searchTerm) {
-			let count = 0;
-			matchingAbility = abilityData.filter((ability) => {
-				if (count >= 10) {
-					return false;
-				}
-				const name = ability.name.toLowerCase();
-				if (name.includes(searchTerm)) {
-					const slug = name.replace(/ /g, '-');
-					ability.slug = slug;
-					count++;
-					return true;
-				}
-				return false;
-			});
-		} else {
-			matchingAbility = [];
-		}
-	}
+	// function updateMatchingAbility(event) {
+	// 	const searchTerm = event.target.value.toLowerCase();
+	// 	if (searchTerm) {
+	// 		let count = 0;
+	// 		matchingAbility = abilityData.filter((ability) => {
+	// 			if (count >= 10) {
+	// 				return false;
+	// 			}
+	// 			const name = ability.name.toLowerCase();
+	// 			if (name.includes(searchTerm)) {
+	// 				const slug = name.replace(/ /g, '-');
+	// 				ability.slug = slug;
+	// 				count++;
+	// 				return true;
+	// 			}
+	// 			return false;
+	// 		});
+	// 	} else {
+	// 		matchingAbility = [];
+	// 	}
+	// }
 
 	function updateMatching(event) {
 		const searchTerm = event.target.value.toLowerCase();
@@ -71,6 +73,7 @@
 			let count = 0;
 			matchingPokemon = [];
 			matchingAbility = [];
+			matchingMove = [];
 			for (const pokemon of pokemonData) {
 				if (count >= 10) {
 					break;
@@ -95,9 +98,22 @@
 					count++;
 				}
 			}
+			for (const move of moveData) {
+				if (count >= 10) {
+					break;
+				}
+				const name = move.name.toLowerCase().replace(/-/g, ' ');
+				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					move.slug = slug;
+					matchingMove.push(move);
+					count++;
+				}
+			}
 		} else {
 			matchingPokemon = [];
 			matchingAbility = [];
+			matchingMove = [];
 		}
 	}
 
@@ -169,6 +185,32 @@
 								alt={ability.name}
 							/>
 							{capitalize(hyphenRemover(ability.name))}
+						</li>
+					</a>
+				{/each}
+			</ul>
+		{/if}
+
+		{#if matchingMove.length}
+			<ul>
+				{#each matchingMove as move}
+					<a
+						href={`/move/${move.slug}`}
+						on:click|preventDefault={() => {
+							goto(`/move/${move.slug}`);
+							// Reload the page on a 1 sec timeout
+							setTimeout(() => {
+								window.location.reload();
+							}, 1000);
+						}}
+					>
+						<li class="flex items-center gap-6 text-xl font-semibold h-16">
+							<img
+								class="my-[-6px] h-14"
+								src="https://print-and-color.com/wp-content/uploads/pokemon_logo.png"
+								alt={move.name}
+							/>
+							{capitalize(hyphenRemover(move.name))}
 						</li>
 					</a>
 				{/each}
