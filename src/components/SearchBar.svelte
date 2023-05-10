@@ -29,7 +29,7 @@
 				if (count >= 10) {
 					return false;
 				}
-				const name = pokemon.name.toLowerCase().replace(/-/g, '');
+				const name = pokemon.name.toLowerCase().replace(/ /g, '-');
 				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					pokemon.slug = slug;
@@ -75,7 +75,7 @@
 				if (count >= 10) {
 					break;
 				}
-				const name = pokemon.name.toLowerCase().replace(/-/g, '');
+				const name = pokemon.name.toLowerCase().replace(/ /g, '-');
 				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					pokemon.slug = slug;
