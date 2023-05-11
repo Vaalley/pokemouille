@@ -57,7 +57,9 @@
 	</div>
 	<ul class="grid grid-cols-3 justify-between w-1/2 text-center text-xl font-medium">
 		{#each pokemonInfo.moves as move}
-			<li>{capitalize(hyphenRemover(move.move.name))}</li>
+			<a href={`/move/${getIdFromUrl(move.move.url)}`}>
+				<li>{capitalize(hyphenRemover(move.move.name))}</li>
+			</a>
 		{/each}
 	</ul>
 	<SearchBar data={searchData} />
