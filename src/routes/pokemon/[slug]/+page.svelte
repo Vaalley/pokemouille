@@ -17,12 +17,21 @@
 	<h1 class="text-7xl text-center mt-8 mb-16 underline font-medium">
 		{capitalize(hyphenRemover(pokemonInfo.name))}
 	</h1>
-	<ul>
-		<img
-			class=" h-60"
-			src={pokemonInfo.sprites.other['official-artwork'].front_default}
-			alt={pokemonInfo.name}
-		/>
+	<ul class="text-center text-xl font-medium">
+		<li>ID: {pokemonInfo.id}</li>
+		<div class="flex items-center gap-8">
+			<img
+				class="h-60"
+				src={pokemonInfo.sprites.other['official-artwork'].front_default}
+				alt={pokemonInfo.name}
+			/>
+			<img class="h-30" src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
+			<img
+				class="h-60"
+				src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
+				alt={pokemonInfo.name}
+			/>
+		</div>
 	</ul>
 
 	<div class="flex text-2xl font-medium">

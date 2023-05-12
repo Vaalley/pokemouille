@@ -23,7 +23,7 @@
 
 <div class="flex flex-col items-center">
 	<h1>Ability: {capitalize(hyphenRemover(abilityInfo.name))}</h1>
-	<p>Flavour text: {abilityInfo.flavor_text_entries[0].flavor_text}</p>
+	<p>Flavor text: {abilityInfo.flavor_text_entries[0].flavor_text}</p>
 	<p>Effect description: {abilityInfo.effect_entries[0].effect}</p>
 	<SearchBar data={searchData} />
 </div>
