@@ -5,81 +5,80 @@
 
 	let pokemonInfo = data.pokemonInfo;
 	let searchData = data.searchData;
-
-	// console.log(pokemon);
 </script>
 
 <svelte:head>
 	<title>{capitalize(hyphenRemover(pokemonInfo.name))}</title>
 </svelte:head>
 
-<div class="flex flex-col items-center">
-	<h1 class="text-7xl text-center mt-8 mb-16 underline font-medium">
-		{capitalize(hyphenRemover(pokemonInfo.name))}
-	</h1>
-	<ul class="text-center text-xl font-medium">
-		<li>ID: {pokemonInfo.id}</li>
-		<div class="flex items-center gap-8">
+<div class="container mx-auto py-8">
+	<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
+	<div class="my-8 flex flex-col lg:flex-row justify-center items-center">
+		<div class="my-4">
 			<img
-				class="h-60"
+				class="w-full"
 				src={pokemonInfo.sprites.other['official-artwork'].front_default}
 				alt={pokemonInfo.name}
 			/>
-			<img class="h-30" src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
+		</div>
+		<div class="my-4">
+			<img class="w-full" src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
+		</div>
+		<div class="my-4">
 			<img
-				class="h-60"
+				class="w-full"
 				src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
 				alt={pokemonInfo.name}
 			/>
 		</div>
-	</ul>
-
-	<div class="flex text-2xl font-medium">
-		<ul>
-			<li class="underline">Height and Weight:</li>
-			<li>Height: {pokemonInfo.height / 10} m</li>
-			<li>Weight: {pokemonInfo.weight / 10} kg</li>
-		</ul>
-
-		<ul>
-			<li class="underline">Type(s):</li>
+	</div>
+	<div class="my-8 flex flex-col lg:flex-row justify-between">
+		<div class="lg:w-1/3">
+			<h2 class="text-2xl font-semibold">ID</h2>
+			<p>{pokemonInfo.id}</p>
+		</div>
+		<div class="my-4 lg:my-0 lg:w-1/3">
+			<h2 class="text-2xl font-semibold">Height</h2>
+			<p>{pokemonInfo.height / 10} m</p>
+		</div>
+		<div class="lg:w-1/3">
+			<h2 class="text-2xl font-semibold">Weight</h2>
+			<p>{pokemonInfo.weight / 10} kg</p>
+		</div>
+	</div>
+	<div class="my-8 flex flex-col lg:flex-row justify-between">
+		<div class="lg:w-1/3">
+			<h2 class="text-2xl font-semibold">Type(s)</h2>
 			{#each pokemonInfo.types as type}
-				<li>{capitalize(type.type.name)}</li>
+				<p>{capitalize(type.type.name)}</p>
 			{/each}
-		</ul>
-
-		<ul>
-			<li class="underline">Ability(ies):</li>
+		</div>
+		<div class="my-4 lg:my-0 lg:w-1/3">
+			<h2 class="text-2xl font-semibold">Ability(ies)</h2>
 			{#each pokemonInfo.abilities as ability}
 				<a href={`/ability/${getIdFromUrl(ability.ability.url)}`}>
-					<li>{capitalize(hyphenRemover(ability.ability.name))}</li>
+					<p>{capitalize(hyphenRemover(ability.ability.name))}</p>
 				</a>
 			{/each}
-		</ul>
-
-		<ul>
-			<li class="underline">Stats:</li>
+		</div>
+		<div class="lg:w-1/3">
+			<h2 class="text-2xl font-semibold">Stats</h2>
 			{#each pokemonInfo.stats as stat}
-				<li>{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}</li>
+				<p>{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}</p>
+			{/each}
+		</div>
+	</div>
+	<div class="my-8">
+		<h2 class="text-2xl font-semibold">Moves</h2>
+		<ul class="grid grid-cols-3 gap-4">
+			{#each pokemonInfo.moves as move}
+				<li>
+					<a href={`/move/${getIdFromUrl(move.move.url)}`}
+						>{capitalize(hyphenRemover(move.move.name))}</a
+					>
+				</li>
 			{/each}
 		</ul>
 	</div>
-	<ul class="grid grid-cols-3 justify-between w-1/2 text-center text-xl font-medium">
-		{#each pokemonInfo.moves as move}
-			<a href={`/move/${getIdFromUrl(move.move.url)}`}>
-				<li>{capitalize(hyphenRemover(move.move.name))}</li>
-			</a>
-		{/each}
-	</ul>
 	<SearchBar data={searchData} />
 </div>
-
-<style>
-	ul {
-		margin: 2rem;
-	}
-
-	li {
-		padding-bottom: 0.5rem;
-	}
-</style>
