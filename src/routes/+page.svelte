@@ -1,4 +1,5 @@
 <script>
+	import ThemeSwitch from '../components/ThemeSwitch.svelte';
 	import SearchBar from '../components/SearchBar.svelte';
 
 	export let data;
@@ -11,6 +12,7 @@
 	<!-- <link rel="icon" href="" /> -->
 </svelte:head>
 
+<ThemeSwitch />
 <div class="container mx-auto py-8">
 	<h1 class="text-7xl text-center mt-8 mb-16 underline">Welcome to Pokémouille</h1>
 	<div class="my-8">

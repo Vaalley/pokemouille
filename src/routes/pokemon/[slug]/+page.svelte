@@ -2,6 +2,7 @@
 	export let data;
 	import { capitalize, hyphenRemover, getIdFromUrl } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
+	import ThemeSwitch from '../../../components/ThemeSwitch.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
 	let searchData = data.searchData;
@@ -11,6 +12,7 @@
 	<title>{capitalize(hyphenRemover(pokemonInfo.name))}</title>
 </svelte:head>
 
+<ThemeSwitch />
 <div class="container mx-auto py-8">
 	<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
 	<div class="my-8 flex flex-col lg:flex-row justify-center items-center">
