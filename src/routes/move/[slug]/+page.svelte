@@ -2,7 +2,6 @@
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
-	import ThemeSwitch from '../../../components/ThemeSwitch.svelte';
 
 	let moveInfo = data.moveInfo;
 	let searchData = data.searchData;
@@ -22,7 +21,6 @@
 	<title>{capitalize(hyphenRemover(moveInfo.name))}</title>
 </svelte:head>
 
-<ThemeSwitch />
 <div class="container mx-auto py-8">
 	<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(moveInfo.name))}</h1>
 	<div class="my-8 flex flex-col lg:flex-row justify-between">
