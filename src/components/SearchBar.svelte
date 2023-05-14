@@ -13,8 +13,6 @@
 	let abilityData = data.pokemon_v2_ability;
 	let moveData = data.pokemon_v2_move;
 
-	// console.log(abilityData);
-
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' || event.type === 'click') {
 			showSearchBar = false;
