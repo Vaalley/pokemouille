@@ -12,27 +12,19 @@
 </svelte:head>
 
 <div class="container mx-auto py-8">
-	<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
-	<div class="my-8 flex flex-col lg:flex-row justify-center items-center">
+	<div class="my-8 flex items-center">
+		<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
+		<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
+	</div>
+	<div class="my-8 flexjustify-center items-center">
 		<div class="my-4">
 			<img
-				class="w-full"
 				src={pokemonInfo.sprites.other['official-artwork'].front_default}
 				alt={pokemonInfo.name}
 			/>
 		</div>
-		<div class="my-4">
-			<img class="w-full" src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
-		</div>
-		<div class="my-4">
-			<img
-				class="w-full"
-				src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
-				alt={pokemonInfo.name}
-			/>
-		</div>
 	</div>
-	<div class="my-8 flex flex-col lg:flex-row justify-between">
+	<div class="my-8 flex justify-between">
 		<div class="lg:w-1/3">
 			<h2 class="text-2xl font-semibold">ID</h2>
 			<p>{pokemonInfo.id}</p>
@@ -46,7 +38,7 @@
 			<p>{pokemonInfo.weight / 10} kg</p>
 		</div>
 	</div>
-	<div class="my-8 flex flex-col lg:flex-row justify-between">
+	<div class="my-8 flex justify-between">
 		<div class="lg:w-1/3">
 			<h2 class="text-2xl font-semibold">Type(s)</h2>
 			{#each pokemonInfo.types as type}

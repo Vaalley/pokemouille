@@ -102,10 +102,12 @@
 					<a
 						href={`/pokemon/${pokemon.slug}`}
 						on:click|preventDefault={() => {
-							goto(`/pokemon/${pokemon.slug}`);
-							setTimeout(() => {
-								window.location.reload();
-							}, 500);
+							if (window.location.pathname === `/pokemon/${pokemon.slug}`) {
+								window.location.href = `${window.location.origin}/pokemon`;
+							} else {
+								goto(`/pokemon/${pokemon.slug}`);
+								window.location.href = `${window.location.origin}/pokemon/${pokemon.slug}`;
+							}
 						}}
 						class="block mt-2"
 					>
@@ -130,10 +132,12 @@
 					<a
 						href={`/ability/${ability.slug}`}
 						on:click|preventDefault={() => {
-							goto(`/ability/${ability.slug}`);
-							setTimeout(() => {
-								window.location.reload();
-							}, 1000);
+							if (window.location.pathname === `/ability/${ability.slug}`) {
+								window.location.href = `${window.location.origin}/ability`;
+							} else {
+								goto(`/ability/${ability.slug}`);
+								window.location.href = `${window.location.origin}/ability/${ability.slug}`;
+							}
 						}}
 						class="block mt-2"
 					>
@@ -158,10 +162,12 @@
 					<a
 						href={`/move/${move.slug}`}
 						on:click|preventDefault={() => {
-							goto(`/move/${move.slug}`);
-							setTimeout(() => {
-								window.location.reload();
-							}, 1000);
+							if (window.location.pathname === `/move/${move.slug}`) {
+								window.location.href = `${window.location.origin}/move`;
+							} else {
+								goto(`/move/${move.slug}`);
+								window.location.href = `${window.location.origin}/move/${move.slug}`;
+							}
 						}}
 						class="block mt-2"
 					>
