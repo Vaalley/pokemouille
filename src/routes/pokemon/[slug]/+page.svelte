@@ -23,11 +23,12 @@
 	</div>
 
 	<div class="my-8 flexjustify-center items-center">
-		<div class="my-4">
+		<div class="flex justify-center items-center gap-32">
 			<img
 				src={pokemonInfo.sprites.other['official-artwork'].front_default}
 				alt={pokemonInfo.name}
 			/>
+			<img src={pokemonInfo.sprites.other['official-artwork'].front_shiny} alt={pokemonInfo.name} />
 		</div>
 	</div>
 	<div class="my-8 flex justify-between">
