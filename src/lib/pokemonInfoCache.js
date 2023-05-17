@@ -22,4 +22,23 @@ async function getPokemonInfo(slug) {
 	return data;
 }
 
-export { getPokemonInfo };
+async function getEvolutionChain(slug) {
+	const cachedEvolutionChain = cache.get(`${slug}-evolution-chain`);
+	if (cachedEvolutionChain) {
+		console.log(`Cache hit for ${slug} evolution chain`);
+		return cachedEvolutionChain;
+	}
+
+	console.log(`Cache miss for ${slug} evolution chain`);
+	const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${slug}`);
+	const speciesData = await response.json();
+
+	const evolutionChainUrl = speciesData.evolution_chain.url;
+	const evolutionChainResponse = await fetch(evolutionChainUrl);
+	const evolutionChainData = await evolutionChainResponse.json();
+
+	cache.set(`${slug}-evolution-chain`, evolutionChainData);
+	return evolutionChainData.chain;
+}
+
+export { getPokemonInfo, getEvolutionChain };

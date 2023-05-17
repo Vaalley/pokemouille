@@ -1,4 +1,4 @@
-import { getPokemonInfo } from '$lib/pokemonInfoCache.js';
+import { getPokemonInfo, getEvolutionChain } from '$lib/pokemonInfoCache.js';
 import { getPokemon } from '$lib/searchCache.js';
 import { fetchAllPokemon } from '$lib/searchFetch.js';
 
@@ -7,10 +7,12 @@ export async function load({ params }) {
 
 	try {
 		const pokemonInfo = await getPokemonInfo(slug);
+		const evolutionChain = await getEvolutionChain(slug);
 		const searchData = await getPokemon(fetchAllPokemon);
 
 		return {
 			pokemonInfo,
+			evolutionChain,
 			searchData,
 			status: 200
 		};

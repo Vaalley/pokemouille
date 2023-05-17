@@ -4,6 +4,7 @@
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
+	let pokemonEvolutionChain = data.evolutionChain;
 	let searchData = data.searchData;
 </script>
 
@@ -16,6 +17,11 @@
 		<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
 		<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
 	</div>
+
+	<div>
+		<h2>Evolution Chain:</h2>
+	</div>
+
 	<div class="my-8 flexjustify-center items-center">
 		<div class="my-4">
 			<img
