@@ -17,28 +17,27 @@ async function getPokemonInfo(slug) {
 	}
 
 	const data = await response.json();
-	cache.set(slug, data);
 
-	return data;
-}
-
-async function getEvolutionChain(slug) {
 	const cachedEvolutionChain = cache.get(`${slug}-evolution-chain`);
+	let evolutionChainData;
 	if (cachedEvolutionChain) {
 		console.log(`Cache hit for ${slug} evolution chain`);
-		return cachedEvolutionChain;
+		evolutionChainData = cachedEvolutionChain;
+	} else {
+		console.log(`Cache miss for ${slug} evolution chain`);
+		const speciesResponse = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${slug}`);
+		const speciesData = await speciesResponse.json();
+
+		const evolutionChainUrl = speciesData.evolution_chain.url;
+		const evolutionChainResponse = await fetch(evolutionChainUrl);
+		evolutionChainData = await evolutionChainResponse.json();
+
+		cache.set(`${slug}-evolution-chain`, evolutionChainData);
 	}
 
-	console.log(`Cache miss for ${slug} evolution chain`);
-	const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${slug}`);
-	const speciesData = await response.json();
+	cache.set(slug, { ...data, evolutionChain: evolutionChainData });
 
-	const evolutionChainUrl = speciesData.evolution_chain.url;
-	const evolutionChainResponse = await fetch(evolutionChainUrl);
-	const evolutionChainData = await evolutionChainResponse.json();
-
-	cache.set(`${slug}-evolution-chain`, evolutionChainData);
-	return evolutionChainData.chain;
+	return { ...data, evolutionChain: evolutionChainData };
 }
 
-export { getPokemonInfo, getEvolutionChain };
+export { getPokemonInfo };
