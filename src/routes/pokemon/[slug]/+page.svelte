@@ -1,14 +1,12 @@
 <script>
 	export let data;
-	import { goto } from '$app/navigation';
 	import { capitalize, hyphenRemover, getIdFromUrl } from '$lib/utils';
+	import PokemonEvolutionChain from '../../../components/PokemonEvolutionChain.svelte';
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
 	let pokemonEvolutionChain = data.pokemonInfo.evolutionChain;
 	let searchData = data.searchData;
-	const pokemonSpritesBaseUrl =
-		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
 	// console.log(pokemonEvolutionChain.chain);
 </script>
@@ -23,81 +21,7 @@
 		<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
 	</div>
 
-	<div>
-		<h2 class="text-2xl font-semibold mb-6">Evolution Chain:</h2>
-		<div class="flex justify-around">
-			{#if pokemonEvolutionChain.chain.species}
-				<a
-					class="flex flex-col items-center w-fit"
-					href={`/pokemon/${pokemonEvolutionChain.chain.species.name}`}
-					on:click|preventDefault={() => {
-						if (
-							window.location.pathname === `/pokemon/${pokemonEvolutionChain.chain.species.name}`
-						) {
-							window.location.href = `${window.location.origin}/pokemon`;
-						} else {
-							goto(`/pokemon/${pokemonEvolutionChain.chain.species.name}`);
-							window.location.href = `${window.location.origin}/pokemon/${pokemonEvolutionChain.chain.species.name}`;
-						}
-					}}
-				>
-					<p>{pokemonEvolutionChain.chain.species.name}</p>
-					<img
-						src={`${pokemonSpritesBaseUrl}/${getIdFromUrl(
-							pokemonEvolutionChain.chain.species.url
-						)}.png`}
-						alt={pokemonEvolutionChain.chain.species.name}
-					/>
-				</a>
-				{#if pokemonEvolutionChain.chain.evolves_to}
-					{#each pokemonEvolutionChain.chain.evolves_to as evolvesTo}
-						<a
-							class="flex flex-col items-center w-fit"
-							href={`/pokemon/${evolvesTo.species.name}`}
-							on:click|preventDefault={() => {
-								if (window.location.pathname === `/pokemon/${evolvesTo.species.name}`) {
-									window.location.href = `${window.location.origin}/pokemon`;
-								} else {
-									goto(`/pokemon/${evolvesTo.species.name}`);
-									window.location.href = `${window.location.origin}/pokemon/${evolvesTo.species.name}`;
-								}
-							}}
-						>
-							<p>{evolvesTo.species.name}</p>
-							<img
-								src={`${pokemonSpritesBaseUrl}/${getIdFromUrl(evolvesTo.species.url)}.png`}
-								alt={evolvesTo.species.name}
-							/>
-						</a>
-						{#if evolvesTo.evolves_to}
-							{#each evolvesTo.evolves_to as secondEvolvesTo}
-								<a
-									class="flex flex-col items-center w-fit"
-									href={`/pokemon/${secondEvolvesTo.species.name}`}
-									on:click|preventDefault={() => {
-										if (window.location.pathname === `/pokemon/${secondEvolvesTo.species.name}`) {
-											window.location.href = `${window.location.origin}/pokemon`;
-										} else {
-											goto(`/pokemon/${secondEvolvesTo.species.name}`);
-											window.location.href = `${window.location.origin}/pokemon/${secondEvolvesTo.species.name}`;
-										}
-									}}
-								>
-									<p>{secondEvolvesTo.species.name}</p>
-									<img
-										src={`${pokemonSpritesBaseUrl}/${getIdFromUrl(
-											secondEvolvesTo.species.url
-										)}.png`}
-										alt={secondEvolvesTo.species.name}
-									/>
-								</a>
-							{/each}
-						{/if}
-					{/each}
-				{/if}
-			{/if}
-		</div>
-	</div>
+	<PokemonEvolutionChain {pokemonEvolutionChain} />
 
 	<div class="my-8 flexjustify-center items-center">
 		<div class="flex justify-center items-center gap-32">
