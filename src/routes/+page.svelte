@@ -15,7 +15,7 @@
 	<h1 class="text-7xl text-center mt-8 mb-16 underline">Welcome to Pokémouille</h1>
 	<div class="my-8">
 		<h2 class="text-4xl font-semibold mb-4">About</h2>
-		<p class="text-lg">
+		<p class="text-lg text-gray-700">
 			Pokémouille is a website that provides information about the world of Pokémon. You can search
 			for your favorite Pokémon and learn more about their stats, moves, abilities, and more.
 			Whether you're a seasoned trainer or just getting started, Pokémouille has everything you need

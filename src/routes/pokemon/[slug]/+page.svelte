@@ -54,70 +54,84 @@
 <div class="container mx-auto py-8">
 	<div class="my-8 flex items-center">
 		<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
-		<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} />
+		<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} class="w-24 ml-4" />
 	</div>
 
 	<PokemonEvolutionChain {pokemonEvolutionChain} />
 
-	<div class="my-8 flexjustify-center items-center">
+	<div class="my-8 flex justify-center items-center">
 		<div class="flex justify-center items-center gap-32">
 			<img
 				src={pokemonInfo.sprites.other['official-artwork'].front_default}
 				alt={pokemonInfo.name}
+				class="w-64"
 			/>
-			<img src={pokemonInfo.sprites.other['official-artwork'].front_shiny} alt={pokemonInfo.name} />
+			<img
+				src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
+				alt={pokemonInfo.name}
+				class="w-64"
+			/>
 		</div>
 	</div>
-	<div class="my-8 flex justify-between">
-		<div class="lg:w-1/3">
+
+	<div class="my-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+		<div>
 			<h2 class="text-2xl font-semibold">ID</h2>
-			<p>{pokemonInfo.id}</p>
+			<p class="text-lg">{pokemonInfo.id}</p>
 		</div>
-		<div class="my-4 lg:my-0 lg:w-1/3">
+		<div>
 			<h2 class="text-2xl font-semibold">Height</h2>
-			<p>{pokemonInfo.height / 10} m</p>
+			<p class="text-lg">{pokemonInfo.height / 10} m</p>
 		</div>
-		<div class="lg:w-1/3">
+		<div>
 			<h2 class="text-2xl font-semibold">Weight</h2>
-			<p>{pokemonInfo.weight / 10} kg</p>
+			<p class="text-lg">{pokemonInfo.weight / 10} kg</p>
 		</div>
-	</div>
-	<div class="my-8 flex justify-between">
-		<div class="lg:w-1/3">
-			<h2 class="text-2xl font-semibold">Type(s)</h2>
-			{#each pokemonInfo.types as type}
-				{#each pokemonTypes as pokemonType}
-					{#if pokemonType.name === type.type.name}
-						<p
-							style="background-color: {pokemonType.color}; color: {getTextColor(
-								pokemonType.color
-							)};"
-							class="py-1 px-2 rounded-md w-fit"
-						>
-							{capitalize(type.type.name)}
-						</p>
-					{/if}
+
+		<div>
+			<h2 class="text-2xl font-semibold mb-6">Type(s)</h2>
+			<div class="flex flex-wrap gap-2">
+				{#each pokemonInfo.types as type}
+					{#each pokemonTypes as pokemonType}
+						{#if pokemonType.name === type.type.name}
+							<p
+								style="background-color: {pokemonType.color}; color: {getTextColor(
+									pokemonType.color
+								)};"
+								class="py-1 px-2 rounded-md w-fit"
+							>
+								{capitalize(type.type.name)}
+							</p>
+						{/if}
+					{/each}
 				{/each}
-			{/each}
+			</div>
 		</div>
-		<div class="my-4 lg:my-0 lg:w-1/3">
+
+		<div>
 			<h2 class="text-2xl font-semibold">Ability(ies)</h2>
-			{#each pokemonInfo.abilities as ability}
-				<a href={`/ability/${getIdFromUrl(ability.ability.url)}`}>
-					<p>{capitalize(hyphenRemover(ability.ability.name))}</p>
-				</a>
-			{/each}
+			<div class="flex flex-col gap-2">
+				{#each pokemonInfo.abilities as ability}
+					<a href={`/ability/${getIdFromUrl(ability.ability.url)}`} class="text-lg"
+						>{capitalize(hyphenRemover(ability.ability.name))}</a
+					>
+				{/each}
+			</div>
 		</div>
-		<div class="lg:w-1/3">
+
+		<div>
 			<h2 class="text-2xl font-semibold">Stats</h2>
-			{#each pokemonInfo.stats as stat}
-				<p>{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}</p>
-			{/each}
+			<div class="flex flex-col gap-2">
+				{#each pokemonInfo.stats as stat}
+					<p class="text-lg">{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}</p>
+				{/each}
+			</div>
 		</div>
 	</div>
+
 	<div class="my-8">
 		<h2 class="text-2xl font-semibold mb-6">Moves</h2>
-		<ul class="grid grid-cols-3 gap-4">
+		<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 			{#each pokemonInfo.moves as move}
 				{#await fetch(move.move.url)
 					.then((res) => res.json())

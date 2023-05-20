@@ -90,14 +90,14 @@
 		<input
 			type="text"
 			placeholder="Search..."
-			class="w-80 max-w-[600px] px-4 py-2 text-lg rounded-md shadow-md border-none"
+			class="w-80 max-w-[600px] px-4 py-2 text-lg rounded-md shadow-md border-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
 			on:input={updateMatching}
 		/>
 
 		{#if matchingPokemon.length}
-			<ul class="mt-4 w-80 max-w-[600px]">
+			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-200">
 				{#each matchingPokemon as pokemon}
 					<a
 						href={`/pokemon/${pokemon.slug}`}
@@ -112,14 +112,14 @@
 						class="block mt-2"
 					>
 						<li
-							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100"
+							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
 						>
 							<img
 								class="h-14 my-[-6px]"
 								src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
 								alt={pokemon.name}
 							/>
-							{capitalize(hyphenRemover(pokemon.name))}
+							<span>{capitalize(hyphenRemover(pokemon.name))}</span>
 						</li>
 					</a>
 				{/each}
@@ -127,7 +127,7 @@
 		{/if}
 
 		{#if matchingAbility.length}
-			<ul class="mt-4 w-80 max-w-[600px]">
+			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-200">
 				{#each matchingAbility as ability}
 					<a
 						href={`/ability/${ability.slug}`}
@@ -142,14 +142,14 @@
 						class="block mt-2"
 					>
 						<li
-							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100"
+							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
 						>
 							<img
 								class="h-14 my-[-6px]"
 								src="https://i.pinimg.com/736x/3f/53/20/3f5320bda51f29d0e6ef7a61d030c234--cricut.jpg"
 								alt={ability.name}
 							/>
-							{capitalize(hyphenRemover(ability.name))}
+							<span>{capitalize(hyphenRemover(ability.name))}</span>
 						</li>
 					</a>
 				{/each}
@@ -157,7 +157,7 @@
 		{/if}
 
 		{#if matchingMove.length}
-			<ul class="mt-4 w-80 max-w-[600px]">
+			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-200">
 				{#each matchingMove as move}
 					<a
 						href={`/move/${move.slug}`}
@@ -172,14 +172,14 @@
 						class="block mt-2"
 					>
 						<li
-							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100"
+							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
 						>
 							<img
 								class="h-14 my-[-6px]"
 								src="https://print-and-color.com/wp-content/uploads/pokemon_logo.png"
 								alt={move.name}
 							/>
-							{capitalize(hyphenRemover(move.name))}
+							<span>{capitalize(hyphenRemover(move.name))}</span>
 						</li>
 					</a>
 				{/each}
