@@ -30,8 +30,7 @@
 				href="https://github.com/Vaalley/pokemouille"
 				target="_blank"
 				rel="noopener noreferrer"
-				style="color: #dd1d2f;text-decoration: none;border-bottom: 1px solid #dd1d2f;"
-				>GitHub repository</a
+				class="text-red-600 hover:text-red-700 underline">GitHub repository</a
 			>. We're always looking for contributors to make Pokémouille even better!
 		</p>
 	</div>
