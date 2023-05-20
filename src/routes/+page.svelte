@@ -12,7 +12,7 @@
 </svelte:head>
 
 <div class="container mx-auto py-8">
-	<h1 class="text-7xl text-center mt-8 mb-16 underline">Welcome to Pokémouille</h1>
+	<h1 class="text-7xl text-center mt-8 mb-16 underline font-semibold">Welcome to Pokémouille</h1>
 	<div class="my-8">
 		<h2 class="text-4xl font-semibold mb-4">About</h2>
 		<p class="text-lg text-gray-700">
@@ -24,6 +24,16 @@
 	</div>
 	<div class="my-8">
 		<h2 class="text-4xl font-semibold mb-4">Start typing to search for anything</h2>
+		<p class="text-lg text-gray-700">
+			Pokémouille is an open-source project under MIT license, which means anyone can contribute to
+			it. If you're interested in helping out, check out our <a
+				href="https://github.com/Vaalley/pokemouille"
+				target="_blank"
+				rel="noopener noreferrer"
+				style="color: #dd1d2f;text-decoration: none;border-bottom: 1px solid #dd1d2f;"
+				>GitHub repository</a
+			>. We're always looking for contributors to make Pokémouille even better!
+		</p>
 	</div>
 	<SearchBar data={searchData} />
 </div>
