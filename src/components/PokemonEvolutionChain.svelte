@@ -1,7 +1,7 @@
 <script>
 	export let pokemonEvolutionChain;
 
-	import { capitalize, hyphenRemover, getIdFromUrl, hasLevelUpEvolution } from '$lib/utils';
+	import { capitalize, hyphenRemover, getIdFromUrl } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	const pokemonSpritesBaseUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';

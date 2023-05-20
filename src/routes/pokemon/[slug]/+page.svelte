@@ -44,7 +44,7 @@
 		return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
 	}
 
-	// console.log(pokemonEvolutionChain.chain);
+	// console.log(pokemonInfo.moves);
 </script>
 
 <svelte:head>
@@ -119,11 +119,19 @@
 		<h2 class="text-2xl font-semibold">Moves</h2>
 		<ul class="grid grid-cols-3 gap-4">
 			{#each pokemonInfo.moves as move}
-				<li>
-					<a href={`/move/${getIdFromUrl(move.move.url)}`}
-						>{capitalize(hyphenRemover(move.move.name))}</a
-					>
-				</li>
+				{#await fetch(move.move.url)
+					.then((res) => res.json())
+					.then((data) => capitalize(data.type.name))}
+					<p>Loading...</p>
+				{:then moveType}
+					<li>
+						<a href={`/move/${getIdFromUrl(move.move.url)}`}
+							>{capitalize(hyphenRemover(move.move.name))} ({moveType})</a
+						>
+					</li>
+				{:catch error}
+					<p>Error: {error.message}</p>
+				{/await}
 			{/each}
 		</ul>
 	</div>

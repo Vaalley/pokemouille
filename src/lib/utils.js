@@ -1,3 +1,4 @@
+// Capitalizes the first letter of each word in a string
 export function capitalize(str) {
 	if (!str) return str;
 	return str
@@ -6,6 +7,7 @@ export function capitalize(str) {
 		.join(' ');
 }
 
+// Removes hyphens from a string, except for specific strings in the keepHyphen array
 const keepHyphen = ['wo-chien', 'chi-yu'];
 const keepHyphenSet = new Set(keepHyphen);
 export function hyphenRemover(str) {
@@ -15,16 +17,13 @@ export function hyphenRemover(str) {
 	return str;
 }
 
-// a function that takes a string parameter that looks like this "https://pokeapi.co/api/v2/ability/34/" and returns the id at the end of the string
+// Extracts the id from a URL string in the format "https://pokeapi.co/api/v2/ability/34/"
 export function getIdFromUrl(url) {
 	const parts = url.split('/');
 	return parts[parts.length - 2];
 }
 
-export function hasLevelUpEvolution(evolutionDetails) {
-	return evolutionDetails.some((detail) => detail.min_level);
-}
-
+// An array of objects representing each Pokemon type, with a name and color property
 export const pokemonTypes = [
 	{ name: 'normal', color: '#B8B8D0' },
 	{ name: 'fire', color: '#F08030' },
