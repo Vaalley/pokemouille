@@ -10,7 +10,6 @@ module.exports = {
 				'-md': { max: '767px' },
 				'-sm': { max: '639px' }
 			},
-			colors: {},
 			fontFamily: {}
 		}
 	},
