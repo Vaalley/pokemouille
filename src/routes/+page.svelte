@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>🐸 Pokémouille</title>
+	<title>Pokémouille</title>
 	<link rel="icon" href="/static/favicon.png" />
 </svelte:head>
 
