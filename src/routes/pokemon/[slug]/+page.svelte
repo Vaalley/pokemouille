@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover, getIdFromUrl, pokemonTypes } from '$lib/utils';
+	import { capitalize, hyphenRemover, getIdFromUrl, pokemonTypes, getStatColor } from '$lib/utils';
 	import PokemonEvolutionChain from '../../../components/PokemonEvolutionChain.svelte';
 	import SearchBar from '../../../components/SearchBar.svelte';
 
@@ -123,7 +123,9 @@
 			<h2 class="text-2xl font-semibold">Stats</h2>
 			<div class="flex flex-col gap-2">
 				{#each pokemonInfo.stats as stat}
-					<p class="text-lg">{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}</p>
+					<p style="color: {getStatColor(stat.base_stat)};">
+						{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}
+					</p>
 				{/each}
 			</div>
 		</div>
