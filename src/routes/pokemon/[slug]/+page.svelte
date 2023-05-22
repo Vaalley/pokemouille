@@ -6,14 +6,29 @@
 		getIdFromUrl,
 		pokemonTypes,
 		getStatColor,
-		getTextColor
+		getTextColor,
+		fetchMoveData
 	} from '$lib/utils';
 	import PokemonEvolutionChain from '../../../components/PokemonEvolutionChain.svelte';
 	import SearchBar from '../../../components/SearchBar.svelte';
+	import { onMount } from 'svelte';
 
 	let pokemonInfo = data.pokemonInfo;
 	let pokemonEvolutionChain = data.pokemonInfo.evolutionChain;
 	let searchData = data.searchData;
+	let moveData = {};
+
+	onMount(async () => {
+		for (let i = 0; i < pokemonInfo.moves.length; i++) {
+			try {
+				const move = pokemonInfo.moves[i];
+				moveData = await fetchMoveData(move.move.url);
+				pokemonInfo.moves[i].moveData = moveData;
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	});
 
 	// console.log(pokemonInfo.moves);
 </script>
@@ -106,26 +121,18 @@
 		<h2 class="text-2xl font-semibold mb-6">Moves</h2>
 		<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 			{#each pokemonInfo.moves as move}
-				{#await fetch(move.move.url)
-					.then((res) => res.json())
-					.then( (data) => ({ type: capitalize(data.type.name), power: data.power, category: data.damage_class.name }) )}
-					<p class="text-gray-500">Loading...</p>
-				{:then moveData}
-					<li class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-						<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
-							<p class="text-lg font-semibold">{capitalize(hyphenRemover(move.move.name))}</p>
-							<p class="text-sm text-gray-500">{moveData.type}</p>
-							{#if moveData.power}
-								<p class="text-sm text-gray-500">Power: {moveData.power}</p>
-							{/if}
-							{#if moveData.category}
-								<p class="text-sm text-gray-500">{capitalize(moveData.category)} Move</p>
-							{/if}
-						</a>
-					</li>
-				{:catch error}
-					<p class="text-red-500">Error: {error.message}</p>
-				{/await}
+				<li class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+					<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
+						<p class="text-lg font-semibold">{capitalize(hyphenRemover(move.move.name))}</p>
+						<p class="text-sm text-gray-500">{moveData.type}</p>
+						{#if moveData.power}
+							<p class="text-sm text-gray-500">Power: {moveData.power}</p>
+						{/if}
+						{#if moveData.category}
+							<p class="text-sm text-gray-500">{capitalize(moveData.category)} Move</p>
+						{/if}
+					</a>
+				</li>
 			{/each}
 		</ul>
 	</div>

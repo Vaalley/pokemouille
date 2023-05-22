@@ -2,7 +2,7 @@ import { getPokemonInfo } from '$lib/pokemonInfoCache.js';
 import { getPokemon } from '$lib/searchCache.js';
 import { fetchAllPokemon } from '$lib/searchFetch.js';
 
-export async function load({ params }) {
+export async function load({ params, query }) {
 	const { slug } = params;
 
 	try {
@@ -12,6 +12,7 @@ export async function load({ params }) {
 		return {
 			pokemonInfo,
 			searchData,
+			query,
 			status: 200
 		};
 	} catch (error) {

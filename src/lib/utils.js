@@ -107,3 +107,14 @@ function calculateLuminance(r, g, b) {
 
 	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
 }
+
+// Fetches the move data from the pokeapi
+export async function fetchMoveData(moveUrl) {
+	const response = await fetch(moveUrl);
+	const data = await response.json();
+	return {
+		type: capitalize(data.type.name),
+		power: data.power,
+		category: data.damage_class.name
+	};
+}

@@ -8,7 +8,7 @@
 
 <svelte:head>
 	<title>Pokémouille</title>
-	<link rel="icon" href="/static/favicon.png" />
+	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
 <div class="container mx-auto py-8">
