@@ -42,26 +42,32 @@ export const pokemonTypes = [
 	{ name: 'dragon', color: '#7038F8' },
 	{ name: 'dark', color: '#705848' },
 	{ name: 'steel', color: '#B8B8D0' },
-	{ name: 'fairy', color: '#EE99AC' },
+	{ name: 'fairy', color: '#EE99AC' }
 ];
 
 // Gets the hexcode of a stat value
 export function getStatColor(statValue) {
 	const maxStatValue = 160; // Assuming 255 is the maximum stat value
 	const minStatValue = 20; // Assuming 0 is the minimum stat value
-	const colorStart = "#ff0000"; // Red
-	const colorEnd = "#00ff00"; // Green
+	const colorStart = '#ff0000'; // Red
+	const colorEnd = '#00ff00'; // Green
 
 	// Calculate the percentage of the stat value relative to the maximum and minimum values
 	const percentage = (statValue - minStatValue) / (maxStatValue - minStatValue);
 
 	// Calculate the color based on the percentage using the gradient between colorStart and colorEnd
-	const red = parseInt(colorStart.substring(1, 3), 16) * (1 - percentage) + parseInt(colorEnd.substring(1, 3), 16) * percentage;
-	const green = parseInt(colorStart.substring(3, 5), 16) * (1 - percentage) + parseInt(colorEnd.substring(3, 5), 16) * percentage;
-	const blue = parseInt(colorStart.substring(5, 7), 16) * (1 - percentage) + parseInt(colorEnd.substring(5, 7), 16) * percentage;
+	const red =
+		parseInt(colorStart.substring(1, 3), 16) * (1 - percentage) +
+		parseInt(colorEnd.substring(1, 3), 16) * percentage;
+	const green =
+		parseInt(colorStart.substring(3, 5), 16) * (1 - percentage) +
+		parseInt(colorEnd.substring(3, 5), 16) * percentage;
+	const blue =
+		parseInt(colorStart.substring(5, 7), 16) * (1 - percentage) +
+		parseInt(colorEnd.substring(5, 7), 16) * percentage;
 
 	// Convert the RGB values to a hex code
-	const hex = "#" + ((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1);
+	const hex = '#' + ((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1);
 	// console.log(statValue);
 	// console.log(hex);
 
@@ -91,7 +97,7 @@ function hexToRgb(hex) {
 	return {
 		r: parseInt(match[0], 16),
 		g: parseInt(match[1], 16),
-		b: parseInt(match[2], 16),
+		b: parseInt(match[2], 16)
 	};
 }
 
@@ -106,15 +112,4 @@ function calculateLuminance(r, g, b) {
 	const blinear = bsrgb <= 0.03928 ? bsrgb / 12.92 : ((bsrgb + 0.055) / 1.055) ** 2.4;
 
 	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
-}
-
-// Fetches the move data from the pokeapi
-export async function fetchMoveData(moveUrl) {
-	const response = await fetch(moveUrl);
-	const data = await response.json();
-	return {
-		type: capitalize(data.type.name),
-		power: data.power,
-		category: data.damage_class.name
-	};
 }
