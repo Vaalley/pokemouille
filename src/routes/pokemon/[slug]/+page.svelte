@@ -108,7 +108,7 @@
 			{#each pokemonInfo.moves as move}
 				{#await fetch(move.move.url)
 					.then((res) => res.json())
-					.then( (data) => ({ type: capitalize(data.type.name), power: data.power, category: data.damage_class.name }) )}
+					.then( (data) => ({ type: data.type.name, power: data.power, category: data.damage_class.name, accuracy: data.accuracy }) )}
 					<p class="text-gray-500">Loading...</p>
 				{:then moveData}
 					<li class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
@@ -117,6 +117,9 @@
 							<p class="text-sm text-gray-500">{moveData.type}</p>
 							{#if moveData.power}
 								<p class="text-sm text-gray-500">Power: {moveData.power}</p>
+							{/if}
+							{#if moveData.accuracy}
+								<p class="text-sm text-gray-500">Accuracy: {moveData.accuracy}%</p>
 							{/if}
 							{#if moveData.category}
 								<p class="text-sm text-gray-500">{capitalize(moveData.category)} Move</p>
