@@ -16,14 +16,13 @@
 	let pokemonInfo = data.pokemonInfo;
 	let pokemonEvolutionChain = data.pokemonInfo.evolutionChain;
 	let searchData = data.searchData;
-	let moveData = {};
 
 	onMount(async () => {
 		for (let i = 0; i < pokemonInfo.moves.length; i++) {
 			try {
 				const move = pokemonInfo.moves[i];
-				moveData = await fetchMoveData(move.move.url);
-				pokemonInfo.moves[i].moveData = moveData;
+				const moveData = await fetchMoveData(move.move.url);
+				pokemonInfo.moves[i].moveData = Object.assign({}, moveData);
 			} catch (error) {
 				console.error(error);
 			}
@@ -124,12 +123,14 @@
 				<li class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
 					<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
 						<p class="text-lg font-semibold">{capitalize(hyphenRemover(move.move.name))}</p>
-						<p class="text-sm text-gray-500">{moveData.type}</p>
-						{#if moveData.power}
-							<p class="text-sm text-gray-500">Power: {moveData.power}</p>
-						{/if}
-						{#if moveData.category}
-							<p class="text-sm text-gray-500">{capitalize(moveData.category)} Move</p>
+						{#if move.moveData}
+							<p class="text-sm text-gray-500">{move.moveData.type}</p>
+							{#if move.moveData.power}
+								<p class="text-sm text-gray-500">Power: {move.moveData.power}</p>
+							{/if}
+							{#if move.moveData.category}
+								<p class="text-sm text-gray-500">{capitalize(move.moveData.category)} Move</p>
+							{/if}
 						{/if}
 					</a>
 				</li>
