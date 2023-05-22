@@ -10,12 +10,21 @@
 	} from '$lib/utils';
 	import PokemonEvolutionChain from '../../../components/PokemonEvolutionChain.svelte';
 	import SearchBar from '../../../components/SearchBar.svelte';
+	import { onMount } from 'svelte';
 
 	let pokemonInfo = data.pokemonInfo;
 	let pokemonEvolutionChain = data.pokemonInfo.evolutionChain;
 	let searchData = data.searchData;
+	let moveDataList = [];
 
-	console.log(pokemonInfo.moves);
+	onMount(async () => {
+		const movePromises = pokemonInfo.moves.map((move) =>
+			fetch(move.move.url).then((response) => response.json())
+		);
+		moveDataList = await Promise.all(movePromises);
+	});
+
+	// console.log(pokemonInfo.moves);
 </script>
 
 <svelte:head>
@@ -105,30 +114,28 @@
 	<div class="my-8">
 		<h2 class="text-2xl font-semibold mb-6">Moves</h2>
 		<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-			{#each pokemonInfo.moves as move}
-				{#await fetch(move.move.url)
-					.then((res) => res.json())
-					.then( (data) => ({ type: data.type.name, power: data.power, category: data.damage_class.name, accuracy: data.accuracy }) )}
-					<p class="text-gray-500">Loading...</p>
-				{:then moveData}
+			{#each pokemonInfo.moves as move, i}
+				{#if moveDataList[i]}
 					<li class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
 						<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
 							<p class="text-lg font-semibold">{capitalize(hyphenRemover(move.move.name))}</p>
-							<p class="text-sm text-gray-500">{moveData.type}</p>
-							{#if moveData.power}
-								<p class="text-sm text-gray-500">Power: {moveData.power}</p>
+							{#if moveDataList[i].type}
+								<p class="text-sm text-gray-500">Type: {capitalize(moveDataList[i].type.name)}</p>
 							{/if}
-							{#if moveData.accuracy}
-								<p class="text-sm text-gray-500">Accuracy: {moveData.accuracy}%</p>
+							{#if moveDataList[i].power}
+								<p class="text-sm text-gray-500">Power: {moveDataList[i].power}</p>
 							{/if}
-							{#if moveData.category}
-								<p class="text-sm text-gray-500">{capitalize(moveData.category)} Move</p>
+							{#if moveDataList[i].accuracy}
+								<p class="text-sm text-gray-500">Accuracy: {moveDataList[i].accuracy}%</p>
+							{/if}
+							{#if moveDataList[i].damage_class}
+								<p class="text-sm text-gray-500">
+									{capitalize(moveDataList[i].damage_class.name)} Move
+								</p>
 							{/if}
 						</a>
 					</li>
-				{:catch error}
-					<p class="text-red-500">Error: {error.message}</p>
-				{/await}
+				{/if}
 			{/each}
 		</ul>
 	</div>
