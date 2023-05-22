@@ -62,10 +62,48 @@ export function getStatColor(statValue) {
 
 	// Convert the RGB values to a hex code
 	const hex = "#" + ((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1);
-	console.log(statValue);
-	console.log(hex);
+	// console.log(statValue);
+	// console.log(hex);
 
 	// Return the hex code as a string
 	return hex;
 }
 
+// Gets the text color of a background color
+export function getTextColor(backgroundColor) {
+	// Convert the background color to RGB values
+	const rgb = hexToRgb(backgroundColor);
+
+	// Calculate the relative luminance of the color
+	const luminance = calculateLuminance(rgb.r, rgb.g, rgb.b);
+
+	// Use the contrast ratio to determine the text color
+	if (luminance > 0.5) {
+		return '#000000'; // Set text color to black
+	} else {
+		return '#ffffff'; // Set text color to white
+	}
+}
+
+// Converts a hex color to RGB
+function hexToRgb(hex) {
+	const match = hex.replace('#', '').match(/.{1,2}/g);
+	return {
+		r: parseInt(match[0], 16),
+		g: parseInt(match[1], 16),
+		b: parseInt(match[2], 16),
+	};
+}
+
+// Calculates the luminance of a color
+function calculateLuminance(r, g, b) {
+	const rsrgb = r / 255;
+	const gsrgb = g / 255;
+	const bsrgb = b / 255;
+
+	const rlinear = rsrgb <= 0.03928 ? rsrgb / 12.92 : ((rsrgb + 0.055) / 1.055) ** 2.4;
+	const glinear = gsrgb <= 0.03928 ? gsrgb / 12.92 : ((gsrgb + 0.055) / 1.055) ** 2.4;
+	const blinear = bsrgb <= 0.03928 ? bsrgb / 12.92 : ((bsrgb + 0.055) / 1.055) ** 2.4;
+
+	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
+}
