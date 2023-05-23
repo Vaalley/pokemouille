@@ -20,40 +20,47 @@
 <svelte:head>
 	<title>{capitalize(hyphenRemover(moveInfo?.name))}</title>
 </svelte:head>
+
 {#if moveInfo}
-	<div class="container mx-auto py-8">
-		<h1 class="text-4xl font-semibold mb-8">{capitalize(hyphenRemover(moveInfo.name))}</h1>
-		<div class="my-8 flex flex-col lg:flex-row justify-between">
-			<div class="lg:w-1/3">
-				<h2 class="text-2xl font-semibold mb-2">Type</h2>
-				<p class="text-gray-700">{moveInfo.type.name}</p>
+	<div class="bg-gray-100 min-h-screen">
+		<div class="container mx-auto py-8">
+			<div class="flex items-center mb-8">
+				<h1 class="text-4xl font-semibold text-gray-800">
+					{capitalize(hyphenRemover(moveInfo.name))}
+				</h1>
 			</div>
-			<div class="my-4 lg:my-0 lg:w-1/3">
-				<h2 class="text-2xl font-semibold mb-2">Power</h2>
-				<p class="text-gray-700">{moveInfo.power || 'N/A'}</p>
+			<div class="my-8 flex flex-col lg:flex-row justify-between">
+				<div class="lg:w-1/3">
+					<h2 class="text-2xl font-semibold mb-2 text-gray-800">Type</h2>
+					<p class="text-gray-700">{moveInfo.type.name}</p>
+				</div>
+				<div class="my-4 lg:my-0 lg:w-1/3">
+					<h2 class="text-2xl font-semibold mb-2 text-gray-800">Power</h2>
+					<p class="text-gray-700">{moveInfo.power || 'N/A'}</p>
+				</div>
+				<div class="lg:w-1/3">
+					<h2 class="text-2xl font-semibold mb-2 text-gray-800">Accuracy</h2>
+					<p class="text-gray-700">{moveInfo.accuracy || 'N/A'}</p>
+				</div>
 			</div>
-			<div class="lg:w-1/3">
-				<h2 class="text-2xl font-semibold mb-2">Accuracy</h2>
-				<p class="text-gray-700">{moveInfo.accuracy || 'N/A'}</p>
+			<div class="my-8">
+				<h2 class="text-2xl font-semibold mb-2 text-gray-800">Effect Entry</h2>
+				{#if moveInfo.effect_entries.length}
+					<p class="text-gray-700">{moveInfo.effect_entries[0].effect}</p>
+				{:else}
+					<p class="text-gray-700">Data not available yet</p>
+				{/if}
 			</div>
+			<div class="my-8">
+				<h2 class="text-2xl font-semibold mb-2 text-gray-800">Flavor Text Entry</h2>
+				{#if moveInfo.flavor_text_entries.length}
+					<p class="text-gray-700">{moveInfo.flavor_text_entries[0].flavor_text}</p>
+				{:else}
+					<p class="text-gray-700">Data not available yet</p>
+				{/if}
+			</div>
+			<SearchBar data={searchData} />
 		</div>
-		<div class="my-8">
-			<h2 class="text-2xl font-semibold mb-2">Effect Entry</h2>
-			{#if moveInfo.effect_entries.length}
-				<p class="text-gray-700">{moveInfo.effect_entries[0].effect}</p>
-			{:else}
-				<p class="text-gray-700">Data not available yet</p>
-			{/if}
-		</div>
-		<div class="my-8">
-			<h2 class="text-2xl font-semibold mb-2">Flavor Text Entry</h2>
-			{#if moveInfo.flavor_text_entries.length}
-				<p class="text-gray-700">{moveInfo.flavor_text_entries[0].flavor_text}</p>
-			{:else}
-				<p class="text-gray-700">Data not available yet</p>
-			{/if}
-		</div>
-		<SearchBar data={searchData} />
 	</div>
 {:else}
 	<p class="text-gray-700">Data not available yet</p>

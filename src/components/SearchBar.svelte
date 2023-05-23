@@ -85,7 +85,7 @@
 
 {#if showSearchBar}
 	<div
-		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-black bg-opacity-50 z-50"
+		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-gray-200 bg-opacity-50 z-50"
 	>
 		<input
 			type="text"
@@ -97,7 +97,7 @@
 		/>
 
 		{#if matchingPokemon.length}
-			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-200">
+			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-300">
 				{#each matchingPokemon as pokemon}
 					<a
 						href={`/pokemon/${pokemon.slug}`}
@@ -127,7 +127,7 @@
 		{/if}
 
 		{#if matchingAbility.length}
-			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-200">
+			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-300">
 				{#each matchingAbility as ability}
 					<a
 						href={`/ability/${ability.slug}`}
@@ -157,7 +157,7 @@
 		{/if}
 
 		{#if matchingMove.length}
-			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-200">
+			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-300">
 				{#each matchingMove as move}
 					<a
 						href={`/move/${move.slug}`}

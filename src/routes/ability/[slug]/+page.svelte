@@ -22,27 +22,29 @@
 </svelte:head>
 
 {#if abilityInfo}
-	<div class="container mx-auto py-8">
-		<h1 class="text-4xl font-semibold mb-8">
-			Ability: {capitalize(hyphenRemover(abilityInfo.name))}
-		</h1>
-		<div class="my-8">
-			<h2 class="text-2xl font-semibold mb-2">Flavor Text</h2>
-			{#if abilityInfo.flavor_text_entries.length}
-				<p class="text-gray-700">{abilityInfo.flavor_text_entries[0].flavor_text}</p>
-			{:else}
-				<p class="text-gray-700">Data not available yet</p>
-			{/if}
+	<div class="bg-gray-100 min-h-screen">
+		<div class="container mx-auto py-8">
+			<h1 class="text-4xl font-semibold mb-8 text-gray-800">
+				{capitalize(hyphenRemover(abilityInfo.name))}
+			</h1>
+			<div class="my-8">
+				<h2 class="text-2xl font-semibold mb-2 text-gray-800">Flavor Text</h2>
+				{#if abilityInfo.flavor_text_entries.length}
+					<p class="text-gray-700">{abilityInfo.flavor_text_entries[0].flavor_text}</p>
+				{:else}
+					<p class="text-gray-700">Data not available yet</p>
+				{/if}
+			</div>
+			<div class="my-8">
+				<h2 class="text-2xl font-semibold mb-2 text-gray-800">Effect Description</h2>
+				{#if abilityInfo.effect_entries.length}
+					<p class="text-gray-700">{abilityInfo.effect_entries[0].effect}</p>
+				{:else}
+					<p class="text-gray-700">Data not available yet</p>
+				{/if}
+			</div>
+			<SearchBar data={searchData} />
 		</div>
-		<div class="my-8">
-			<h2 class="text-2xl font-semibold mb-2">Effect Description</h2>
-			{#if abilityInfo.effect_entries.length}
-				<p class="text-gray-700">{abilityInfo.effect_entries[0].effect}</p>
-			{:else}
-				<p class="text-gray-700">Data not available yet</p>
-			{/if}
-		</div>
-		<SearchBar data={searchData} />
 	</div>
 {:else}
 	<p class="text-gray-700">Data not available yet</p>
