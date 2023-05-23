@@ -176,7 +176,7 @@
 						>
 							<img
 								class="h-14 my-[-6px]"
-								src="https://print-and-color.com/wp-content/uploads/pokemon_logo.png"
+								src="https://archives.bulbagarden.net/media/upload/thumb/a/a5/Bag_TM_Normal_SV_Sprite.png/40px-Bag_TM_Normal_SV_Sprite.png"
 								alt={move.name}
 							/>
 							<span>{capitalize(hyphenRemover(move.name))}</span>

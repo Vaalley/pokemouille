@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover } from '$lib/utils';
+	import { capitalize, hyphenRemover, pokemonTypes, getTextColor } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let moveInfo = data.moveInfo;
@@ -32,7 +32,18 @@
 			<div class="my-8 flex flex-col lg:flex-row justify-between">
 				<div class="lg:w-1/3">
 					<h2 class="text-2xl font-semibold mb-2 text-gray-800">Type</h2>
-					<p class="text-gray-700">{moveInfo.type.name}</p>
+					{#each pokemonTypes as pokemonType}
+						{#if pokemonType.name === moveInfo.type.name}
+							<p
+								style="background-color: {pokemonType.color}; color: {getTextColor(
+									pokemonType.color
+								)};"
+								class="py-1 px-2 rounded-md w-fit"
+							>
+								{capitalize(moveInfo.type.name)}
+							</p>
+						{/if}
+					{/each}
 				</div>
 				<div class="my-4 lg:my-0 lg:w-1/3">
 					<h2 class="text-2xl font-semibold mb-2 text-gray-800">Power</h2>
