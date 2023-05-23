@@ -27,9 +27,9 @@
 		</div>
 		<div class="my-8">
 			<h2
-				class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 text-gray-800 bg-gray-200 w-fit"
+				class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 text-amber-400 bg-amber-100 w-fit p-2 border-2 border-amber-400"
 			>
-				Start typing to search for anything
+				Start typing anywhere to search for anything
 			</h2>
 			<p class="text-lg sm:text-xl text-gray-700">
 				Pokémouille is an open-source project under MIT license, which means anyone can contribute
