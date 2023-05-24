@@ -1,27 +1,24 @@
 // Capitalizes the first letter of each word in a string
 export function capitalize(str) {
-	if (!str) return str;
-	return str
-		.split(' ')
-		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-		.join(' ');
+	return str.replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
 // Removes hyphens from a string, except for specific strings in the keepHyphen array
 const keepHyphen = ['wo-chien', 'chi-yu'];
 const keepHyphenSet = new Set(keepHyphen);
 export function hyphenRemover(str) {
-	if (str.indexOf('-') !== -1 && !keepHyphenSet.has(str)) {
-		return str.split('-').join(' ');
+	if (str.includes('-') && !keepHyphenSet.has(str)) {
+		return str.replace(/-/g, ' ');
 	}
 	return str;
 }
 
 // Extracts the id from a URL string in the format "https://pokeapi.co/api/v2/ability/34/"
 export function getIdFromUrl(url) {
-	const parts = url.split('/');
-	return parts[parts.length - 2];
+	const match = url.match(/\/(\d+)\/$/);
+	return match ? match[1] : null;
 }
+
 
 // An array of objects representing each Pokemon type, with a name and color property
 export const pokemonTypes = [
@@ -47,59 +44,42 @@ export const pokemonTypes = [
 
 // Gets the hexcode of a stat value
 export function getStatColor(statValue) {
-	const maxStatValue = 160; // Assuming 255 is the maximum stat value
-	const minStatValue = 20; // Assuming 0 is the minimum stat value
-	const colorStart = '#ff0000'; // Red
-	const colorEnd = '#00ff00'; // Green
+	const maxStatValue = 160;
+	const minStatValue = 20;
+	const colorStart = parseInt('ff0000', 16);
+	const colorEnd = parseInt('00ff00', 16);
 
-	// Calculate the percentage of the stat value relative to the maximum and minimum values
 	const percentage = (statValue - minStatValue) / (maxStatValue - minStatValue);
+	const red = Math.floor((colorStart >> 16) * (1 - percentage) + (colorEnd >> 16) * percentage);
+	const green = Math.floor(((colorStart >> 8) & 0xff) * (1 - percentage) + ((colorEnd >> 8) & 0xff) * percentage);
+	const blue = Math.floor((colorStart & 0xff) * (1 - percentage) + (colorEnd & 0xff) * percentage);
 
-	// Calculate the color based on the percentage using the gradient between colorStart and colorEnd
-	const red =
-		parseInt(colorStart.substring(1, 3), 16) * (1 - percentage) +
-		parseInt(colorEnd.substring(1, 3), 16) * percentage;
-	const green =
-		parseInt(colorStart.substring(3, 5), 16) * (1 - percentage) +
-		parseInt(colorEnd.substring(3, 5), 16) * percentage;
-	const blue =
-		parseInt(colorStart.substring(5, 7), 16) * (1 - percentage) +
-		parseInt(colorEnd.substring(5, 7), 16) * percentage;
-
-	// Convert the RGB values to a hex code
-	const hex = '#' + ((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1);
-	// console.log(statValue);
-	// console.log(hex);
-
-	// Return the hex code as a string
+	const hex = `#${((red << 16) | (green << 8) | blue).toString(16).padStart(6, '0')}`;
 	return hex;
 }
 
+
 // Gets the text color of a background color
 export function getTextColor(backgroundColor) {
-	// Convert the background color to RGB values
-	const rgb = hexToRgb(backgroundColor);
-
-	// Calculate the relative luminance of the color
-	const luminance = calculateLuminance(rgb.r, rgb.g, rgb.b);
-
-	// Use the contrast ratio to determine the text color
-	if (luminance > 0.5) {
-		return '#000000'; // Set text color to black
-	} else {
-		return '#ffffff'; // Set text color to white
-	}
+	const { r, g, b } = hexToRgb(backgroundColor);
+	const luminance = calculateLuminance(r, g, b);
+	return luminance > 0.5 ? '#000000' : '#ffffff';
 }
+
 
 // Converts a hex color to RGB
 function hexToRgb(hex) {
-	const match = hex.replace('#', '').match(/.{1,2}/g);
+	const match = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+	if (!match) {
+		throw new Error('Invalid hex color');
+	}
 	return {
-		r: parseInt(match[0], 16),
-		g: parseInt(match[1], 16),
-		b: parseInt(match[2], 16)
+		r: parseInt(match[1], 16),
+		g: parseInt(match[2], 16),
+		b: parseInt(match[3], 16)
 	};
 }
+
 
 // Calculates the luminance of a color
 function calculateLuminance(r, g, b) {
@@ -113,3 +93,4 @@ function calculateLuminance(r, g, b) {
 
 	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
 }
+
