@@ -44,7 +44,7 @@
 				if (count >= 10) {
 					break;
 				}
-				const name = ability.name.toLowerCase();
+				const name = ability.name.toLowerCase().replace(/-/g, ' ');
 				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					ability.slug = slug;
