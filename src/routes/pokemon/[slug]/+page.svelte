@@ -31,8 +31,10 @@
 
 <div class="bg-gray-100 text-gray-800 min-h-screen">
 	<div class="container mx-auto py-8">
-		<div class="my-8 flex items-center">
-			<h1 class="text-4xl font-semibold">{capitalize(hyphenRemover(pokemonInfo.name))}</h1>
+		<div class="my-8 flex items-center justify-center">
+			<h1 class="text-4xl font-semibold">
+				{capitalize(hyphenRemover(pokemonInfo.name))}
+			</h1>
 			<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} class="w-24 ml-4" />
 		</div>
 
@@ -110,9 +112,17 @@
 				<h2 class="text-2xl font-semibold">Stats</h2>
 				<div class="flex flex-col gap-2">
 					{#each pokemonInfo.stats as stat}
-						<p style="color: {getStatColor(stat.base_stat)};">
-							{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}
-						</p>
+						<div class="flex items-center gap-2">
+							<div class="w-24 bg-gray-200 rounded-lg h-4 relative overflow-hidden">
+								<div
+									class="h-full bg-green-400"
+									style="width: {Math.min((stat.base_stat / 160) * 100, 100)}%"
+								/>
+							</div>
+							<p style="color: {getStatColor(stat.base_stat)};">
+								{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}
+							</p>
+						</div>
 					{/each}
 				</div>
 			</div>
