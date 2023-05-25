@@ -23,8 +23,6 @@
 		);
 		moveDataList = await Promise.all(movePromises);
 	});
-
-	// console.log(pokemonInfo.moves);
 </script>
 
 <svelte:head>
@@ -85,7 +83,7 @@
 									style="background-color: {pokemonType.color}; color: {getTextColor(
 										pokemonType.color
 									)};"
-									class="py-1 px-2 rounded-md w-fit"
+									class="py-1 px-2 rounded-md w-fit hover:scale-105 transition-transform duration-300"
 								>
 									{capitalize(type.type.name)}
 								</p>
@@ -99,7 +97,9 @@
 				<h2 class="text-2xl font-semibold">Ability(ies)</h2>
 				<div class="flex flex-col gap-2">
 					{#each pokemonInfo.abilities as ability}
-						<a href={`/ability/${getIdFromUrl(ability.ability.url)}`} class="text-lg"
+						<a
+							href={`/ability/${getIdFromUrl(ability.ability.url)}`}
+							class="text-lg text-blue-500 hover:text-blue-800 hover:bg-blue-200 bg-blue-100 w-fit p-2 transition-colors duration-300"
 							>{capitalize(hyphenRemover(ability.ability.name))}</a
 						>
 					{/each}
@@ -123,7 +123,9 @@
 			<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 				{#each pokemonInfo.moves as move, i}
 					{#if moveDataList[i]}
-						<li class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+						<li
+							class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 transform hover:scale-105 transition-transform duration-300"
+						>
 							<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
 								<p class="text-lg font-semibold">{capitalize(hyphenRemover(move.move.name))}</p>
 								{#if moveDataList[i].type}
