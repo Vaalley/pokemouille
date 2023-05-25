@@ -42,16 +42,22 @@
 
 		<div class="my-8 flex justify-center items-center">
 			<div class="flex justify-center items-center gap-32">
-				<img
-					src={pokemonInfo.sprites.other['official-artwork'].front_default}
-					alt={pokemonInfo.name}
-					class="w-64"
-				/>
-				<img
-					src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
-					alt={pokemonInfo.name}
-					class="w-64"
-				/>
+				<div class="flex items-center">
+					<img
+						src={pokemonInfo.sprites.other['official-artwork'].front_default}
+						alt={pokemonInfo.name}
+						class="w-64"
+					/>
+					<img src={pokemonInfo.sprites.back_default} alt={pokemonInfo.name} />
+				</div>
+				<div class="flex items-center">
+					<img
+						src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
+						alt={pokemonInfo.name}
+						class="w-64"
+					/>
+					<img src={pokemonInfo.sprites.back_shiny} alt={pokemonInfo.name} />
+				</div>
 			</div>
 		</div>
 

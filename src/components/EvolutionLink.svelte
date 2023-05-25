@@ -7,7 +7,7 @@
 </script>
 
 <a
-	class="flex flex-col items-center w-fit bg-gray-200 p-4 transition-colors duration-300 hover:bg-gray-300 text-center"
+	class="flex flex-col items-center w-fit bg-gray-100 p-4 transition-colors duration-300 hover:bg-gray-200 text-center"
 	href={`/pokemon/${evolution.species.name}`}
 	on:click|preventDefault={() => {
 		if (window.location.pathname === `/pokemon/${evolution.species.name}`) {
