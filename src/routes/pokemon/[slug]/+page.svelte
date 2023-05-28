@@ -17,18 +17,17 @@
 	let searchData = data.searchData;
 	let moveDataList = [];
 
-	// Add this function in the script section
 	function sortMoves(sortBy) {
 		moveDataList.sort((a, b) => {
 			switch (sortBy) {
 				case 'power':
-					return b.power - a.power;
+					return (b.power || 0) - (a.power || 0);
 				case 'accuracy':
-					return b.accuracy - a.accuracy;
+					return (b.accuracy || 0) - (a.accuracy || 0);
 				case 'category':
-					return a.damage_class.name.localeCompare(b.damage_class.name);
+					return b.damage_class.name.localeCompare(a.damage_class.name);
 				case 'name':
-					return a.name.localeCompare(b.name);
+					return a.move.name.localeCompare(b.move.name);
 				default:
 					return 0;
 			}
