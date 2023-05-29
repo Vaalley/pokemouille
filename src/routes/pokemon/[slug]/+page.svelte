@@ -17,23 +17,6 @@
 	let searchData = data.searchData;
 	let moveDataList = [];
 
-	function sortMoves(sortBy) {
-		moveDataList.sort((a, b) => {
-			switch (sortBy) {
-				case 'power':
-					return (b.power || 0) - (a.power || 0);
-				case 'accuracy':
-					return (b.accuracy || 0) - (a.accuracy || 0);
-				case 'category':
-					return b.damage_class.name.localeCompare(a.damage_class.name);
-				case 'name':
-					return a.move.name.localeCompare(b.move.name);
-				default:
-					return 0;
-			}
-		});
-	}
-
 	onMount(async () => {
 		const movePromises = pokemonInfo.moves.map((move) =>
 			fetch(move.move.url).then((response) => response.json())
@@ -147,32 +130,6 @@
 
 		<div class="my-8">
 			<h2 class="text-2xl font-semibold mb-6">Moves</h2>
-			<div class="flex gap-4 mb-4">
-				<button
-					class="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-700 transition-colors duration-300"
-					on:click={() => sortMoves('power')}
-				>
-					Sort by Power
-				</button>
-				<button
-					class="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-700 transition-colors duration-300"
-					on:click={() => sortMoves('accuracy')}
-				>
-					Sort by Accuracy
-				</button>
-				<button
-					class="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-700 transition-colors duration-300"
-					on:click={() => sortMoves('category')}
-				>
-					Sort by Category
-				</button>
-				<button
-					class="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-700 transition-colors duration-300"
-					on:click={() => sortMoves('name')}
-				>
-					Sort by Name
-				</button>
-			</div>
 			<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 				{#each pokemonInfo.moves as move, i}
 					{#if moveDataList[i]}
