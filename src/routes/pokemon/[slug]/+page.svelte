@@ -23,6 +23,8 @@
 		);
 		moveDataList = await Promise.all(movePromises);
 	});
+
+	console.log(pokemonInfo.abilities);
 </script>
 
 <svelte:head>
@@ -102,8 +104,11 @@
 						<a
 							href={`/ability/${getIdFromUrl(ability.ability.url)}`}
 							class="text-lg text-blue-500 hover:text-blue-800 hover:bg-blue-200 bg-blue-100 w-fit p-2 transition-colors duration-300"
-							>{capitalize(hyphenRemover(ability.ability.name))}</a
-						>
+							>{capitalize(hyphenRemover(ability.ability.name))}
+							{#if ability.is_hidden}
+								<span class="text-gray-500">(hidden ability)</span>
+							{/if}
+						</a>
 					{/each}
 				</div>
 			</div>
