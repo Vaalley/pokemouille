@@ -31,7 +31,10 @@
 		<div class="container mx-auto py-8">
 			<div class="flex items-center mb-8">
 				<h1 class="text-4xl font-semibold text-gray-800">
-					{capitalize(hyphenRemover(moveInfo.name))}
+					{capitalize(hyphenRemover(moveInfo.name))} -
+					<span class="text-gray-700 text-2xl">
+						Introduced in {hyphenRemover(moveInfo.generation.name)}
+					</span>
 				</h1>
 			</div>
 			<div class="my-8 flex flex-col lg:flex-row justify-between">
