@@ -11,6 +11,8 @@
 	import PokemonEvolutionChain from '../../../components/PokemonEvolutionChain.svelte';
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import { onMount } from 'svelte';
+	import tippy from 'tippy.js';
+	import 'tippy.js/dist/tippy.css';
 
 	let pokemonInfo = data.pokemonInfo;
 	let pokemonEvolutionChain = data.pokemonInfo.evolutionChain;
@@ -21,7 +23,58 @@
 		const movePromises = pokemonInfo.moves.map((move) =>
 			fetch(move.move.url).then((response) => response.json())
 		);
+
 		moveDataList = await Promise.all(movePromises);
+
+		const abilityTooltips = await Promise.all(
+			pokemonInfo.abilities.map((ability) =>
+				fetch(ability.ability.url)
+					.then((response) => response.json())
+					.then((data) => {
+						// Get the English flavor text, or loop through all entries if not found
+						let flavorText = '';
+						for (let i = 0; i < data.flavor_text_entries.length; i++) {
+							if (data.flavor_text_entries[i].language.name === 'en') {
+								flavorText = data.flavor_text_entries[i].flavor_text;
+								break;
+							}
+						}
+						return capitalize(flavorText);
+					})
+					.catch(() => null)
+			)
+		);
+
+		document.querySelectorAll('.ability-tooltip').forEach((tooltip, i) => {
+			tippy(tooltip, {
+				content: abilityTooltips[i]
+			});
+		});
+
+		const moveTooltips = await Promise.all(
+			pokemonInfo.moves.map((move) =>
+				fetch(move.move.url)
+					.then((response) => response.json())
+					.then((data) => {
+						// Get the English flavor text, or loop through all entries if not found
+						let flavorText = '';
+						for (let i = 0; i < data.flavor_text_entries.length; i++) {
+							if (data.flavor_text_entries[i].language.name === 'en') {
+								flavorText = data.flavor_text_entries[i].flavor_text;
+								break;
+							}
+						}
+						return capitalize(flavorText);
+					})
+					.catch(() => null)
+			)
+		);
+
+		document.querySelectorAll('.move-tooltip').forEach((tooltip, i) => {
+			tippy(tooltip, {
+				content: moveTooltips[i]
+			});
+		});
 	});
 
 	console.log(pokemonInfo.abilities);
@@ -103,7 +156,7 @@
 					{#each pokemonInfo.abilities as ability}
 						<a
 							href={`/ability/${getIdFromUrl(ability.ability.url)}`}
-							class="text-lg text-blue-500 hover:text-blue-800 hover:bg-blue-200 bg-blue-100 w-fit p-2 transition-colors duration-300"
+							class="ability-tooltip text-lg text-blue-500 hover:text-blue-800 hover:bg-blue-200 bg-blue-100 w-fit p-2 transition-colors duration-300"
 							>{capitalize(hyphenRemover(ability.ability.name))}
 							{#if ability.is_hidden}
 								<span class="text-gray-500">(hidden ability)</span>
@@ -139,10 +192,12 @@
 				{#each pokemonInfo.moves as move, i}
 					{#if moveDataList[i]}
 						<li
-							class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 transform hover:scale-105 transition-transform duration-300"
+							class="move-tooltip bg-white border border-gray-200 rounded-lg shadow-sm p-4 transform hover:scale-105 transition-transform duration-300"
 						>
 							<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
-								<p class="text-lg font-semibold">{capitalize(hyphenRemover(move.move.name))}</p>
+								<p class="text-lg font-semibold">
+									{capitalize(hyphenRemover(move.move.name))}
+								</p>
 								{#if moveDataList[i].type}
 									<p class="text-sm text-gray-500">Type: {capitalize(moveDataList[i].type.name)}</p>
 								{/if}

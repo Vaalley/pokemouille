@@ -18,7 +18,7 @@
 	const englishEffect = abilityInfo?.effect_entries.find((entry) => entry.language.name === 'en');
 	abilityInfo.effect_entries = englishEffect ? [englishEffect] : [];
 
-	console.log(abilityInfo);
+	// console.log(abilityInfo);
 </script>
 
 <svelte:head>
