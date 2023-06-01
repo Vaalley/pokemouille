@@ -1,13 +1,13 @@
 import { getAbilityInfo } from '$lib/abilityInfoCache.js';
 import { getPokemon } from '$lib/searchCache.js';
-import { fetchAllPokemon } from '$lib/searchFetch.js';
+import { GetMainInfo } from '$lib/searchFetch.js';
 
 export async function load({ params }) {
 	const { slug } = params;
 
 	try {
 		const abilityInfo = await getAbilityInfo(slug);
-		const searchData = await getPokemon(fetchAllPokemon);
+		const searchData = await getPokemon(GetMainInfo);
 
 		return {
 			abilityInfo,
