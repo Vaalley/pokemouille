@@ -19,27 +19,135 @@ export function getIdFromUrl(url) {
 	return match ? match[1] : null;
 }
 
-
-// An array of objects representing each Pokemon type, with a name and color property
+// An array of objects representing each Pokemon type, with a name, color property and their defensive capabilities  
 export const pokemonTypes = [
-	{ name: 'normal', color: '#B8B8D0' },
-	{ name: 'fire', color: '#F08030' },
-	{ name: 'water', color: '#6890F0' },
-	{ name: 'electric', color: '#F8D030' },
-	{ name: 'grass', color: '#78C850' },
-	{ name: 'ice', color: '#98D8D8' },
-	{ name: 'fighting', color: '#C03028' },
-	{ name: 'poison', color: '#A040A0' },
-	{ name: 'ground', color: '#E0C068' },
-	{ name: 'flying', color: '#A890F0' },
-	{ name: 'psychic', color: '#F85888' },
-	{ name: 'bug', color: '#A8B820' },
-	{ name: 'rock', color: '#B8A038' },
-	{ name: 'ghost', color: '#705898' },
-	{ name: 'dragon', color: '#7038F8' },
-	{ name: 'dark', color: '#705848' },
-	{ name: 'steel', color: '#B8B8D0' },
-	{ name: 'fairy', color: '#EE99AC' }
+	{
+		name: 'normal',
+		color: '#B8B8D0',
+		weak: ['fighting'],
+		resist: [],
+		immune: ['ghost']
+	},
+	{
+		name: 'fire',
+		color: '#F08030',
+		weak: ['water', 'ground', 'rock'],
+		resist: ['fire', 'grass', 'ice', 'bug', 'steel', 'fairy'],
+		immune: []
+	},
+	{
+		name: 'water',
+		color: '#6890F0',
+		weak: ['grass', 'electric'],
+		resist: ['fire', 'water', 'ice', 'steel'],
+		immune: []
+	},
+	{
+		name: 'grass',
+		color: '#78C850',
+		weak: ['fire', 'ice', 'poison', 'flying', 'bug'],
+		resist: ['water', 'grass', 'electric', 'ground'],
+		immune: []
+	},
+	{
+		name: 'electric',
+		color: '#F8D030',
+		weak: ['ground'],
+		resist: ['electric', 'flying', 'steel'],
+		immune: []
+	},
+	{
+		name: 'ice',
+		color: '#98D8D8',
+		weak: ['fire', 'fighting', 'rock', 'steel'],
+		resist: ['ice'],
+		immune: []
+	},
+	{
+		name: 'fighting',
+		color: '#C03028',
+		weak: ['flying', 'psychic', 'fairy'],
+		resist: ['bug', 'rock', 'dark'],
+		immune: []
+	},
+	{
+		name: 'poison',
+		color: '#A040A0',
+		weak: ['ground', 'psychic'],
+		resist: ['grass', 'fighting', 'poison', 'bug', 'fairy'],
+		immune: []
+	},
+	{
+		name: 'ground',
+		color: '#E0C068',
+		weak: ['water', 'grass', 'ice', 'electric'],
+		resist: ['poison', 'rock'],
+		immune: ['electric']
+	},
+	{
+		name: 'flying',
+		color: '#A890F0',
+		weak: ['electric', 'ice', 'rock'],
+		resist: ['grass', 'fighting', 'bug'],
+		immune: ['ground']
+	},
+	{
+		name: 'psychic',
+		color: '#F85888',
+		weak: ['bug', 'ghost', 'dark'],
+		resist: ['fighting', 'psychic'],
+		immune: []
+	},
+	{
+		name: 'bug',
+		color: '#A8B820',
+		weak: ['fire', 'flying', 'rock'],
+		resist: ['grass', 'fighting', 'ground'],
+		immune: []
+	},
+	{
+		name: 'rock',
+		color: '#B8A038',
+		weak: ['water', 'grass', 'fighting', 'ground', 'steel'],
+		resist: ['normal', 'fire', 'poison', 'flying'],
+		immune: []
+	},
+	{
+		name: 'ghost',
+		color: '#705898',
+		weak: ['ghost', 'dark'],
+		resist: ['poison', 'bug'],
+		immune: ['normal', 'fighting']
+
+	},
+	{
+		name: 'dragon',
+		color: '#7038F8',
+		weak: ['ice', 'dragon', 'fairy'],
+		resist: ['fire', 'water', 'grass', 'electric'],
+		immune: []
+	},
+	{
+		name: 'dark',
+		color: '#705848',
+		weak: ['fighting', 'bug', 'fairy'],
+		resist: ['ghost', 'dark'],
+		immune: ['psychic']
+	},
+	{
+		name: 'steel',
+		color: '#B8B8D0',
+		weak: ['fire', 'fighting', 'ground'],
+		resist: ['normal', 'grass', 'ice', 'flying', 'psychic', 'bug', 'rock', 'dragon', 'steel', 'fairy'],
+		immune: ['poison']
+	},
+	{
+		name: 'fairy',
+		color: '#EE99AC',
+		weak: ['poison', 'steel'],
+		resist: ['fighting', 'bug', 'dark'],
+		immune: ['dragon']
+	}
 ];
 
 // Gets the hexcode of a stat value

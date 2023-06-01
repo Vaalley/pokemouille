@@ -1,6 +1,5 @@
 <script>
 	import SearchBar from '../components/SearchBar.svelte';
-
 	export let data;
 
 	let searchData = data.searchData;

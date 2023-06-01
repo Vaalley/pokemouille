@@ -1,7 +1,8 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { capitalize, hyphenRemover } from '$lib/utils';
+	import { capitalize, hyphenRemover, pokemonTypes } from '$lib/utils';
+	import Type from './Type.svelte';
 	export let data;
 
 	let showSearchBar = false;
@@ -12,6 +13,9 @@
 	let pokemonData = data.pokemon_v2_pokemon;
 	let abilityData = data.pokemon_v2_ability;
 	let moveData = data.pokemon_v2_move;
+	const pokemonSpriteUrl =
+		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
+	const moveSpriteUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/';
 
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' || event.type === 'click') {
@@ -33,9 +37,10 @@
 					break;
 				}
 				const name = pokemon.name.toLowerCase().replace(/ /g, '-');
-				if (name.includes(searchTerm)) {
+				if (name.includes(searchTerm) && pokemon.is_default) {
 					const slug = name.replace(/ /g, '-');
 					pokemon.slug = slug;
+					pokemon.types = pokemon.pokemon_v2_pokemontypes;
 					matchingPokemon.push(pokemon);
 					count++;
 				}
@@ -60,6 +65,7 @@
 				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					move.slug = slug;
+					move.type = move.pokemon_v2_type.name;
 					matchingMove.push(move);
 					count++;
 				}
@@ -71,6 +77,7 @@
 		}
 	}
 
+	console.log(data);
 	onMount(() => {
 		document.addEventListener('keydown', toggleSearchBar);
 		document.addEventListener('click', toggleSearchBar);
@@ -112,14 +119,19 @@
 						class="block mt-2"
 					>
 						<li
-							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
+							class="flex items-center justify-end gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
 						>
 							<img
-								class="h-14 my-[-6px]"
-								src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
+								class="h-fit my-[-6px]"
+								src={`${pokemonSpriteUrl}${pokemon.id}.png`}
 								alt={pokemon.name}
 							/>
-							<span>{capitalize(hyphenRemover(pokemon.name))}</span>
+							<p class="mr-auto">{capitalize(hyphenRemover(pokemon.name))}</p>
+							<div class="flex flex-col gap-1 text-sm items-end">
+								{#each pokemon.types as pokemonType}
+									<p><Type type={pokemonType.pokemon_v2_type.name} /></p>
+								{/each}
+							</div>
 						</li>
 					</a>
 				{/each}
@@ -145,11 +157,11 @@
 							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
 						>
 							<img
-								class="h-14 my-[-6px]"
-								src="https://i.pinimg.com/736x/3f/53/20/3f5320bda51f29d0e6ef7a61d030c234--cricut.jpg"
+								class="h-fit my-[-6px]"
+								src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ability-capsule.png"
 								alt={ability.name}
 							/>
-							<span>{capitalize(hyphenRemover(ability.name))}</span>
+							<p>{capitalize(hyphenRemover(ability.name))}</p>
 						</li>
 					</a>
 				{/each}
@@ -172,14 +184,19 @@
 						class="block mt-2"
 					>
 						<li
-							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
+							class="flex items-center justify-end gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
 						>
 							<img
-								class="h-14 my-[-6px]"
-								src="https://archives.bulbagarden.net/media/upload/thumb/a/a5/Bag_TM_Normal_SV_Sprite.png/40px-Bag_TM_Normal_SV_Sprite.png"
+								class="h-fit my-[-6px]"
+								src={`${moveSpriteUrl}tm-${move.pokemon_v2_type.name}.png`}
 								alt={move.name}
 							/>
-							<span>{capitalize(hyphenRemover(move.name))}</span>
+							<p class="mr-auto">{capitalize(hyphenRemover(move.name))}</p>
+							<div class="flex flex-col gap-1 text-sm items-end">
+								{#if move.type}
+									<p><Type type={move.type} /></p>
+								{/if}
+							</div>
 						</li>
 					</a>
 				{/each}
