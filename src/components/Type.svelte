@@ -4,9 +4,11 @@
 
 	let color = '';
 
-	for (const pokemonType of pokemonTypes) {
-		if (pokemonType.name === type) {
-			color = pokemonType.color;
+	$: {
+		for (const pokemonType of pokemonTypes) {
+			if (pokemonType.name === type) {
+				color = pokemonType.color;
+			}
 		}
 	}
 

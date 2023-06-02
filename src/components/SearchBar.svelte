@@ -40,7 +40,6 @@
 				if (name.includes(searchTerm) && pokemon.is_default) {
 					const slug = name.replace(/ /g, '-');
 					pokemon.slug = slug;
-					pokemon.types = pokemon.pokemon_v2_pokemontypes;
 					matchingPokemon.push(pokemon);
 					count++;
 				}
@@ -65,7 +64,6 @@
 				if (name.includes(searchTerm)) {
 					const slug = name.replace(/ /g, '-');
 					move.slug = slug;
-					move.type = move.pokemon_v2_type.name;
 					matchingMove.push(move);
 					count++;
 				}
@@ -77,7 +75,7 @@
 		}
 	}
 
-	console.log(data);
+	// console.log(data);
 	onMount(() => {
 		document.addEventListener('keydown', toggleSearchBar);
 		document.addEventListener('click', toggleSearchBar);
@@ -128,7 +126,7 @@
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(pokemon.name))}</p>
 							<div class="flex flex-col gap-1 text-sm items-end">
-								{#each pokemon.types as pokemonType}
+								{#each pokemon.pokemon_v2_pokemontypes as pokemonType}
 									<p><Type type={pokemonType.pokemon_v2_type.name} /></p>
 								{/each}
 							</div>
@@ -193,8 +191,8 @@
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(move.name))}</p>
 							<div class="flex flex-col gap-1 text-sm items-end">
-								{#if move.type}
-									<p><Type type={move.type} /></p>
+								{#if move.pokemon_v2_type}
+									<p><Type type={move.pokemon_v2_type.name} /></p>
 								{/if}
 							</div>
 						</li>
