@@ -7,7 +7,7 @@ const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 	}
 });
 
-async function GetMainInfo() {
+async function fetchMainInfo() {
 	try {
 		const query = `
 		query GetMainInfo {
@@ -34,8 +34,8 @@ async function GetMainInfo() {
 `;
 		return await client.request(query);
 	} catch (error) {
-		throw new Error('Error fetching pokemon data');
+		throw new Error('Error fetching main data ❌');
 	}
 }
 
-export { GetMainInfo };
+export { fetchMainInfo };

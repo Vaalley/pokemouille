@@ -1,9 +1,8 @@
-import { getPokemon } from '$lib/searchCache.js';
-import { GetMainInfo } from '$lib/searchFetch.js';
+import { getMainInfo } from '$lib/mainInfoCache.js';
 
 export async function load() {
 	try {
-		const searchData = await getPokemon(GetMainInfo);
+		const searchData = await getMainInfo();
 		return {
 			searchData,
 			status: 200

@@ -1,224 +1,163 @@
 <script>
 	export let data;
-	import {
-		capitalize,
-		hyphenRemover,
-		getIdFromUrl,
-		pokemonTypes,
-		getStatColor,
-		getTextColor
-	} from '$lib/utils';
-	import PokemonEvolutionChain from '../../../components/PokemonEvolutionChain.svelte';
+	import { capitalize, hyphenRemover, getStatColor, pokemonTypes } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
-	import { onMount } from 'svelte';
 	import tippy from 'tippy.js';
 	import 'tippy.js/dist/tippy.css';
+	import Type from '../../../components/Type.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
-	let pokemonEvolutionChain = data.pokemonInfo.evolutionChain;
-	let searchData = data.searchData;
-	let moveDataList = [];
+	const searchData = data.searchData;
+	const pokemonOfficialArtworkUrl =
+		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
+	const pokemonMainSpriteUrl =
+		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
+	let movesDisplayed = [];
 
-	onMount(async () => {
-		const movePromises = pokemonInfo.moves.map((move) =>
-			fetch(move.move.url).then((response) => response.json())
-		);
-
-		moveDataList = await Promise.all(movePromises);
-
-		const abilityTooltips = await Promise.all(
-			pokemonInfo.abilities.map((ability) =>
-				fetch(ability.ability.url)
-					.then((response) => response.json())
-					.then((data) => {
-						// Get the English flavor text, or loop through all entries if not found
-						let flavorText = '';
-						for (let i = 0; i < data.flavor_text_entries.length; i++) {
-							if (data.flavor_text_entries[i].language.name === 'en') {
-								flavorText = data.flavor_text_entries[i].flavor_text;
-								break;
-							}
-						}
-						return capitalize(flavorText);
-					})
-					.catch(() => null)
-			)
-		);
-
-		document.querySelectorAll('.ability-tooltip').forEach((tooltip, i) => {
-			tippy(tooltip, {
-				content: abilityTooltips[i]
-			});
-		});
-
-		const moveTooltips = await Promise.all(
-			pokemonInfo.moves.map((move) =>
-				fetch(move.move.url)
-					.then((response) => response.json())
-					.then((data) => {
-						// Get the English flavor text, or loop through all entries if not found
-						let flavorText = '';
-						for (let i = 0; i < data.flavor_text_entries.length; i++) {
-							if (data.flavor_text_entries[i].language.name === 'en') {
-								flavorText = data.flavor_text_entries[i].flavor_text;
-								break;
-							}
-						}
-						return capitalize(flavorText);
-					})
-					.catch(() => null)
-			)
-		);
-
-		document.querySelectorAll('.move-tooltip').forEach((tooltip, i) => {
-			tippy(tooltip, {
-				content: moveTooltips[i]
-			});
-		});
-	});
-
-	console.log(pokemonInfo.abilities);
+	console.log(pokemonInfo);
 </script>
 
 <svelte:head>
-	<title>{capitalize(hyphenRemover(pokemonInfo.name))}</title>
+	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
-<div class="bg-gray-100 text-gray-800 min-h-screen">
-	<div class="container mx-auto py-8">
-		<div class="my-8 flex items-center justify-center">
-			<h1 class="text-4xl font-semibold">
-				{capitalize(hyphenRemover(pokemonInfo.name))}
-			</h1>
-			<img src={pokemonInfo.sprites.front_default} alt={pokemonInfo.name} class="w-24 ml-4" />
-		</div>
-
-		<PokemonEvolutionChain {pokemonEvolutionChain} />
-
-		<div class="my-8 flex justify-center items-center">
-			<div class="flex justify-center items-center gap-32">
-				<div class="flex items-center">
-					<img
-						src={pokemonInfo.sprites.other['official-artwork'].front_default}
-						alt={pokemonInfo.name}
-						class="w-64"
-					/>
-					<img src={pokemonInfo.sprites.back_default} alt={pokemonInfo.name} />
-				</div>
-				<div class="flex items-center">
-					<img
-						src={pokemonInfo.sprites.other['official-artwork'].front_shiny}
-						alt={pokemonInfo.name}
-						class="w-64"
-					/>
-					<img src={pokemonInfo.sprites.back_shiny} alt={pokemonInfo.name} />
-				</div>
-			</div>
-		</div>
-
-		<div class="my-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-			<div>
-				<h2 class="text-2xl font-semibold">ID</h2>
-				<p class="text-lg">{pokemonInfo.id}</p>
-			</div>
-			<div>
-				<h2 class="text-2xl font-semibold">Height</h2>
-				<p class="text-lg">{pokemonInfo.height / 10} m</p>
-			</div>
-			<div>
-				<h2 class="text-2xl font-semibold">Weight</h2>
-				<p class="text-lg">{pokemonInfo.weight / 10} kg</p>
-			</div>
-
-			<div>
-				<h2 class="text-2xl font-semibold mb-6">Type(s)</h2>
-				<div class="flex flex-wrap gap-2">
-					{#each pokemonInfo.types as type}
-						{#each pokemonTypes as pokemonType}
-							{#if pokemonType.name === type.type.name}
-								<p
-									style="background-color: {pokemonType.color}; color: {getTextColor(
-										pokemonType.color
-									)};"
-									class="py-1 px-2 rounded-md w-fit hover:scale-105 transition-transform duration-300"
-								>
-									{capitalize(type.type.name)}
-								</p>
-							{/if}
-						{/each}
-					{/each}
-				</div>
-			</div>
-
-			<div>
-				<h2 class="text-2xl font-semibold">Ability(ies)</h2>
-				<div class="flex flex-col gap-2">
-					{#each pokemonInfo.abilities as ability}
-						<a
-							href={`/ability/${getIdFromUrl(ability.ability.url)}`}
-							class="ability-tooltip text-lg text-blue-500 hover:text-blue-800 hover:bg-blue-200 bg-blue-100 w-fit p-2 transition-colors duration-300"
-							>{capitalize(hyphenRemover(ability.ability.name))}
-							{#if ability.is_hidden}
-								<span class="text-gray-500">(hidden ability)</span>
-							{/if}
-						</a>
-					{/each}
-				</div>
-			</div>
-
-			<div>
-				<h2 class="text-2xl font-semibold">Stats</h2>
-				<div class="flex flex-col gap-2">
-					{#each pokemonInfo.stats as stat}
-						<div class="flex items-center gap-2">
-							<div class="w-24 bg-gray-200 rounded-lg h-4 relative overflow-hidden">
-								<div
-									class="h-full bg-green-400"
-									style="width: {Math.min((stat.base_stat / 160) * 100, 100)}%"
-								/>
-							</div>
-							<p style="color: {getStatColor(stat.base_stat)};">
-								{capitalize(hyphenRemover(stat.stat.name))}: {stat.base_stat}
-							</p>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</div>
-
-		<div class="my-8">
-			<h2 class="text-2xl font-semibold mb-6">Moves</h2>
-			<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-				{#each pokemonInfo.moves as move, i}
-					{#if moveDataList[i]}
-						<li
-							class="move-tooltip bg-white border border-gray-200 rounded-lg shadow-sm p-4 transform hover:scale-105 transition-transform duration-300"
-						>
-							<a href={`/move/${getIdFromUrl(move.move.url)}`} class="block text-center">
-								<p class="text-lg font-semibold">
-									{capitalize(hyphenRemover(move.move.name))}
-								</p>
-								{#if moveDataList[i].type}
-									<p class="text-sm text-gray-500">Type: {capitalize(moveDataList[i].type.name)}</p>
-								{/if}
-								{#if moveDataList[i].power}
-									<p class="text-sm text-gray-500">Power: {moveDataList[i].power}</p>
-								{/if}
-								{#if moveDataList[i].accuracy}
-									<p class="text-sm text-gray-500">Accuracy: {moveDataList[i].accuracy}%</p>
-								{/if}
-								{#if moveDataList[i].damage_class}
-									<p class="text-sm text-gray-500">
-										{capitalize(moveDataList[i].damage_class.name)} Move
-									</p>
-								{/if}
-							</a>
-						</li>
-					{/if}
-				{/each}
-			</ul>
-		</div>
-
-		<SearchBar data={searchData} />
+<div>
+	<!-- Pokemon Name -->
+	<div class="flex gap-6 items-center justify-center">
+		<h1 class="text-3xl mt-8 mb-16 font-semibold text-gray-800">
+			{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
+		</h1>
 	</div>
+	<!-- Artworks -->
+	<div class="my-8 flex justify-center items-center mb-24">
+		<div class="flex justify-center items-center gap-32">
+			<div class="flex items-center">
+				<img
+					src={pokemonOfficialArtworkUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
+					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+					class="w-64"
+				/>
+				<img
+					src={pokemonMainSpriteUrl + '/back/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
+					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+				/>
+			</div>
+			<div class="flex items-center">
+				<img
+					src={pokemonOfficialArtworkUrl +
+						'/shiny/' +
+						pokemonInfo.pokemon_v2_pokemon[0].id +
+						'.png'}
+					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+					class="w-64"
+				/>
+				<img
+					src={pokemonMainSpriteUrl +
+						'/back/' +
+						'/shiny/' +
+						pokemonInfo.pokemon_v2_pokemon[0].id +
+						'.png'}
+					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+				/>
+			</div>
+		</div>
+	</div>
+	<!-- General Info -->
+	<div class="mx-[10%] justify-around grid grid-cols-3 gap-x-60 gap-y-24 mb-12">
+		<!-- Pokemon ID -->
+		<div>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">ID:</h2>
+			<p class="text-lg">{pokemonInfo.pokemon_v2_pokemon[0].id}</p>
+		</div>
+		<!-- Pokemon Height -->
+		<div>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Height:</h2>
+			<p class="text-lg">{pokemonInfo.pokemon_v2_pokemon[0].height / 10} m</p>
+		</div>
+		<!-- Pokemon Weight -->
+		<div>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Weight:</h2>
+			<p class="text-lg">{pokemonInfo.pokemon_v2_pokemon[0].weight / 10} kg</p>
+		</div>
+		<!-- Pokemon Types -->
+		<div>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Type(s):</h2>
+			<div class="flex gap-2">
+				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes as type}
+					<p class="text-lg"><Type type={type.pokemon_v2_type.name} /></p>
+				{/each}
+			</div>
+		</div>
+		<!-- Pokemon Abilities -->
+		<div>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Ability(ies):</h2>
+			<div class="flex flex-col gap-2">
+				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
+					<a href="/ability/{ability.pokemon_v2_ability.name}">
+						<p class="text-lg">
+							{capitalize(hyphenRemover(ability.pokemon_v2_ability.name))}
+							{#if ability.is_hidden}
+								<span class="text-red-600">(hidden)</span>
+							{/if}
+						</p>
+					</a>
+				{/each}
+			</div>
+		</div>
+		<!-- Pokemon Stats -->
+		<div>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Statistics:</h2>
+			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats as stat}
+				<div class="flex items-center gap-2">
+					<div class="w-24 bg-gray-200 rounded-lg h-4 relative overflow-hidden">
+						<div
+							class="h-full bg-green-400"
+							style="width: {Math.min((stat.base_stat / 160) * 100, 100)}%"
+						/>
+					</div>
+					<p style="color: {getStatColor(stat.base_stat)};">
+						{capitalize(hyphenRemover(stat.pokemon_v2_stat.name))}: {stat.base_stat}
+					</p>
+				</div>
+			{/each}
+		</div>
+	</div>
+	<!-- Moves -->
+	<div class="mx-[10%]">
+		<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Moves:</h2>
+		<div class="grid grid-cols-4 gap-4">
+			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
+				{#if !movesDisplayed.includes(move.pokemon_v2_move.name)}
+					<a class="border rounded-lg p-4" href="/move/{move.pokemon_v2_move.name}">
+						<div class="flex flex-col items-center text-center">
+							<div class="flex gap-4">
+								<p class="text-xl font-semibold text-gray-800">
+									{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
+								</p>
+								<Type type={move.pokemon_v2_move.pokemon_v2_type.name} />
+							</div>
+							<div>
+								{#if move.pokemon_v2_move.power}
+									<p>Power: {move.pokemon_v2_move.power}</p>
+								{/if}
+								{#if move.pokemon_v2_move.pp}
+									<p>PP: {move.pokemon_v2_move.pp}</p>
+								{/if}
+								{#if move.pokemon_v2_move.accuracy}
+									<p>Accuracy: {move.pokemon_v2_move.accuracy}</p>
+								{/if}
+								{#if move.pokemon_v2_move.priority}
+									<p>Priority: {move.pokemon_v2_move.priority}</p>
+								{/if}
+							</div>
+							<span class="hidden">
+								{movesDisplayed.push(move.pokemon_v2_move.name)}
+							</span>
+						</div>
+					</a>
+				{/if}
+			{/each}
+		</div>
+	</div>
+	<SearchBar data={searchData} />
 </div>

@@ -1,13 +1,12 @@
 import { getPokemonInfo } from '$lib/pokemonInfoCache.js';
-import { getPokemon } from '$lib/searchCache.js';
-import { GetMainInfo } from '$lib/searchFetch.js';
+import { getMainInfo } from '$lib/mainInfoCache.js';
 
 export async function load({ params, query }) {
 	const { slug } = params;
 
 	try {
 		const pokemonInfo = await getPokemonInfo(slug);
-		const searchData = await getPokemon(GetMainInfo);
+		const searchData = await getMainInfo();
 
 		return {
 			pokemonInfo,
@@ -19,7 +18,7 @@ export async function load({ params, query }) {
 		console.error(error);
 		return {
 			status: 500,
-			error: 'Failed to fetch data from PokeAPI'
+			error: 'Failed to fetch data from PokeAPI ❌'
 		};
 	}
 }
