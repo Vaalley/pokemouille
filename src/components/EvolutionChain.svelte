@@ -6,13 +6,18 @@
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	console.log(evolutionChainData);
+	const sortedPokemonSpecies =
+		evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort(
+			(a, b) => a.id - b.id
+		);
+
+	console.log(sortedPokemonSpecies);
 </script>
 
 <div class="mx-[10%] my-12">
 	<h2 class="text-2xl font-semibold mb-6 text-gray-800 underline">Evolution Chain</h2>
-	<div class="flex justify-between">
-		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies as pokemon, index}
+	<div class="flex justify-around">
+		{#each sortedPokemonSpecies as pokemon, index}
 			<a
 				class="hover:bg-gray-100 p-4"
 				href={`/pokemon/${pokemon.name}`}
@@ -20,18 +25,21 @@
 					goto(`/pokemon/${pokemon.name}`);
 					setTimeout(() => {
 						location.reload();
-					}, 10);
+					}, 100);
 				}}
 			>
 				<div>
-					<p class="text-lg font-semibold text-gray-800 text-center">{pokemon.name}</p>
+					<p class="text-lg font-semibold text-gray-800 text-center">
+						{capitalize(hyphenRemover(pokemon.name))}
+					</p>
 					<img src={`${pokemonSpriteUrl}${pokemon.id}.png`} alt={pokemon.name} />
 				</div>
-				{#if evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies[index].pokemon_v2_pokemonevolutions}
+				{#if pokemon.pokemon_v2_pokemonevolutions}
 					<div class="flex flex-col">
-						{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies[index].pokemon_v2_pokemonevolutions as evolution}
+						{#each pokemon.pokemon_v2_pokemonevolutions as evolution}
 							<p class="underline font-semibold text-center">
-								{capitalize(hyphenRemover(evolution.pokemon_v2_evolutiontrigger.name))}:
+								{capitalize(hyphenRemover(evolution.pokemon_v2_evolutiontrigger.name))}
+								:
 							</p>
 							{#if evolution.pokemon_v2_evolutiontrigger.name === 'level-up'}
 								{#if evolution.min_level}
@@ -44,10 +52,19 @@
 									<p>Time: {evolution.time_of_day}</p>
 								{/if}
 								{#if evolution.pokemon_v2_location}
-									<p>Location: {capitalize(hyphenRemover(evolution.pokemon_v2_location.name))}</p>
+									<p>
+										Location: {capitalize(hyphenRemover(evolution.pokemon_v2_location.name))}
+									</p>
 								{/if}
 								{#if evolution.min_affection}
 									<p>Affection: {evolution.min_affection}</p>
+								{/if}
+								{#if evolution.pokemonV2PokemonspecyByPartySpeciesId}
+									<p>
+										Need in party: {capitalize(
+											hyphenRemover(evolution.pokemonV2PokemonspecyByPartySpeciesId.name)
+										)}
+									</p>
 								{/if}
 							{/if}
 							{#if evolution.pokemon_v2_evolutiontrigger.name === 'use-item'}

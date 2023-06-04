@@ -85,6 +85,13 @@ async function fetchPokemonInfo(slug) {
 								pokemon_v2_location {
 									name
 								}
+								party_species_id
+								pokemonV2PokemonspecyByPartySpeciesId {
+									name
+								}
+								pokemonV2ItemByHeldItemId {
+									name
+								}
 							}
 						}
 					}
