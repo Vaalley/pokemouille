@@ -5,8 +5,10 @@
 	import tippy from 'tippy.js';
 	import 'tippy.js/dist/tippy.css';
 	import Type from '../../../components/Type.svelte';
+	import EvolutionChain from '../../../components/EvolutionChain.svelte';
 
 	let pokemonInfo = data.pokemonInfo;
+	let evolutionChainData = data.pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy;
 	const searchData = data.searchData;
 	const pokemonOfficialArtworkUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
@@ -14,7 +16,7 @@
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	let movesDisplayed = [];
 
-	console.log(pokemonInfo);
+	// console.log(pokemonInfo);
 </script>
 
 <svelte:head>
@@ -27,6 +29,10 @@
 		<h1 class="text-3xl mt-8 mb-16 font-semibold text-gray-800">
 			{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 		</h1>
+	</div>
+	<!-- Evolution Chain -->
+	<div>
+		<EvolutionChain {evolutionChainData} />
 	</div>
 	<!-- Artworks -->
 	<div class="my-8 flex justify-center items-center mb-24">
@@ -140,11 +146,11 @@
 								{#if move.pokemon_v2_move.power}
 									<p>Power: {move.pokemon_v2_move.power}</p>
 								{/if}
-								{#if move.pokemon_v2_move.pp}
-									<p>PP: {move.pokemon_v2_move.pp}</p>
-								{/if}
 								{#if move.pokemon_v2_move.accuracy}
 									<p>Accuracy: {move.pokemon_v2_move.accuracy}</p>
+								{/if}
+								{#if move.pokemon_v2_move.pp}
+									<p>PP: {move.pokemon_v2_move.pp}</p>
 								{/if}
 								{#if move.pokemon_v2_move.priority}
 									<p>Priority: {move.pokemon_v2_move.priority}</p>
