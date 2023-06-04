@@ -1,7 +1,7 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { capitalize, hyphenRemover, pokemonTypes } from '$lib/utils';
+	import { capitalize, hyphenRemover } from '$lib/utils';
 	import Type from './Type.svelte';
 	export let data;
 
