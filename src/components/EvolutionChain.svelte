@@ -6,7 +6,7 @@
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	console.log(evolutionChainData);
+	// console.log(evolutionChainData);
 </script>
 
 <div class="mx-[10%] my-12">
@@ -14,7 +14,7 @@
 	<div class="flex justify-around">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies as pokemon, index}
 			<a
-				class="hover:bg-gray-100 p-4"
+				class="hover:bg-gray-200 p-6"
 				href={`/pokemon/${pokemon.name}`}
 				on:click|preventDefault={() => {
 					if (window.location.pathname === `/pokemon/${pokemon.name}`) {
@@ -29,7 +29,7 @@
 					<p class="text-lg font-semibold text-gray-800 text-center">
 						{capitalize(hyphenRemover(pokemon.name))}
 					</p>
-					<img src={`${pokemonSpriteUrl}${pokemon.id}.png`} alt={pokemon.name} />
+					<img class="mx-auto" src={`${pokemonSpriteUrl}${pokemon.id}.png`} alt={pokemon.name} />
 				</div>
 				{#if pokemon.pokemon_v2_pokemonevolutions}
 					<div class="flex flex-col">

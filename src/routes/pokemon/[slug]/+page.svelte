@@ -23,7 +23,7 @@
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
-<div>
+<div class="bg-gray-100">
 	<!-- Pokemon Name -->
 	<div class="flex gap-6 items-center justify-center">
 		<h1 class="text-3xl mt-8 mb-16 font-semibold text-gray-800">
