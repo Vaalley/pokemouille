@@ -1,7 +1,7 @@
 import NodeCache from 'node-cache';
 import { fetchPokemonInfo } from '$lib/pokemonInfoFetch';
 
-const cache = new NodeCache({ stdTTL: 21600, checkperiod: 120 }); // 21600 = 6 hours stdTTL
+const cache = new NodeCache({ stdTTL: 86400, checkperiod: 120 }); // 86400 = 24 hours stdTTL
 
 async function getPokemonInfo(slug) {
 	let memo = {};
