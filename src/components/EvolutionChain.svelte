@@ -6,26 +6,23 @@
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	const sortedPokemonSpecies =
-		evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort(
-			(a, b) => a.id - b.id
-		);
-
-	console.log(sortedPokemonSpecies);
+	console.log(evolutionChainData);
 </script>
 
 <div class="mx-[10%] my-12">
 	<h2 class="text-2xl font-semibold mb-6 text-gray-800 underline">Evolution Chain</h2>
 	<div class="flex justify-around">
-		{#each sortedPokemonSpecies as pokemon, index}
+		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies as pokemon, index}
 			<a
 				class="hover:bg-gray-100 p-4"
 				href={`/pokemon/${pokemon.name}`}
-				on:click={() => {
-					goto(`/pokemon/${pokemon.name}`);
-					setTimeout(() => {
-						location.reload();
-					}, 100);
+				on:click|preventDefault={() => {
+					if (window.location.pathname === `/pokemon/${pokemon.name}`) {
+						window.location.href = `${window.location.origin}/pokemon`;
+					} else {
+						goto(`/pokemon/${pokemon.name}`);
+						window.location.href = `${window.location.origin}/pokemon/${pokemon.name}`;
+					}
 				}}
 			>
 				<div>
@@ -69,6 +66,15 @@
 							{/if}
 							{#if evolution.pokemon_v2_evolutiontrigger.name === 'use-item'}
 								<p>{capitalize(hyphenRemover(evolution.pokemon_v2_item.name))}</p>
+							{/if}
+							{#if evolution.pokemon_v2_evolutiontrigger.name === 'trade'}
+								{#if evolution.pokemonV2ItemByHeldItemId}
+									<p>
+										Needs to carry: {capitalize(
+											hyphenRemover(evolution.pokemonV2ItemByHeldItemId.name)
+										)}
+									</p>
+								{/if}
 							{/if}
 						{/each}
 					</div>
