@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover, getIdFromUrl } from '$lib/utils';
+	import { capitalize, hyphenRemover } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 
 	let abilityInfo = data.abilityInfo;
@@ -15,7 +15,8 @@
 	<title>{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 </svelte:head>
 
-<div class="bg-gray-100">
+<div class="bg-gray-100 min-h-screen">
+	<!-- Ability name -->
 	<div class="flex mx-[10%]">
 		<h1 class="text-3xl font-semibold text-gray-800 my-6">
 			{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}
@@ -26,18 +27,21 @@
 			>
 		</h1>
 	</div>
+	<!-- Ability flavor text -->
 	<div class="mx-[10%]">
 		<h2 class="text-2xl font-semibold text-gray-800 underline my-2">Flavor Text:</h2>
 		<p class="text-lg text-gray-600">
 			{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
 		</p>
 	</div>
+	<!-- Ability effect -->
 	<div class="mx-[10%]">
 		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">Effect Description:</h2>
 		<p class="text-lg text-gray-600">
 			{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
 		</p>
 	</div>
+	<!-- Ability Pokémon list -->
 	<div class="mx-[10%]">
 		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">
 			List of Pokémon that can learn that ability:
