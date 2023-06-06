@@ -1,9 +1,7 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover, getStatColor, pokemonTypes } from '$lib/utils';
+	import { capitalize, hyphenRemover, getStatColor } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
-	import tippy from 'tippy.js';
-	import 'tippy.js/dist/tippy.css';
 	import Type from '../../../components/Type.svelte';
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
 
