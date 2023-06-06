@@ -12,7 +12,6 @@
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
-	let movesDisplayed = [];
 
 	// console.log(pokemonInfo);
 </script>
@@ -135,35 +134,30 @@
 		<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Moves:</h2>
 		<div class="grid grid-cols-4 gap-4">
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
-				{#if !movesDisplayed.includes(move.pokemon_v2_move.name)}
-					<a class="border rounded-lg p-4" href="/move/{move.pokemon_v2_move.name}">
-						<div class="flex flex-col items-center text-center">
-							<div class="flex gap-4">
-								<p class="text-xl font-semibold text-gray-800">
-									{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
-								</p>
-								<Type type={move.pokemon_v2_move.pokemon_v2_type.name} />
-							</div>
-							<div>
-								{#if move.pokemon_v2_move.power}
-									<p>Power: {move.pokemon_v2_move.power}</p>
-								{/if}
-								{#if move.pokemon_v2_move.accuracy}
-									<p>Accuracy: {move.pokemon_v2_move.accuracy}</p>
-								{/if}
-								{#if move.pokemon_v2_move.pp}
-									<p>PP: {move.pokemon_v2_move.pp}</p>
-								{/if}
-								{#if move.pokemon_v2_move.priority}
-									<p>Priority: {move.pokemon_v2_move.priority}</p>
-								{/if}
-							</div>
-							<span class="hidden">
-								{movesDisplayed.push(move.pokemon_v2_move.name)}
-							</span>
+				<a class="border rounded-lg p-4" href="/move/{move.pokemon_v2_move.name}">
+					<div class="flex flex-col items-center text-center">
+						<div class="flex gap-4">
+							<p class="text-xl font-semibold text-gray-800">
+								{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
+							</p>
+							<Type type={move.pokemon_v2_move.pokemon_v2_type.name} />
 						</div>
-					</a>
-				{/if}
+						<div>
+							{#if move.pokemon_v2_move.power}
+								<p>Power: {move.pokemon_v2_move.power}</p>
+							{/if}
+							{#if move.pokemon_v2_move.accuracy}
+								<p>Accuracy: {move.pokemon_v2_move.accuracy}</p>
+							{/if}
+							{#if move.pokemon_v2_move.pp}
+								<p>PP: {move.pokemon_v2_move.pp}</p>
+							{/if}
+							{#if move.pokemon_v2_move.priority}
+								<p>Priority: {move.pokemon_v2_move.priority}</p>
+							{/if}
+						</div>
+					</div>
+				</a>
 			{/each}
 		</div>
 	</div>

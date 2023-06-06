@@ -45,7 +45,7 @@ async function fetchPokemonInfo(slug) {
 						name
 					}
 				}
-				pokemon_v2_pokemonmoves {
+				pokemon_v2_pokemonmoves(distinct_on: move_id) {
 					level
 					id
 					pokemon_v2_move {
