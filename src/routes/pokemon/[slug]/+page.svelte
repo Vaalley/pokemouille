@@ -42,10 +42,12 @@
 					src={pokemonOfficialArtworkUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 					class="w-64"
+					loading="lazy"
 				/>
 				<img
 					src={pokemonMainSpriteUrl + '/back/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+					loading="lazy"
 				/>
 			</div>
 			<div class="flex items-center">
@@ -56,6 +58,7 @@
 						'.png'}
 					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 					class="w-64"
+					loading="lazy"
 				/>
 				<img
 					src={pokemonMainSpriteUrl +
@@ -64,6 +67,7 @@
 						pokemonInfo.pokemon_v2_pokemon[0].id +
 						'.png'}
 					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+					loading="lazy"
 				/>
 			</div>
 		</div>
