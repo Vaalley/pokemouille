@@ -7,8 +7,13 @@
 	let searchData = data.searchData;
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
+	const moveEffect =
+		moveInfo.pokemon_v2_move[0].pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0].effect;
+	const moveEffectChance = moveInfo.pokemon_v2_move[0].move_effect_chance;
 
-	console.log(moveInfo);
+	const formattedEffect = moveEffect.replace(/\$effect_chance/g, moveEffectChance);
+
+	// console.log(moveInfo);
 </script>
 
 <svelte:head>
@@ -37,9 +42,7 @@
 	<!-- Move effect -->
 	<div class="mx-[10%]">
 		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">Effect Description:</h2>
-		<p class="text-lg text-gray-600">
-			{moveInfo.pokemon_v2_move[0].pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0].effect}
-		</p>
+		<p class="text-lg text-gray-600">{formattedEffect}</p>
 	</div>
 	<!-- Move Pokémon list -->
 	<div class="mx-[10%]">
