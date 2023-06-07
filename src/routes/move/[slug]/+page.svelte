@@ -2,6 +2,7 @@
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
+	import Type from '../../../components/Type.svelte';
 
 	let moveInfo = data.moveInfo;
 	let searchData = data.searchData;
@@ -22,7 +23,8 @@
 
 <div class="bg-gray-100 min-h-screen">
 	<!-- Move name -->
-	<div class="flex mx-[10%]">
+	<div class="flex items-center gap-6 mx-[10%]">
+		<Type type={moveInfo.pokemon_v2_move[0].pokemon_v2_type.name} />
 		<h1 class="text-3xl font-semibold text-gray-800 my-6">
 			{capitalize(hyphenRemover(moveInfo.pokemon_v2_move[0].name))}
 			<span class="text-xl text-gray-500"
