@@ -26,7 +26,6 @@
 	"type": "module",
 	"dependencies": {
 		"graphql-request": "^6.0.0",
-		"node-cache": "^4.2.1",
-		"tippy.js": "^6.3.7"
+		"node-cache": "^4.2.1"
 	}
 }
