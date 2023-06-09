@@ -91,7 +91,7 @@
 			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Type(s):</h2>
 			<div class="flex gap-2">
 				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes as type}
-					<p class="text-lg"><Type type={type.pokemon_v2_type.name} /></p>
+					<p class="text-lg"><Type textSize="16" type={type.pokemon_v2_type.name} /></p>
 				{/each}
 			</div>
 		</div>
@@ -140,7 +140,7 @@
 							<p class="text-xl font-semibold text-gray-800">
 								{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
 							</p>
-							<Type type={move.pokemon_v2_move.pokemon_v2_type.name} />
+							<Type textSize="14" type={move.pokemon_v2_move.pokemon_v2_type.name} />
 						</div>
 						<div>
 							{#if move.pokemon_v2_move.power}
