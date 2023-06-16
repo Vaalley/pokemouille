@@ -12,6 +12,8 @@
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
+	const pokemonShowdownUrl =
+		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/';
 
 	// console.log(pokemonInfo);
 </script>
@@ -26,6 +28,11 @@
 		<h1 class="text-3xl mt-8 mb-16 font-semibold text-gray-800">
 			{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 		</h1>
+		<img
+			class=""
+			src={pokemonShowdownUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.gif'}
+			alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+		/>
 	</div>
 	<!-- Evolution Chain -->
 	<div>
