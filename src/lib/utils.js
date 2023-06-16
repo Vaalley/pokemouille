@@ -19,7 +19,7 @@ export function getIdFromUrl(url) {
 	return match ? match[1] : null;
 }
 
-// An array of objects representing each Pokemon type, with a name, color property and their defensive capabilities  
+// An array of objects representing each Pokemon type, with a name, color property and their defensive capabilities
 export const pokemonTypes = [
 	{
 		name: 'normal',
@@ -118,7 +118,6 @@ export const pokemonTypes = [
 		weak: ['ghost', 'dark'],
 		resist: ['poison', 'bug'],
 		immune: ['normal', 'fighting']
-
 	},
 	{
 		name: 'dragon',
@@ -138,7 +137,18 @@ export const pokemonTypes = [
 		name: 'steel',
 		color: '#B8B8D0',
 		weak: ['fire', 'fighting', 'ground'],
-		resist: ['normal', 'grass', 'ice', 'flying', 'psychic', 'bug', 'rock', 'dragon', 'steel', 'fairy'],
+		resist: [
+			'normal',
+			'grass',
+			'ice',
+			'flying',
+			'psychic',
+			'bug',
+			'rock',
+			'dragon',
+			'steel',
+			'fairy'
+		],
 		immune: ['poison']
 	},
 	{
@@ -159,13 +169,14 @@ export function getStatColor(statValue) {
 
 	const percentage = (statValue - minStatValue) / (maxStatValue - minStatValue);
 	const red = Math.floor((colorStart >> 16) * (1 - percentage) + (colorEnd >> 16) * percentage);
-	const green = Math.floor(((colorStart >> 8) & 0xff) * (1 - percentage) + ((colorEnd >> 8) & 0xff) * percentage);
+	const green = Math.floor(
+		((colorStart >> 8) & 0xff) * (1 - percentage) + ((colorEnd >> 8) & 0xff) * percentage
+	);
 	const blue = Math.floor((colorStart & 0xff) * (1 - percentage) + (colorEnd & 0xff) * percentage);
 
 	const hex = `#${((red << 16) | (green << 8) | blue).toString(16).padStart(6, '0')}`;
 	return hex;
 }
-
 
 // Gets the text color of a background color
 export function getTextColor(backgroundColor) {
@@ -173,7 +184,6 @@ export function getTextColor(backgroundColor) {
 	const luminance = calculateLuminance(r, g, b);
 	return luminance > 0.5 ? '#000000' : '#ffffff';
 }
-
 
 // Converts a hex color to RGB
 function hexToRgb(hex) {
@@ -188,7 +198,6 @@ function hexToRgb(hex) {
 	};
 }
 
-
 // Calculates the luminance of a color
 function calculateLuminance(r, g, b) {
 	const rsrgb = r / 255;
@@ -201,4 +210,3 @@ function calculateLuminance(r, g, b) {
 
 	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
 }
-

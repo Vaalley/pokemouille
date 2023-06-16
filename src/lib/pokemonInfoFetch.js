@@ -8,14 +8,14 @@ const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
 });
 
 async function fetchPokemonInfo(slug) {
-	let pokemonId = 0
-	let pokemonName = "";
+	let pokemonId = 0;
+	let pokemonName = '';
 
 	// If type of slug is string, then set pokemonName to slug, else if it's a integer, then set pokemonId to slug
 	if (typeof slug === 'string') {
 		pokemonName = slug;
 	} else {
-		pokemonId = slug
+		pokemonId = slug;
 	}
 
 	try {
