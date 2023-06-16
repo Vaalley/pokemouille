@@ -15,7 +15,7 @@
 	const pokemonShowdownUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/';
 
-	// console.log(evolutionChainData);
+	console.log(evolutionChainData);
 </script>
 
 <svelte:head>

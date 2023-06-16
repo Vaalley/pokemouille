@@ -12,7 +12,7 @@
 <div class="mx-[10%] my-12">
 	<h2 class="text-2xl font-semibold mb-6 text-gray-800 underline">Evolution Chain</h2>
 	<div class="flex justify-around">
-		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies as pokemon, index}
+		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon, index}
 			<a
 				class="hover:bg-gray-200 p-6"
 				href={`/pokemon/${pokemon.name}`}
