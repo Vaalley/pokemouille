@@ -77,8 +77,13 @@
 
 	// console.log(data);
 	onMount(() => {
-		document.addEventListener('keydown', toggleSearchBar);
-		document.addEventListener('click', toggleSearchBar);
+		if (window.innerWidth >= 1024) {
+			document.addEventListener('keydown', toggleSearchBar);
+			document.addEventListener('click', toggleSearchBar);
+		}
+		if (window.innerWidth < 1024) {
+			showSearchBar = true;
+		}
 	});
 
 	afterUpdate(() => {
@@ -90,7 +95,7 @@
 
 {#if showSearchBar}
 	<div
-		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-gray-200 bg-opacity-50 z-50"
+		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-gray-100 bg-opacity-50 z-50 -lg:static"
 	>
 		<input
 			type="text"
