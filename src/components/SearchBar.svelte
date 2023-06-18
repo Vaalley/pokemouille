@@ -100,14 +100,14 @@
 		<input
 			type="text"
 			placeholder="Search..."
-			class="w-80 max-w-[600px] px-4 py-2 text-lg rounded-md shadow-md border-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+			class="w-80 max-w-[600px] px-4 py-2 text-lg shadow-md border-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
 			on:input={updateMatching}
 		/>
 
 		{#if matchingPokemon.length}
-			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-300">
+			<ul class="mt-4 grid grid-cols-2 gap-6 items-start border-2 border-gray-500">
 				{#each matchingPokemon as pokemon}
 					<a
 						href={`/pokemon/${pokemon.slug}`}
@@ -119,10 +119,9 @@
 								window.location.href = `${window.location.origin}/pokemon/${pokemon.slug}`;
 							}
 						}}
-						class="block mt-2"
 					>
 						<li
-							class="flex items-center justify-end gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
+							class="flex items-center justify-end gap-6 h-24 text-xl font-semibold bg-white cursor-pointer hover:bg-gray-100 px-4 border-2 border-gray-300"
 						>
 							<img
 								class="h-fit my-[-6px]"
@@ -142,7 +141,7 @@
 		{/if}
 
 		{#if matchingAbility.length}
-			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-300">
+			<ul class="mt-4 grid grid-cols-2 gap-6 items-start border-2 border-gray-500">
 				{#each matchingAbility as ability}
 					<a
 						href={`/ability/${ability.slug}`}
@@ -154,10 +153,9 @@
 								window.location.href = `${window.location.origin}/ability/${ability.slug}`;
 							}
 						}}
-						class="block mt-2"
 					>
 						<li
-							class="flex items-center gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
+							class="flex items-center gap-6 h-24 text-xl font-semibold bg-white cursor-pointer hover:bg-gray-100 px-4 border-2 border-gray-300"
 						>
 							<img
 								class="h-fit my-[-6px]"
@@ -172,7 +170,7 @@
 		{/if}
 
 		{#if matchingMove.length}
-			<ul class="mt-4 w-80 max-w-[600px] divide-y divide-gray-300">
+			<ul class="mt-4 grid grid-cols-2 gap-6 items-start border-2 border-gray-500">
 				{#each matchingMove as move}
 					<a
 						href={`/move/${move.slug}`}
@@ -184,10 +182,9 @@
 								window.location.href = `${window.location.origin}/move/${move.slug}`;
 							}
 						}}
-						class="block mt-2"
 					>
 						<li
-							class="flex items-center justify-end gap-6 h-16 text-xl font-semibold rounded-md bg-white cursor-pointer hover:bg-gray-100 px-4"
+							class="flex items-center justify-end gap-6 h-24 text-xl font-semibold bg-white cursor-pointer hover:bg-gray-100 px-4 border-2 border-gray-300"
 						>
 							<img
 								class="h-fit my-[-6px]"
