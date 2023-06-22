@@ -14,7 +14,7 @@
 
 	const formattedEffect = moveEffect.replace(/\$effect_chance/g, moveEffectChance);
 
-	// console.log(moveInfo);
+	console.log(moveInfo);
 </script>
 
 <svelte:head>
@@ -34,8 +34,66 @@
 			>
 		</h1>
 	</div>
+	<!-- Move Info -->
+	<div class="flex justify-between mx-[10%] flex-wrap mt-6">
+		<!-- Category -->
+		<div>
+			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Category:</h2>
+			{#if moveInfo.pokemon_v2_move[0].move_damage_class_id == 1}
+				<p class="text-gray-600">Status</p>
+			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 2}
+				<p class="text-gray-600">Physical</p>
+			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 3}
+				<p class="text-gray-600">Special</p>
+			{/if}
+		</div>
+		<!-- Power -->
+		<div>
+			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Power:</h2>
+			{#if moveInfo.pokemon_v2_move[0].power}
+				<p class="text-gray-600">
+					{moveInfo.pokemon_v2_move[0].power}
+				</p>
+			{:else}
+				<p class="text-gray-600">N/A</p>
+			{/if}
+		</div>
+		<!-- Accuracy -->
+		<div>
+			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Accuracy:</h2>
+			{#if moveInfo.pokemon_v2_move[0].accuracy}
+				<p class="text-gray-600">
+					{moveInfo.pokemon_v2_move[0].accuracy}
+				</p>
+			{:else}
+				<p class="text-gray-600">N/A</p>
+			{/if}
+		</div>
+		<!-- Priority -->
+		<div>
+			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Priority:</h2>
+			{#if moveInfo.pokemon_v2_move[0].priority}
+				<p class="text-gray-600">
+					{moveInfo.pokemon_v2_move[0].priority}
+				</p>
+			{:else}
+				<p class="text-gray-600">N/A</p>
+			{/if}
+		</div>
+		<!-- PP -->
+		<div>
+			<h2 class="text-xl font-semibold text-gray-800 underline my-2">PP:</h2>
+			{#if moveInfo.pokemon_v2_move[0].pp}
+				<p class="text-gray-600">
+					{moveInfo.pokemon_v2_move[0].pp}
+				</p>
+			{:else}
+				<p class="text-gray-600">N/A</p>
+			{/if}
+		</div>
+	</div>
 	<!-- Move flavor text -->
-	<div class="mx-[10%]">
+	<div class="mx-[10%] mt-16">
 		<h2 class="text-2xl font-semibold text-gray-800 underline my-2">Flavor Text:</h2>
 		<p class="text-lg text-gray-600">
 			{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
