@@ -15,7 +15,7 @@
 	const pokemonShowdownUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/';
 
-	console.log(evolutionChainData);
+	// console.log(evolutionChainData);
 </script>
 
 <svelte:head>
@@ -24,127 +24,103 @@
 
 <div class="bg-gray-100">
 	<!-- Pokemon Name -->
-	<div class="flex gap-6 items-center justify-center">
-		<h1 class="text-3xl mt-8 mb-16 font-semibold text-gray-800">
+	<div class="flex gap-6 items-center justify-center h-32">
+		<h1 class="text-5xl font-semibold">
 			{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 		</h1>
 		<img
-			class=""
 			src={pokemonShowdownUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.gif'}
 			alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 		/>
 	</div>
 	<!-- Evolution Chain -->
 	<div>
-		<EvolutionChain {evolutionChainData} />
-	</div>
-	<!-- Artworks -->
-	<div class="my-8 flex justify-center items-center mb-24">
-		<div class="flex justify-center items-center gap-32">
-			<div class="flex items-center">
-				<img
-					src={pokemonOfficialArtworkUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
-					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
-					class="w-64"
-					loading="lazy"
-				/>
-				<img
-					src={pokemonMainSpriteUrl + '/back/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
-					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
-					loading="lazy"
-				/>
-			</div>
-			<div class="flex items-center">
-				<img
-					src={pokemonOfficialArtworkUrl +
-						'/shiny/' +
-						pokemonInfo.pokemon_v2_pokemon[0].id +
-						'.png'}
-					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
-					class="w-64"
-					loading="lazy"
-				/>
-				<img
-					src={pokemonMainSpriteUrl +
-						'/back/' +
-						'/shiny/' +
-						pokemonInfo.pokemon_v2_pokemon[0].id +
-						'.png'}
-					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
-					loading="lazy"
-				/>
-			</div>
-		</div>
+		<EvolutionChain
+			{evolutionChainData}
+			currentPokemonName={pokemonInfo.pokemon_v2_pokemon[0].name}
+		/>
 	</div>
 	<!-- General Info -->
-	<div class="mx-[10%] justify-around grid grid-cols-3 gap-x-60 gap-y-24 mb-12">
-		<!-- Pokemon ID -->
-		<div>
-			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">ID:</h2>
-			<p class="text-lg">{pokemonInfo.pokemon_v2_pokemon[0].id}</p>
-		</div>
-		<!-- Pokemon Height -->
-		<div>
-			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Height:</h2>
-			<p class="text-lg">{pokemonInfo.pokemon_v2_pokemon[0].height / 10} m</p>
-		</div>
-		<!-- Pokemon Weight -->
-		<div>
-			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Weight:</h2>
-			<p class="text-lg">{pokemonInfo.pokemon_v2_pokemon[0].weight / 10} kg</p>
-		</div>
-		<!-- Pokemon Types -->
-		<div>
-			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Type(s):</h2>
-			<div class="flex gap-2">
-				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes as type}
-					<p class="text-lg"><Type textSize="16" type={type.pokemon_v2_type.name} /></p>
-				{/each}
+	<div class="mx-[10%] flex items-center justify-around h-80">
+		<img
+			src={pokemonOfficialArtworkUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
+			alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+			class="h-80"
+			loading="lazy"
+		/>
+		<div class="max-h-80 overflow-auto">
+			<div>
+				<h3 class="text-xl font-semibold">
+					ID: <span class="font-medium">{pokemonInfo.pokemon_v2_pokemon[0].id}</span>
+				</h3>
+			</div>
+			<div>
+				<h2 class="text-xl font-semibold mt-4">
+					Height / Weight: <span class="font-medium"
+						>{pokemonInfo.pokemon_v2_pokemon[0].height / 10} m / {pokemonInfo.pokemon_v2_pokemon[0]
+							.weight / 10} kg</span
+					>
+				</h2>
+			</div>
+			<div>
+				<h2 class="text-xl font-semibold mt-4">Type(s):</h2>
+				<div class="flex gap-2 mt-2">
+					{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes as type}
+						<p class="text-lg"><Type textSize="16" type={type.pokemon_v2_type.name} /></p>
+					{/each}
+				</div>
+			</div>
+			<div>
+				<h2 class="text-xl font-semibold mt-4">Ability(ies):</h2>
+				<div class="flex flex-col gap-2">
+					{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
+						<a href="/ability/{ability.pokemon_v2_ability.name}">
+							<p class="text-lg font-medium">
+								-{capitalize(hyphenRemover(ability.pokemon_v2_ability.name))}
+								{#if ability.is_hidden}
+									<span class="text-red-600">(hidden)</span>
+								{/if}
+							</p>
+						</a>
+					{/each}
+				</div>
 			</div>
 		</div>
-		<!-- Pokemon Abilities -->
 		<div>
-			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Ability(ies):</h2>
-			<div class="flex flex-col gap-2">
-				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
-					<a href="/ability/{ability.pokemon_v2_ability.name}">
-						<p class="text-lg">
-							{capitalize(hyphenRemover(ability.pokemon_v2_ability.name))}
-							{#if ability.is_hidden}
-								<span class="text-red-600">(hidden)</span>
-							{/if}
-						</p>
-					</a>
-				{/each}
-			</div>
-		</div>
-		<!-- Pokemon Stats -->
-		<div>
-			<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Statistics:</h2>
+			<h2 class="text-xl font-semibold mb-4">Statistics:</h2>
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats as stat}
-				<div class="flex items-center gap-2">
-					<div class="w-24 bg-gray-200 rounded-lg h-4 relative overflow-hidden">
+				<div class="flex items-center justify-end gap-2 mt-1">
+					<p style="color: {getStatColor(stat.base_stat)};">
+						{capitalize(hyphenRemover(stat.pokemon_v2_stat.name))}
+					</p>
+					<p style="color: {getStatColor(stat.base_stat)};">
+						{stat.base_stat}
+					</p>
+					<div class="w-24 bg-gray-200 rounded h-4 relative overflow-hidden">
 						<div
-							class="h-full bg-green-400"
-							style="width: {Math.min((stat.base_stat / 160) * 100, 100)}%"
+							class="h-full"
+							style="width: {Math.min(
+								(stat.base_stat / 160) * 100,
+								100
+							)}%; background-color: {getStatColor(stat.base_stat)};"
 						/>
 					</div>
-					<p style="color: {getStatColor(stat.base_stat)};">
-						{capitalize(hyphenRemover(stat.pokemon_v2_stat.name))}: {stat.base_stat}
-					</p>
 				</div>
 			{/each}
 		</div>
 	</div>
 	<!-- Moves -->
-	<div class="mx-[10%]">
-		<h2 class="text-2xl font-semibold text-gray-800 mb-6 underline">Moves:</h2>
+	<div class="mx-[10%] mt-24">
+		<h2 class="text-4xl font-semibold mb-6 underline">Moves:</h2>
 		<div class="grid grid-cols-4 gap-4">
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
-				<a class="border rounded-lg p-4" href="/move/{move.pokemon_v2_move.name}">
+				<a
+					class="border-2 border-slate-200 hover:bg-gray-200 p-4"
+					href="/move/{move.pokemon_v2_move.name}"
+				>
 					<div class="flex flex-col items-center text-center">
 						<div class="flex gap-4">
-							<p class="text-xl font-semibold text-gray-800">
+							<p class="text-xl font-semibold">
 								{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
 							</p>
 							<Type textSize="14" type={move.pokemon_v2_move.pokemon_v2_type.name} />

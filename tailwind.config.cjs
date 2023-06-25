@@ -10,7 +10,9 @@ module.exports = {
 				'-md': { max: '767px' },
 				'-sm': { max: '639px' }
 			},
-			fontFamily: {}
+			fontFamily: {
+				hind: ['Hind', 'sans-serif']
+			}
 		}
 	},
 	plugins: []

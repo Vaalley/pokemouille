@@ -19,7 +19,7 @@
 <div>
 	<p
 		style="background-color: {color}; color: {getTextColor(color)}; font-size: {textSize}px;"
-		class="font-light py-1 px-2 rounded-md w-fit hover:scale-105 hover:cursor-default transition-transform duration-300"
+		class="font-medium py-1 px-2 rounded-md w-fit hover:scale-105 hover:cursor-default transition-transform duration-300"
 	>
 		{capitalize(type)}
 	</p>

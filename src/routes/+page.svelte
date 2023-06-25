@@ -6,18 +6,18 @@
 </script>
 
 <svelte:head>
-	<title>Pokémouille</title>
+	<title>Pokémouille 🐸</title>
 	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
 <div class="bg-gray-100 min-h-screen">
 	<div class="container mx-auto py-8">
-		<h1 class="text-4xl sm:text-5xl md:text-6xl text-center mt-8 mb-16 font-semibold text-gray-800">
-			Welcome to Pokémouille
+		<h1 class="text-4xl sm:text-5xl md:text-6xl text-center mt-8 mb-16 font-bold">
+			Welcome to Pokémouille 🐸
 		</h1>
 		<div class="my-8">
-			<h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 text-gray-800">About</h2>
-			<p class="text-lg sm:text-xl text-gray-700">
+			<h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4">About</h2>
+			<p class="text-lg sm:text-xl">
 				Pokémouille is a website that provides information about the world of Pokémon. You can
 				search for your favorite Pokémon and learn more about their stats, moves, abilities, and
 				more. Whether you're a seasoned trainer or just getting started, Pokémouille has everything
@@ -30,7 +30,7 @@
 			>
 				Start typing anywhere to search for anything
 			</h2>
-			<p class="text-lg sm:text-xl text-gray-700">
+			<p class="text-lg sm:text-xl">
 				Pokémouille is an open-source project under MIT license, which means anyone can contribute
 				to it. If you're interested in helping out, check out our <a
 					href="https://github.com/Vaalley/pokemouille"

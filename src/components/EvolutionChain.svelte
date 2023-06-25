@@ -1,6 +1,6 @@
 <script>
 	export let evolutionChainData;
-	import { goto } from '$app/navigation';
+	export let currentPokemonName;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 
 	const pokemonSpriteUrl =
@@ -10,23 +10,20 @@
 </script>
 
 <div class="mx-[10%] my-12">
-	<h2 class="text-2xl font-semibold mb-6 text-gray-800 underline">Evolution Chain</h2>
-	<div class="flex justify-around">
+	<h2 class="text-4xl font-semibold mb-6 underline">
+		Evolution chain for {capitalize(hyphenRemover(currentPokemonName))}:
+	</h2>
+	<div class="flex gap-4">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon, index}
 			<a
-				class="hover:bg-gray-200 p-6"
+				class="hover:bg-slate-200 rounded-xl p-5"
 				href={`/pokemon/${pokemon.name}`}
 				on:click|preventDefault={() => {
-					if (window.location.pathname === `/pokemon/${pokemon.name}`) {
-						window.location.href = `${window.location.origin}/pokemon`;
-					} else {
-						goto(`/pokemon/${pokemon.name}`);
-						window.location.href = `${window.location.origin}/pokemon/${pokemon.name}`;
-					}
+					window.location.href = `${window.location.origin}/pokemon/${pokemon.name}`;
 				}}
 			>
 				<div>
-					<p class="text-lg font-semibold text-gray-800 text-center">
+					<p class="text-xl font-semibold text-center">
 						{capitalize(hyphenRemover(pokemon.name))}
 					</p>
 					<img class="mx-auto" src={`${pokemonSpriteUrl}${pokemon.id}.png`} alt={pokemon.name} />
@@ -34,7 +31,7 @@
 				{#if pokemon.pokemon_v2_pokemonevolutions}
 					<div class="flex flex-col">
 						{#each pokemon.pokemon_v2_pokemonevolutions as evolution}
-							<p class="underline font-semibold text-center">
+							<p class="text-lg font-semibold">
 								{capitalize(hyphenRemover(evolution.pokemon_v2_evolutiontrigger.name))}
 								:
 							</p>
