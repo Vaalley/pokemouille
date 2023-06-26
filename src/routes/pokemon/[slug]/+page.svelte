@@ -15,7 +15,7 @@
 	const pokemonShowdownUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/';
 
-	// console.log(evolutionChainData);
+	console.log(pokemonInfo);
 </script>
 
 <svelte:head>
@@ -115,7 +115,7 @@
 		<div class="grid grid-cols-4 gap-4">
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
 				<a
-					class="border-2 border-slate-200 hover:bg-gray-200 p-4"
+					class="border-2 border-slate-200 hover:bg-slate-50 p-4"
 					href="/move/{move.pokemon_v2_move.name}"
 				>
 					<div class="flex flex-col items-center text-center">
