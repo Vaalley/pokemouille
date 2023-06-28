@@ -23,9 +23,9 @@
 
 <div class="bg-gray-100 min-h-screen">
 	<!-- Move name -->
-	<div class="flex items-center gap-6 mx-[10%]">
-		<Type type={moveInfo.pokemon_v2_move[0].pokemon_v2_type.name} />
-		<h1 class="text-3xl font-semibold text-gray-800 my-6">
+	<div class="flex gap-6 items-center justify-center h-32">
+		<Type type={moveInfo.pokemon_v2_move[0].pokemon_v2_type.name} textSize="20" />
+		<h1 class="text-5xl font-semibold">
 			{capitalize(hyphenRemover(moveInfo.pokemon_v2_move[0].name))}
 			<span class="text-xl text-gray-500"
 				>- Introduced in {hyphenRemover(
@@ -35,81 +35,84 @@
 		</h1>
 	</div>
 	<!-- Move Info -->
+	<h2 class="text-4xl font-semibold mb-6 underline mx-[10%]">General Info:</h2>
 	<div class="flex justify-between mx-[10%] flex-wrap mt-6">
 		<!-- Category -->
 		<div>
-			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Category:</h2>
+			<h2 class="text-3xl font-semibold mb-6 underline">Category:</h2>
 			{#if moveInfo.pokemon_v2_move[0].move_damage_class_id == 1}
-				<p class="text-gray-600">Status</p>
+				<p class="text-xl font-medium">Status</p>
 			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 2}
-				<p class="text-gray-600">Physical</p>
+				<p class="text-xl font-medium">Physical</p>
 			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 3}
-				<p class="text-gray-600">Special</p>
+				<p class="text-xl font-medium">Special</p>
 			{/if}
 		</div>
 		<!-- Power -->
 		<div>
-			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Power:</h2>
+			<h2 class="text-3xl font-semibold mb-6 underline">Power:</h2>
 			{#if moveInfo.pokemon_v2_move[0].power}
-				<p class="text-gray-600">
+				<p class="text-xl font-medium">
 					{moveInfo.pokemon_v2_move[0].power}
 				</p>
 			{:else}
-				<p class="text-gray-600">N/A</p>
+				<p class="text-xl font-medium">N/A</p>
 			{/if}
 		</div>
 		<!-- Accuracy -->
 		<div>
-			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Accuracy:</h2>
+			<h2 class="text-3xl font-semibold mb-6 underline">Accuracy:</h2>
 			{#if moveInfo.pokemon_v2_move[0].accuracy}
-				<p class="text-gray-600">
+				<p class="text-xl font-medium">
 					{moveInfo.pokemon_v2_move[0].accuracy}
 				</p>
 			{:else}
-				<p class="text-gray-600">N/A</p>
+				<p class="text-xl font-medium">N/A</p>
 			{/if}
 		</div>
 		<!-- Priority -->
 		<div>
-			<h2 class="text-xl font-semibold text-gray-800 underline my-2">Priority:</h2>
+			<h2 class="text-3xl font-semibold mb-6 underline">Priority:</h2>
 			{#if moveInfo.pokemon_v2_move[0].priority}
-				<p class="text-gray-600">
+				<p class="text-xl font-medium">
 					{moveInfo.pokemon_v2_move[0].priority}
 				</p>
 			{:else}
-				<p class="text-gray-600">N/A</p>
+				<p class="text-xl font-medium">N/A</p>
 			{/if}
 		</div>
 		<!-- PP -->
 		<div>
-			<h2 class="text-xl font-semibold text-gray-800 underline my-2">PP:</h2>
+			<h2 class="text-3xl font-semibold mb-6 underline">PP:</h2>
 			{#if moveInfo.pokemon_v2_move[0].pp}
-				<p class="text-gray-600">
+				<p class="text-xl font-medium">
 					{moveInfo.pokemon_v2_move[0].pp}
 				</p>
 			{:else}
-				<p class="text-gray-600">N/A</p>
+				<p class="text-xl font-medium">N/A</p>
 			{/if}
 		</div>
 	</div>
-	<!-- Move flavor text -->
-	<div class="mx-[10%] mt-16">
-		<h2 class="text-2xl font-semibold text-gray-800 underline my-2">Flavor Text:</h2>
-		<p class="text-lg text-gray-600">
-			{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
-		</p>
-	</div>
-	<!-- Move effect -->
-	<div class="mx-[10%]">
-		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">Effect Description:</h2>
-		<p class="text-lg text-gray-600">{formattedEffect}</p>
+	<div class="grid grid-cols-2 items-baseline mx-[10%] my-20">
+		<!-- Move flavor text -->
+		<div>
+			<h2 class="text-4xl font-semibold mb-6 underline">Flavor Text:</h2>
+			<p class="text-lg font-medium">
+				{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
+			</p>
+		</div>
+		<!-- Move effect -->
+		<div>
+			<h2 class="text-4xl font-semibold mb-6 underline">Effect Description:</h2>
+			<p class="text-lg font-medium">{formattedEffect}</p>
+		</div>
 	</div>
 	<!-- Move Pokémon list -->
 	<div class="mx-[10%]">
-		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">
+		<h2 class="text-4xl font-semibold mb-6 underline">
 			List of Pokémon that can learn that ability:
 		</h2>
-		<div class="grid grid-cols-4">
+		<div class="grid grid-cols-8">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
 				<a
 					class="hover:bg-gray-200 w-fit p-6 flex flex-col justify-center items-center mx-auto"

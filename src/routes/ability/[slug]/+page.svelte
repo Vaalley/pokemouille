@@ -17,8 +17,8 @@
 
 <div class="bg-gray-100 min-h-screen">
 	<!-- Ability name -->
-	<div class="flex mx-[10%]">
-		<h1 class="text-3xl font-semibold text-gray-800 my-6">
+	<div class="flex gap-6 items-center justify-center h-32">
+		<h1 class="text-5xl font-semibold">
 			{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}
 			<span class="text-xl text-gray-500"
 				>- Introduced in {hyphenRemover(
@@ -27,29 +27,33 @@
 			>
 		</h1>
 	</div>
-	<!-- Ability flavor text -->
-	<div class="mx-[10%]">
-		<h2 class="text-2xl font-semibold text-gray-800 underline my-2">Flavor Text:</h2>
-		<p class="text-lg text-gray-600">
-			{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
-		</p>
-	</div>
-	<!-- Ability effect -->
-	<div class="mx-[10%]">
-		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">Effect Description:</h2>
-		<p class="text-lg text-gray-600">
-			{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
-		</p>
+	<div class="grid grid-cols-2 items-baseline mx-[10%]">
+		<!-- Ability flavor text -->
+		<div class="mt-20">
+			<h2 class="text-4xl font-semibold mb-6 underline">Flavor Text:</h2>
+			<p class="text-xl font-medium">
+				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
+			</p>
+		</div>
+		<!-- Ability effect -->
+		<div class="mt-12">
+			<h2 class="text-4xl font-semibold mb-6 underline">Effect Description:</h2>
+			<p class="text-xl font-medium">
+				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
+			</p>
+		</div>
 	</div>
 	<!-- Ability Pokémon list -->
-	<div class="mx-[10%]">
-		<h2 class="text-2xl font-semibold text-gray-800 underline my-6">
-			List of Pokémon that can learn that ability:
+	<div class="mx-[10%] py-12">
+		<h2 class="text-4xl font-semibold mb-6 underline">
+			List of Pokémon that can learn {capitalize(
+				hyphenRemover(abilityInfo.pokemon_v2_ability[0].name)
+			)}:
 		</h2>
-		<div class="grid grid-cols-4">
+		<div class="grid grid-cols-8">
 			{#each abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities as pokemon}
 				<a
-					class="hover:bg-gray-200 w-fit p-6 flex flex-col justify-center items-center mx-auto"
+					class="hover:bg-slate-200 rounded-xl p-5 w-fit flex flex-col justify-center items-center mx-auto"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img

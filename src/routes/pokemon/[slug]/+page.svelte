@@ -15,13 +15,14 @@
 	const pokemonShowdownUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/';
 
-	console.log(pokemonInfo);
+	// console.log(pokemonInfo);
 </script>
 
 <svelte:head>
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
+<!-- TODO: When type is hovered, display it's weaknesses and resistances -->
 <div class="bg-gray-100">
 	<!-- Pokemon Name -->
 	<div class="flex gap-6 items-center justify-center h-32">
@@ -165,7 +166,7 @@
 		</div>
 	</div>
 	<!-- Moves -->
-	<div class="mx-[10%] mt-24">
+	<div class="mx-[10%] py-24">
 		<h2 class="text-4xl font-semibold mb-6 underline">Moves:</h2>
 		<div class="grid grid-cols-4 gap-4">
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
