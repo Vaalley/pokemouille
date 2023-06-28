@@ -109,6 +109,61 @@
 			{/each}
 		</div>
 	</div>
+	<!-- Pokemon Sprites Gallery -->
+	<div class="mx-[10%] mt-24">
+		<h2 class="text-4xl font-semibold mb-6 underline">Pokemon Sprites Gallery:</h2>
+		<div class="grid grid-cols-2">
+			<div class="mx-auto">
+				<h3 class="text-xl font-semibold">Official Shiny Artwork:</h3>
+				<img
+					src={pokemonOfficialArtworkUrl +
+						'/shiny/' +
+						pokemonInfo.pokemon_v2_pokemon[0].id +
+						'.png'}
+					alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+					class="w-64"
+					loading="lazy"
+				/>
+			</div>
+			<div class="mx-auto">
+				<h3 class="text-xl font-semibold">Main Sprites:</h3>
+				<div class="flex items-center">
+					<div>
+						<img
+							src={pokemonMainSpriteUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
+							alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+							loading="lazy"
+							class="w-max h-max"
+						/>
+						<img
+							src={pokemonMainSpriteUrl + '/back/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
+							alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+							loading="lazy"
+							class="w-max h-max"
+						/>
+					</div>
+					<div>
+						<img
+							src={pokemonMainSpriteUrl + '/shiny/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
+							alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+							loading="lazy"
+							class="w-max h-max"
+						/>
+						<img
+							src={pokemonMainSpriteUrl +
+								'/back/' +
+								'/shiny/' +
+								pokemonInfo.pokemon_v2_pokemon[0].id +
+								'.png'}
+							alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+							loading="lazy"
+							class="w-max h-max"
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!-- Moves -->
 	<div class="mx-[10%] mt-24">
 		<h2 class="text-4xl font-semibold mb-6 underline">Moves:</h2>

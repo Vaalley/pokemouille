@@ -11,7 +11,7 @@
 
 <div class="mx-[10%] my-12">
 	<h2 class="text-4xl font-semibold mb-6 underline">
-		Evolution chain for {capitalize(hyphenRemover(currentPokemonName))}:
+		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
 	<div class="flex gap-4">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon, index}
