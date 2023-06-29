@@ -22,7 +22,6 @@
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
-<!-- TODO: When type is hovered, display it's weaknesses and resistances -->
 <div class="bg-gray-100">
 	<!-- Pokemon Name -->
 	<div class="flex gap-6 items-center justify-center h-32">
