@@ -47,7 +47,6 @@
 	// console.log(color);
 </script>
 
-<!-- TODO: When type is hovered, display it's weaknesses and resistances -->
 <div>
 	<p
 		id={`type-${type}`}
@@ -58,10 +57,3 @@
 		{capitalize(type)}
 	</p>
 </div>
-
-<style>
-	.tippy-box[data-theme~='tomato'] {
-		background-color: tomato;
-		color: yellow;
-	}
-</style>
