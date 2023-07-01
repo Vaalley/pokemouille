@@ -8,12 +8,10 @@
 	let pokemonInfo = data.pokemonInfo;
 	let evolutionChainData = data.pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy;
 	const searchData = data.searchData;
-	const pokemonOfficialArtworkUrl =
-		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
-	const pokemonShowdownUrl =
-		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/';
+	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
+	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
 
 	// console.log(pokemonInfo);
 </script>

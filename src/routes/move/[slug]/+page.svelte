@@ -14,7 +14,7 @@
 
 	const formattedEffect = moveEffect.replace(/\$effect_chance/g, moveEffectChance);
 
-	console.log(moveInfo);
+	// console.log(moveInfo);
 </script>
 
 <svelte:head>
@@ -115,7 +115,7 @@
 		<div class="grid grid-cols-8">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
 				<a
-					class="hover:bg-gray-200 w-fit p-6 flex flex-col justify-center items-center mx-auto"
+					class="hover:bg-slate-200 rounded-xl p-5 w-fit flex flex-col justify-center items-center mx-auto"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img
