@@ -108,7 +108,7 @@
 		</div>
 	</div>
 	<!-- Pokemon Sprites Gallery -->
-	<div class="mx-[10%] mt-24">
+	<div class="mx-[10%] mt-28">
 		<h2 class="text-4xl font-semibold mb-6 underline">Pokemon Sprites Gallery:</h2>
 		<div class="grid grid-cols-2">
 			<div class="mx-auto">
