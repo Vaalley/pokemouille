@@ -167,18 +167,15 @@
 		<h2 class="text-4xl font-semibold mb-6 underline">Moves:</h2>
 		<div class="grid grid-cols-4 gap-4">
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
-				<a
-					class="border-2 border-slate-200 hover:bg-slate-50 p-4"
-					href="/move/{move.pokemon_v2_move.name}"
-				>
+				<a class="hover:bg-slate-200 rounded-xl p-4" href="/move/{move.pokemon_v2_move.name}">
 					<div class="flex flex-col items-center text-center">
 						<div class="flex gap-4">
+							<Type textSize="14" type={move.pokemon_v2_move.pokemon_v2_type.name} />
 							<p class="text-xl font-semibold">
 								{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
 							</p>
-							<Type textSize="14" type={move.pokemon_v2_move.pokemon_v2_type.name} />
 						</div>
-						<div>
+						<div class="mt-4">
 							{#if move.pokemon_v2_move.power}
 								<p>Power: {move.pokemon_v2_move.power}</p>
 							{/if}
