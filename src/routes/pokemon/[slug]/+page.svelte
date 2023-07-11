@@ -165,7 +165,7 @@
 	<!-- Moves -->
 	<div class="mx-[10%] py-24">
 		<h2 class="text-4xl font-semibold mb-6 underline">Moves:</h2>
-		<div class="grid grid-cols-4 gap-4">
+		<div class="grid grid-cols-5 gap-4">
 			{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
 				<a class="hover:bg-slate-200 rounded-xl p-4" href="/move/{move.pokemon_v2_move.name}">
 					<div class="flex flex-col items-center text-center">
