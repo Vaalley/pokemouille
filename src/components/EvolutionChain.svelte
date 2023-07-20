@@ -9,18 +9,17 @@
 	// console.log(evolutionChainData);
 </script>
 
+<!-- TODO: Show alternate forms under evolution -->
 <div class="mx-[10%] my-12">
 	<h2 class="text-4xl font-semibold mb-6 underline">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
 	<div class="flex gap-4">
-		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon, index}
+		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
+				data-sveltekit-reload
 				class="hover:bg-slate-200 rounded-xl p-5"
 				href={`/pokemon/${pokemon.name}`}
-				on:click|preventDefault={() => {
-					window.location.href = `${window.location.origin}/pokemon/${pokemon.name}`;
-				}}
 			>
 				<div>
 					<p class="text-xl font-semibold text-center">
