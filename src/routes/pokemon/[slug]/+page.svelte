@@ -26,6 +26,7 @@
 		{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 	</h1>
 	<img
+		loading="lazy"
 		src={pokemonShowdownUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.gif'}
 		alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 	/>
