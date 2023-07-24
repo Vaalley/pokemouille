@@ -6,31 +6,36 @@
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	// console.log(evolutionChainData);
+	console.log(evolutionChainData);
 </script>
 
 <!-- TODO: Show alternate forms under evolution -->
-<div class="mx-[10%] my-12">
-	<h2 class="text-4xl font-semibold mb-6 underline">
+<div class="container mx-auto my-24">
+	<h2 class="h2 font-semibold underline">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
-	<div class="flex gap-4">
+	<div class="flex gap-6 mt-6">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
 				data-sveltekit-reload
-				class="hover:bg-slate-200 rounded-xl p-5"
+				class="hover:bg-secondary-hover-token p-6 transition-all"
 				href={`/pokemon/${pokemon.name}`}
 			>
 				<div>
-					<p class="text-xl font-semibold text-center">
+					<p class="h3 font-semibold text-center">
 						{capitalize(hyphenRemover(pokemon.name))}
 					</p>
-					<img class="mx-auto" src={`${pokemonSpriteUrl}${pokemon.id}.png`} alt={pokemon.name} />
+					<img
+						class="mx-auto"
+						loading="lazy"
+						src={`${pokemonSpriteUrl}${pokemon.id}.png`}
+						alt={pokemon.name}
+					/>
 				</div>
 				{#if pokemon.pokemon_v2_pokemonevolutions}
 					<div class="flex flex-col">
 						{#each pokemon.pokemon_v2_pokemonevolutions as evolution}
-							<p class="text-lg font-semibold">
+							<p class="h4 font-semibold">
 								{capitalize(hyphenRemover(evolution.pokemon_v2_evolutiontrigger.name))}
 								:
 							</p>
