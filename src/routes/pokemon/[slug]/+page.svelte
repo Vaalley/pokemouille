@@ -21,8 +21,8 @@
 </svelte:head>
 
 <!-- Pokemon Name -->
-<div class="flex gap-6 items-center justify-center h1 font-bold text-center mt-12">
-	<h1 class="">
+<div class="flex gap-6 items-center justify-center text-center mt-12">
+	<h1 class="h1 font-bold">
 		{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 	</h1>
 	<img
@@ -39,7 +39,8 @@
 	/>
 </div>
 <!-- General Info -->
-<div class="container mx-auto flex items-center justify-around h-80">
+<h2 class="container mx-auto h2 font-semibold mt-16">General Info:</h2>
+<div class="container mx-auto flex items-center justify-around h-80 mt-6">
 	<img
 		src={pokemonOfficialArtworkUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 		alt={pokemonInfo.pokemon_v2_pokemon[0].name}
@@ -72,11 +73,14 @@
 			<h2 class="h4 font-semibold mt-4">Ability(ies):</h2>
 			<div class="flex flex-col gap-2">
 				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
-					<a href="/ability/{ability.pokemon_v2_ability.name}">
+					<a
+						class="hover:text-primary-500 transition-all"
+						href="/ability/{ability.pokemon_v2_ability.name}"
+					>
 						<p class="h5 font-medium">
 							-{capitalize(hyphenRemover(ability.pokemon_v2_ability.name))}
 							{#if ability.is_hidden}
-								<span class="text-red-500">(hidden)</span>
+								<span class="text-primary-500">(hidden)</span>
 							{/if}
 						</p>
 					</a>
@@ -94,7 +98,7 @@
 				<p style="color: {getStatColor(stat.base_stat)};">
 					{stat.base_stat}
 				</p>
-				<div class="w-24 bg-gray-200 rounded h-4 relative overflow-hidden">
+				<div class="w-24 bg-tertiary-50 rounded h-4 relative overflow-hidden">
 					<div
 						class="h-full"
 						style="width: {Math.min(
@@ -109,10 +113,10 @@
 </div>
 <!-- Pokemon Sprites Gallery -->
 <div class="container mx-auto mt-28">
-	<h2 class="h2 font-semibold underline">Pokemon Sprites Gallery:</h2>
+	<h2 class="h2 font-semibold">Pokemon Sprites Gallery:</h2>
 	<div class="grid grid-cols-2 mt-12">
 		<div class="mx-auto">
-			<h3 class="h4 font-semibold">Official Shiny Artwork:</h3>
+			<h3 class="h3 text-center font-semibold">Official Shiny Artwork:</h3>
 			<img
 				src={pokemonOfficialArtworkUrl + '/shiny/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 				alt={pokemonInfo.pokemon_v2_pokemon[0].name}
@@ -121,7 +125,7 @@
 			/>
 		</div>
 		<div class="mx-auto">
-			<h3 class="h4 font-semibold">Main Sprites:</h3>
+			<h3 class="h3 text-center font-semibold">Main Sprites:</h3>
 			<div class="flex items-center">
 				<div>
 					<img
@@ -161,11 +165,11 @@
 </div>
 <!-- Moves -->
 <div class="container mx-auto">
-	<h2 class="h2 font-semibold underline">Moves:</h2>
+	<h2 class="h2 font-semibold">Moves:</h2>
 	<div class="grid grid-cols-5 gap-4 mt-12">
 		{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
 			<a
-				class="hover:bg-secondary-hover-token p-6 transition-all"
+				class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
 				href="/move/{move.pokemon_v2_move.name}"
 			>
 				<div class="flex flex-col items-center text-center">

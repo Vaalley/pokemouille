@@ -127,6 +127,7 @@
 								class="h-fit my-[-6px]"
 								src={`${pokemonSpriteUrl}${pokemon.id}.png`}
 								alt={pokemon.name}
+								loading="lazy"
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(pokemon.name))}</p>
 							<div class="flex flex-col gap-1 text-sm items-end">
@@ -161,6 +162,7 @@
 								class="h-fit my-[-6px]"
 								src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ability-capsule.png"
 								alt={ability.name}
+								loading="lazy"
 							/>
 							<p>{capitalize(hyphenRemover(ability.name))}</p>
 						</li>
@@ -190,6 +192,7 @@
 								class="h-fit my-[-6px]"
 								src={`${moveSpriteUrl}tm-${move.pokemon_v2_type.name}.png`}
 								alt={move.name}
+								loading="lazy"
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(move.name))}</p>
 							<div class="flex flex-col gap-1 text-sm items-end">

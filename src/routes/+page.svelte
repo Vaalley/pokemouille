@@ -24,13 +24,13 @@
 	>
 		Start typing anywhere to search for anything
 	</h2>
-	<p class="font-medium italic text-sm p-2">
+	<p class="font-medium italic text-sm p-2 text-secondary-500">
 		Pokémouille is an open-source project under MIT license, which means anyone can contribute to
 		it. If you're interested in helping out, check out our <a
 			href="https://github.com/Vaalley/pokemouille"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="text-red-600 hover:text-red-700 underline">GitHub repository</a
+			class="text-primary-600 hover:text-primary-700 underline transition-all">GitHub repository</a
 		>. We're always looking for contributors to make Pokémouille even better!
 	</p>
 </div>

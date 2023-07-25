@@ -6,19 +6,19 @@
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	console.log(evolutionChainData);
+	// console.log(evolutionChainData);
 </script>
 
 <!-- TODO: Show alternate forms under evolution -->
-<div class="container mx-auto my-24">
-	<h2 class="h2 font-semibold underline">
+<div class="container mx-auto mt-24">
+	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
 	<div class="flex gap-6 mt-6">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
 				data-sveltekit-reload
-				class="hover:bg-secondary-hover-token p-6 transition-all"
+				class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
 				href={`/pokemon/${pokemon.name}`}
 			>
 				<div>

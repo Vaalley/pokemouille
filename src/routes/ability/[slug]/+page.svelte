@@ -15,12 +15,12 @@
 	<title>{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 </svelte:head>
 
-<div class="bg-gray-100 min-h-screen">
+<div class="min-h-screen">
 	<!-- Ability name -->
 	<div class="flex gap-6 items-center justify-center h-32">
-		<h1 class="text-5xl font-semibold">
+		<h1 class="h1 font-bold flex items-center gap-3">
 			{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}
-			<span class="text-xl text-gray-500"
+			<span class="h4 text-tertiary-800"
 				>- Introduced in {hyphenRemover(
 					abilityInfo.pokemon_v2_ability[0].pokemon_v2_generation.name
 				)}</span
@@ -30,14 +30,14 @@
 	<div class="grid grid-cols-2 items-baseline mx-[10%]">
 		<!-- Ability flavor text -->
 		<div class="mt-20">
-			<h2 class="text-4xl font-semibold mb-6 underline">Flavor Text:</h2>
+			<h2 class="h2 font-semibold mb-6">Flavor Text:</h2>
 			<p class="text-xl font-medium">
 				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
 			</p>
 		</div>
 		<!-- Ability effect -->
 		<div class="mt-12">
-			<h2 class="text-4xl font-semibold mb-6 underline">Effect Description:</h2>
+			<h2 class="h2 font-semibold mb-6">Effect Description:</h2>
 			<p class="text-xl font-medium">
 				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
 			</p>
@@ -45,25 +45,26 @@
 	</div>
 	<!-- Ability Pokémon list -->
 	<div class="mx-[10%] py-12">
-		<h2 class="text-4xl font-semibold mb-6 underline">
+		<h2 class="h2 font-semibold mb-6">
 			List of Pokémon that can learn {capitalize(
 				hyphenRemover(abilityInfo.pokemon_v2_ability[0].name)
 			)}:
 		</h2>
-		<div class="grid grid-cols-8">
+		<div class="grid grid-cols-8 gap-3">
 			{#each abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities as pokemon}
 				<a
-					class="hover:bg-slate-200 rounded-xl p-5 w-fit flex flex-col justify-center items-center mx-auto"
+					class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all w-fit flex flex-col justify-center items-center mx-auto h5 font-medium"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img
+						loading="lazy"
 						src={pokemonMainSpriteUrl + pokemon.pokemon_v2_pokemon.id + '.png'}
 						alt={pokemon.pokemon_v2_pokemon.name}
 					/>
 					<p>
-						{pokemon.pokemon_v2_pokemon.name}
+						{capitalize(pokemon.pokemon_v2_pokemon.name)}
 						{#if pokemon.is_hidden}
-							<span class="text-red-500">(hidden)</span>
+							<span class="text-primary-500">(hidden)</span>
 						{/if}
 					</p>
 				</a>
