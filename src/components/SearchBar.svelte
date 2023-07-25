@@ -1,6 +1,5 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import Type from './Type.svelte';
 	export let data;
@@ -18,7 +17,9 @@
 	const moveSpriteUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/';
 
 	function toggleSearchBar(event) {
-		if (event.key === 'Escape' || event.type === 'click') {
+		if (event.key === 'Escape' && showSearchBar) {
+			showSearchBar = false;
+		} else if (event.type === 'click' && event.target !== inputEl) {
 			showSearchBar = false;
 		} else if (/^[a-zA-Z]$/.test(event.key)) {
 			showSearchBar = true;
@@ -95,36 +96,26 @@
 
 {#if showSearchBar}
 	<div
-		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-gray-100 bg-opacity-50 z-50 -lg:static"
+		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-tertiary-100 bg-opacity-20 z-50 -lg:static"
 	>
 		<input
 			type="text"
 			placeholder="Search..."
-			class="w-80 max-w-[600px] px-4 py-2 text-lg shadow-md border-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+			class="w-80 max-w-[600px] input variant-form-material outline-none bg-tertiary-100 h3 px-4 py-3"
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
 			on:input={updateMatching}
 		/>
 
 		{#if matchingPokemon.length}
-			<ul class="mt-4 grid grid-cols-2 gap-6 items-start border-2 border-gray-500">
+			<ul class="mt-6 grid grid-cols-2 gap-6 items-start">
 				{#each matchingPokemon as pokemon}
-					<a
-						href={`/pokemon/${pokemon.slug}`}
-						on:click|preventDefault={() => {
-							if (window.location.pathname === `/pokemon/${pokemon.slug}`) {
-								window.location.href = `${window.location.origin}/pokemon`;
-							} else {
-								goto(`/pokemon/${pokemon.slug}`);
-								window.location.href = `${window.location.origin}/pokemon/${pokemon.slug}`;
-							}
-						}}
-					>
+					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
 						<li
-							class="flex items-center justify-end gap-6 h-24 text-xl font-semibold bg-white cursor-pointer hover:bg-gray-100 px-4 border-2 border-gray-300"
+							class="flex items-center justify-end gap-6 h-24 h4 font-semibold rounded-none p-3 outline-none cursor-pointer card hover:border-primary-500 hover:border-b-2 bg-tertiary-100 hover:text-primary-500"
 						>
 							<img
-								class="h-fit my-[-6px]"
+								class="h-fit"
 								src={`${pokemonSpriteUrl}${pokemon.id}.png`}
 								alt={pokemon.name}
 								loading="lazy"
@@ -142,21 +133,11 @@
 		{/if}
 
 		{#if matchingAbility.length}
-			<ul class="mt-4 grid grid-cols-2 gap-6 items-start border-2 border-gray-500">
+			<ul class="mt-6 grid grid-cols-2 gap-6 items-start">
 				{#each matchingAbility as ability}
-					<a
-						href={`/ability/${ability.slug}`}
-						on:click|preventDefault={() => {
-							if (window.location.pathname === `/ability/${ability.slug}`) {
-								window.location.href = `${window.location.origin}/ability`;
-							} else {
-								goto(`/ability/${ability.slug}`);
-								window.location.href = `${window.location.origin}/ability/${ability.slug}`;
-							}
-						}}
-					>
+					<a data-sveltekit-reload href={`/ability/${ability.slug}`}>
 						<li
-							class="flex items-center gap-6 h-24 text-xl font-semibold bg-white cursor-pointer hover:bg-gray-100 px-4 border-2 border-gray-300"
+							class="flex items-center justify-end gap-6 h-24 h4 font-semibold rounded-none p-3 outline-none cursor-pointer card hover:border-primary-500 hover:border-b-2 bg-tertiary-100 hover:text-primary-500"
 						>
 							<img
 								class="h-fit my-[-6px]"
@@ -172,21 +153,11 @@
 		{/if}
 
 		{#if matchingMove.length}
-			<ul class="mt-4 grid grid-cols-2 gap-6 items-start border-2 border-gray-500">
+			<ul class="mt-6 grid grid-cols-2 gap-6 items-start">
 				{#each matchingMove as move}
-					<a
-						href={`/move/${move.slug}`}
-						on:click|preventDefault={() => {
-							if (window.location.pathname === `/move/${move.slug}`) {
-								window.location.href = `${window.location.origin}/move`;
-							} else {
-								goto(`/move/${move.slug}`);
-								window.location.href = `${window.location.origin}/move/${move.slug}`;
-							}
-						}}
-					>
+					<a data-sveltekit-reload href={`/move/${move.slug}`}>
 						<li
-							class="flex items-center justify-end gap-6 h-24 text-xl font-semibold bg-white cursor-pointer hover:bg-gray-100 px-4 border-2 border-gray-300"
+							class="flex items-center justify-end gap-6 h-24 h4 font-semibold rounded-none p-3 outline-none cursor-pointer card hover:border-primary-500 hover:border-b-2 bg-tertiary-100 hover:text-primary-500"
 						>
 							<img
 								class="h-fit my-[-6px]"

@@ -10,7 +10,8 @@
 </script>
 
 <!-- TODO: Show alternate forms under evolution -->
-<div class="container mx-auto mt-24">
+<!-- TODO: fix order not correct all the time (should be ordered by id) -->
+<div class="container mx-auto mt-16">
 	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>

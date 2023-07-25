@@ -7,6 +7,10 @@
 
 	let pokemonInfo = data.pokemonInfo;
 	let evolutionChainData = data.pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy;
+	let totalStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats.reduce(
+		(sum, stat) => sum + stat.base_stat,
+		0
+	);
 	const searchData = data.searchData;
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
@@ -21,7 +25,7 @@
 </svelte:head>
 
 <!-- Pokemon Name -->
-<div class="flex gap-6 items-center justify-center text-center mt-12">
+<div class="flex gap-6 items-center justify-center text-center mt-6">
 	<h1 class="h1 font-bold">
 		{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 	</h1>
@@ -89,7 +93,10 @@
 		</div>
 	</div>
 	<div>
-		<h2 class="h4 font-semibold mb-4">Statistics:</h2>
+		<h2 class="h4 font-semibold">Statistics:</h2>
+		<p class="h5 font-medium mb-3">
+			Total stats: <span class="text-primary-500">{totalStats}</span>
+		</p>
 		{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats as stat}
 			<div class="flex items-center justify-end gap-2 mt-1 h5 font-medium">
 				<p style="color: {getStatColor(stat.base_stat)};">
@@ -167,7 +174,7 @@
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
 	<p class="h5 font-medium">
-		Total moves known: <span class="text-primary-500"
+		Total moves: <span class="text-primary-500"
 			>{pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves.length}</span
 		>
 	</p>
