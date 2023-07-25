@@ -166,6 +166,11 @@
 <!-- Moves -->
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
+	<p class="h5 font-medium">
+		Total moves known: <span class="text-primary-500"
+			>{pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves.length}</span
+		>
+	</p>
 	<div class="grid grid-cols-5 gap-4 mt-12">
 		{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
 			<a

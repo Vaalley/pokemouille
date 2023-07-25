@@ -27,7 +27,7 @@
 			>
 		</h1>
 	</div>
-	<div class="grid grid-cols-2 items-baseline mx-[10%]">
+	<div class="grid grid-cols-2 items-baseline container mx-auto">
 		<!-- Ability flavor text -->
 		<div class="mt-20">
 			<h2 class="h2 font-semibold mb-6">Flavor Text:</h2>
@@ -44,7 +44,7 @@
 		</div>
 	</div>
 	<!-- Ability Pokémon list -->
-	<div class="mx-[10%] py-12">
+	<div class="container mx-auto py-12">
 		<h2 class="h2 font-semibold mb-6">
 			List of Pokémon that can learn {capitalize(
 				hyphenRemover(abilityInfo.pokemon_v2_ability[0].name)

@@ -35,8 +35,8 @@
 		</h1>
 	</div>
 	<!-- Move Info -->
-	<h2 class="h2 font-semibold mb-6 mx-[10%]">General Info:</h2>
-	<div class="flex justify-between mx-[10%] flex-wrap mt-6">
+	<h2 class="h2 font-semibold mb-6 container mx-auto">General Info:</h2>
+	<div class="flex justify-between container mx-auto flex-wrap mt-6">
 		<!-- Category -->
 		<div>
 			<h2 class="h3 font-semibold mb-6">Category:</h2>
@@ -93,7 +93,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="grid grid-cols-2 items-baseline mx-[10%] my-20">
+	<div class="grid grid-cols-2 items-baseline container mx-auto my-20">
 		<!-- Move flavor text -->
 		<div>
 			<h2 class="h2 font-semibold mb-6">Flavor Text:</h2>
@@ -108,7 +108,7 @@
 		</div>
 	</div>
 	<!-- Move Pokémon list -->
-	<div class="mx-[10%]">
+	<div class="container mx-auto">
 		<h2 class="h2 font-semibold mb-6">List of Pokémon that can learn that ability:</h2>
 		<div class="grid grid-cols-8">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
