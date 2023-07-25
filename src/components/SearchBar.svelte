@@ -2,6 +2,7 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import Type from './Type.svelte';
+
 	export let data;
 
 	let showSearchBar = false;

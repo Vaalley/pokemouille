@@ -9,8 +9,6 @@
 	// console.log(evolutionChainData);
 </script>
 
-<!-- TODO: Show alternate forms under evolution -->
-<!-- TODO: fix order not correct all the time (should be ordered by id) -->
 <div class="container mx-auto mt-16">
 	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
@@ -82,6 +80,30 @@
 					</div>
 				{/if}
 			</a>
+			{#if pokemon.pokemon_v2_pokemons.length > 1}
+				{#each pokemon.pokemon_v2_pokemons as pokemon}
+					{#if pokemon.pokemon_v2_pokemonforms[0].form_name !== ''}
+						<!-- <p>{capitalize(hyphenRemover(pokemon.pokemon_v2_pokemonforms[0].name))}</p> -->
+						<a
+							data-sveltekit-reload
+							class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
+							href="/pokemon/{pokemon.pokemon_v2_pokemonforms[0].name}"
+						>
+							<div>
+								<p class="h3 font-semibold text-center">
+									{capitalize(hyphenRemover(pokemon.pokemon_v2_pokemonforms[0].name))}
+								</p>
+								<img
+									class="mx-auto"
+									loading="lazy"
+									src={`${pokemonSpriteUrl}${pokemon.pokemon_v2_pokemonforms[0].pokemon_id}.png`}
+									alt={pokemon.pokemon_v2_pokemonforms[0].name}
+								/>
+							</div>
+						</a>
+					{/if}
+				{/each}
+			{/if}
 		{/each}
 	</div>
 </div>

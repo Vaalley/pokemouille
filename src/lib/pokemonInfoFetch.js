@@ -93,6 +93,14 @@ async function fetchPokemonInfo(slug) {
 									name
 								}
 							}
+							pokemon_v2_pokemons {
+								pokemon_v2_pokemonforms {
+									form_name
+									name
+									id
+									pokemon_id
+								}
+							}
 						}
 					}
 				}
