@@ -17,7 +17,7 @@
 	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
 	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
 
-	console.log(pokemonInfo);
+	// console.log(pokemonInfo);
 </script>
 
 <svelte:head>
