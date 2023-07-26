@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover, getStatColor } from '$lib/utils';
+	import { capitalize, hyphenRemover, getStatColor, getExtremeValue } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
@@ -17,13 +17,14 @@
 	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
 	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
 
-	// console.log(pokemonInfo);
+	console.log(pokemonInfo);
 </script>
 
 <svelte:head>
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
-
+<!-- TODO: Fix statistics below 30 and above 160 showing not showing properly (instead take min stat of pokemon and max stat of pokemon to determine the boundaries) -->
+<!-- TODO: Being able to sort moves by power, accuracy or alphabetically -->
 <!-- Pokemon Name -->
 <div class="flex gap-6 items-center justify-center text-center mt-6">
 	<h1 class="h1 font-bold">
@@ -99,10 +100,22 @@
 		</p>
 		{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats as stat}
 			<div class="flex items-center justify-end gap-2 mt-1 h5 font-medium">
-				<p style="color: {getStatColor(stat.base_stat)};">
+				<p
+					style="color: {getStatColor(
+						stat.base_stat,
+						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'lowest'),
+						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'highest')
+					)};"
+				>
 					{capitalize(hyphenRemover(stat.pokemon_v2_stat.name))}
 				</p>
-				<p style="color: {getStatColor(stat.base_stat)};">
+				<p
+					style="color: {getStatColor(
+						stat.base_stat,
+						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'lowest'),
+						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'highest')
+					)};"
+				>
 					{stat.base_stat}
 				</p>
 				<div class="w-24 bg-tertiary-50 rounded h-4 relative overflow-hidden">
@@ -111,7 +124,11 @@
 						style="width: {Math.min(
 							(stat.base_stat / 160) * 100,
 							100
-						)}%; background-color: {getStatColor(stat.base_stat)};"
+						)}%; background-color: {getStatColor(
+							stat.base_stat,
+							getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'lowest'),
+							getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'highest')
+						)};"
 					/>
 				</div>
 			</div>
