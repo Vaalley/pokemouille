@@ -167,7 +167,6 @@ export function getStatColor(statValue, minStat, maxStat) {
 	const colorStart = parseInt('d4163c', 16);
 	const colorEnd = parseInt('4685af', 16);
 
-
 	const percentage = (statValue - minStatValue) / (maxStatValue - minStatValue);
 	const red = Math.floor((colorStart >> 16) * (1 - percentage) + (colorEnd >> 16) * percentage);
 	const green = Math.floor(
@@ -179,19 +178,18 @@ export function getStatColor(statValue, minStat, maxStat) {
 	return hex;
 }
 
-// Gets the extreme value of a stat 
+// Gets the extreme value of a stat
 export function getExtremeValue(stats, parameter) {
 	let extremeValue;
 
 	if (parameter === 'highest') {
-		extremeValue = Math.max(...stats.map(stat => stat.base_stat));
+		extremeValue = Math.max(...stats.map((stat) => stat.base_stat));
 	} else if (parameter === 'lowest') {
-		extremeValue = Math.min(...stats.map(stat => stat.base_stat));
+		extremeValue = Math.min(...stats.map((stat) => stat.base_stat));
 	}
 
 	return extremeValue;
 }
-
 
 // Gets the text color of a background color
 export function getTextColor(backgroundColor) {

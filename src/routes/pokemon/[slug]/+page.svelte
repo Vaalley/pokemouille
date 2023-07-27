@@ -16,6 +16,35 @@
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
 	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
+	let moves = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves;
+
+	// Function to sort moves by power
+	function sortByPower() {
+		moves.sort((a, b) => {
+			return (b.pokemon_v2_move.power || 0) - (a.pokemon_v2_move.power || 0);
+		});
+		moves = [...moves];
+	}
+
+	// Function to sort moves by accuracy
+	function sortByAccuracy() {
+		moves.sort((a, b) => {
+			return (b.pokemon_v2_move.accuracy || 0) - (a.pokemon_v2_move.accuracy || 0);
+		});
+		moves = [...moves];
+	}
+
+	// Function to sort moves alphabetically
+	function sortAlphabetically() {
+		moves.sort((a, b) => {
+			const nameA = a.pokemon_v2_move.name.toLowerCase();
+			const nameB = b.pokemon_v2_move.name.toLowerCase();
+			if (nameA < nameB) return -1;
+			if (nameA > nameB) return 1;
+			return 0;
+		});
+		moves = [...moves];
+	}
 
 	// console.log(pokemonInfo);
 </script>
@@ -23,8 +52,6 @@
 <svelte:head>
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
-<!-- TODO: Fix statistics below 30 and above 160 showing not showing properly (instead take min stat of pokemon and max stat of pokemon to determine the boundaries) -->
-<!-- TODO: Being able to sort moves by power, accuracy or alphabetically -->
 <!-- Pokemon Name -->
 <div class="flex gap-6 items-center justify-center text-center mt-6">
 	<h1 class="h1 font-bold">
@@ -191,12 +218,25 @@
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
 	<p class="h5 font-medium">
-		Total moves: <span class="text-primary-500"
-			>{pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves.length}</span
-		>
+		Total moves: <span class="text-primary-500">{moves.length}</span>
 	</p>
+	<div class="mt-6 flex gap-6">
+		<button
+			class="btn variant-filled rounded-none bg-primary-500 h5 font-semibold"
+			on:click={() => sortByPower()}>Sort by Power</button
+		>
+		<button
+			class="btn variant-filled rounded-none bg-primary-500 h5 font-semibold"
+			on:click={() => sortByAccuracy()}>Sort by Accuracy</button
+		>
+		<button
+			class="btn variant-filled rounded-none bg-primary-500 h5 font-semibold"
+			on:click={() => sortAlphabetically()}>Sort Alphabetically</button
+		>
+	</div>
+
 	<div class="grid grid-cols-5 gap-4 mt-12">
-		{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves as move}
+		{#each moves as move}
 			<a
 				class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
 				href="/move/{move.pokemon_v2_move.name}"
