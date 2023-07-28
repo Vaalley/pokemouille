@@ -17,7 +17,7 @@
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
 				data-sveltekit-reload
-				class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
+				class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
 				href={`/pokemon/${pokemon.name}`}
 			>
 				<div>
@@ -86,7 +86,7 @@
 						<!-- <p>{capitalize(hyphenRemover(pokemon.pokemon_v2_pokemonforms[0].name))}</p> -->
 						<a
 							data-sveltekit-reload
-							class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
+							class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
 							href="/pokemon/{pokemon.pokemon_v2_pokemonforms[0].name}"
 						>
 							<div>

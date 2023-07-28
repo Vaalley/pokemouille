@@ -4,6 +4,7 @@
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
+	import { LightSwitch } from '@skeletonlabs/skeleton';
 
 	let pokemonInfo = data.pokemonInfo;
 	let evolutionChainData = data.pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy;
@@ -52,6 +53,8 @@
 <svelte:head>
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
+
+<LightSwitch class="absolute top-10 right-10 scale-125" />
 <!-- Pokemon Name -->
 <div class="flex gap-6 items-center justify-center text-center mt-6">
 	<h1 class="h1 font-bold">
@@ -240,7 +243,7 @@
 	<div class="grid grid-cols-5 gap-4 mt-12">
 		{#each moves as move}
 			<a
-				class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all"
+				class="btn hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
 				href="/move/{move.pokemon_v2_move.name}"
 			>
 				<div class="flex flex-col items-center text-center">

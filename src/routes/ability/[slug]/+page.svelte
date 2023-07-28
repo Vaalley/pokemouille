@@ -2,6 +2,7 @@
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
+	import { LightSwitch } from '@skeletonlabs/skeleton';
 
 	let abilityInfo = data.abilityInfo;
 	let searchData = data.searchData;
@@ -15,6 +16,7 @@
 	<title>{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 </svelte:head>
 
+<LightSwitch class="absolute top-10 right-10 scale-125" />
 <div class="min-h-screen">
 	<!-- Ability name -->
 	<div class="flex gap-6 items-center justify-center h-32">
@@ -53,7 +55,7 @@
 		<div class="grid grid-cols-8 gap-3">
 			{#each abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities as pokemon}
 				<a
-					class="hover:bg-surface-100 hover:text-primary-500 p-6 transition-all w-fit flex flex-col justify-center items-center mx-auto h5 font-medium"
+					class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all w-fit flex flex-col justify-center items-center mx-auto h5 font-medium"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img

@@ -1,5 +1,6 @@
 <script>
 	import SearchBar from '../components/SearchBar.svelte';
+	import { LightSwitch } from '@skeletonlabs/skeleton';
 	export let data;
 
 	let searchData = data.searchData;
@@ -10,6 +11,7 @@
 	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
+<LightSwitch class="absolute top-10 right-10 scale-125" />
 <div class="min-h-screen container mx-auto flex flex-col justify-end">
 	<h1 class="h1 font-bold text-center mt-12">Welcome to Pokémouille 🐸</h1>
 	<h2 class="h2 font-semibold mt-24">About</h2>
