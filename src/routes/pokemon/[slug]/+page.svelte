@@ -249,17 +249,30 @@
 						<p class="h4 font-semibold">
 							{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
 						</p>
+						{#if move.pokemon_v2_move.move_damage_class_id == 1}
+							<img
+								class="object-contain"
+								loading="lazy"
+								src="https://archives.bulbagarden.net/media/upload/7/71/StatusIC_BW.png"
+								alt="physical"
+							/>
+						{:else if move.pokemon_v2_move.move_damage_class_id == 2}
+							<img
+								class="object-contain"
+								loading="lazy"
+								src="https://archives.bulbagarden.net/media/upload/e/ed/PhysicalIC_BW.png"
+								alt="physical"
+							/>
+						{:else if move.pokemon_v2_move.move_damage_class_id == 3}
+							<img
+								class="object-contain"
+								loading="lazy"
+								src="https://archives.bulbagarden.net/media/upload/8/8c/SpecialIC_BW.png"
+								alt="physical"
+							/>
+						{/if}
 					</div>
 					<div class="mt-4 h5 font-medium">
-						<div class="font-semibold mb-3">
-							{#if move.pokemon_v2_move.move_damage_class_id == 1}
-								<p class="h4 font-medium">Status</p>
-							{:else if move.pokemon_v2_move.move_damage_class_id == 2}
-								<p class="h4 font-medium">Physical</p>
-							{:else if move.pokemon_v2_move.move_damage_class_id == 3}
-								<p class="h4 font-medium">Special</p>
-							{/if}
-						</div>
 						{#if move.pokemon_v2_move.power}
 							<p>Power: {move.pokemon_v2_move.power}</p>
 						{/if}

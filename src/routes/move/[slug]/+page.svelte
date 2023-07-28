@@ -41,11 +41,35 @@
 		<div>
 			<h2 class="h3 font-semibold mb-6">Category:</h2>
 			{#if moveInfo.pokemon_v2_move[0].move_damage_class_id == 1}
-				<p class="h4 font-medium">Status</p>
+				<div class="flex gap-3">
+					<p class="h4 font-medium">Status</p>
+					<img
+						class="object-contain"
+						loading="lazy"
+						src="https://archives.bulbagarden.net/media/upload/7/71/StatusIC_BW.png"
+						alt="physical"
+					/>
+				</div>
 			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 2}
-				<p class="h4 font-medium">Physical</p>
+				<div class="flex gap-3">
+					<p class="h4 font-medium">Physical</p>
+					<img
+						class="object-contain"
+						loading="lazy"
+						src="https://archives.bulbagarden.net/media/upload/e/ed/PhysicalIC_BW.png"
+						alt="physical"
+					/>
+				</div>
 			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 3}
-				<p class="h4 font-medium">Special</p>
+				<div class="flex gap-3">
+					<p class="h4 font-medium">Special</p>
+					<img
+						class="object-contain"
+						loading="lazy"
+						src="https://archives.bulbagarden.net/media/upload/8/8c/SpecialIC_BW.png"
+						alt="physical"
+					/>
+				</div>
 			{/if}
 		</div>
 		<!-- Power -->
