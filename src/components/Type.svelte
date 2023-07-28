@@ -11,6 +11,9 @@
 				color = pokemonType.color;
 			}
 		}
+		if (!color) {
+			color = '#FFFFFF'; // Hex code for white
+		}
 	}
 
 	// console.log(color);
@@ -20,7 +23,7 @@
 	<p
 		id={`type-${type}`}
 		style="background-color: {color}; color: {getTextColor(color)}; font-size: {textSize}px;"
-		class="font-medium py-1 px-2 rounded-md w-fit hover:cursor-default"
+		class="font-medium py-1 px-2 w-fit hover:cursor-default"
 	>
 		{capitalize(type)}
 	</p>

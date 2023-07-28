@@ -214,6 +214,7 @@
 		</div>
 	</div>
 </div>
+<!-- TODO: Add wether a move is physical or special -->
 <!-- Moves -->
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>

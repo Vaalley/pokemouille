@@ -78,6 +78,7 @@
 	}
 
 	// console.log(data);
+
 	onMount(() => {
 		if (window.innerWidth >= 1024) {
 			document.addEventListener('keydown', toggleSearchBar);

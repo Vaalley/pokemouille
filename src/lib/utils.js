@@ -191,35 +191,30 @@ export function getExtremeValue(stats, parameter) {
 	return extremeValue;
 }
 
-// Gets the text color of a background color
 export function getTextColor(backgroundColor) {
 	const { r, g, b } = hexToRgb(backgroundColor);
 	const luminance = calculateLuminance(r, g, b);
 	return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
-// Converts a hex color to RGB
 function hexToRgb(hex) {
 	const match = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
 	if (!match) {
 		throw new Error('Invalid hex color');
 	}
-	return {
-		r: parseInt(match[1], 16),
-		g: parseInt(match[2], 16),
-		b: parseInt(match[3], 16)
-	};
+
+	const [_, r, g, b] = match;
+	return { r: parseInt(r, 16), g: parseInt(g, 16), b: parseInt(b, 16) };
 }
 
-// Calculates the luminance of a color
 function calculateLuminance(r, g, b) {
 	const rsrgb = r / 255;
 	const gsrgb = g / 255;
 	const bsrgb = b / 255;
 
-	const rlinear = rsrgb <= 0.03928 ? rsrgb / 12.92 : ((rsrgb + 0.055) / 1.055) ** 2.4;
-	const glinear = gsrgb <= 0.03928 ? gsrgb / 12.92 : ((gsrgb + 0.055) / 1.055) ** 2.4;
-	const blinear = bsrgb <= 0.03928 ? bsrgb / 12.92 : ((bsrgb + 0.055) / 1.055) ** 2.4;
+	const rlinear = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
+	const glinear = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
+	const blinear = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
 
 	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
 }
