@@ -46,7 +46,7 @@
 		moves = [...moves];
 	}
 
-	// console.log(pokemonInfo);
+	// console.log(moves);
 </script>
 
 <svelte:head>
@@ -121,6 +121,7 @@
 		</div>
 	</div>
 	<div>
+		<!-- TODO: Add EV yields -->
 		<h2 class="h4 font-semibold">Statistics:</h2>
 		<p class="h5 font-medium mb-3">
 			Total stats: <span class="text-primary-500">{totalStats}</span>
@@ -214,7 +215,7 @@
 		</div>
 	</div>
 </div>
-<!-- TODO: Add wether a move is physical or special -->
+<!-- TODO: Add moveffecttexts using tippy or similar on hover -->
 <!-- Moves -->
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
@@ -250,6 +251,15 @@
 						</p>
 					</div>
 					<div class="mt-4 h5 font-medium">
+						<div class="font-semibold mb-3">
+							{#if move.pokemon_v2_move.move_damage_class_id == 1}
+								<p class="h4 font-medium">Status</p>
+							{:else if move.pokemon_v2_move.move_damage_class_id == 2}
+								<p class="h4 font-medium">Physical</p>
+							{:else if move.pokemon_v2_move.move_damage_class_id == 3}
+								<p class="h4 font-medium">Special</p>
+							{/if}
+						</div>
 						{#if move.pokemon_v2_move.power}
 							<p>Power: {move.pokemon_v2_move.power}</p>
 						{/if}

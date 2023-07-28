@@ -63,6 +63,7 @@ async function fetchPokemonInfo(slug) {
 						pokemon_v2_type {
 							name
 						}
+						move_damage_class_id
 					}
 				}
 				pokemon_v2_pokemonspecy {
