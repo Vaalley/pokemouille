@@ -1,11 +1,13 @@
 <script>
-	export let data;
+	// Import statements
 	import { capitalize, hyphenRemover, getStatColor, getExtremeValue } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 
+	// Variable declarations
+	export let data;
 	let pokemonInfo = data.pokemonInfo;
 	let evolutionChainData = data.pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy;
 	let totalStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats.reduce(
@@ -163,8 +165,8 @@
 					/>
 				</div>
 				<!-- Add EV yields here -->
-				<div class="h5 font-medium">
-					<p class="text-base">
+				<div class="h5 text-base font-medium">
+					<p>
 						EV yield:
 						{stat.effort}
 					</p>
