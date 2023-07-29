@@ -17,37 +17,38 @@
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
 	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
-	let moves = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves;
+	let pokemonMoves = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves;
+	let pokemonStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats;
 
 	// Function to sort moves by power
 	function sortByPower() {
-		moves.sort((a, b) => {
+		pokemonMoves.sort((a, b) => {
 			return (b.pokemon_v2_move.power || 0) - (a.pokemon_v2_move.power || 0);
 		});
-		moves = [...moves];
+		pokemonMoves = [...pokemonMoves];
 	}
 
 	// Function to sort moves by accuracy
 	function sortByAccuracy() {
-		moves.sort((a, b) => {
+		pokemonMoves.sort((a, b) => {
 			return (b.pokemon_v2_move.accuracy || 0) - (a.pokemon_v2_move.accuracy || 0);
 		});
-		moves = [...moves];
+		pokemonMoves = [...pokemonMoves];
 	}
 
 	// Function to sort moves alphabetically
 	function sortAlphabetically() {
-		moves.sort((a, b) => {
+		pokemonMoves.sort((a, b) => {
 			const nameA = a.pokemon_v2_move.name.toLowerCase();
 			const nameB = b.pokemon_v2_move.name.toLowerCase();
 			if (nameA < nameB) return -1;
 			if (nameA > nameB) return 1;
 			return 0;
 		});
-		moves = [...moves];
+		pokemonMoves = [...pokemonMoves];
 	}
 
-	// console.log(moves);
+	// console.log(pokemonMoves);
 </script>
 
 <svelte:head>
@@ -124,18 +125,17 @@
 		</div>
 	</div>
 	<div>
-		<!-- TODO: Add EV yields -->
 		<h2 class="h4 font-semibold">Statistics:</h2>
 		<p class="h5 font-medium mb-3">
 			Total stats: <span class="text-primary-500">{totalStats}</span>
 		</p>
-		{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats as stat}
+		{#each pokemonStats as stat}
 			<div class="flex items-center justify-end gap-2 mt-1 h5 font-medium">
 				<p
 					style="color: {getStatColor(
 						stat.base_stat,
-						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'lowest'),
-						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'highest')
+						getExtremeValue(pokemonStats, 'lowest'),
+						getExtremeValue(pokemonStats, 'highest')
 					)};"
 				>
 					{capitalize(hyphenRemover(stat.pokemon_v2_stat.name))}
@@ -143,29 +143,37 @@
 				<p
 					style="color: {getStatColor(
 						stat.base_stat,
-						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'lowest'),
-						getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'highest')
+						getExtremeValue(pokemonStats, 'lowest'),
+						getExtremeValue(pokemonStats, 'highest')
 					)};"
 				>
 					{stat.base_stat}
 				</p>
-				<div class="w-24 bg-tertiary-50 rounded h-4 relative overflow-hidden">
+				<div class="w-24 bg-tertiary-50 h-4 relative overflow-hidden">
 					<div
 						class="h-full"
 						style="width: {Math.min(
-							(stat.base_stat / 160) * 100,
+							(stat.base_stat / 255) * 100,
 							100
 						)}%; background-color: {getStatColor(
 							stat.base_stat,
-							getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'lowest'),
-							getExtremeValue(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats, 'highest')
+							getExtremeValue(pokemonStats, 'lowest'),
+							getExtremeValue(pokemonStats, 'highest')
 						)};"
 					/>
+				</div>
+				<!-- Add EV yields here -->
+				<div class="h5 font-medium">
+					<p class="text-base">
+						EV yield:
+						{stat.effort}
+					</p>
 				</div>
 			</div>
 		{/each}
 	</div>
 </div>
+
 <!-- Pokemon Sprites Gallery -->
 <div class="container mx-auto mt-28">
 	<h2 class="h2 font-semibold">Pokemon Sprites Gallery:</h2>
@@ -223,7 +231,7 @@
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
 	<p class="h5 font-medium">
-		Total moves: <span class="text-primary-500">{moves.length}</span>
+		Total moves: <span class="text-primary-500">{pokemonMoves.length}</span>
 	</p>
 	<div class="mt-6 flex gap-6">
 		<button
@@ -241,7 +249,7 @@
 	</div>
 
 	<div class="grid grid-cols-5 gap-4 mt-12">
-		{#each moves as move}
+		{#each pokemonMoves as move}
 			<a
 				class="btn hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
 				href="/move/{move.pokemon_v2_move.name}"
