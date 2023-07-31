@@ -57,9 +57,9 @@
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
-<LightSwitch class="absolute top-10 right-10 scale-125" />
+<LightSwitch class="absolute right-10 top-10 scale-125" />
 <!-- Pokemon Name -->
-<div class="flex gap-6 items-center justify-center text-center mt-6">
+<div class="mt-6 flex items-center justify-center gap-6 text-center">
 	<h1 class="h1 font-bold">
 		{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
 	</h1>
@@ -77,8 +77,8 @@
 	/>
 </div>
 <!-- General Info -->
-<h2 class="container mx-auto h2 font-semibold mt-16">General Info:</h2>
-<div class="container mx-auto flex items-center justify-around h-80 mt-6">
+<h2 class="container h2 mx-auto mt-16 font-semibold">General Info:</h2>
+<div class="container mx-auto mt-6 flex h-80 items-center justify-around">
 	<img
 		src={pokemonOfficialArtworkUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 		alt={pokemonInfo.pokemon_v2_pokemon[0].name}
@@ -92,7 +92,7 @@
 			</h3>
 		</div>
 		<div>
-			<h2 class="h4 font-semibold mt-4">
+			<h2 class="h4 mt-4 font-semibold">
 				Height / Weight: <span class="font-medium"
 					>{pokemonInfo.pokemon_v2_pokemon[0].height / 10} m / {pokemonInfo.pokemon_v2_pokemon[0]
 						.weight / 10} kg</span
@@ -100,19 +100,19 @@
 			</h2>
 		</div>
 		<div>
-			<h2 class="h4 font-semibold mt-4">Type(s):</h2>
-			<div class="flex gap-3 mt-2">
+			<h2 class="h4 mt-4 font-semibold">Type(s):</h2>
+			<div class="mt-2 flex gap-3">
 				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes as type}
 					<Type type={type.pokemon_v2_type.name} />
 				{/each}
 			</div>
 		</div>
 		<div>
-			<h2 class="h4 font-semibold mt-4">Ability(ies):</h2>
+			<h2 class="h4 mt-4 font-semibold">Ability(ies):</h2>
 			<div class="flex flex-col gap-2">
 				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
 					<a
-						class="hover:text-primary-500 transition-all"
+						class="transition-all hover:text-primary-500"
 						href="/ability/{ability.pokemon_v2_ability.name}"
 					>
 						<p class="h5 font-medium">
@@ -128,11 +128,11 @@
 	</div>
 	<div>
 		<h2 class="h4 font-semibold">Statistics:</h2>
-		<p class="h5 font-medium mb-3">
+		<p class="h5 mb-3 font-medium">
 			Total stats: <span class="text-primary-500">{totalStats}</span>
 		</p>
 		{#each pokemonStats as stat}
-			<div class="flex items-center justify-end gap-2 mt-1 h5 font-medium">
+			<div class="h5 mt-1 flex items-center justify-end gap-2 font-medium">
 				<p
 					style="color: {getStatColor(
 						stat.base_stat,
@@ -151,7 +151,7 @@
 				>
 					{stat.base_stat}
 				</p>
-				<div class="w-24 bg-tertiary-50 h-4 relative overflow-hidden">
+				<div class="relative h-4 w-24 overflow-hidden bg-tertiary-50">
 					<div
 						class="h-full"
 						style="width: {Math.min(
@@ -179,7 +179,7 @@
 <!-- Pokemon Sprites Gallery -->
 <div class="container mx-auto mt-28">
 	<h2 class="h2 font-semibold">Pokemon Sprites Gallery:</h2>
-	<div class="grid grid-cols-2 mt-12">
+	<div class="mt-12 grid grid-cols-2">
 		<div class="mx-auto">
 			<h3 class="h3 text-center font-semibold">Official Shiny Artwork:</h3>
 			<img
@@ -197,13 +197,13 @@
 						src={pokemonMainSpriteUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 						alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 						loading="lazy"
-						class="w-max h-max"
+						class="h-max w-max"
 					/>
 					<img
 						src={pokemonMainSpriteUrl + '/back/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 						alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 						loading="lazy"
-						class="w-max h-max"
+						class="h-max w-max"
 					/>
 				</div>
 				<div>
@@ -211,7 +211,7 @@
 						src={pokemonMainSpriteUrl + '/shiny/' + pokemonInfo.pokemon_v2_pokemon[0].id + '.png'}
 						alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 						loading="lazy"
-						class="w-max h-max"
+						class="h-max w-max"
 					/>
 					<img
 						src={pokemonMainSpriteUrl +
@@ -221,7 +221,7 @@
 							'.png'}
 						alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 						loading="lazy"
-						class="w-max h-max"
+						class="h-max w-max"
 					/>
 				</div>
 			</div>
@@ -237,23 +237,23 @@
 	</p>
 	<div class="mt-6 flex gap-6">
 		<button
-			class="btn variant-filled rounded-none bg-primary-500 h5 font-semibold"
+			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortByPower()}>Sort by Power</button
 		>
 		<button
-			class="btn variant-filled rounded-none bg-primary-500 h5 font-semibold"
+			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortByAccuracy()}>Sort by Accuracy</button
 		>
 		<button
-			class="btn variant-filled rounded-none bg-primary-500 h5 font-semibold"
+			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortAlphabetically()}>Sort Alphabetically</button
 		>
 	</div>
 
-	<div class="grid grid-cols-5 gap-4 mt-12">
+	<div class="mt-12 grid grid-cols-5 gap-4">
 		{#each pokemonMoves as move}
 			<a
-				class="btn hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
+				class="btn rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
 				href="/move/{move.pokemon_v2_move.name}"
 			>
 				<div class="flex flex-col items-center text-center">
@@ -285,7 +285,7 @@
 							/>
 						{/if}
 					</div>
-					<div class="mt-4 h5 font-medium">
+					<div class="h5 mt-4 font-medium">
 						{#if move.pokemon_v2_move.power}
 							<p>Power: {move.pokemon_v2_move.power}</p>
 						{/if}

@@ -98,23 +98,23 @@
 
 {#if showSearchBar}
 	<div
-		class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-tertiary-100 bg-opacity-20 z-50 -lg:static"
+		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-tertiary-100 bg-opacity-20 -lg:static"
 	>
 		<input
 			type="text"
 			placeholder="Search..."
-			class="w-80 max-w-[600px] input variant-form-material outline-none bg-tertiary-100 h3 px-4 py-3"
+			class="h3 input variant-form-material w-80 max-w-[600px] bg-tertiary-100 px-4 py-3 outline-none"
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
 			on:input={updateMatching}
 		/>
 
 		{#if matchingPokemon.length}
-			<ul class="mt-6 grid grid-cols-2 gap-6 items-start">
+			<ul class="mt-6 grid grid-cols-2 items-start gap-6">
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
 						<li
-							class="flex items-center justify-end gap-6 h-24 h4 font-semibold rounded-none p-3 outline-none cursor-pointer card hover:border-primary-500 hover:border-b-2 bg-tertiary-100 hover:text-primary-500"
+							class="h4 card flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
 								class="h-fit"
@@ -123,7 +123,7 @@
 								loading="lazy"
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(pokemon.name))}</p>
-							<div class="flex flex-col gap-1 text-sm items-end">
+							<div class="flex flex-col items-end gap-1 text-sm">
 								{#each pokemon.pokemon_v2_pokemontypes as pokemonType}
 									<p><Type textSize="12" type={pokemonType.pokemon_v2_type.name} /></p>
 								{/each}
@@ -135,14 +135,14 @@
 		{/if}
 
 		{#if matchingAbility.length}
-			<ul class="mt-6 grid grid-cols-2 gap-6 items-start">
+			<ul class="mt-6 grid grid-cols-2 items-start gap-6">
 				{#each matchingAbility as ability}
 					<a data-sveltekit-reload href={`/ability/${ability.slug}`}>
 						<li
-							class="flex items-center justify-end gap-6 h-24 h4 font-semibold rounded-none p-3 outline-none cursor-pointer card hover:border-primary-500 hover:border-b-2 bg-tertiary-100 hover:text-primary-500"
+							class="h4 card flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
-								class="h-fit my-[-6px]"
+								class="my-[-6px] h-fit"
 								src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ability-capsule.png"
 								alt={ability.name}
 								loading="lazy"
@@ -155,20 +155,20 @@
 		{/if}
 
 		{#if matchingMove.length}
-			<ul class="mt-6 grid grid-cols-2 gap-6 items-start">
+			<ul class="mt-6 grid grid-cols-2 items-start gap-6">
 				{#each matchingMove as move}
 					<a data-sveltekit-reload href={`/move/${move.slug}`}>
 						<li
-							class="flex items-center justify-end gap-6 h-24 h4 font-semibold rounded-none p-3 outline-none cursor-pointer card hover:border-primary-500 hover:border-b-2 bg-tertiary-100 hover:text-primary-500"
+							class="h4 card flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
-								class="h-fit my-[-6px]"
+								class="my-[-6px] h-fit"
 								src={`${moveSpriteUrl}tm-${move.pokemon_v2_type.name}.png`}
 								alt={move.name}
 								loading="lazy"
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(move.name))}</p>
-							<div class="flex flex-col gap-1 text-sm items-end">
+							<div class="flex flex-col items-end gap-1 text-sm">
 								{#if move.pokemon_v2_type}
 									<p><Type textSize="12" type={move.pokemon_v2_type.name} /></p>
 								{/if}

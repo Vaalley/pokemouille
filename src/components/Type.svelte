@@ -23,7 +23,7 @@
 	<p
 		id={`type-${type}`}
 		style="background-color: {color}; color: {getTextColor(color)}; font-size: {textSize}px;"
-		class="font-medium py-1 px-2 w-fit hover:cursor-default"
+		class="w-fit px-2 py-1 font-medium hover:cursor-default"
 	>
 		{capitalize(type)}
 	</p>

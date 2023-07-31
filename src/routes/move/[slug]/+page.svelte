@@ -22,10 +22,10 @@
 	<title>{capitalize(hyphenRemover(moveInfo.pokemon_v2_move[0].name))}</title>
 </svelte:head>
 
-<LightSwitch class="absolute top-10 right-10 scale-125" />
+<LightSwitch class="absolute right-10 top-10 scale-125" />
 <div class="min-h-screen">
 	<!-- Move name -->
-	<div class="flex gap-6 items-center justify-center h-32">
+	<div class="flex h-32 items-center justify-center gap-6">
 		<Type type={moveInfo.pokemon_v2_move[0].pokemon_v2_type.name} textSize="18" />
 		<h1 class="h1 font-bold">
 			{capitalize(hyphenRemover(moveInfo.pokemon_v2_move[0].name))}
@@ -37,11 +37,11 @@
 		</h1>
 	</div>
 	<!-- Move Info -->
-	<h2 class="h2 font-semibold mb-6 container mx-auto">General Info:</h2>
-	<div class="flex justify-between container mx-auto flex-wrap mt-6">
+	<h2 class="container h2 mx-auto mb-6 font-semibold">General Info:</h2>
+	<div class="container mx-auto mt-6 flex flex-wrap justify-between">
 		<!-- Category -->
 		<div>
-			<h2 class="h3 font-semibold mb-6">Category:</h2>
+			<h2 class="h3 mb-6 font-semibold">Category:</h2>
 			{#if moveInfo.pokemon_v2_move[0].move_damage_class_id == 1}
 				<div class="flex gap-3">
 					<p class="h4 font-medium">Status</p>
@@ -76,7 +76,7 @@
 		</div>
 		<!-- Power -->
 		<div>
-			<h2 class="h3 font-semibold mb-6">Power:</h2>
+			<h2 class="h3 mb-6 font-semibold">Power:</h2>
 			{#if moveInfo.pokemon_v2_move[0].power}
 				<p class="h4 font-medium">
 					{moveInfo.pokemon_v2_move[0].power}
@@ -87,7 +87,7 @@
 		</div>
 		<!-- Accuracy -->
 		<div>
-			<h2 class="h3 font-semibold mb-6">Accuracy:</h2>
+			<h2 class="h3 mb-6 font-semibold">Accuracy:</h2>
 			{#if moveInfo.pokemon_v2_move[0].accuracy}
 				<p class="h4 font-medium">
 					{moveInfo.pokemon_v2_move[0].accuracy}
@@ -98,7 +98,7 @@
 		</div>
 		<!-- Priority -->
 		<div>
-			<h2 class="h3 font-semibold mb-6">Priority:</h2>
+			<h2 class="h3 mb-6 font-semibold">Priority:</h2>
 			{#if moveInfo.pokemon_v2_move[0].priority}
 				<p class="h4 font-medium">
 					{moveInfo.pokemon_v2_move[0].priority}
@@ -109,7 +109,7 @@
 		</div>
 		<!-- PP -->
 		<div>
-			<h2 class="h3 font-semibold mb-6">PP:</h2>
+			<h2 class="h3 mb-6 font-semibold">PP:</h2>
 			{#if moveInfo.pokemon_v2_move[0].pp}
 				<p class="h4 font-medium">
 					{moveInfo.pokemon_v2_move[0].pp}
@@ -119,27 +119,27 @@
 			{/if}
 		</div>
 	</div>
-	<div class="grid grid-cols-2 items-baseline container mx-auto my-20">
+	<div class="container mx-auto my-20 grid grid-cols-2 items-baseline">
 		<!-- Move flavor text -->
 		<div>
-			<h2 class="h2 font-semibold mb-6">Flavor Text:</h2>
+			<h2 class="h2 mb-6 font-semibold">Flavor Text:</h2>
 			<p class="text-lg font-medium">
 				{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
 			</p>
 		</div>
 		<!-- Move effect -->
 		<div>
-			<h2 class="h2 font-semibold mb-6">Effect Description:</h2>
+			<h2 class="h2 mb-6 font-semibold">Effect Description:</h2>
 			<p class="text-lg font-medium">{formattedEffect}</p>
 		</div>
 	</div>
 	<!-- Move Pokémon list -->
 	<div class="container mx-auto">
-		<h2 class="h2 font-semibold mb-6">List of Pokémon that can learn that ability:</h2>
+		<h2 class="h2 mb-6 font-semibold">List of Pokémon that can learn that ability:</h2>
 		<div class="grid grid-cols-8">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
 				<a
-					class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all w-fit flex flex-col justify-center items-center mx-auto h5 font-medium"
+					class="h5 mx-auto flex w-fit flex-col items-center justify-center rounded-none p-6 font-medium transition-all hover:variant-ringed-primary hover:text-primary-500"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img

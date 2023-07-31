@@ -203,6 +203,7 @@ function hexToRgb(hex) {
 		throw new Error('Invalid hex color');
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	const [_, r, g, b] = match;
 	return { r: parseInt(r, 16), g: parseInt(g, 16), b: parseInt(b, 16) };
 }

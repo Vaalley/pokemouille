@@ -13,15 +13,15 @@
 	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
-	<div class="flex gap-6 mt-6">
+	<div class="mt-6 flex gap-6">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
 				data-sveltekit-reload
-				class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
+				class="rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
 				href={`/pokemon/${pokemon.name}`}
 			>
 				<div>
-					<p class="h3 font-semibold text-center">
+					<p class="h3 text-center font-semibold">
 						{capitalize(hyphenRemover(pokemon.name))}
 					</p>
 					<img
@@ -86,11 +86,11 @@
 						<!-- <p>{capitalize(hyphenRemover(pokemon.pokemon_v2_pokemonforms[0].name))}</p> -->
 						<a
 							data-sveltekit-reload
-							class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all"
+							class="rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
 							href="/pokemon/{pokemon.pokemon_v2_pokemonforms[0].name}"
 						>
 							<div>
-								<p class="h3 font-semibold text-center">
+								<p class="h3 text-center font-semibold">
 									{capitalize(hyphenRemover(pokemon.pokemon_v2_pokemonforms[0].name))}
 								</p>
 								<img

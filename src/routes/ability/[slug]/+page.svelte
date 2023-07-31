@@ -16,11 +16,11 @@
 	<title>{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 </svelte:head>
 
-<LightSwitch class="absolute top-10 right-10 scale-125" />
+<LightSwitch class="absolute right-10 top-10 scale-125" />
 <div class="min-h-screen">
 	<!-- Ability name -->
-	<div class="flex gap-6 items-center justify-center h-32">
-		<h1 class="h1 font-bold flex items-center gap-3">
+	<div class="flex h-32 items-center justify-center gap-6">
+		<h1 class="h1 flex items-center gap-3 font-bold">
 			{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}
 			<span class="h4 text-tertiary-800"
 				>- Introduced in {hyphenRemover(
@@ -29,17 +29,17 @@
 			>
 		</h1>
 	</div>
-	<div class="grid grid-cols-2 items-baseline container mx-auto">
+	<div class="container mx-auto grid grid-cols-2 items-baseline">
 		<!-- Ability flavor text -->
 		<div class="mt-20">
-			<h2 class="h2 font-semibold mb-6">Flavor Text:</h2>
+			<h2 class="h2 mb-6 font-semibold">Flavor Text:</h2>
 			<p class="text-xl font-medium">
 				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
 			</p>
 		</div>
 		<!-- Ability effect -->
 		<div class="mt-12">
-			<h2 class="h2 font-semibold mb-6">Effect Description:</h2>
+			<h2 class="h2 mb-6 font-semibold">Effect Description:</h2>
 			<p class="text-xl font-medium">
 				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
 			</p>
@@ -47,7 +47,7 @@
 	</div>
 	<!-- Ability Pokémon list -->
 	<div class="container mx-auto py-12">
-		<h2 class="h2 font-semibold mb-6">
+		<h2 class="h2 mb-6 font-semibold">
 			List of Pokémon that can learn {capitalize(
 				hyphenRemover(abilityInfo.pokemon_v2_ability[0].name)
 			)}:
@@ -55,7 +55,7 @@
 		<div class="grid grid-cols-8 gap-3">
 			{#each abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities as pokemon}
 				<a
-					class="hover:variant-ringed-primary rounded-none hover:text-primary-500 p-6 transition-all w-fit flex flex-col justify-center items-center mx-auto h5 font-medium"
+					class="h5 mx-auto flex w-fit flex-col items-center justify-center rounded-none p-6 font-medium transition-all hover:variant-ringed-primary hover:text-primary-500"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img
