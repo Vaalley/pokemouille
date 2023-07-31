@@ -12,6 +12,8 @@
 </svelte:head>
 
 <LightSwitch class="absolute right-10 top-10 scale-125" />
+<SearchBar data={searchData} />
+
 <div class="container mx-auto flex min-h-screen flex-col justify-end">
 	<h1 class="h1 mt-12 text-center font-bold">Welcome to Pokémouille 🐸</h1>
 	<h2 class="h2 mt-24 font-semibold">About</h2>
@@ -36,4 +38,3 @@
 		>. We're always looking for contributors to make Pokémouille even better!
 	</p>
 </div>
-<SearchBar data={searchData} />

@@ -57,7 +57,12 @@
 	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
+<!-- TODO: Add moveffecttexts using tippy or similar on hover -->
+<!-- TODO: Add Pokedex pages, for each region -->
+
 <LightSwitch class="absolute right-10 top-10 scale-125" />
+<SearchBar data={searchData} />
+
 <!-- Pokemon Name -->
 <div class="mt-6 flex items-center justify-center gap-6 text-center">
 	<h1 class="h1 font-bold">
@@ -228,7 +233,6 @@
 		</div>
 	</div>
 </div>
-<!-- TODO: Add moveffecttexts using tippy or similar on hover -->
 <!-- Moves -->
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
@@ -304,4 +308,3 @@
 		{/each}
 	</div>
 </div>
-<SearchBar data={searchData} />

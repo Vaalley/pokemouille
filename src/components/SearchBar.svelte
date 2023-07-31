@@ -98,7 +98,7 @@
 
 {#if showSearchBar}
 	<div
-		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-tertiary-100 bg-opacity-20 -lg:static"
+		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-secondary-400 bg-opacity-5 -lg:static"
 	>
 		<input
 			type="text"

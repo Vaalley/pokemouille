@@ -23,6 +23,8 @@
 </svelte:head>
 
 <LightSwitch class="absolute right-10 top-10 scale-125" />
+<SearchBar data={searchData} />
+
 <div class="min-h-screen">
 	<!-- Move name -->
 	<div class="flex h-32 items-center justify-center gap-6">
@@ -154,5 +156,4 @@
 			{/each}
 		</div>
 	</div>
-	<SearchBar data={searchData} />
 </div>
