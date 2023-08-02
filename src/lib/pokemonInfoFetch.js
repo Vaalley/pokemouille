@@ -104,6 +104,11 @@ async function fetchPokemonInfo(slug) {
 							}
 						}
 					}
+					is_legendary
+      		is_mythical
+      		pokemon_v2_generation {
+        		id
+      		}
 				}
 			}
 		}
