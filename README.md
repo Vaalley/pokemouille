@@ -7,9 +7,9 @@ Pokémouille is a pokedex app that allows users to easily search for and view in
 - Search for Pokemon by name (DONE ✅)
 - View information about each Pokemon, including its type, abilities, and stats (DONE ✅)
 - Ease of use with clever UX (ALMOST DONE ⚒️)
-- Dark mode support (TODO ❌)
-- Multi language support (TODO ❌)
-- Beautiful and clean design (TODO ❌)
+- Dark mode support (TODO ✅)
+- Multi language support (TO DO ❌)
+- Beautiful and clean design (WORK IN PROGRESS ⚒️)
 
 ## License
 
