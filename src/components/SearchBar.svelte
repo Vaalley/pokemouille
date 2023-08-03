@@ -1,6 +1,7 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
 	import { capitalize, hyphenRemover } from '$lib/utils';
+	import { Drawer, drawerStore } from '@skeletonlabs/skeleton';
 	import Type from './Type.svelte';
 
 	export let data;
@@ -19,11 +20,11 @@
 
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' && showSearchBar) {
-			showSearchBar = false;
+			drawerStore.close();
 		} else if (event.type === 'click' && event.target !== inputEl) {
-			showSearchBar = false;
+			drawerStore.close();
 		} else if (/^[a-zA-Z]$/.test(event.key)) {
-			showSearchBar = true;
+			drawerStore.open();
 		}
 	}
 
@@ -96,7 +97,7 @@
 	});
 </script>
 
-{#if showSearchBar}
+<Drawer>
 	<div
 		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-secondary-400 bg-opacity-5 -lg:static"
 	>
@@ -179,4 +180,4 @@
 			</ul>
 		{/if}
 	</div>
-{/if}
+</Drawer>
