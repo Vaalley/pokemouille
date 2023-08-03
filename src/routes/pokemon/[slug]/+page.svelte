@@ -266,7 +266,7 @@
 		>
 	</div>
 
-	<div class="mt-12 grid grid-cols-5 gap-4">
+	<div class="mt-12 grid grid-cols-4 gap-4">
 		{#each pokemonMoves as move}
 			<a
 				class="btn rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
@@ -283,7 +283,7 @@
 								class="object-contain"
 								loading="lazy"
 								src="https://archives.bulbagarden.net/media/upload/7/71/StatusIC_BW.png"
-								alt="physical"
+								alt="status"
 							/>
 						{:else if move.pokemon_v2_move.move_damage_class_id == 2}
 							<img
@@ -297,7 +297,7 @@
 								class="object-contain"
 								loading="lazy"
 								src="https://archives.bulbagarden.net/media/upload/8/8c/SpecialIC_BW.png"
-								alt="physical"
+								alt="special"
 							/>
 						{/if}
 					</div>
