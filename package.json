@@ -26,6 +26,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@vercel/analytics": "^1.0.1",
 		"graphql-request": "^6.1.0",
 		"node-cache": "^4.2.1",
 		"prettier-plugin-tailwindcss": "^0.4.1"
