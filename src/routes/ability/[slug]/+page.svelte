@@ -13,7 +13,7 @@
 </script>
 
 <svelte:head>
-	<title>{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
+	<title>Pokémouille | {capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 </svelte:head>
 
 <LightSwitch class="absolute right-10 top-10 scale-125" />

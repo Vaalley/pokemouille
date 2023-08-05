@@ -30,51 +30,32 @@
 
 	function updateMatching(event) {
 		const searchTerm = event.target.value.toLowerCase();
+		matchingPokemon = [];
+		matchingAbility = [];
+		matchingMove = [];
+
 		if (searchTerm) {
 			let count = 0;
-			matchingPokemon = [];
-			matchingAbility = [];
-			matchingMove = [];
-			for (const pokemon of pokemonData) {
-				if (count >= 10) {
+			const maxCount = 15;
+
+			for (const item of pokemonData.concat(abilityData, moveData)) {
+				if (count >= maxCount) {
 					break;
 				}
-				const name = pokemon.name.toLowerCase().replace(/ /g, '-');
-				if (name.includes(searchTerm) && pokemon.is_default) {
-					const slug = name.replace(/ /g, '-');
-					pokemon.slug = slug;
-					matchingPokemon.push(pokemon);
-					count++;
-				}
-			}
-			for (const ability of abilityData) {
-				if (count >= 10) {
-					break;
-				}
-				const name = ability.name.toLowerCase().replace(/-/g, ' ');
+				const name = item.name.toLowerCase().replace(/-/g, ' ');
+				const slug = name.replace(/ /g, '-');
 				if (name.includes(searchTerm)) {
-					const slug = name.replace(/ /g, '-');
-					ability.slug = slug;
-					matchingAbility.push(ability);
+					item.slug = slug;
+					if (item.pokemon_v2_pokemontypes) {
+						matchingPokemon.push(item);
+					} else if (item.pokemon_v2_type) {
+						matchingMove.push(item);
+					} else {
+						matchingAbility.push(item);
+					}
 					count++;
 				}
 			}
-			for (const move of moveData) {
-				if (count >= 10) {
-					break;
-				}
-				const name = move.name.toLowerCase().replace(/-/g, ' ');
-				if (name.includes(searchTerm)) {
-					const slug = name.replace(/ /g, '-');
-					move.slug = slug;
-					matchingMove.push(move);
-					count++;
-				}
-			}
-		} else {
-			matchingPokemon = [];
-			matchingAbility = [];
-			matchingMove = [];
 		}
 	}
 
@@ -110,8 +91,8 @@
 			on:input={updateMatching}
 		/>
 
-		{#if matchingPokemon.length}
-			<ul class="mt-6 grid grid-cols-2 items-start gap-6">
+		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length}
+			<ul class="mt-6 grid grid-cols-3 items-start gap-6">
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
 						<li
@@ -132,11 +113,7 @@
 						</li>
 					</a>
 				{/each}
-			</ul>
-		{/if}
 
-		{#if matchingAbility.length}
-			<ul class="mt-6 grid grid-cols-2 items-start gap-6">
 				{#each matchingAbility as ability}
 					<a data-sveltekit-reload href={`/ability/${ability.slug}`}>
 						<li
@@ -148,15 +125,11 @@
 								alt={ability.name}
 								loading="lazy"
 							/>
-							<p>{capitalize(hyphenRemover(ability.name))}</p>
+							<p class="mr-auto">{capitalize(hyphenRemover(ability.name))}</p>
 						</li>
 					</a>
 				{/each}
-			</ul>
-		{/if}
 
-		{#if matchingMove.length}
-			<ul class="mt-6 grid grid-cols-2 items-start gap-6">
 				{#each matchingMove as move}
 					<a data-sveltekit-reload href={`/move/${move.slug}`}>
 						<li
@@ -170,14 +143,14 @@
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(move.name))}</p>
 							<div class="flex flex-col items-end gap-1 text-sm">
-								{#if move.pokemon_v2_type}
-									<p><Type textSize="12" type={move.pokemon_v2_type.name} /></p>
-								{/if}
+								<p><Type textSize="12" type={move.pokemon_v2_type.name} /></p>
 							</div>
 						</li>
 					</a>
 				{/each}
 			</ul>
+		{:else}
+			<p class="h4 mt-3 font-medium">No matches found</p>
 		{/if}
 	</div>
 </Drawer>

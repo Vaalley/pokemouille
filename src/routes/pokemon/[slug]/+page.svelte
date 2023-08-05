@@ -54,12 +54,8 @@
 </script>
 
 <svelte:head>
-	<title>{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
+	<title>Pokémouille | {capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
-
-<!-- TODO: Add moveeffecttexts using tippy or similar on hover -->
-<!-- TODO: Add Pokedex pages, for each region -->
-<!-- TODO: Add berries  -->
 
 <LightSwitch class="absolute right-10 top-10 scale-125" />
 <SearchBar data={searchData} />

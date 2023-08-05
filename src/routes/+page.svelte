@@ -6,6 +6,10 @@
 	let searchData = data.searchData;
 </script>
 
+<!-- TODO: Add moveeffecttexts using tippy or similar on hover -->
+<!-- TODO: Add Pokedex pages, for each region -->
+<!-- TODO: Add berries  -->
+
 <svelte:head>
 	<title>Pokémouille 🐸</title>
 	<link rel="icon" href="/favicon.png" />
