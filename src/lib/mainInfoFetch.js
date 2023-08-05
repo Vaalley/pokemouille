@@ -30,6 +30,9 @@ async function fetchMainInfo() {
 					name
 				}
 			}
+			pokemon_v2_item {
+				name
+			}
 		}
 `;
 		return await client.request(query);

@@ -11,9 +11,11 @@
 	let matchingPokemon = [];
 	let matchingAbility = [];
 	let matchingMove = [];
+	let matchingItem = [];
 	let pokemonData = data.pokemon_v2_pokemon;
 	let abilityData = data.pokemon_v2_ability;
 	let moveData = data.pokemon_v2_move;
+	let itemData = data.pokemon_v2_item;
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	const moveSpriteUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/';
@@ -30,32 +32,71 @@
 
 	function updateMatching(event) {
 		const searchTerm = event.target.value.toLowerCase();
-		matchingPokemon = [];
-		matchingAbility = [];
-		matchingMove = [];
-
 		if (searchTerm) {
 			let count = 0;
-			const maxCount = 15;
+			let maxCount = 15;
 
-			for (const item of pokemonData.concat(abilityData, moveData)) {
+			matchingPokemon = [];
+			matchingAbility = [];
+			matchingMove = [];
+			matchingItem = [];
+
+			for (const pokemon of pokemonData) {
+				if (count >= maxCount) {
+					break;
+				}
+				const name = pokemon.name.toLowerCase().replace(/ /g, '-');
+				if (name.includes(searchTerm) && pokemon.is_default) {
+					const slug = name.replace(/ /g, '-');
+					pokemon.slug = slug;
+					matchingPokemon.push(pokemon);
+					count++;
+				}
+			}
+
+			for (const ability of abilityData) {
+				if (count >= maxCount) {
+					break;
+				}
+				const name = ability.name.toLowerCase().replace(/-/g, ' ');
+				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					ability.slug = slug;
+					matchingAbility.push(ability);
+					count++;
+				}
+			}
+
+			for (const move of moveData) {
+				if (count >= maxCount) {
+					break;
+				}
+				const name = move.name.toLowerCase().replace(/-/g, ' ');
+				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					move.slug = slug;
+					matchingMove.push(move);
+					count++;
+				}
+			}
+
+			for (const item of itemData) {
 				if (count >= maxCount) {
 					break;
 				}
 				const name = item.name.toLowerCase().replace(/-/g, ' ');
-				const slug = name.replace(/ /g, '-');
 				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
 					item.slug = slug;
-					if (item.pokemon_v2_pokemontypes) {
-						matchingPokemon.push(item);
-					} else if (item.pokemon_v2_type) {
-						matchingMove.push(item);
-					} else {
-						matchingAbility.push(item);
-					}
+					matchingItem.push(item);
 					count++;
 				}
 			}
+		} else {
+			matchingPokemon = [];
+			matchingAbility = [];
+			matchingMove = [];
+			matchingItem = [];
 		}
 	}
 
@@ -91,7 +132,7 @@
 			on:input={updateMatching}
 		/>
 
-		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length}
+		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length || matchingItem.length}
 			<ul class="mt-6 grid grid-cols-3 items-start gap-6">
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
@@ -145,6 +186,24 @@
 							<div class="flex flex-col items-end gap-1 text-sm">
 								<p><Type textSize="12" type={move.pokemon_v2_type.name} /></p>
 							</div>
+						</li>
+					</a>
+				{/each}
+
+				{#each matchingItem as item}
+					<a data-sveltekit-reload href={`/item/${item.slug}`}>
+						<li
+							class="h4 card flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+						>
+							<img
+								class="my-[-6px] h-fit"
+								src={'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/' +
+									item.name +
+									'.png'}
+								alt={item.name}
+								loading="lazy"
+							/>
+							<p class="mr-auto">{capitalize(hyphenRemover(item.name))}</p>
 						</li>
 					</a>
 				{/each}
