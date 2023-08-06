@@ -17,7 +17,7 @@
 	let moveData = data.pokemon_v2_move;
 	let itemData = data.pokemon_v2_item;
 	const pokemonSpriteUrl =
-		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/';
+		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	const moveSpriteUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/';
 
 	function toggleSearchBar(event) {
