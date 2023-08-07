@@ -16,6 +16,16 @@ async function fetchItemInfo(slug) {
 			pokemon_v2_item(where: {name: {_eq: "${itemName}"}}) {
 				name
 				cost
+				pokemon_v2_itemflavortexts(where: {language_id: {_eq: 9}}) {
+					flavor_text
+				}
+				pokemon_v2_itemeffecttexts(where: {language_id: {_eq: 9}}) {
+					short_effect
+					effect
+				}
+				pokemon_v2_itemcategory {
+					name
+				}
 			}
 		}
 		
