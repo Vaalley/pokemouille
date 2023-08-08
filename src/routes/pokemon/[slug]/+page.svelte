@@ -50,7 +50,7 @@
 		pokemonMoves = [...pokemonMoves];
 	}
 
-	console.log(pokemonInfo);
+	// console.log(pokemonInfo);
 </script>
 
 <svelte:head>
