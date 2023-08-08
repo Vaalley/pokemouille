@@ -7,7 +7,7 @@
 	let itemInfo = data.itemInfo;
 	let searchData = data.searchData;
 
-	console.log(itemInfo);
+	// console.log(itemInfo);
 </script>
 
 <LightSwitch class="absolute right-10 top-10 scale-125" />
