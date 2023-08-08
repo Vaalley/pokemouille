@@ -50,7 +50,7 @@
 		pokemonMoves = [...pokemonMoves];
 	}
 
-	// console.log(pokemonInfo);
+	console.log(pokemonInfo);
 </script>
 
 <svelte:head>
@@ -121,9 +121,10 @@
 				{/each}
 			</div>
 		</div>
+		<!-- Abilities -->
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Ability(ies):</h2>
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-1">
 				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
 					<a
 						class="transition-all hover:text-primary-500"
@@ -136,6 +137,20 @@
 							{/if}
 						</p>
 					</a>
+				{/each}
+			</div>
+		</div>
+		<!-- Egg group -->
+		<div>
+			<h2 class="h4 mt-4 font-semibold">Egg group(s):</h2>
+			<div class="flex gap-2">
+				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups as egggroup, index}
+					<p class="h5 font-medium">
+						{capitalize(hyphenRemover(egggroup.pokemon_v2_egggroup.name))}
+						{#if index !== pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups.length - 1}
+							{' & '}
+						{/if}
+					</p>
 				{/each}
 			</div>
 		</div>

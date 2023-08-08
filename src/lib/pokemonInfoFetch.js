@@ -109,6 +109,11 @@ async function fetchPokemonInfo(slug) {
       		pokemon_v2_generation {
         		id
       		}
+					pokemon_v2_pokemonegggroups {
+						pokemon_v2_egggroup {
+							name
+						}
+					}
 				}
 			}
 		}
