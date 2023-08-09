@@ -20,7 +20,11 @@
 	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
 	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
 	let pokemonMoves = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves;
+	let pokemonAbilities = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities;
+	let pokemonTypes = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes;
 	let pokemonStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats;
+	let pokemonEggGroups =
+		pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups;
 
 	// Function to sort moves by power
 	function sortByPower() {
@@ -116,7 +120,7 @@
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Type(s):</h2>
 			<div class="mt-2 flex gap-3">
-				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes as type}
+				{#each pokemonTypes as type}
 					<Type type={type.pokemon_v2_type.name} />
 				{/each}
 			</div>
@@ -125,7 +129,7 @@
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Ability(ies):</h2>
 			<div class="flex flex-col gap-1">
-				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities as ability}
+				{#each pokemonAbilities as ability}
 					<a
 						class="transition-all hover:text-primary-500"
 						href="/ability/{ability.pokemon_v2_ability.name}"
@@ -144,10 +148,10 @@
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Egg group(s):</h2>
 			<div class="flex gap-2">
-				{#each pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups as egggroup, index}
+				{#each pokemonEggGroups as egggroup, index}
 					<p class="h5 font-medium">
 						{capitalize(hyphenRemover(egggroup.pokemon_v2_egggroup.name))}
-						{#if index !== pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups.length - 1}
+						{#if index !== pokemonEggGroups.length - 1}
 							{' & '}
 						{/if}
 					</p>
