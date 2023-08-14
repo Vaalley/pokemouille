@@ -14,8 +14,8 @@ export function hyphenRemover(str) {
 }
 
 // Extracts the id from a URL string in the format "https://pokeapi.co/api/v2/ability/34/"
-export function getIdFromUrl(url) {
-	const match = url.match(/\/(\d+)\/$/);
+export function getIdFromUrl(urlString) {
+	const match = urlString.match(/\/(\d+)\/$/);
 	return match ? match[1] : null;
 }
 
