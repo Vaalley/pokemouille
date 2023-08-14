@@ -2,6 +2,8 @@
 
 Pokémouille is a pokedex app that allows users to easily search for and view information about different Pokemon. This app is open-source and open to contributions from the community.
 
+For more info please contact **vallley** on Discord
+
 ## Features
 
 - Search for Pokemon by name (DONE ✅)
