@@ -163,9 +163,13 @@ export const pokemonTypes = [
 // Gets the hexcode of a stat value
 export function getStatColor(statValue, minStat, maxStat) {
 	const minStatValue = minStat;
-	const maxStatValue = maxStat;
+	let maxStatValue = maxStat;
 	const colorStart = parseInt('d4163c', 16);
 	const colorEnd = parseInt('4685af', 16);
+
+	if (minStatValue === maxStatValue) {
+		maxStatValue = minStatValue + 1;
+	}
 
 	const percentage = (statValue - minStatValue) / (maxStatValue - minStatValue);
 	const red = Math.floor((colorStart >> 16) * (1 - percentage) + (colorEnd >> 16) * percentage);
@@ -190,6 +194,7 @@ export function getExtremeValue(stats, parameter) {
 
 	return extremeValue;
 }
+
 
 export function getTextColor(backgroundColor) {
 	const { r, g, b } = hexToRgb(backgroundColor);

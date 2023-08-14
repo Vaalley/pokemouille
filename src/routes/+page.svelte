@@ -6,8 +6,6 @@
 	let searchData = data.searchData;
 </script>
 
-<!-- TODO: Add moveeffecttexts using tippy or similar on hover -->
-
 <svelte:head>
 	<title>Pokémouille 🐸</title>
 	<link rel="icon" href="/favicon.png" />
