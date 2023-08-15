@@ -1,13 +1,12 @@
 // Capitalizes the first letter of each word in a string
 export function capitalize(str) {
-	return str.replace(/\b\w/g, (match) => match.toUpperCase());
+	return str.replace(/\b\w/g, match => match.toUpperCase());
 }
 
 // Removes hyphens from a string, except for specific strings in the keepHyphen array
-const keepHyphen = ['wo-chien', 'chi-yu', 'ting-lu', 'chien-pao'];
-const keepHyphenSet = new Set(keepHyphen);
+const keepHyphen = new Set(['wo-chien', 'chi-yu', 'ting-lu', 'chien-pao']);
 export function hyphenRemover(str) {
-	if (str.includes('-') && !keepHyphenSet.has(str)) {
+	if (str.includes('-') && !keepHyphen.has(str)) {
 		return str.replace(/-/g, ' ');
 	}
 	return str;
@@ -162,65 +161,58 @@ export const pokemonTypes = [
 
 // Gets the hexcode of a stat value
 export function getStatColor(statValue, minStat, maxStat) {
-	const minStatValue = minStat;
-	let maxStatValue = maxStat;
-	const colorStart = parseInt('d4163c', 16);
-	const colorEnd = parseInt('4685af', 16);
-
-	if (minStatValue === maxStatValue) {
-		maxStatValue = minStatValue + 1;
-	}
-
-	const percentage = (statValue - minStatValue) / (maxStatValue - minStatValue);
-	const red = Math.floor((colorStart >> 16) * (1 - percentage) + (colorEnd >> 16) * percentage);
-	const green = Math.floor(
-		((colorStart >> 8) & 0xff) * (1 - percentage) + ((colorEnd >> 8) & 0xff) * percentage
-	);
-	const blue = Math.floor((colorStart & 0xff) * (1 - percentage) + (colorEnd & 0xff) * percentage);
-
+	const colorStart = 0xd4163c;
+	const colorEnd = 0x4685af;
+	const percentage = (statValue - minStat) / (maxStat - minStat);
+	const red = interpolateColorComponent(colorStart >> 16, colorEnd >> 16, percentage);
+	const green = interpolateColorComponent((colorStart >> 8) & 0xff, (colorEnd >> 8) & 0xff, percentage);
+	const blue = interpolateColorComponent(colorStart & 0xff, colorEnd & 0xff, percentage);
 	const hex = `#${((red << 16) | (green << 8) | blue).toString(16).padStart(6, '0')}`;
 	return hex;
 }
 
-// Gets the extreme value of a stat
-export function getExtremeValue(stats, parameter) {
-	let extremeValue;
-
-	if (parameter === 'highest') {
-		extremeValue = Math.max(...stats.map((stat) => stat.base_stat));
-	} else if (parameter === 'lowest') {
-		extremeValue = Math.min(...stats.map((stat) => stat.base_stat));
-	}
-
-	return extremeValue;
+function interpolateColorComponent(start, end, percentage) {
+	return Math.floor(start * (1 - percentage) + end * percentage);
 }
 
+// Gets the extreme value of a stat
+export function getExtremeValue(stats, parameter) {
+	if (parameter === 'highest') {
+		return Math.max(...stats.map(stat => stat.base_stat));
+	} else if (parameter === 'lowest') {
+		return Math.min(...stats.map(stat => stat.base_stat));
+	}
+}
 
+// Gets text color based on background color luminance
 export function getTextColor(backgroundColor) {
 	const { r, g, b } = hexToRgb(backgroundColor);
 	const luminance = calculateLuminance(r, g, b);
 	return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
+// Converts a hex string to an object
 function hexToRgb(hex) {
 	const match = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
 	if (!match) {
 		throw new Error('Invalid hex color');
 	}
-
-	// eslint-disable-next-line no-unused-vars
-	const [_, r, g, b] = match;
+	const [, r, g, b] = match;
 	return { r: parseInt(r, 16), g: parseInt(g, 16), b: parseInt(b, 16) };
 }
 
+// Calculates the luminance of a color
 function calculateLuminance(r, g, b) {
 	const rsrgb = r / 255;
 	const gsrgb = g / 255;
 	const bsrgb = b / 255;
-
-	const rlinear = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
-	const glinear = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
-	const blinear = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
-
+	const rlinear = calculateLinear(rsrgb);
+	const glinear = calculateLinear(gsrgb);
+	const blinear = calculateLinear(bsrgb);
 	return 0.2126 * rlinear + 0.7152 * glinear + 0.0722 * blinear;
+}
+
+// Calculates the linear value of a color
+function calculateLinear(component) {
+	return component <= 0.03928 ? component / 12.92 : Math.pow((component + 0.055) / 1.055, 2.4);
 }
