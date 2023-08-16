@@ -1,10 +1,17 @@
 <script>
 	// Import statements
-	import { capitalize, hyphenRemover, getStatColor, getExtremeValue } from '$lib/utils';
+	import {
+		capitalize,
+		hyphenRemover,
+		getStatColor,
+		getExtremeValue,
+		pokemonTypes as types
+	} from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
 	import { LightSwitch } from '@skeletonlabs/skeleton';
+	import { popup } from '@skeletonlabs/skeleton';
 
 	// Variable declarations
 	export let data;
@@ -25,6 +32,12 @@
 	let pokemonStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats;
 	let pokemonEggGroups =
 		pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups;
+
+	const popupHover = {
+		event: 'hover',
+		target: 'popupHover',
+		placement: 'top'
+	};
 
 	// Function to sort moves by power
 	function sortByPower() {
@@ -52,6 +65,23 @@
 			return 0;
 		});
 		pokemonMoves = [...pokemonMoves];
+	}
+
+	function getTypeInfo(typeName) {
+		return types.find((type) => type.name === typeName);
+	}
+
+	function combineEffectiveness(type1, type2) {
+		const type1Info = getTypeInfo(type1);
+		const type2Info = getTypeInfo(type2);
+
+		const combined = {
+			weak: [...type1Info.defending.weak, ...type2Info.defending.weak],
+			resist: [...type1Info.defending.resist, ...type2Info.defending.resist],
+			immune: [...type1Info.defending.immune, ...type2Info.defending.immune]
+		};
+
+		return combined;
 	}
 
 	// console.log(pokemonInfo);
@@ -104,11 +134,13 @@
 		loading="lazy"
 	/>
 	<div class="max-h-80">
+		<!-- ID -->
 		<div>
 			<h3 class="h4 font-semibold">
 				ID: <span class="font-medium">{pokemonInfo.pokemon_v2_pokemon[0].id}</span>
 			</h3>
 		</div>
+		<!-- Height / Weight -->
 		<div>
 			<h2 class="h4 mt-4 font-semibold">
 				Height / Weight: <span class="font-medium"
@@ -117,12 +149,56 @@
 				>
 			</h2>
 		</div>
+		<!-- Types -->
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Type(s):</h2>
-			<div class="mt-2 flex gap-3">
+			<div class="mt-2 flex gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
 				{#each pokemonTypes as type}
 					<Type type={type.pokemon_v2_type.name} />
 				{/each}
+			</div>
+			<div class="variant-filled-primary p-3" data-popup="popupHover">
+				{#if pokemonTypes.length === 1}
+					<p>
+						<b>Defending:</b><br />
+						{#each getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.immune as immune}
+							{capitalize(immune)} (immune) <br />
+						{/each}
+						{#each getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.weak as weakness}
+							{#if !getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.immune.includes(weakness)}
+								{capitalize(weakness)} (2x weak) <br />
+							{/if}
+						{/each}
+						{#each getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.resist as resist}
+							{capitalize(resist)} (0.5x resistant) <br />
+						{/each}
+					</p>
+				{:else}
+					<p>
+						<b>Combined Defending:</b><br />
+						{#each Array.from(new Set( [...combineEffectiveness(pokemonTypes[0].pokemon_v2_type.name, pokemonTypes[1].pokemon_v2_type.name).weak, ...combineEffectiveness(pokemonTypes[1].pokemon_v2_type.name, pokemonTypes[0].pokemon_v2_type.name).weak] )) as weakness}
+							{#if !getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.immune.includes(weakness) && !getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.immune.includes(weakness)}
+								{#if getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.weak.includes(weakness) && getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.weak.includes(weakness)}
+									{capitalize(weakness)} (4x weak) <br />
+								{:else if (getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.weak.includes(weakness) || getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.weak.includes(weakness)) && !(getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.resist.includes(weakness) || getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.resist.includes(weakness))}
+									{capitalize(weakness)} (2x weak) <br />
+								{/if}
+							{/if}
+						{/each}
+						{#each Array.from(new Set( [...combineEffectiveness(pokemonTypes[0].pokemon_v2_type.name, pokemonTypes[1].pokemon_v2_type.name).resist, ...combineEffectiveness(pokemonTypes[1].pokemon_v2_type.name, pokemonTypes[0].pokemon_v2_type.name).resist] )) as resist}
+							{#if !getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.immune.includes(resist) && !getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.immune.includes(resist)}
+								{#if getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.resist.includes(resist) && getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.resist.includes(resist)}
+									{capitalize(resist)} (0.25x resistant) <br />
+								{:else if (getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.resist.includes(resist) || getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.resist.includes(resist)) && !(getTypeInfo(pokemonTypes[0].pokemon_v2_type.name).defending.weak.includes(resist) || getTypeInfo(pokemonTypes[1].pokemon_v2_type.name).defending.weak.includes(resist))}
+									{capitalize(resist)} (0.5x resistant) <br />
+								{/if}
+							{/if}
+						{/each}
+						{#each combineEffectiveness(pokemonTypes[0].pokemon_v2_type.name, pokemonTypes[1].pokemon_v2_type.name).immune as immune}
+							{capitalize(immune)} (immune) <br />
+						{/each}
+					</p>
+				{/if}
 			</div>
 		</div>
 		<!-- Abilities -->
