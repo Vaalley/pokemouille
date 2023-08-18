@@ -1,6 +1,6 @@
 // Capitalizes the first letter of each word in a string
 export function capitalize(str) {
-	return str.replace(/\b\w/g, match => match.toUpperCase());
+	return str.replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
 // Removes hyphens from a string, except for specific strings in the keepHyphen array
@@ -18,14 +18,17 @@ export function getIdFromUrl(urlString) {
 	return match ? match[1] : null;
 }
 
-
 // Gets the hexcode of a stat value
 export function getStatColor(statValue, minStat, maxStat) {
 	const colorStart = 0xd4163c;
 	const colorEnd = 0x4685af;
 	const percentage = (statValue - minStat) / (maxStat - minStat);
 	const red = interpolateColorComponent(colorStart >> 16, colorEnd >> 16, percentage);
-	const green = interpolateColorComponent((colorStart >> 8) & 0xff, (colorEnd >> 8) & 0xff, percentage);
+	const green = interpolateColorComponent(
+		(colorStart >> 8) & 0xff,
+		(colorEnd >> 8) & 0xff,
+		percentage
+	);
 	const blue = interpolateColorComponent(colorStart & 0xff, colorEnd & 0xff, percentage);
 	const hex = `#${((red << 16) | (green << 8) | blue).toString(16).padStart(6, '0')}`;
 	return hex;
@@ -38,9 +41,9 @@ function interpolateColorComponent(start, end, percentage) {
 // Gets the extreme value of a stat
 export function getExtremeValue(stats, parameter) {
 	if (parameter === 'highest') {
-		return Math.max(...stats.map(stat => stat.base_stat));
+		return Math.max(...stats.map((stat) => stat.base_stat));
 	} else if (parameter === 'lowest') {
-		return Math.min(...stats.map(stat => stat.base_stat));
+		return Math.min(...stats.map((stat) => stat.base_stat));
 	}
 }
 
@@ -58,7 +61,6 @@ function hexToRgb(hex) {
 	const b = parseInt(hex.slice(5, 7), 16);
 	return { r, g, b };
 }
-
 
 // Calculates the luminance of a color
 function calculateLuminance(r, g, b) {
@@ -88,8 +90,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['rock', 'steel'],
-			SuperEffective: [],
-			NoEffect: ['ghost']
+			superEffective: [],
+			noEffect: ['ghost']
 		}
 	},
 	{
@@ -102,8 +104,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fire', 'water', 'rock', 'dragon'],
-			SuperEffective: ['grass', 'ice', 'bug', 'steel'],
-			NoEffect: []
+			superEffective: ['grass', 'ice', 'bug', 'steel'],
+			noEffect: []
 		}
 	},
 	{
@@ -116,8 +118,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['water', 'grass', 'dragon'],
-			SuperEffective: ['fire', 'ground', 'rock'],
-			NoEffect: []
+			superEffective: ['fire', 'ground', 'rock'],
+			noEffect: []
 		}
 	},
 	{
@@ -130,8 +132,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['electric', 'grass', 'dragon'],
-			SuperEffective: ['water', 'flying'],
-			NoEffect: ['ground']
+			superEffective: ['water', 'flying'],
+			noEffect: ['ground']
 		}
 	},
 	{
@@ -144,8 +146,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fire', 'grass', 'poison', 'flying', 'bug', 'dragon', 'steel'],
-			SuperEffective: ['water', 'ground', 'rock'],
-			NoEffect: ['ground']
+			superEffective: ['water', 'ground', 'rock'],
+			noEffect: ['ground']
 		}
 	},
 	{
@@ -158,8 +160,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fire', 'water', 'ice', 'steel'],
-			SuperEffective: ['grass', 'ground', 'flying', 'dragon'],
-			NoEffect: []
+			superEffective: ['grass', 'ground', 'flying', 'dragon'],
+			noEffect: []
 		}
 	},
 	{
@@ -172,8 +174,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['poison', 'flying', 'psychic', 'bug', 'fairy'],
-			SuperEffective: ['normal', 'ice', 'rock', 'dark', 'steel'],
-			NoEffect: ['ghost']
+			superEffective: ['normal', 'ice', 'rock', 'dark', 'steel'],
+			noEffect: ['ghost']
 		}
 	},
 	{
@@ -186,8 +188,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['poison', 'ground', 'rock', 'ghost'],
-			SuperEffective: ['grass', 'fairy'],
-			NoEffect: ['steel']
+			superEffective: ['grass', 'fairy'],
+			noEffect: ['steel']
 		}
 	},
 	{
@@ -200,8 +202,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['grass', 'bug'],
-			SuperEffective: ['fire', 'electric', 'poison', 'rock', 'steel'],
-			NoEffect: ['flying']
+			superEffective: ['fire', 'electric', 'poison', 'rock', 'steel'],
+			noEffect: ['flying']
 		}
 	},
 	{
@@ -214,8 +216,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['electric', 'rock', 'steel'],
-			SuperEffective: ['grass', 'fighting', 'bug'],
-			NoEffect: []
+			superEffective: ['grass', 'fighting', 'bug'],
+			noEffect: []
 		}
 	},
 	{
@@ -228,8 +230,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['psychic', 'steel'],
-			SuperEffective: ['fighting', 'poison'],
-			NoEffect: ['dark']
+			superEffective: ['fighting', 'poison'],
+			noEffect: ['dark']
 		}
 	},
 	{
@@ -242,8 +244,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fire', 'fighting', 'poison', 'flying', 'ghost', 'steel', 'fairy'],
-			SuperEffective: ['grass', 'psychic', 'dark'],
-			NoEffect: []
+			superEffective: ['grass', 'psychic', 'dark'],
+			noEffect: []
 		}
 	},
 	{
@@ -256,8 +258,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fighting', 'ground', 'steel'],
-			SuperEffective: ['fire', 'ice', 'flying', 'bug'],
-			NoEffect: []
+			superEffective: ['fire', 'ice', 'flying', 'bug'],
+			noEffect: []
 		}
 	},
 	{
@@ -270,8 +272,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['dark'],
-			SuperEffective: ['psychic', 'ghost'],
-			NoEffect: ['normal']
+			superEffective: ['psychic', 'ghost'],
+			noEffect: ['normal']
 		}
 	},
 	{
@@ -284,8 +286,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['steel'],
-			SuperEffective: ['dragon'],
-			NoEffect: ['fairy']
+			superEffective: ['dragon'],
+			noEffect: ['fairy']
 		}
 	},
 	{
@@ -298,8 +300,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fighting', 'dragon', 'fairy'],
-			SuperEffective: ['psychic', 'ghost'],
-			NoEffect: []
+			superEffective: ['psychic', 'ghost'],
+			noEffect: []
 		}
 	},
 	{
@@ -323,8 +325,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fire', 'water', 'electric', 'steel'],
-			SuperEffective: ['ice', 'rock', 'fairy'],
-			NoEffect: []
+			superEffective: ['ice', 'rock', 'fairy'],
+			noEffect: []
 		}
 	},
 	{
@@ -337,8 +339,8 @@ export const pokemonTypes = [
 		},
 		attacking: {
 			notVeryEffective: ['fire', 'poison', 'steel'],
-			SuperEffective: ['fighting', 'dragon', 'dark'],
-			NoEffect: []
+			superEffective: ['fighting', 'dragon', 'dark'],
+			noEffect: []
 		}
 	}
 ];

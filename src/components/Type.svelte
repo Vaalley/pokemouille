@@ -21,12 +21,14 @@
 	// console.log(color);
 </script>
 
-<div
-	class="flex gap-1 px-2 py-1"
+<a
+	data-sveltekit-reload
+	href={`/type/${type}`}
+	class="flex w-fit gap-1 px-2 py-1"
 	style="background-color: {color}; color: {getTextColor(color)}; font-size: {textSize}px;"
 >
 	<img width="20" src={typeIconUrl + type + '.svg'} alt={type} />
-	<p id={`type-${type}`} class="w-fit font-medium hover:cursor-default">
+	<p id={`type-${type}`} class="w-fit font-medium">
 		{capitalize(type)}
 	</p>
-</div>
+</a>

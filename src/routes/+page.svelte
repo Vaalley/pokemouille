@@ -6,6 +6,8 @@
 	let searchData = data.searchData;
 </script>
 
+<!-- Use of SkeletonUI Tree Views to display Evolution Chain -->
+
 <svelte:head>
 	<title>Pokémouille 🐸</title>
 	<link rel="icon" href="/favicon.png" />

@@ -1,6 +1,6 @@
 <script>
 	import { onMount, afterUpdate } from 'svelte';
-	import { capitalize, hyphenRemover } from '$lib/utils';
+	import { capitalize, hyphenRemover, pokemonTypes } from '$lib/utils';
 	import { Drawer, drawerStore } from '@skeletonlabs/skeleton';
 	import Type from './Type.svelte';
 
@@ -9,16 +9,20 @@
 	let showSearchBar = false;
 	let inputEl;
 	let matchingPokemon = [];
+	let matchingType = [];
 	let matchingAbility = [];
 	let matchingMove = [];
 	let matchingItem = [];
 	let pokemonData = data.pokemon_v2_pokemon;
+	let typeData = pokemonTypes;
 	let abilityData = data.pokemon_v2_ability;
 	let moveData = data.pokemon_v2_move;
 	let itemData = data.pokemon_v2_item;
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	const moveSpriteUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/';
+	const typeIconUrl =
+		'https://raw.githubusercontent.com/partywhale/pokemon-type-icons/fcbe6978c61c359680bc07636c3f9bdc0f346b43/icons/';
 
 	function toggleSearchBar(event) {
 		if (event.key === 'Escape' && showSearchBar) {
@@ -37,6 +41,7 @@
 			let maxCount = 15;
 
 			matchingPokemon = [];
+			matchingType = [];
 			matchingAbility = [];
 			matchingMove = [];
 			matchingItem = [];
@@ -50,6 +55,19 @@
 					const slug = name.replace(/ /g, '-');
 					pokemon.slug = slug;
 					matchingPokemon.push(pokemon);
+					count++;
+				}
+			}
+
+			for (const type of typeData) {
+				if (count >= maxCount) {
+					break;
+				}
+				const name = type.name.toLowerCase().replace(/-/g, ' ');
+				if (name.includes(searchTerm)) {
+					const slug = name.replace(/ /g, '-');
+					type.slug = slug;
+					matchingType.push(type);
 					count++;
 				}
 			}
@@ -132,7 +150,7 @@
 			on:input={updateMatching}
 		/>
 
-		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length || matchingItem.length}
+		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length || matchingItem.length || matchingType.length}
 			<ul class="mt-6 grid grid-cols-3 items-start gap-6">
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
@@ -151,6 +169,16 @@
 									<p><Type textSize="12" type={pokemonType.pokemon_v2_type.name} /></p>
 								{/each}
 							</div>
+						</li>
+					</a>
+				{/each}
+
+				{#each matchingType as type}
+					<a data-sveltekit-reload href={`/type/${type.slug}`}>
+						<li
+							class="h4 card flex h-24 cursor-pointer items-center justify-center gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+						>
+							<Type textSize="12" type={type.name} />
 						</li>
 					</a>
 				{/each}
