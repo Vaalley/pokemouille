@@ -118,15 +118,21 @@
 		}
 	}
 
-	// console.log(data);
+	let isDrawerOpen = false;
+
+	function toggleDrawer() {
+		isDrawerOpen = !isDrawerOpen;
+		if (isDrawerOpen) {
+			drawerStore.open();
+		} else {
+			drawerStore.close();
+		}
+	}
 
 	onMount(() => {
 		if (window.innerWidth >= 1024) {
 			document.addEventListener('keydown', toggleSearchBar);
 			document.addEventListener('click', toggleSearchBar);
-		}
-		if (window.innerWidth < 1024) {
-			showSearchBar = true;
 		}
 	});
 
@@ -137,9 +143,23 @@
 	});
 </script>
 
+<button
+	class="fixed bottom-4 right-4 z-50 rounded-full bg-primary-500 p-2 text-white shadow-lg lg:hidden"
+	on:click={toggleDrawer}
+>
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+		<path
+			d="M2 12h20M2 6h20M2 18h20"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+		/>
+	</svg>
+</button>
+
 <Drawer>
 	<div
-		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-secondary-400 bg-opacity-5 -lg:static"
+		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-secondary-400 bg-opacity-5"
 	>
 		<input
 			type="text"
@@ -151,7 +171,7 @@
 		/>
 
 		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length || matchingItem.length || matchingType.length}
-			<ul class="mt-6 grid grid-cols-3 items-start gap-6">
+			<ul class="mt-6 grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
 						<li

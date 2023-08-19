@@ -7,6 +7,7 @@
 </script>
 
 <!-- Use of SkeletonUI Tree Views to display Evolution Chain -->
+<!-- Add mobile support  -->
 
 <svelte:head>
 	<title>Pokémouille 🐸</title>

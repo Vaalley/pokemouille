@@ -96,6 +96,12 @@
 
 <!-- Pokemon Name -->
 <div class="mt-6 flex items-center justify-center gap-6 text-center">
+	<img
+		loading="lazy"
+		src={pokemonShowdownUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.gif'}
+		alt={pokemonInfo.pokemon_v2_pokemon[0].name}
+	/>
+
 	<h1
 		class="h1 font-bold"
 		style="color: {pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.is_legendary
@@ -110,12 +116,6 @@
 				.pokemon_v2_generation.id}
 		</span>
 	</h1>
-
-	<img
-		loading="lazy"
-		src={pokemonShowdownUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.gif'}
-		alt={pokemonInfo.pokemon_v2_pokemon[0].name}
-	/>
 </div>
 <!-- Evolution Chain -->
 <div>
