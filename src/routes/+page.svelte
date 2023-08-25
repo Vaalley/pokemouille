@@ -6,8 +6,11 @@
 	let searchData = data.searchData;
 </script>
 
-<!-- Use of SkeletonUI Tree Views to display Evolution Chain -->
+<!-- Make a credits page, crediting all assets we're using etc... -->
 <!-- Add mobile support  -->
+<!-- Use of SkeletonUI Tree Views to display Evolution Chain -->
+<!-- Add multi language support -->
+<!-- Add battle simulator (similar to Pokemon Showdown) -->
 
 <svelte:head>
 	<title>Pokémouille 🐸</title>
