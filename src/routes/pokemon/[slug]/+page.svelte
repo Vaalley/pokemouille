@@ -152,7 +152,7 @@
 		<!-- Types -->
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Type(s):</h2>
-			<div class="mt-2 flex gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
+			<div class="mt-2 flex gap-3" use:popup={popupHover}>
 				{#each pokemonTypes as type}
 					<Type type={type.pokemon_v2_type.name} />
 				{/each}
