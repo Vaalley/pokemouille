@@ -365,7 +365,7 @@
 				href="/move/{move.pokemon_v2_move.name}"
 			>
 				<div class="flex flex-col items-center text-center">
-					<div class="flex gap-4">
+					<div class="flex items-center gap-4">
 						<Type textSize="14" type={move.pokemon_v2_move.pokemon_v2_type.name} />
 						<p class="h4 font-semibold">
 							{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
@@ -374,22 +374,25 @@
 							<img
 								class="object-contain"
 								loading="lazy"
-								src="https://archives.bulbagarden.net/media/upload/7/71/StatusIC_BW.png"
+								src="https://img.pokemondb.net/images/icons/move-status.png"
 								alt="status"
+								width="24"
 							/>
 						{:else if move.pokemon_v2_move.move_damage_class_id == 2}
 							<img
 								class="object-contain"
 								loading="lazy"
-								src="https://archives.bulbagarden.net/media/upload/e/ed/PhysicalIC_BW.png"
+								src="https://img.pokemondb.net/images/icons/move-physical.png"
 								alt="physical"
+								width="24"
 							/>
 						{:else if move.pokemon_v2_move.move_damage_class_id == 3}
 							<img
 								class="object-contain"
 								loading="lazy"
-								src="https://archives.bulbagarden.net/media/upload/8/8c/SpecialIC_BW.png"
+								src="https://img.pokemondb.net/images/icons/move-special.png"
 								alt="special"
+								width="24"
 							/>
 						{/if}
 					</div>
