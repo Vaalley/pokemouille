@@ -10,7 +10,6 @@
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
-	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import { popup } from '@skeletonlabs/skeleton';
 
 	// Variable declarations
@@ -91,7 +90,6 @@
 	<title>Pokémouille | {capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
 </svelte:head>
 
-<LightSwitch class="absolute right-10 top-10 scale-125" />
 <SearchBar data={searchData} />
 
 <!-- Pokemon Name -->

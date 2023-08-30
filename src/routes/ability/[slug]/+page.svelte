@@ -2,7 +2,6 @@
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
-	import { LightSwitch } from '@skeletonlabs/skeleton';
 
 	let abilityInfo = data.abilityInfo;
 	let searchData = data.searchData;
@@ -16,7 +15,6 @@
 	<title>Pokémouille | {capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 </svelte:head>
 
-<LightSwitch class="absolute right-10 top-10 scale-125" />
 <SearchBar data={searchData} />
 
 <div class="min-h-screen">

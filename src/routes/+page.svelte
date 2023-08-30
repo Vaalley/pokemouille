@@ -1,15 +1,14 @@
 <script>
 	import SearchBar from '../components/SearchBar.svelte';
-	import { LightSwitch } from '@skeletonlabs/skeleton';
 	export let data;
 
 	let searchData = data.searchData;
 </script>
 
 <!-- Make a credits page, crediting all assets we're using etc... -->
-<!-- Add mobile support  -->
-<!-- Use of SkeletonUI Tree Views to display Evolution Chain -->
-<!-- Add multi language support -->
+<!-- Add mobile support on every page  -->
+<!-- Use of SkeletonUI Tree Views to completely overhaul the Evolution Chain component -->
+<!-- Add multi languages support -->
 <!-- Add battle simulator (similar to Pokemon Showdown) -->
 
 <svelte:head>
@@ -17,7 +16,6 @@
 	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
-<LightSwitch class="absolute right-10 top-10 scale-125" />
 <SearchBar data={searchData} />
 
 <div class="container mx-auto flex min-h-screen flex-col justify-end">

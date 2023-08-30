@@ -1,6 +1,5 @@
 <script>
 	import SearchBar from '../../../components/SearchBar.svelte';
-	import { LightSwitch } from '@skeletonlabs/skeleton';
 	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import Type from '../../../components/Type.svelte';
@@ -14,7 +13,6 @@
 	// console.log(typeInfo);
 </script>
 
-<LightSwitch class="absolute right-10 top-10 scale-125" />
 <SearchBar data={searchData} />
 
 <svelte:head>

@@ -1,4 +1,6 @@
 <script>
+	import { LightSwitch } from '@skeletonlabs/skeleton';
+
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
 
@@ -19,4 +21,5 @@
 	import '../app.css';
 </script>
 
+<LightSwitch class="absolute right-10 top-10 scale-125" />
 <slot />
