@@ -5,11 +5,12 @@
 	let searchData = data.searchData;
 </script>
 
-<!-- Make a credits page, crediting all assets we're using etc... -->
-<!-- Add mobile support on every page  -->
-<!-- Use of SkeletonUI Tree Views to completely overhaul the Evolution Chain component -->
-<!-- Add multi languages support -->
-<!-- Add battle simulator (similar to Pokemon Showdown) -->
+<!-- TODO: Make a credits page, crediting all assets we're using etc... -->
+<!-- TODO: Update the visuals for the types weaknesses on hover in pokemon page -->
+<!-- TODO: Add mobile support on every page  -->
+<!-- TODO: Use of SkeletonUI Tree Views to completely overhaul the Evolution Chain component -->
+<!-- TODO: Add multi languages support -->
+<!-- TODO: Add battle simulator (similar to Pokemon Showdown) -->
 
 <svelte:head>
 	<title>Pokémouille 🐸</title>
