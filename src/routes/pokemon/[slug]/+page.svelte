@@ -244,6 +244,7 @@
 		<!-- Types -->
 		<div>
 			<h2 class="h4 mt-4 font-semibold">Type(s):</h2>
+			<!-- FIXME: pointer-events-none preventing Type a tag from working (and thus can't be clicked) -->
 			<div class="mt-2 flex gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
 				{#each pokemonTypes as type}
 					<Type type={type.pokemon_v2_type.name} />

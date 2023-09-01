@@ -6,7 +6,6 @@
 </script>
 
 <!-- TODO: Make a credits page, crediting all assets we're using etc... -->
-<!-- TODO: Update the visuals for the types weaknesses on hover in pokemon page -->
 <!-- TODO: Add mobile support on every page  -->
 <!-- TODO: Use of SkeletonUI Tree Views to completely overhaul the Evolution Chain component -->
 <!-- TODO: Add multi languages support -->
