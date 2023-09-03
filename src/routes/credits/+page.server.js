@@ -1,7 +1,6 @@
 import { getMainInfo } from '$lib/mainInfoCache.js';
 
 export async function load() {
-
 	try {
 		const searchData = await getMainInfo();
 

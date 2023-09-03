@@ -39,7 +39,7 @@
 	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
-	<div class="mt-6 flex gap-6">
+	<div class="mt-6 flex flex-wrap gap-6">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
 				data-sveltekit-reload

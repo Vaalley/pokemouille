@@ -292,6 +292,7 @@
 			</div>
 		</div>
 	</div>
+	<!-- Stats -->
 	<div>
 		<h2 class="h4 font-semibold">Statistics:</h2>
 		<p class="h5 mb-3 font-medium">
@@ -345,7 +346,7 @@
 <!-- Pokemon Sprites Gallery -->
 <div class="container mx-auto mt-28">
 	<h2 class="h2 font-semibold">Pokemon Sprites Gallery:</h2>
-	<div class="mt-12 grid grid-cols-2">
+	<div class="mt-12 grid grid-cols-2 -lg:grid-cols-1">
 		<div class="mx-auto">
 			<h3 class="h3 text-center font-semibold">Official Shiny Artwork:</h3>
 			<img
@@ -394,13 +395,14 @@
 		</div>
 	</div>
 </div>
+
 <!-- Moves -->
 <div class="container mx-auto">
 	<h2 class="h2 font-semibold">Moves:</h2>
 	<p class="h5 font-medium">
 		Total moves: <span class="text-primary-500">{pokemonMoves.length}</span>
 	</p>
-	<div class="mt-6 flex gap-6">
+	<div class="mt-6 flex flex-wrap gap-6">
 		<button
 			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortByPower()}>Sort by Power</button
@@ -415,7 +417,7 @@
 		>
 	</div>
 
-	<div class="mt-12 grid grid-cols-4 gap-4">
+	<div class="mt-12 grid grid-cols-4 gap-4 -xl:grid-cols-3 -lg:grid-cols-2 -md:grid-cols-1">
 		{#each pokemonMoves as move}
 			<a
 				class="btn rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"

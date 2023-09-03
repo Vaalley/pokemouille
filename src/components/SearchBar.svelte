@@ -159,7 +159,7 @@
 
 <Drawer>
 	<div
-		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-secondary-400 bg-opacity-5"
+		class="z-50 flex h-full w-full flex-col items-center justify-center bg-secondary-400 bg-opacity-5"
 	>
 		<input
 			type="text"
