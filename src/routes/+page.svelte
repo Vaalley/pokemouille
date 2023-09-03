@@ -5,7 +5,6 @@
 	let searchData = data.searchData;
 </script>
 
-<!-- TODO: Make a credits page, crediting all assets we're using etc... -->
 <!-- TODO: Add mobile support on every page  -->
 <!-- TODO: Use of SkeletonUI Tree Views to completely overhaul the Evolution Chain component -->
 <!-- TODO: Add multi languages support -->
@@ -21,11 +20,14 @@
 <div class="container mx-auto flex min-h-screen flex-col justify-end">
 	<h1 class="h1 mt-12 text-center font-bold">Welcome to Pokémouille 🐸</h1>
 	<h2 class="h2 mt-24 font-semibold">About</h2>
-	<p class="mt-6 font-medium">
+	<p class="h5 mt-6 font-medium">
 		Pokémouille is a website that provides information about the world of Pokémon. You can search
 		for your favorite Pokémon and learn more about their stats, moves, abilities, and more. Whether
 		you're a seasoned trainer or just getting started, Pokémouille has everything you need to become
 		a Pokémon master!
+	</p>
+	<p class="mt-2 font-medium">
+		All credits can be found here: <a class="anchor" href="/credits">Credits</a>
 	</p>
 	<h2
 		class="h2 mx-auto mb-auto mt-24 w-fit border-2 border-primary-400 bg-primary-100 p-3 font-semibold text-primary-400"
