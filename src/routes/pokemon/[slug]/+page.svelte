@@ -182,6 +182,7 @@
 
 <svelte:head>
 	<title>Pokémouille | {capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <SearchBar data={searchData} />

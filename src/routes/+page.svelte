@@ -11,16 +11,20 @@
 <!-- TODO: Add battle simulator (similar to Pokemon Showdown) -->
 
 <svelte:head>
-	<title>Pokémouille 🐸</title>
-	<link rel="icon" href="/favicon.png" />
+	<title>Pokémouille</title>
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <SearchBar data={searchData} />
 
-<div class="container mx-auto flex min-h-screen flex-col justify-end">
-	<h1 class="h1 mt-12 text-center font-bold">Welcome to Pokémouille 🐸</h1>
-	<h2 class="h2 mt-24 font-semibold">About</h2>
-	<p class="h5 mt-6 font-medium">
+<main class="container mx-auto flex min-h-screen flex-col justify-end">
+	<h1
+		class="h1 mt-10 bg-gradient-to-br from-green-500 to-lime-300 box-decoration-clone bg-clip-text text-center font-bold text-transparent"
+	>
+		Welcome to Pokémouille
+	</h1>
+	<h2 class="h2 mt-20 font-semibold">About</h2>
+	<p class="mt-5 font-medium">
 		Pokémouille is a website that provides information about the world of Pokémon. You can search
 		for your favorite Pokémon and learn more about their stats, moves, abilities, and more. Whether
 		you're a seasoned trainer or just getting started, Pokémouille has everything you need to become
@@ -30,7 +34,7 @@
 		All credits can be found here: <a class="anchor" href="/credits">Credits</a>
 	</p>
 	<h2
-		class="h2 mx-auto mb-auto mt-24 w-fit border-2 border-primary-400 bg-primary-100 p-3 font-semibold text-primary-400"
+		class="h2 mb-auto mt-20 w-fit border-2 border-primary-400 bg-primary-100 p-3 text-center font-semibold text-primary-400"
 	>
 		Start typing anywhere to search for anything
 	</h2>
@@ -43,4 +47,4 @@
 			class="text-primary-600 underline transition-all hover:text-primary-700">GitHub repository</a
 		>. We're always looking for contributors to make Pokémouille even better!
 	</p>
-</div>
+</main>

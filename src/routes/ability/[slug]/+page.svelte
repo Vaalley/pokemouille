@@ -13,6 +13,7 @@
 
 <svelte:head>
 	<title>Pokémouille | {capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <SearchBar data={searchData} />

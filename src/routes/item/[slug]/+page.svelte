@@ -13,7 +13,7 @@
 
 <svelte:head>
 	<title>Pokémouille | {capitalize(hyphenRemover(itemInfo.pokemon_v2_item[0].name))}</title>
-	<link rel="icon" href="/favicon.png" />
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <div class="min-h-screen">

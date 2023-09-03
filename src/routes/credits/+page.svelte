@@ -10,7 +10,7 @@
 
 <svelte:head>
 	<title>Pokémouille | 🎉 Credits</title>
-	<link rel="icon" href="/favicon.png" />
+	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
 <div class="min-h-screen">
