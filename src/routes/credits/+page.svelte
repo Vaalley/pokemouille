@@ -27,7 +27,7 @@
 					<a class="anchor" href="https://github.com/partywhale">Partywhale</a>
 				</h2>
 				<p class="h5 mt-2">
-					Partywhale recreated every Pokemon type icon as a SVG's, can be found here: <a
+					Partywhale recreated every Pokemon type icon as a SVG's, which can be found here: <a
 						class="anchor"
 						href="https://github.com/partywhale/pokemon-type-icons"
 						>https://github.com/partywhale/pokemon-type-icons</a
@@ -46,8 +46,20 @@
 				</p>
 			</div>
 		</div>
+		<!-- Data Credits -->
 		<div>
-			<!-- <h1 class="h1 font-bold">Other Credits:</h1> -->
+			<h1 class="h1 font-bold">Data Credits:</h1>
+			<div class="mt-5">
+				<h2 class="h2 font-semibold">
+					<a class="anchor" href="https://github.com/PokeAPI">PokéAPI</a>
+				</h2>
+				<p class="h5 mt-2">
+					PokéAPI provides all the data used in this website (pokemon height/weight, abilities,
+					moves, items etc...) which can be found here: <a class="anchor" href="https://pokeapi.co"
+						>https://pokeapi.co</a
+					>
+				</p>
+			</div>
 		</div>
 	</div>
 </div>
