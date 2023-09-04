@@ -1,25 +1,19 @@
 <script>
-	import { LightSwitch } from '@skeletonlabs/skeleton';
-
+	import { Drawer, LightSwitch } from '@skeletonlabs/skeleton';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
+	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+	import { storePopup } from '@skeletonlabs/skeleton';
+	import { initializeStores } from '@skeletonlabs/skeleton';
+	import '../app.css';
 
 	inject({ mode: dev ? 'development' : 'production' });
 
-	// Imports for SkeletonUI Popups
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
-	import { storePopup } from '@skeletonlabs/skeleton';
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
-	// Your selected Skeleton theme:
-	import '@skeletonlabs/skeleton/themes/theme-crimson.css';
-
-	// This contains the bulk of Skeletons required styles:
-	import '@skeletonlabs/skeleton/styles/skeleton.css';
-
-	// Finally, your application's global stylesheet (sometimes labeled 'app.css')
-	import '../app.css';
+	initializeStores();
 </script>
 
+<Drawer />
 <LightSwitch class="absolute right-10 top-10 scale-125" />
 <slot />

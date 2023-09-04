@@ -405,15 +405,15 @@
 	</p>
 	<div class="mt-6 flex flex-wrap gap-6">
 		<button
-			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
+			class="variant-filled h5 btn rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortByPower()}>Sort by Power</button
 		>
 		<button
-			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
+			class="variant-filled h5 btn rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortByAccuracy()}>Sort by Accuracy</button
 		>
 		<button
-			class="h5 btn variant-filled rounded-none bg-primary-500 font-semibold"
+			class="variant-filled h5 btn rounded-none bg-primary-500 font-semibold"
 			on:click={() => sortAlphabetically()}>Sort Alphabetically</button
 		>
 	</div>
