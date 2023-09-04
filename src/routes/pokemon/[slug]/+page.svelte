@@ -204,7 +204,7 @@
 			: ''}"
 	>
 		{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
-		<span class="h4 text-tertiary-800">
+		<span class="h4 text-base">
 			- Introduced in gen {pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy
 				.pokemon_v2_generation.id}
 		</span>
@@ -404,16 +404,14 @@
 		Total moves: <span class="text-primary-500">{pokemonMoves.length}</span>
 	</p>
 	<div class="mt-6 flex flex-wrap gap-6">
-		<button
-			class="variant-filled h5 btn rounded-none bg-primary-500 font-semibold"
-			on:click={() => sortByPower()}>Sort by Power</button
+		<button class="variant-filled-primary h5 btn font-semibold" on:click={() => sortByPower()}
+			>Sort by Power</button
+		>
+		<button class="variant-filled-primary h5 btn font-semibold" on:click={() => sortByAccuracy()}
+			>Sort by Accuracy</button
 		>
 		<button
-			class="variant-filled h5 btn rounded-none bg-primary-500 font-semibold"
-			on:click={() => sortByAccuracy()}>Sort by Accuracy</button
-		>
-		<button
-			class="variant-filled h5 btn rounded-none bg-primary-500 font-semibold"
+			class="variant-filled-primary h5 btn font-semibold"
 			on:click={() => sortAlphabetically()}>Sort Alphabetically</button
 		>
 	</div>
