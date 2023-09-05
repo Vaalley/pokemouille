@@ -9,7 +9,7 @@
 <SearchBar data={searchData} />
 
 <svelte:head>
-	<title>Pokémouille | 🎉 Credits</title>
+	<title>Pokémouille | Credits 🎉</title>
 	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
