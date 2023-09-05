@@ -163,7 +163,7 @@
 		<input
 			type="text"
 			placeholder="Search..."
-			class="input variant-form-material h3 w-80 max-w-[600px] bg-tertiary-100 px-4 py-3 outline-none"
+			class="input h3 w-80 max-w-[600px] px-4 py-3 outline-none"
 			bind:this={inputEl}
 			on:blur={toggleSearchBar}
 			on:input={updateMatching}
@@ -174,7 +174,7 @@
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
 						<li
-							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 bg-surface-50 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
 								class="h-fit"
@@ -195,7 +195,7 @@
 				{#each matchingType as type}
 					<a data-sveltekit-reload href={`/type/${type.slug}`}>
 						<li
-							class="card h4 flex h-24 cursor-pointer items-center justify-center gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+							class="card h4 flex h-24 cursor-pointer items-center justify-center gap-6 bg-surface-50 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<Type textSize="12" type={type.name} />
 						</li>
@@ -205,7 +205,7 @@
 				{#each matchingAbility as ability}
 					<a data-sveltekit-reload href={`/ability/${ability.slug}`}>
 						<li
-							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 bg-surface-50 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
 								class="my-[-6px] h-fit"
@@ -221,7 +221,7 @@
 				{#each matchingMove as move}
 					<a data-sveltekit-reload href={`/move/${move.slug}`}>
 						<li
-							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 bg-surface-50 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
 								class="my-[-6px] h-fit"
@@ -240,7 +240,7 @@
 				{#each matchingItem as item}
 					<a data-sveltekit-reload href={`/item/${item.slug}`}>
 						<li
-							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 rounded-none bg-tertiary-100 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
+							class="card h4 flex h-24 cursor-pointer items-center justify-end gap-6 bg-surface-50 p-3 font-semibold outline-none hover:border-b-2 hover:border-primary-500 hover:text-primary-500"
 						>
 							<img
 								class="my-[-6px] h-fit"
