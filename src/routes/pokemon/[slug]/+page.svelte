@@ -195,7 +195,6 @@
 			src={pokemonShowdownUrl + pokemonInfo.pokemon_v2_pokemon[0].id + '.gif'}
 			alt={pokemonInfo.pokemon_v2_pokemon[0].name}
 		/>
-
 		<h1
 			class="h1 p-2 font-bold"
 			style={`

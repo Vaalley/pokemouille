@@ -9,12 +9,12 @@ const getMainInfo = (() => {
 	return async () => {
 		const cached = cache.get('data');
 		if (cached) {
-			console.log('cache hit ✅');
+			console.log('cache hit for Searchbar data ✅');
 			// console.log(cached);
 			return cached;
 		}
 
-		console.log('cache miss, fetching data 🔃');
+		console.log('cache miss for Searchbar data, fetching data 🔃');
 		const result = await fetchMainInfo();
 
 		memo = { data: result };
