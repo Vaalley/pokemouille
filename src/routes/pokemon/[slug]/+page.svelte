@@ -317,7 +317,7 @@
 				</p>
 				{#each pokemonStats as stat}
 					<div class="mt-1 flex items-center justify-start gap-2 font-medium">
-						<div class="flex w-48 gap-3 -md:w-40 -md:text-sm">
+						<div class="flex w-48 gap-2 -md:w-36 -md:text-sm">
 							<p
 								style="color: {getStatColor(
 									stat.base_stat,
