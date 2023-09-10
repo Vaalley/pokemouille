@@ -353,7 +353,7 @@
 						<!-- Add EV yields here -->
 						<div class="text-base font-medium">
 							<p>
-								EV yield:
+								EV 🔍:
 								{stat.effort}
 							</p>
 						</div>
