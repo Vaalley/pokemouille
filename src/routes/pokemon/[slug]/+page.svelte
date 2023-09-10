@@ -317,7 +317,7 @@
 				</p>
 				{#each pokemonStats as stat}
 					<div class="mt-1 flex items-center justify-start gap-2 font-medium">
-						<div class="flex w-48 gap-3 -md:w-40">
+						<div class="flex w-48 gap-3 -md:w-40 -md:text-sm">
 							<p
 								style="color: {getStatColor(
 									stat.base_stat,
@@ -351,7 +351,7 @@
 							/>
 						</div>
 						<!-- Add EV yields here -->
-						<div class="text-base font-medium">
+						<div class="font-medium -md:text-sm">
 							<p>
 								EV 🔍:
 								{stat.effort}
