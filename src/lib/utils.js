@@ -20,8 +20,8 @@ export function getIdFromUrl(urlString) {
 
 // Gets the hexcode of a stat value
 export function getStatColor(statValue, minStat, maxStat) {
-	const colorStart = 0xd4163c;
-	const colorEnd = 0x4685af;
+	const colorStart = 0xff4d4d;
+	const colorEnd = 0x43d696;
 	const percentage = (statValue - minStat) / (maxStat - minStat);
 	const red = interpolateColorComponent(colorStart >> 16, colorEnd >> 16, percentage);
 	const green = interpolateColorComponent(

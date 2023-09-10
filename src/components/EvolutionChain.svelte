@@ -35,7 +35,7 @@
 	}
 </script>
 
-<div class="container mx-auto mt-16">
+<section class="container mx-auto mt-16">
 	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
@@ -93,4 +93,4 @@
 			{/if}
 		{/each}
 	</div>
-</div>
+</section>

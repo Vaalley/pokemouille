@@ -15,5 +15,7 @@
 </script>
 
 <Drawer />
-<LightSwitch class="absolute right-10 top-10 scale-125" />
+<LightSwitch
+	class="absolute right-[1vw] top-[1vw] scale-125 -md:right-[3vw] -md:top-[3vw] -md:scale-100"
+/>
 <slot />
