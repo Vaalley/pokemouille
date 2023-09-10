@@ -219,6 +219,7 @@
 					`}
 		>
 			{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}
+			<br class="hidden -sm:block" />
 			<span class="text-base font-medium text-surface-400">
 				- Introduced in gen {pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy
 					.pokemon_v2_generation.id}
@@ -260,7 +261,9 @@
 				</div>
 				<!-- Types -->
 				<div>
-					<h3 class="h3 mt-4 font-semibold">Type(s):</h3>
+					<h3 class="h3 mt-4 font-semibold">
+						{pokemonTypes.length === 1 ? 'Type:' : 'Types:'}
+					</h3>
 					<!-- FIXME: pointer-events-none preventing Type a tag from working (and thus can't be clicked) -->
 					<div class="mt-2 flex gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
 						{#each pokemonTypes as type}
@@ -317,7 +320,7 @@
 				</p>
 				{#each pokemonStats as stat}
 					<div class="mt-1 flex items-center justify-start gap-2 font-medium">
-						<div class="flex w-48 gap-2 -md:w-36 -md:text-sm">
+						<div class="flex w-48 gap-2 -md:w-32 -md:text-sm">
 							<p
 								style="color: {getStatColor(
 									stat.base_stat,
@@ -337,7 +340,7 @@
 								{stat.base_stat}
 							</p>
 						</div>
-						<div class="relative h-4 w-24 overflow-hidden bg-tertiary-50 -md:w-16">
+						<div class="relative h-4 w-24 overflow-hidden bg-surface-100 -md:w-16">
 							<div
 								class="h-full"
 								style="width: {Math.min(
@@ -353,7 +356,7 @@
 						<!-- Add EV yields here -->
 						<div class="font-medium -md:text-sm">
 							<p>
-								EV 🔍:
+								EV:
 								{stat.effort}
 							</p>
 						</div>
@@ -365,8 +368,8 @@
 	<!-- Pokemon Sprites Gallery -->
 	<section class="container mx-auto mt-16">
 		<h2 class="h2 font-semibold">Pokemon Sprites Gallery:</h2>
-		<div class="mt-12 grid grid-cols-2 -lg:grid-cols-1">
-			<div class="mx-auto">
+		<div class="mt-12 flex flex-wrap justify-around">
+			<div class="">
 				<h3 class="h3 text-center font-semibold">Official Shiny Artwork:</h3>
 				<img
 					src={pokemonOfficialArtworkUrl +
@@ -378,7 +381,7 @@
 					loading="lazy"
 				/>
 			</div>
-			<div class="mx-auto">
+			<div class="">
 				<h3 class="h3 text-center font-semibold">Main Sprites:</h3>
 				<div class="flex items-center">
 					<div>
@@ -417,38 +420,36 @@
 			</div>
 		</div>
 	</section>
-
 	<!-- Moves -->
-	<div class="container mx-auto">
+	<section class="container mx-auto mt-16">
 		<h2 class="h2 font-semibold">Moves:</h2>
 		<p class="font-medium">
 			Total moves: <span class="text-primary-500">{pokemonMoves.length}</span>
 		</p>
-		<div class="mt-6 flex flex-wrap gap-6">
-			<button class="variant-filled-primary h5 btn font-semibold" on:click={() => sortByPower()}
+		<div class="mt-5 flex flex-wrap gap-5">
+			<button class="variant-filled h5 btn font-semibold" on:click={() => sortByPower()}
 				>Sort by Power</button
 			>
-			<button class="variant-filled-primary h5 btn font-semibold" on:click={() => sortByAccuracy()}
+			<button class="variant-filled h5 btn font-semibold" on:click={() => sortByAccuracy()}
 				>Sort by Accuracy</button
 			>
-			<button
-				class="variant-filled-primary h5 btn font-semibold"
-				on:click={() => sortAlphabetically()}>Sort Alphabetically</button
+			<button class="variant-filled h5 btn font-semibold" on:click={() => sortAlphabetically()}
+				>Sort Alphabetically</button
 			>
 		</div>
 
 		<div class="mt-12 grid grid-cols-4 gap-4 -xl:grid-cols-3 -lg:grid-cols-2 -md:grid-cols-1">
 			{#each pokemonMoves as move}
 				<a
-					class="btn rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
+					class="p-5 transition-all hover:card hover:text-primary-500"
 					href="/move/{move.pokemon_v2_move.name}"
 				>
 					<div class="flex flex-col items-center text-center">
 						<div class="flex items-center gap-4">
 							<Type textSize="14" type={move.pokemon_v2_move.pokemon_v2_type.name} />
-							<p class="h4 font-semibold">
+							<h4 class="h4 font-semibold">
 								{capitalize(hyphenRemover(move.pokemon_v2_move.name))}
-							</p>
+							</h4>
 							{#if move.pokemon_v2_move.move_damage_class_id == 1}
 								<img
 									class="object-contain"
@@ -493,5 +494,5 @@
 				</a>
 			{/each}
 		</div>
-	</div>
+	</section>
 </main>
