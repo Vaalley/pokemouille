@@ -32,6 +32,7 @@ async function fetchAbilityInfo(slug) {
 				}
 				pokemon_v2_generation {
 					name
+					id
 				}
 			}
 		}

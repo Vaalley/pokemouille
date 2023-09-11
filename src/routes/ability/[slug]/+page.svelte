@@ -8,7 +8,7 @@
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	// console.log(abilityInfo);
+	console.log(abilityInfo);
 </script>
 
 <svelte:head>
@@ -18,45 +18,45 @@
 
 <SearchBar data={searchData} />
 
-<div class="min-h-screen">
+<main class="min-h-screen">
 	<!-- Ability name -->
 	<div class="flex h-32 items-center justify-center gap-6">
-		<h1 class="h1 flex items-center gap-3 font-bold">
+		<h1 class="h1 p-2 font-bold">
 			{capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}
-			<span class="h4 text-tertiary-800"
-				>- Introduced in {hyphenRemover(
-					abilityInfo.pokemon_v2_ability[0].pokemon_v2_generation.name
-				)}</span
+			<br class="hidden -sm:block" />
+			<span class="text-base font-medium text-surface-400"
+				>- Introduced in gen {abilityInfo.pokemon_v2_ability[0].pokemon_v2_generation.id}</span
 			>
 		</h1>
 	</div>
-	<div class="container mx-auto grid grid-cols-2 items-baseline">
+	<!-- Ability descriptions -->
+	<div class="container mx-auto mt-10 grid grid-cols-2 items-baseline -lg:grid-cols-1">
 		<!-- Ability flavor text -->
-		<div class="mt-20">
-			<h2 class="h2 mb-6 font-semibold">Flavor Text:</h2>
-			<p class="text-xl font-medium">
+		<div>
+			<h2 class="h2 font-semibold">Flavor Text:</h2>
+			<p class="mt-3 font-medium">
 				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
 			</p>
 		</div>
 		<!-- Ability effect -->
-		<div class="mt-12">
-			<h2 class="h2 mb-6 font-semibold">Effect Description:</h2>
-			<p class="text-xl font-medium">
+		<div class="-lg:mt-10">
+			<h2 class="h2 font-semibold">Effect Description:</h2>
+			<p class="mt-3 font-medium">
 				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
 			</p>
 		</div>
 	</div>
 	<!-- Ability Pokémon list -->
-	<div class="container mx-auto py-12">
-		<h2 class="h2 mb-6 font-semibold">
+	<div class="container mx-auto my-16">
+		<h2 class="h2 font-semibold">
 			List of Pokémon that can learn {capitalize(
 				hyphenRemover(abilityInfo.pokemon_v2_ability[0].name)
 			)}:
 		</h2>
-		<div class="grid grid-cols-8 gap-3">
+		<div class="mt-5 flex flex-wrap gap-3">
 			{#each abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities as pokemon}
 				<a
-					class="h5 mx-auto flex w-fit flex-col items-center justify-center rounded-none p-6 font-medium transition-all hover:variant-ringed-primary hover:text-primary-500"
+					class="mx-auto flex flex-col items-center justify-center p-3 transition-all hover:card hover:text-primary-500"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img
@@ -74,4 +74,4 @@
 			{/each}
 		</div>
 	</div>
-</div>
+</main>
