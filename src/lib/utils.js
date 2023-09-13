@@ -6,11 +6,9 @@ export function capitalize(str) {
 // Removes hyphens from a string, except for specific strings in the keepHyphen array
 const keepHyphen = new Set(['wo-chien', 'chi-yu', 'ting-lu', 'chien-pao', 'ho-oh']);
 export function hyphenRemover(str) {
-	if (str.includes('-') && !keepHyphen.has(str)) {
-		return str.replace(/-/g, ' ');
-	}
-	return str;
+	return keepHyphen.has(str) ? str : str.replace(/-/g, ' ');
 }
+
 
 // Extracts the id from a URL string in the format "https://pokeapi.co/api/v2/ability/34/"
 export function getIdFromUrl(urlString) {
@@ -40,10 +38,11 @@ function interpolateColorComponent(start, end, percentage) {
 
 // Gets the extreme value of a stat
 export function getExtremeValue(stats, parameter) {
+	const baseStats = stats.map((stat) => stat.base_stat);
 	if (parameter === 'highest') {
-		return Math.max(...stats.map((stat) => stat.base_stat));
+		return Math.max(...baseStats);
 	} else if (parameter === 'lowest') {
-		return Math.min(...stats.map((stat) => stat.base_stat));
+		return Math.min(...baseStats);
 	}
 }
 

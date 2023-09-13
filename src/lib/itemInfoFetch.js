@@ -1,11 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 
-const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
-	headers: {
-		'Content-Type': 'application/json',
-		Accept: '*/*'
-	}
-});
+const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta');
 
 async function fetchItemInfo(slug) {
 	let itemName = slug;
@@ -32,7 +27,7 @@ async function fetchItemInfo(slug) {
 `;
 		return await client.request(query);
 	} catch (error) {
-		throw new Error('Error fetching item data ❌');
+		throw new Error(`Error fetching item data ❌: ${error}`);
 	}
 }
 

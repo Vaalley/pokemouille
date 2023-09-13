@@ -1,22 +1,18 @@
 import { GraphQLClient } from 'graphql-request';
 
-const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta', {
-	headers: {
-		'Content-Type': 'application/json',
-		Accept: '*/*'
-	}
-});
+const client = new GraphQLClient('https://beta.pokeapi.co/graphql/v1beta');
 
 async function fetchPokemonInfo(slug) {
 	let pokemonId = 0;
 	let pokemonName = '';
 
 	// If type of slug is string, then set pokemonName to slug, else if it's a integer, then set pokemonId to slug
-	if (typeof slug === 'string') {
-		pokemonName = slug;
-	} else {
+	if (Number.isInteger(slug)) {
 		pokemonId = slug;
+	} else {
+		pokemonName = slug;
 	}
+
 
 	try {
 		const query = `
@@ -120,7 +116,7 @@ async function fetchPokemonInfo(slug) {
 `;
 		return await client.request(query);
 	} catch (error) {
-		throw new Error('Error fetching pokemon data ❌');
+		throw new Error(`Error fetching pokemon data ❌: ${error.message}`);
 	}
 }
 
