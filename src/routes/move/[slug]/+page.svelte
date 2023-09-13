@@ -24,13 +24,14 @@
 
 <SearchBar data={searchData} />
 
-<div class="min-h-screen">
+<main class="min-h-screen">
 	<!-- Move name -->
 	<div class="flex h-32 items-center justify-center gap-6">
 		<Type type={moveInfo.pokemon_v2_move[0].pokemon_v2_type.name} textSize="18" />
-		<h1 class="h1 font-bold">
+		<h1 class="h1 p-2 font-bold">
 			{capitalize(hyphenRemover(moveInfo.pokemon_v2_move[0].name))}
-			<span class="h4 text-tertiary-800"
+			<br class="hidden -sm:block" />
+			<span class="text-base font-medium text-surface-400"
 				>- Introduced in {hyphenRemover(
 					moveInfo.pokemon_v2_move[0].pokemon_v2_generation.name
 				)}</span
@@ -38,109 +39,112 @@
 		</h1>
 	</div>
 	<!-- Move Info -->
-	<h2 class="container h2 mx-auto mb-6 font-semibold">General Info:</h2>
-	<div class="container mx-auto mt-6 flex flex-wrap justify-between">
+	<h2 class="container h2 mx-auto font-semibold">General Info:</h2>
+	<div class="container mx-auto mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
 		<!-- Category -->
 		<div>
-			<h2 class="h3 mb-6 font-semibold">Category:</h2>
+			<h3 class="h3 font-semibold">Category:</h3>
 			{#if moveInfo.pokemon_v2_move[0].move_damage_class_id == 1}
 				<div class="flex gap-3">
-					<p class="h4 font-medium">Status</p>
+					<p class="font-medium">Status</p>
 					<img
 						class="object-contain"
 						loading="lazy"
-						src="https://archives.bulbagarden.net/media/upload/7/71/StatusIC_BW.png"
-						alt="physical"
+						src="https://img.pokemondb.net/images/icons/move-status.png"
+						alt="status"
+						width="24"
 					/>
 				</div>
 			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 2}
 				<div class="flex gap-3">
-					<p class="h4 font-medium">Physical</p>
+					<p class="font-medium">Physical</p>
 					<img
 						class="object-contain"
 						loading="lazy"
-						src="https://archives.bulbagarden.net/media/upload/e/ed/PhysicalIC_BW.png"
+						src="https://img.pokemondb.net/images/icons/move-physical.png"
 						alt="physical"
+						width="24"
 					/>
 				</div>
 			{:else if moveInfo.pokemon_v2_move[0].move_damage_class_id == 3}
 				<div class="flex gap-3">
-					<p class="h4 font-medium">Special</p>
+					<p class="font-medium">Special</p>
 					<img
 						class="object-contain"
 						loading="lazy"
-						src="https://archives.bulbagarden.net/media/upload/8/8c/SpecialIC_BW.png"
-						alt="physical"
+						src="https://img.pokemondb.net/images/icons/move-special.png"
+						alt="special"
+						width="24"
 					/>
 				</div>
 			{/if}
 		</div>
 		<!-- Power -->
 		<div>
-			<h2 class="h3 mb-6 font-semibold">Power:</h2>
+			<h3 class="h3 font-semibold">Power:</h3>
 			{#if moveInfo.pokemon_v2_move[0].power}
-				<p class="h4 font-medium">
+				<p class="font-medium">
 					{moveInfo.pokemon_v2_move[0].power}
 				</p>
 			{:else}
-				<p class="h4 font-medium">N/A</p>
+				<p class="font-medium">N/A</p>
 			{/if}
 		</div>
 		<!-- Accuracy -->
 		<div>
-			<h2 class="h3 mb-6 font-semibold">Accuracy:</h2>
+			<h3 class="h3 font-semibold">Accuracy:</h3>
 			{#if moveInfo.pokemon_v2_move[0].accuracy}
-				<p class="h4 font-medium">
+				<p class="font-medium">
 					{moveInfo.pokemon_v2_move[0].accuracy}
 				</p>
 			{:else}
-				<p class="h4 font-medium">N/A</p>
+				<p class="font-medium">N/A</p>
 			{/if}
 		</div>
 		<!-- Priority -->
 		<div>
-			<h2 class="h3 mb-6 font-semibold">Priority:</h2>
+			<h3 class="h3 font-semibold">Priority:</h3>
 			{#if moveInfo.pokemon_v2_move[0].priority}
-				<p class="h4 font-medium">
+				<p class="font-medium">
 					{moveInfo.pokemon_v2_move[0].priority}
 				</p>
 			{:else}
-				<p class="h4 font-medium">N/A</p>
+				<p class="font-medium">N/A</p>
 			{/if}
 		</div>
 		<!-- PP -->
 		<div>
-			<h2 class="h3 mb-6 font-semibold">PP:</h2>
+			<h3 class="h3 font-semibold">PP:</h3>
 			{#if moveInfo.pokemon_v2_move[0].pp}
-				<p class="h4 font-medium">
+				<p class="font-medium">
 					{moveInfo.pokemon_v2_move[0].pp}
 				</p>
 			{:else}
-				<p class="h4 font-medium">N/A</p>
+				<p class="font-medium">N/A</p>
 			{/if}
 		</div>
 	</div>
-	<div class="container mx-auto my-20 grid grid-cols-2 items-baseline">
+	<div class="container mx-auto my-20 grid grid-cols-2 items-baseline -lg:grid-cols-1">
 		<!-- Move flavor text -->
 		<div>
-			<h2 class="h2 mb-6 font-semibold">Flavor Text:</h2>
-			<p class="text-lg font-medium">
+			<h2 class="h2 font-semibold">Flavor Text:</h2>
+			<p class="mt-5 text-lg font-medium">
 				{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
 			</p>
 		</div>
 		<!-- Move effect -->
-		<div>
-			<h2 class="h2 mb-6 font-semibold">Effect Description:</h2>
-			<p class="text-lg font-medium">{formattedEffect}</p>
+		<div class="-lg:mt-10">
+			<h2 class="h2 font-semibold">Effect Description:</h2>
+			<p class="mt-5 text-lg font-medium">{formattedEffect}</p>
 		</div>
 	</div>
 	<!-- Move Pokémon list -->
-	<div class="container mx-auto">
-		<h2 class="h2 mb-6 font-semibold">List of Pokémon that can learn that ability:</h2>
-		<div class="grid grid-cols-8">
+	<div class="container mx-auto my-16">
+		<h2 class="h2 font-semibold">List of Pokémon that can learn that ability:</h2>
+		<div class="mt-5 flex flex-wrap gap-3">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
 				<a
-					class="h5 mx-auto flex w-fit flex-col items-center justify-center rounded-none p-6 font-medium transition-all hover:variant-ringed-primary hover:text-primary-500"
+					class="mx-auto flex flex-col items-center justify-center p-3 transition-all hover:card hover:text-primary-500"
 					href={`/pokemon/${pokemon.pokemon_v2_pokemon.name}`}
 				>
 					<img
@@ -155,4 +159,4 @@
 			{/each}
 		</div>
 	</div>
-</div>
+</main>

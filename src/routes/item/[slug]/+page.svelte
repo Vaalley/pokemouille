@@ -16,7 +16,7 @@
 	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
-<div class="min-h-screen">
+<main class="min-h-screen">
 	<!-- Item name -->
 	<div class="flex h-32 items-center justify-center gap-6">
 		<img
@@ -26,34 +26,37 @@
 				'.png'}
 			alt={itemInfo.pokemon_v2_item[0].name}
 		/>
-		<h1 class="h1 flex items-center gap-3 font-bold">
+		<h1 class="h1 p-2 font-bold">
 			{capitalize(hyphenRemover(itemInfo.pokemon_v2_item[0].name))}
+			<br class="hidden -sm:block" />
 			{#if itemInfo.pokemon_v2_item[0].cost}
-				<span class="h4 text-tertiary-800">- Cost: ¥{itemInfo.pokemon_v2_item[0].cost}</span>
+				<span class="text-base font-medium text-surface-400"
+					>- Cost: ¥{itemInfo.pokemon_v2_item[0].cost}</span
+				>
 			{/if}
 		</h1>
 	</div>
-	<div class="container mx-auto grid grid-cols-2 items-baseline">
+	<div class="container mx-auto mt-10 grid grid-cols-2 items-baseline -lg:grid-cols-1">
 		<!-- Item flavor text -->
-		<div class="mt-20">
-			<h2 class="h2 mb-6 font-semibold">Flavor Text:</h2>
-			<p class="text-xl font-medium">
+		<div>
+			<h2 class="h2 font-semibold">Flavor Text:</h2>
+			<p class="mt-3 font-medium">
 				{itemInfo.pokemon_v2_item[0].pokemon_v2_itemflavortexts[0].flavor_text}
 			</p>
 		</div>
 		<!-- Item effect -->
-		<div class="mt-12">
-			<h2 class="h2 mb-6 font-semibold">Effect Description:</h2>
-			<p class="text-xl font-medium">
+		<div class="-lg:mt-10">
+			<h2 class="h2 font-semibold">Effect Description:</h2>
+			<p class="mt-3 font-medium">
 				{itemInfo.pokemon_v2_item[0].pokemon_v2_itemeffecttexts[0].effect}
 			</p>
 		</div>
 	</div>
 	<!-- Item category -->
-	<div class="container mx-auto mt-20">
-		<h2 class="h2 mb-6 font-semibold">Item Category:</h2>
-		<p class="text-xl font-medium">
+	<div class="container mx-auto my-16">
+		<h2 class="h2 font-semibold">Item Category:</h2>
+		<p class="mt-3 font-medium">
 			{capitalize(hyphenRemover(itemInfo.pokemon_v2_item[0].pokemon_v2_itemcategory.name))}
 		</p>
 	</div>
-</div>
+</main>
