@@ -13,12 +13,12 @@
 	<link rel="icon" href="/favicon.ico" />
 </svelte:head>
 
-<div class="min-h-screen">
+<main class="min-h-screen">
 	<!-- Item name -->
 	<div class="flex h-32 items-center justify-center gap-6">
-		<h1 class="h1 flex items-center gap-3 font-bold">🎉 Credits</h1>
+		<h1 class="h1 p-2 font-bold">🎉 Credits</h1>
 	</div>
-	<div class="container mx-auto mt-20 grid grid-cols-2 items-baseline">
+	<div class="container mx-auto mt-20 grid grid-cols-2 items-baseline -lg:grid-cols-1">
 		<!-- Graphical Assets Credits -->
 		<div>
 			<h1 class="h1 font-bold">Graphical Assets Credits:</h1>
@@ -47,7 +47,7 @@
 			</div>
 		</div>
 		<!-- Data Credits -->
-		<div>
+		<div class="-lg:mt-10">
 			<h1 class="h1 font-bold">Data Credits:</h1>
 			<div class="mt-5">
 				<h2 class="h2 font-semibold">
@@ -62,4 +62,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+</main>
