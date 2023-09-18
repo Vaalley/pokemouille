@@ -66,6 +66,14 @@
 		pokemonMoves = [...pokemonMoves];
 	}
 
+	// function to sort moves by level learned if level != 0
+	function sortLevel() {
+		pokemonMoves.sort((a, b) => {
+			return (b.level || 0) - (a.level || 0);
+		});
+		pokemonMoves = [...pokemonMoves];
+	}
+
 	// Function to get type info
 	function getTypeInfo(typeName) {
 		return types.find((type) => type.name === typeName);
@@ -177,7 +185,7 @@
 		return html;
 	}
 
-	// console.log(pokemonInfo);
+	// console.log(pokemonMoves);
 </script>
 
 <svelte:head>
@@ -436,6 +444,9 @@
 			<button class="variant-filled h5 btn font-semibold" on:click={() => sortAlphabetically()}
 				>Sort Alphabetically</button
 			>
+			<button class="variant-filled h5 btn font-semibold" on:click={() => sortLevel()}
+				>Sort by Level</button
+			>
 		</div>
 
 		<div class="mt-12 grid grid-cols-4 gap-4 -xl:grid-cols-3 -lg:grid-cols-2 -md:grid-cols-1">
@@ -477,6 +488,9 @@
 							{/if}
 						</div>
 						<div class="mt-4 font-medium">
+							{#if move.level != 0}
+								<p>Learn at level: {move.level}</p>
+							{/if}
 							{#if move.pokemon_v2_move.power}
 								<p>Power: {move.pokemon_v2_move.power}</p>
 							{/if}
