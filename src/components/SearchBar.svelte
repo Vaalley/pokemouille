@@ -37,7 +37,16 @@
 		const searchTerm = event.target.value.toLowerCase();
 		if (searchTerm) {
 			let count = 0;
-			let maxCount = 15;
+			let maxCount;
+
+			// Check window width and update maxCount if necessary
+			if (window.innerWidth < 768) {
+				maxCount = 5;
+			} else if (window.innerWidth < 1280) {
+				maxCount = 10;
+			} else {
+				maxCount = 18;
+			}
 
 			matchingPokemon = [];
 			matchingType = [];
@@ -170,7 +179,7 @@
 		/>
 
 		{#if matchingPokemon.length || matchingAbility.length || matchingMove.length || matchingItem.length || matchingType.length}
-			<ul class="mt-6 grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
+			<ul class="mt-6 grid grid-cols-1 items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
 				{#each matchingPokemon as pokemon}
 					<a data-sveltekit-reload href={`/pokemon/${pokemon.slug}`}>
 						<li
