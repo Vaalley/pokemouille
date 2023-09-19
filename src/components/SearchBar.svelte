@@ -185,7 +185,9 @@
 							<p class="mr-auto">{capitalize(hyphenRemover(pokemon.name))}</p>
 							<div class="flex flex-col items-end gap-1 text-sm">
 								{#each pokemon.pokemon_v2_pokemontypes as pokemonType}
-									<p><Type textSize="12" type={pokemonType.pokemon_v2_type.name} /></p>
+									<p>
+										<Type textSize="12" type={pokemonType.pokemon_v2_type.name} tabIndex={-1} />
+									</p>
 								{/each}
 							</div>
 						</li>
@@ -231,7 +233,7 @@
 							/>
 							<p class="mr-auto">{capitalize(hyphenRemover(move.name))}</p>
 							<div class="flex flex-col items-end gap-1 text-sm">
-								<p><Type textSize="12" type={move.pokemon_v2_type.name} /></p>
+								<p><Type textSize="12" type={move.pokemon_v2_type.name} tabIndex={-1} /></p>
 							</div>
 						</li>
 					</a>

@@ -272,8 +272,9 @@
 					<h3 class="h3 mt-4 font-semibold">
 						{pokemonTypes.length === 1 ? 'Type:' : 'Types:'}
 					</h3>
-					<!-- FIXME: pointer-events-none preventing Type a tag from working (and thus can't be clicked) -->
-					<div class="mt-2 flex gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
+					<!-- FIXME: pointer-events-none preventing Type a tag from working (and thus can't be clicked), but the pointer events none has to be there for the popup to work -->
+					<!-- Possible solution would be to have invisible clickable buttons on top of each Type component but I couldn't make it work :( -->
+					<div class="mt-2 flex w-fit gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
 						{#each pokemonTypes as type}
 							<Type type={type.pokemon_v2_type.name} />
 						{/each}
@@ -449,7 +450,7 @@
 			>
 		</div>
 
-		<div class="mt-12 grid grid-cols-4 gap-4 -xl:grid-cols-3 -lg:grid-cols-2 -md:grid-cols-1">
+		<div class="mt-12 flex flex-wrap justify-around gap-3">
 			{#each pokemonMoves as move}
 				<a
 					class="p-5 transition-all hover:card hover:text-primary-500"
