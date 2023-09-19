@@ -32,9 +32,9 @@
 	let pokemonEggGroups =
 		pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy.pokemon_v2_pokemonegggroups;
 
-	const popupHover = {
-		event: 'hover',
-		target: 'popupHover',
+	const popupClick = {
+		event: 'click',
+		target: 'popupClick',
 		placement: 'top'
 	};
 
@@ -93,7 +93,7 @@
 		let html = '';
 
 		// Group weaknesses together
-		html += `<h4 class="h4 font-bold my-2">Weaknesses:</h4>`;
+		html += `<h4 class="h4 font-bold">Weaknesses:</h4>`;
 		for (const weakness of Array.from(new Set(combined.weak))) {
 			if (
 				!type1Info.defending.immune.includes(weakness) &&
@@ -118,7 +118,7 @@
 		}
 
 		// Group resistances together
-		html += `<h4 class="h4 font-bold my-2">Resistances:</h4>`;
+		html += `<h4 class="h4 font-bold mt-2">Resistances:</h4>`;
 		for (const resist of Array.from(new Set(combined.resist))) {
 			if (
 				!type1Info.defending.immune.includes(resist) &&
@@ -140,7 +140,7 @@
 		}
 
 		// Display immunities separately
-		html += `<h4 class="h4 font-bold my-2">Immunities:</h4>`;
+		html += `<h4 class="h4 font-bold mt-2">Immunities:</h4>`;
 		for (const immune of Array.from(new Set(combined.immune))) {
 			html += `${capitalize(immune)} (immune) <br />`;
 		}
@@ -161,7 +161,7 @@
 		let html = '';
 
 		// Group weaknesses together
-		html += `<h4 class="h4 font-bold my-2">Weaknesses:</h4>`;
+		html += `<h4 class="h4 font-bold">Weaknesses:</h4>`;
 		for (const weakness of Array.from(new Set(combined.weak))) {
 			if (!typeInfo.defending.immune.includes(weakness)) {
 				html += `${capitalize(weakness)} (2x) <br />`;
@@ -169,7 +169,7 @@
 		}
 
 		// Group resistances together
-		html += `<h4 class="h4 font-bold my-2">Resistances:</h4>`;
+		html += `<h4 class="h4 font-bold mt-2">Resistances:</h4>`;
 		for (const resist of Array.from(new Set(combined.resist))) {
 			if (!typeInfo.defending.immune.includes(resist)) {
 				html += `${capitalize(resist)} (0.5x) <br />`;
@@ -177,7 +177,7 @@
 		}
 
 		// Display immunities separately
-		html += `<h4 class="h4 font-bold my-2">Immunities:</h4>`;
+		html += `<h4 class="h4 font-bold mt-2">Immunities:</h4>`;
 		for (const immune of Array.from(new Set(combined.immune))) {
 			html += `${capitalize(immune)} (immune) <br />`;
 		}
@@ -274,12 +274,15 @@
 					</h3>
 					<!-- FIXME: pointer-events-none preventing Type a tag from working (and thus can't be clicked), but the pointer events none has to be there for the popup to work -->
 					<!-- Possible solution would be to have invisible clickable buttons on top of each Type component but I couldn't make it work :( -->
-					<div class="mt-2 flex w-fit gap-3 [&>*]:pointer-events-none" use:popup={popupHover}>
+					<button class="variant-filled btn mt-2 font-semibold" use:popup={popupClick}
+						>Weaknesses / Resistances</button
+					>
+					<div class="mt-2 flex w-fit gap-3">
 						{#each pokemonTypes as type}
 							<Type type={type.pokemon_v2_type.name} />
 						{/each}
 					</div>
-					<div class="variant-filled-primary p-3" data-popup="popupHover">
+					<div class="card variant-filled-primary p-3" data-popup="popupClick">
 						{#if pokemonTypes.length === 1}
 							<p>{@html combineMonoDefendingTypes()}</p>
 						{:else}
