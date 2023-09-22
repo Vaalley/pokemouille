@@ -81,7 +81,7 @@ function calculateLinear(component) {
 export const pokemonTypes = [
 	{
 		name: 'normal',
-		color: '#B8B8D0',
+		color: '#888484',
 		defending: {
 			weak: ['fighting'],
 			resist: [],
@@ -95,7 +95,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'fire',
-		color: '#F08030',
+		color: '#e56140',
 		defending: {
 			weak: ['water', 'ground', 'rock'],
 			resist: ['fire', 'grass', 'ice', 'bug', 'steel', 'fairy'],
@@ -109,7 +109,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'water',
-		color: '#6890F0',
+		color: '#299ade',
 		defending: {
 			weak: ['grass', 'electric'],
 			resist: ['fire', 'water', 'ice', 'steel'],
@@ -123,7 +123,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'electric',
-		color: '#F8D030',
+		color: '#e0bb3a',
 		defending: {
 			weak: ['ground'],
 			resist: ['electric', 'flying', 'steel'],
@@ -137,7 +137,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'grass',
-		color: '#78C850',
+		color: '#439740',
 		defending: {
 			weak: ['fire', 'ice', 'poison', 'flying', 'bug'],
 			resist: ['water', 'grass', 'electric', 'ground'],
@@ -151,7 +151,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'ice',
-		color: '#98D8D8',
+		color: '#44c8c8',
 		defending: {
 			weak: ['fire', 'fighting', 'rock', 'steel'],
 			resist: ['ice'],
@@ -165,7 +165,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'fighting',
-		color: '#C03028',
+		color: '#e58f2e',
 		defending: {
 			weak: ['flying', 'psychic', 'fairy'],
 			resist: ['bug', 'rock', 'dark'],
@@ -179,7 +179,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'poison',
-		color: '#A040A0',
+		color: '#9257c7',
 		defending: {
 			weak: ['ground', 'psychic'],
 			resist: ['grass', 'fighting', 'poison', 'bug', 'fairy'],
@@ -193,7 +193,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'ground',
-		color: '#E0C068',
+		color: '#a57340',
 		defending: {
 			weak: ['water', 'grass', 'ice', 'electric'],
 			resist: ['poison', 'rock'],
@@ -207,7 +207,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'flying',
-		color: '#A890F0',
+		color: '#73aace',
 		defending: {
 			weak: ['electric', 'ice', 'rock'],
 			resist: ['grass', 'fighting', 'bug'],
@@ -221,7 +221,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'psychic',
-		color: '#F85888',
+		color: '#ea6d8b',
 		defending: {
 			weak: ['bug', 'ghost', 'dark'],
 			resist: ['fighting', 'psychic'],
@@ -235,7 +235,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'bug',
-		color: '#A8B820',
+		color: '#a09e35',
 		defending: {
 			weak: ['fire', 'flying', 'rock'],
 			resist: ['grass', 'fighting', 'ground'],
@@ -249,7 +249,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'rock',
-		color: '#B8A038',
+		color: '#a9a383',
 		defending: {
 			weak: ['water', 'grass', 'fighting', 'ground', 'steel'],
 			resist: ['normal', 'fire', 'poison', 'flying'],
@@ -263,7 +263,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'ghost',
-		color: '#705898',
+		color: '#6f466f',
 		defending: {
 			weak: ['ghost', 'dark'],
 			resist: ['poison', 'bug'],
@@ -277,7 +277,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'dragon',
-		color: '#7038F8',
+		color: '#5570b9',
 		defending: {
 			weak: ['ice', 'dragon', 'fairy'],
 			resist: ['fire', 'water', 'grass', 'electric'],
@@ -291,7 +291,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'dark',
-		color: '#705848',
+		color: '#4f4747',
 		defending: {
 			weak: ['fighting', 'bug', 'fairy'],
 			resist: ['ghost', 'dark'],
@@ -305,7 +305,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'steel',
-		color: '#B8B8D0',
+		color: '#73b0ca',
 		defending: {
 			weak: ['fire', 'fighting', 'ground'],
 			resist: [
@@ -330,7 +330,7 @@ export const pokemonTypes = [
 	},
 	{
 		name: 'fairy',
-		color: '#EE99AC',
+		color: '#e18ede',
 		defending: {
 			weak: ['poison', 'steel'],
 			resist: ['fighting', 'bug', 'dark'],
