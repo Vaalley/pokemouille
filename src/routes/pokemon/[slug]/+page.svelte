@@ -496,7 +496,12 @@
 								<p>Learn at level: {move.level}</p>
 							{/if}
 							{#if move.pokemon_v2_move.power}
-								<p>Power: {move.pokemon_v2_move.power}</p>
+								<p>
+									Power: {move.pokemon_v2_move.power}
+									{#if pokemonTypes.find((type) => type.pokemon_v2_type.name === move.pokemon_v2_move.pokemon_v2_type.name)}
+										({move.pokemon_v2_move.power * 1.5})
+									{/if}
+								</p>
 							{/if}
 							{#if move.pokemon_v2_move.accuracy}
 								<p>Accuracy: {move.pokemon_v2_move.accuracy}</p>

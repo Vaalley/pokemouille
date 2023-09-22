@@ -5,7 +5,6 @@
 	let searchData = data.searchData;
 </script>
 
-<!-- TODO: Add mobile support on every page  -->
 <!-- TODO: Use of SkeletonUI Tree Views to completely overhaul the Evolution Chain component -->
 <!-- TODO: Add multi languages support -->
 <!-- TODO: Add battle simulator (similar to Pokemon Showdown) -->
