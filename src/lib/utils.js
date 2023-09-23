@@ -18,6 +18,10 @@ export function getIdFromUrl(urlString) {
 
 // Gets the hexcode of a stat value
 export function getStatColor(statValue, minStat, maxStat) {
+	if (minStat === maxStat) {
+		return "#43d696";
+	}
+
 	const colorStart = 0xff4d4d;
 	const colorEnd = 0x43d696;
 	const percentage = (statValue - minStat) / (maxStat - minStat);
