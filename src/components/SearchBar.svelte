@@ -154,6 +154,7 @@
 <button
 	class="fixed bottom-4 right-4 z-50 rounded-full bg-primary-500 p-2 text-white shadow-lg lg:hidden"
 	on:click={toggleDrawer}
+	aria-label="Search"
 >
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 		<path

@@ -14,6 +14,10 @@
 <svelte:head>
 	<title>Pokémouille | {capitalize(hyphenRemover(itemInfo.pokemon_v2_item[0].name))}</title>
 	<link rel="icon" href="/favicon.ico" />
+	<meta
+		name="description"
+		content="In a item page you can expect to find information about the item's effect, flavor text, and more!"
+	/>
 </svelte:head>
 
 <main class="min-h-screen">

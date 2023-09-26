@@ -14,6 +14,10 @@
 <svelte:head>
 	<title>Pokémouille | {capitalize(hyphenRemover(abilityInfo.pokemon_v2_ability[0].name))}</title>
 	<link rel="icon" href="/favicon.ico" />
+	<meta
+		name="description"
+		content="In a ability page you can expect to find information about the ability's effect, flavor text, and more!"
+	/>
 </svelte:head>
 
 <SearchBar data={searchData} />

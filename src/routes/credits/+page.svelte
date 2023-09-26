@@ -11,6 +11,10 @@
 <svelte:head>
 	<title>Pokémouille | Credits 🎉</title>
 	<link rel="icon" href="/favicon.ico" />
+	<meta
+		name="description"
+		content="In the credits page you can find all the people who helped make Pokémouille in one way or another."
+	/>
 </svelte:head>
 
 <main class="min-h-screen">

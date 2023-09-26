@@ -12,6 +12,10 @@
 <svelte:head>
 	<title>Pokémouille</title>
 	<link rel="icon" href="/favicon.ico" />
+	<meta
+		name="description"
+		content="Pokémouille is a Pokémon encyclopedia. Find out all about your favorite Pokémon in our Pokémon Encyclopedia. Learn about their moves, abilities, stats, and more!"
+	/>
 </svelte:head>
 
 <SearchBar data={searchData} />

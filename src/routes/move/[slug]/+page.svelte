@@ -20,6 +20,10 @@
 <svelte:head>
 	<title>Pokémouille | {capitalize(hyphenRemover(moveInfo.pokemon_v2_move[0].name))}</title>
 	<link rel="icon" href="/favicon.ico" />
+	<meta
+		name="description"
+		content="In a move page you can expect to find information about the move's type, power, accuracy, and more!"
+	/>
 </svelte:head>
 
 <SearchBar data={searchData} />
