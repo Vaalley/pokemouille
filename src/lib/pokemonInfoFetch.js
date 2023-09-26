@@ -13,7 +13,6 @@ async function fetchPokemonInfo(slug) {
 		pokemonName = slug;
 	}
 
-
 	try {
 		const query = `
 		query GetPokemonInfo {

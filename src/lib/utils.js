@@ -9,7 +9,6 @@ export function hyphenRemover(str) {
 	return keepHyphen.has(str) ? str : str.replace(/-/g, ' ');
 }
 
-
 // Extracts the id from a URL string in the format "https://pokeapi.co/api/v2/ability/34/"
 export function getIdFromUrl(urlString) {
 	const match = urlString.match(/\/(\d+)\/$/);
@@ -19,7 +18,7 @@ export function getIdFromUrl(urlString) {
 // Gets the hexcode of a stat value
 export function getStatColor(statValue, minStat, maxStat) {
 	if (minStat === maxStat) {
-		return "#43d696";
+		return '#43d696';
 	}
 
 	const colorStart = 0xff4d4d;

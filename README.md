@@ -9,6 +9,7 @@ For more info please contact **vallley** on Discord
 - Search for Pokemon by name (DONE ✅)
 - View information about each Pokemon, including its type, abilities, and stats (DONE ✅)
 - Dark mode support (DONE ✅)
+- Mobile support (MOSTLY DONE ⚒️)
 - Ease of use with clever UX (WORK IN PROGRESS ⚒️)
 - Beautiful and clean design (WORK IN PROGRESS ⚒️)
 - Multi languages support (TO DO ❌)
