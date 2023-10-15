@@ -56,6 +56,9 @@
 			List of Pokémon that can learn {capitalize(
 				hyphenRemover(abilityInfo.pokemon_v2_ability[0].name)
 			)}:
+			<span class="text-primary-500"
+				>{abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities.length}</span
+			>
 		</h2>
 		<div class="mt-5 flex flex-wrap gap-3">
 			{#each abilityInfo.pokemon_v2_ability[0].pokemon_v2_pokemonabilities as pokemon}

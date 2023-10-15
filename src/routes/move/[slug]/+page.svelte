@@ -144,7 +144,11 @@
 	</div>
 	<!-- Move Pokémon list -->
 	<div class="container mx-auto my-16">
-		<h2 class="h2 font-semibold">List of Pokémon that can learn that ability:</h2>
+		<h2 class="h2 font-semibold">
+			List of Pokémon that can learn that ability: <span class="text-primary-500"
+				>{moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves.length}</span
+			>
+		</h2>
 		<div class="mt-5 flex flex-wrap gap-3">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
 				<a
