@@ -85,16 +85,16 @@
 		const type2Info = getTypeInfo(pokemonTypes[1].pokemon_v2_type.name);
 
 		const combined = {
-			weak: [...type1Info.defending.weak, ...type2Info.defending.weak],
-			resist: [...type1Info.defending.resist, ...type2Info.defending.resist],
-			immune: [...type1Info.defending.immune, ...type2Info.defending.immune]
+			weaknesses: [...type1Info.defending.weak, ...type2Info.defending.weak],
+			resistances: [...type1Info.defending.resist, ...type2Info.defending.resist],
+			immunities: [...type1Info.defending.immune, ...type2Info.defending.immune]
 		};
 
 		let html = '';
 
 		// Group weaknesses together
 		html += `<h4 class="h4 font-bold">Weaknesses:</h4>`;
-		for (const weakness of Array.from(new Set(combined.weak))) {
+		for (const weakness of Array.from(new Set(combined.weaknesses))) {
 			if (
 				!type1Info.defending.immune.includes(weakness) &&
 				!type2Info.defending.immune.includes(weakness)
@@ -119,30 +119,33 @@
 
 		// Group resistances together
 		html += `<h4 class="h4 font-bold mt-2">Resistances:</h4>`;
-		for (const resist of Array.from(new Set(combined.resist))) {
+		for (const resistance of Array.from(new Set(combined.resistances))) {
 			if (
-				!type1Info.defending.immune.includes(resist) &&
-				!type2Info.defending.immune.includes(resist)
+				!type1Info.defending.immune.includes(resistance) &&
+				!type2Info.defending.immune.includes(resistance)
 			) {
 				if (
-					type1Info.defending.resist.includes(resist) &&
-					type2Info.defending.resist.includes(resist)
+					type1Info.defending.resist.includes(resistance) &&
+					type2Info.defending.resist.includes(resistance)
 				) {
-					html += `${capitalize(resist)} (0.25x) <br />`;
+					html += `${capitalize(resistance)} (0.25x) <br />`;
 				} else if (
-					(type1Info.defending.resist.includes(resist) ||
-						type2Info.defending.resist.includes(resist)) &&
-					!(type1Info.defending.weak.includes(resist) || type2Info.defending.weak.includes(resist))
+					(type1Info.defending.resist.includes(resistance) ||
+						type2Info.defending.resist.includes(resistance)) &&
+					!(
+						type1Info.defending.weak.includes(resistance) ||
+						type2Info.defending.weak.includes(resistance)
+					)
 				) {
-					html += `${capitalize(resist)} (0.5x) <br />`;
+					html += `${capitalize(resistance)} (0.5x) <br />`;
 				}
 			}
 		}
 
 		// Display immunities separately
 		html += `<h4 class="h4 font-bold mt-2">Immunities:</h4>`;
-		for (const immune of Array.from(new Set(combined.immune))) {
-			html += `${capitalize(immune)} (immune) <br />`;
+		for (const immunity of Array.from(new Set(combined.immunities))) {
+			html += `${capitalize(immunity)} (immune) <br />`;
 		}
 
 		return html;
@@ -150,36 +153,28 @@
 
 	// Function to combine defending types for mono-type Pokémon
 	function combineMonoDefendingTypes() {
-		const typeInfo = getTypeInfo(pokemonTypes[0].pokemon_v2_type.name);
-
-		const combined = {
-			weak: [...typeInfo.defending.weak],
-			resist: [...typeInfo.defending.resist],
-			immune: [...typeInfo.defending.immune]
-		};
+		const typeInformation = getTypeInfo(pokemonTypes[0].pokemon_v2_type.name);
+		const { weak, resist, immune } = typeInformation.defending;
 
 		let html = '';
 
-		// Group weaknesses together
-		html += `<h4 class="h4 font-bold">Weaknesses:</h4>`;
-		for (const weakness of Array.from(new Set(combined.weak))) {
-			if (!typeInfo.defending.immune.includes(weakness)) {
-				html += `${capitalize(weakness)} (2x) <br />`;
-			}
+		function generateHeader(title) {
+			html += `<h4 class="h4 font-bold">${title}:</h4>`;
 		}
 
-		// Group resistances together
-		html += `<h4 class="h4 font-bold mt-2">Resistances:</h4>`;
-		for (const resist of Array.from(new Set(combined.resist))) {
-			if (!typeInfo.defending.immune.includes(resist)) {
-				html += `${capitalize(resist)} (0.5x) <br />`;
-			}
+		generateHeader('Weaknesses');
+		for (const weakness of weak) {
+			html += `${capitalize(weakness)} (2x) <br />`;
 		}
 
-		// Display immunities separately
-		html += `<h4 class="h4 font-bold mt-2">Immunities:</h4>`;
-		for (const immune of Array.from(new Set(combined.immune))) {
-			html += `${capitalize(immune)} (immune) <br />`;
+		generateHeader('Resistances');
+		for (const resistance of resist) {
+			html += `${capitalize(resistance)} (0.5x) <br />`;
+		}
+
+		generateHeader('Immunities');
+		for (const immunity of immune) {
+			html += `${capitalize(immunity)} (immune) <br />`;
 		}
 
 		return html;
