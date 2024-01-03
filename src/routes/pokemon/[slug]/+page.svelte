@@ -180,7 +180,7 @@
 		return html;
 	}
 
-	// console.log(pokemonMoves);
+	console.log(pokemonAbilities);
 </script>
 
 <svelte:head>
@@ -271,8 +271,6 @@
 					<h3 class="h3 mt-4 font-semibold">
 						{pokemonTypes.length === 1 ? 'Type:' : 'Types:'}
 					</h3>
-					<!-- FIXME: pointer-events-none preventing Type a tag from working (and thus can't be clicked), but the pointer events none has to be there for the popup to work -->
-					<!-- Possible solution would be to have invisible clickable buttons on top of each Type component but I couldn't make it work :( -->
 					<button class="variant-filled btn mt-2 font-semibold" use:popup={popupClick}
 						>Weaknesses / Resistances</button
 					>
@@ -303,6 +301,9 @@
 									{#if ability.is_hidden}
 										<span class="text-primary-500">(hidden)</span>
 									{/if}
+								</p>
+								<p class="text-surface-400">
+									{ability.pokemon_v2_ability.pokemon_v2_abilityeffecttexts[0].short_effect}
 								</p>
 							</a>
 						{/each}

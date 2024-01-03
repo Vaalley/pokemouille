@@ -31,6 +31,9 @@ async function fetchPokemonInfo(slug) {
 					is_hidden
 					pokemon_v2_ability {
 						name
+						pokemon_v2_abilityeffecttexts(where: {language_id: {_eq: 9}}) {
+							short_effect
+						}
 					}
 				}
 				pokemon_v2_pokemonstats {
