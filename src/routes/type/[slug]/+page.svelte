@@ -27,9 +27,9 @@
 		<img width="48" loading="lazy" src={typeIconUrl + typeInfo.name + '.svg'} alt={typeInfo.name} />
 	</div>
 	<!-- Type weaknesses and strengths -->
-	<div class="container mx-auto grid grid-cols-2 items-baseline">
+	<div class="container mx-auto grid grid-cols-2 items-baseline gap-6">
 		<!-- Type defending -->
-		<div class="mt-20">
+		<div class="card mt-20 p-6">
 			<h2 class="h2 mb-6 font-semibold">
 				Strengths and weaknesses for the {typeInfo.name} type when defending are:
 			</h2>
@@ -69,7 +69,7 @@
 			</ul>
 		</div>
 		<!-- Type attacking -->
-		<div class="mt-20">
+		<div class="card mt-20 p-6">
 			<h2 class="h2 mb-6 font-semibold">
 				Strengths and weaknesses for the {typeInfo.name} type when attacking are:
 			</h2>
