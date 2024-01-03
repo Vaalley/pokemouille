@@ -302,7 +302,7 @@
 										<span class="text-primary-500">(hidden)</span>
 									{/if}
 								</p>
-								<p class="text-surface-400">
+								<p class="max-w-sm text-surface-400">
 									{ability.pokemon_v2_ability.pokemon_v2_abilityeffecttexts[0].short_effect}
 								</p>
 							</a>
