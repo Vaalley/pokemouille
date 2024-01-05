@@ -44,16 +44,24 @@
 		<!-- Item flavor text -->
 		<div>
 			<h2 class="h2 font-semibold">Flavor Text:</h2>
-			<p class="mt-3 font-medium">
-				{itemInfo.pokemon_v2_item[0].pokemon_v2_itemflavortexts[0].flavor_text}
-			</p>
+			{#if itemInfo.pokemon_v2_item[0].pokemon_v2_itemflavortexts[0]}
+				<p class="mt-3 font-medium">
+					{itemInfo.pokemon_v2_item[0].pokemon_v2_itemflavortexts[0].flavor_text}
+				</p>
+			{:else}
+				<p class="mt-3 font-medium">No flavor text available.</p>
+			{/if}
 		</div>
 		<!-- Item effect -->
 		<div class="-lg:mt-10">
 			<h2 class="h2 font-semibold">Effect Description:</h2>
-			<p class="mt-3 font-medium">
-				{itemInfo.pokemon_v2_item[0].pokemon_v2_itemeffecttexts[0].effect}
-			</p>
+			{#if itemInfo.pokemon_v2_item[0].pokemon_v2_itemeffecttexts[0]}
+				<p class="mt-3 font-medium">
+					{itemInfo.pokemon_v2_item[0].pokemon_v2_itemeffecttexts[0].effect}
+				</p>
+			{:else}
+				<p class="mt-3 font-medium">No effect description available.</p>
+			{/if}
 		</div>
 	</div>
 	<!-- Item category -->
