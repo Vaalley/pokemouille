@@ -455,7 +455,7 @@
 			>
 		</div>
 
-		<div class="mt-12 flex flex-wrap justify-around gap-3">
+		<div class="mt-12 grid grid-cols-5 justify-around gap-3">
 			{#each pokemonMoves as move}
 				<a
 					class="p-5 transition-all hover:card hover:text-primary-500"

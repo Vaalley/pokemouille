@@ -165,7 +165,7 @@
 				>{moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves.length}</span
 			>
 		</h2>
-		<div class="mt-5 flex flex-wrap gap-3">
+		<div class="mt-5 grid grid-cols-10 gap-3">
 			{#each moveInfo.pokemon_v2_move[0].pokemon_v2_pokemonmoves as pokemon}
 				<a
 					class="mx-auto flex flex-col items-center justify-center p-3 transition-all hover:card hover:text-primary-500"
