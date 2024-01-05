@@ -180,7 +180,7 @@
 		return html;
 	}
 
-	console.log(pokemonAbilities);
+	// console.log(pokemonAbilities);
 </script>
 
 <svelte:head>

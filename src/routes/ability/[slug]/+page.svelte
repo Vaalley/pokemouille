@@ -38,16 +38,24 @@
 		<!-- Ability flavor text -->
 		<div>
 			<h2 class="h2 font-semibold">Flavor Text:</h2>
-			<p class="mt-3 font-medium">
-				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
-			</p>
+			{#if abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts.length > 0}
+				<p class="mt-3 font-medium">
+					{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityflavortexts[0].flavor_text}
+				</p>
+			{:else}
+				<p class="mt-3 font-medium">No flavor text available.</p>
+			{/if}
 		</div>
 		<!-- Ability effect -->
 		<div class="-lg:mt-10">
 			<h2 class="h2 font-semibold">Effect Description:</h2>
-			<p class="mt-3 font-medium">
-				{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
-			</p>
+			{#if abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts.length > 0}
+				<p class="mt-3 font-medium">
+					{abilityInfo.pokemon_v2_ability[0].pokemon_v2_abilityeffecttexts[0].effect}
+				</p>
+			{:else}
+				<p class="mt-3 font-medium">No effect description available.</p>
+			{/if}
 		</div>
 	</div>
 	<!-- Ability Pokémon list -->
