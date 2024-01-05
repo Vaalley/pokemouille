@@ -1,18 +1,26 @@
 <script>
 	export let data;
-	import { capitalize, hyphenRemover } from '$lib/utils';
+	import { capitalize, hyphenRemover, get } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
+
+	const getEffect = (moveInfo) =>
+		get(
+			moveInfo,
+			'pokemon_v2_move[0].pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0].effect'
+		);
+	const getEffectChance = (moveInfo) => get(moveInfo, 'pokemon_v2_move[0].move_effect_chance');
 
 	let moveInfo = data.moveInfo;
 	let searchData = data.searchData;
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
-	const moveEffect =
-		moveInfo.pokemon_v2_move[0].pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0].effect;
-	const moveEffectChance = moveInfo.pokemon_v2_move[0].move_effect_chance;
+	const moveEffect = getEffect(moveInfo);
+	const moveEffectChance = getEffectChance(moveInfo);
 
-	const formattedEffect = moveEffect.replace(/\$effect_chance/g, moveEffectChance);
+	const formattedEffect = moveEffect
+		? moveEffect.replace(/\$effect_chance/g, moveEffectChance)
+		: 'No effect information available.';
 
 	// console.log(moveInfo);
 </script>
@@ -132,14 +140,22 @@
 		<!-- Move flavor text -->
 		<div>
 			<h2 class="h2 font-semibold">Flavor Text:</h2>
-			<p class="mt-5 text-lg font-medium">
-				{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
-			</p>
+			{#if moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0]}
+				<p class="mt-5 text-lg font-medium">
+					{moveInfo.pokemon_v2_move[0].pokemon_v2_moveflavortexts[0].flavor_text}
+				</p>
+			{:else}
+				<p class="mt-5 text-lg font-medium">No flavor text available.</p>
+			{/if}
 		</div>
 		<!-- Move effect -->
 		<div class="-lg:mt-10">
 			<h2 class="h2 font-semibold">Effect Description:</h2>
-			<p class="mt-5 text-lg font-medium">{formattedEffect}</p>
+			{#if moveEffect}
+				<p class="mt-5 text-lg font-medium">{formattedEffect}</p>
+			{:else}
+				<p class="mt-5 text-lg font-medium">No effect description available.</p>
+			{/if}
 		</div>
 	</div>
 	<!-- Move Pokémon list -->

@@ -80,6 +80,10 @@ function calculateLinear(component) {
 	return component <= 0.03928 ? component / 12.92 : ((component + 0.055) / 1.055) ** 2.4;
 }
 
+export function get(obj, path, defaultValue = null) {
+	path.split('.').reduce((o, p) => (o && o[p] != null ? o[p] : defaultValue), obj);
+}
+
 // An array of objects representing each Pokemon type, with a name, color property and their defensive capabilities
 export const pokemonTypes = [
 	{
