@@ -302,9 +302,11 @@
 										<span class="text-primary-500">(hidden)</span>
 									{/if}
 								</p>
-								<p class="max-w-sm text-surface-400">
-									{ability.pokemon_v2_ability.pokemon_v2_abilityeffecttexts[0].short_effect}
-								</p>
+								{#if ability.pokemon_v2_ability.pokemon_v2_abilityeffecttexts[0]}
+									<p class="max-w-sm text-surface-400">
+										{ability.pokemon_v2_ability.pokemon_v2_abilityeffecttexts[0].short_effect}
+									</p>
+								{/if}
 							</a>
 						{/each}
 					</div>
