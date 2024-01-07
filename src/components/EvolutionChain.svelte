@@ -39,11 +39,11 @@
 	<h2 class="h2 font-semibold">
 		Evolution Chain for {capitalize(hyphenRemover(currentPokemonName))}:
 	</h2>
-	<div class="mt-6 flex flex-wrap gap-6">
+	<div class="mt-5 flex flex-wrap justify-around gap-5">
 		{#each evolutionChainData.pokemon_v2_evolutionchain.pokemon_v2_pokemonspecies.sort((a, b) => a.id - b.id) as pokemon}
 			<a
 				data-sveltekit-reload
-				class="rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
+				class="p-5 transition-all hover:card hover:text-primary-500"
 				href={`/pokemon/${pokemon.name}`}
 			>
 				<div>
@@ -73,7 +73,7 @@
 					{#if form.pokemon_v2_pokemonforms[0].form_name !== ''}
 						<a
 							data-sveltekit-reload
-							class="rounded-none p-6 transition-all hover:variant-ringed-primary hover:text-primary-500"
+							class="p-5 transition-all hover:card hover:text-primary-500"
 							href={`/pokemon/${form.pokemon_v2_pokemonforms[0].name}`}
 						>
 							<div>
