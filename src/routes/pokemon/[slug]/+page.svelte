@@ -180,7 +180,7 @@
 		return html;
 	}
 
-	// console.log(pokemonAbilities);
+	// console.log(pokemonMoves);
 </script>
 
 <svelte:head>
@@ -496,6 +496,12 @@
 							{/if}
 						</div>
 						<div class="mt-4 font-medium">
+							{#if move.pokemon_v2_move.pokemon_v2_moveeffect}
+								<p class="text-sm text-surface-400">
+									{move.pokemon_v2_move.pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0]
+										.short_effect}
+								</p>
+							{/if}
 							{#if move.level != 0}
 								<p>Learn at level: {move.level}</p>
 							{/if}

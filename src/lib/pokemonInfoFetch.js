@@ -55,7 +55,7 @@ async function fetchPokemonInfo(slug) {
 						move_effect_chance
 						pokemon_v2_moveeffect {
 							pokemon_v2_moveeffecteffecttexts {
-								effect
+								short_effect
 							}
 						}
 						pokemon_v2_type {
