@@ -38,6 +38,16 @@
 		placement: 'top'
 	};
 
+	function generateShortText(moveEffect, moveEffectChance) {
+		let moveShortText = '';
+		// if there's a $effect_chance% in the effect text replace it with the chance
+		if (moveEffect.includes('$effect_chance')) {
+			moveShortText = moveEffect.replace('$effect_chance', moveEffectChance);
+			return moveShortText;
+		}
+		return moveEffect;
+	}
+
 	// Function to sort moves by power
 	function sortByPower() {
 		pokemonMoves.sort((a, b) => {
@@ -498,8 +508,11 @@
 						<div class="mt-4 font-medium">
 							{#if move.pokemon_v2_move.pokemon_v2_moveeffect}
 								<p class="text-sm text-surface-400">
-									{move.pokemon_v2_move.pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0]
-										.short_effect}
+									{generateShortText(
+										move.pokemon_v2_move.pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0]
+											.short_effect,
+										move.pokemon_v2_move.move_effect_chance
+									)}
 								</p>
 							{/if}
 							{#if move.level != 0}

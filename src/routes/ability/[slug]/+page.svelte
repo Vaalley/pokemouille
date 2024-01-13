@@ -8,7 +8,7 @@
 	const pokemonMainSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 
-	console.log(abilityInfo);
+	// console.log(abilityInfo);
 </script>
 
 <svelte:head>
