@@ -24,7 +24,7 @@ export default {
 				'-sm': { max: '639px' }
 			},
 			fontFamily: {
-				hind: ['Hind', 'sans-serif']
+				outfit: ['Outfit', 'sans-serif'],
 			}
 		}
 	},
