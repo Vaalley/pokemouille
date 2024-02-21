@@ -506,7 +506,7 @@
 							{/if}
 						</div>
 						<div class="mt-4 font-medium">
-							{#if move.pokemon_v2_move.pokemon_v2_moveeffect}
+							{#if move.pokemon_v2_move.pokemon_v2_moveeffect && move.pokemon_v2_move.move_effect_chance}
 								<p class="text-sm text-surface-400">
 									{generateShortText(
 										move.pokemon_v2_move.pokemon_v2_moveeffect.pokemon_v2_moveeffecteffecttexts[0]
