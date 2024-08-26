@@ -190,11 +190,37 @@
 		return html;
 	}
 
+	let typeEmojis = {
+		normal: '🐐',
+		fire: '🔥',
+		water: '💧',
+		electric: '⚡',
+		grass: '🌱',
+		ice: '❄️',
+		fighting: '🥊',
+		poison: '☠️',
+		ground: '⛰',
+		flying: '🦅',
+		psychic: '🧠',
+		bug: '🐛',
+		rock: '🪨',
+		ghost: '👻',
+		dragon: '🐉',
+		dark: '🌙',
+		steel: '🔩',
+		fairy: '🧚‍♀️'
+	};
+
 	// console.log(pokemonMoves);
 </script>
 
 <svelte:head>
-	<title>Pokémouille | {capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title>
+	<title
+		>Pokémouille | {typeEmojis[
+			pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes[0].pokemon_v2_type.name
+		]}
+		{capitalize(hyphenRemover(pokemonInfo.pokemon_v2_pokemon[0].name))}</title
+	>
 	<link rel="icon" href="/favicon.ico" />
 	<meta
 		name="description"
