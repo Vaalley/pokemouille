@@ -406,7 +406,7 @@
 									getExtremeValue(pokemonStats, 'lowest'),
 									getExtremeValue(pokemonStats, 'highest')
 								)};"
-							/>
+							></div>
 						</div>
 						<!-- Add EV yields here -->
 						<div class="font-medium -md:text-sm">

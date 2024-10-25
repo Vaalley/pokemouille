@@ -6,6 +6,13 @@
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { initializeStores } from '@skeletonlabs/skeleton';
 	import '../app.css';
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('svelte').Snippet} [children]
+	 */
+
+	/** @type {Props} */
+	let { children } = $props();
 
 	inject({ mode: dev ? 'development' : 'production' });
 
@@ -18,4 +25,4 @@
 <LightSwitch
 	class="absolute right-[1vw] top-[1vw] scale-125 -md:right-[3vw] -md:top-[3vw] -md:scale-100"
 />
-<slot />
+{@render children?.()}
