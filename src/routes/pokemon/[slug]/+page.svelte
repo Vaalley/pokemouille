@@ -12,8 +12,13 @@
 	import EvolutionChain from '../../../components/EvolutionChain.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 
-	// Variable declarations
-	export let data;
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} data - Variable declarations
+	 */
+
+	/** @type {Props} */
+	let { data } = $props();
 	let pokemonInfo = data.pokemonInfo;
 	let evolutionChainData = data.pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonspecy;
 	let totalStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats.reduce(
@@ -25,7 +30,7 @@
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 	const pokemonOfficialArtworkUrl = pokemonMainSpriteUrl + '/other/official-artwork/';
 	const pokemonShowdownUrl = pokemonMainSpriteUrl + '/other/showdown/';
-	let pokemonMoves = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves;
+	let pokemonMoves = $state(pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonmoves);
 	let pokemonAbilities = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonabilities;
 	let pokemonTypes = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemontypes;
 	let pokemonStats = pokemonInfo.pokemon_v2_pokemon[0].pokemon_v2_pokemonstats;
@@ -477,16 +482,16 @@
 			Total moves: <span class="text-primary-500">{pokemonMoves.length}</span>
 		</p>
 		<div class="mt-5 flex flex-wrap gap-5">
-			<button class="variant-filled h5 btn font-semibold" on:click={() => sortByPower()}
+			<button class="variant-filled h5 btn font-semibold" onclick={() => sortByPower()}
 				>Sort by Power</button
 			>
-			<button class="variant-filled h5 btn font-semibold" on:click={() => sortByAccuracy()}
+			<button class="variant-filled h5 btn font-semibold" onclick={() => sortByAccuracy()}
 				>Sort by Accuracy</button
 			>
-			<button class="variant-filled h5 btn font-semibold" on:click={() => sortAlphabetically()}
+			<button class="variant-filled h5 btn font-semibold" onclick={() => sortAlphabetically()}
 				>Sort Alphabetically</button
 			>
-			<button class="variant-filled h5 btn font-semibold" on:click={() => sortLevel()}
+			<button class="variant-filled h5 btn font-semibold" onclick={() => sortLevel()}
 				>Sort by Level</button
 			>
 		</div>

@@ -1,7 +1,6 @@
 <script>
-	export let evolutionChainData;
-	export let currentPokemonName;
 	import { capitalize, hyphenRemover } from '$lib/utils';
+	let { evolutionChainData, currentPokemonName } = $props();
 
 	const pokemonSpriteUrl =
 		'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';

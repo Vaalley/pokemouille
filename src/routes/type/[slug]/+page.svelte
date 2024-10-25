@@ -1,8 +1,8 @@
 <script>
 	import SearchBar from '../../../components/SearchBar.svelte';
-	export let data;
 	import { capitalize, hyphenRemover } from '$lib/utils';
 	import Type from '../../../components/Type.svelte';
+	let { data } = $props();
 
 	let typeInfo = data.typeInfo;
 	let searchData = data.searchData;

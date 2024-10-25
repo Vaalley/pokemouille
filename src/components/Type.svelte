@@ -1,14 +1,22 @@
 <script>
-	import { pokemonTypes, capitalize, getTextColor } from '$lib/utils';
-	export let type;
-	export let textSize;
-	export let tabIndex = 0;
+	import { run } from 'svelte/legacy';
 
-	let color = '';
+	import { pokemonTypes, capitalize, getTextColor } from '$lib/utils';
+	/**
+	 * @typedef {Object} Props
+	 * @property {any} type
+	 * @property {any} textSize
+	 * @property {number} [tabIndex]
+	 */
+
+	/** @type {Props} */
+	let { type, textSize, tabIndex = 0 } = $props();
+
+	let color = $state('');
 	const typeIconUrl =
 		'https://raw.githubusercontent.com/partywhale/pokemon-type-icons/fcbe6978c61c359680bc07636c3f9bdc0f346b43/icons/';
 
-	$: {
+	run(() => {
 		for (const pokemonType of pokemonTypes) {
 			if (pokemonType.name === type) {
 				color = pokemonType.color;
@@ -17,7 +25,7 @@
 		if (!color) {
 			color = '#FFFFFF'; // Hex code for white
 		}
-	}
+	});
 
 	// console.log(color);
 </script>

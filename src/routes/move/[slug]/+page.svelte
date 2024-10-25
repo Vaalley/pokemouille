@@ -1,8 +1,8 @@
 <script>
-	export let data;
 	import { capitalize, hyphenRemover, get } from '$lib/utils';
 	import SearchBar from '../../../components/SearchBar.svelte';
 	import Type from '../../../components/Type.svelte';
+	let { data } = $props();
 
 	const getEffect = (moveInfo) =>
 		get(

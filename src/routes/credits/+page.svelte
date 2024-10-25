@@ -1,7 +1,7 @@
 <script>
 	import SearchBar from '../../components/SearchBar.svelte';
 
-	export let data;
+	let { data } = $props();
 
 	let searchData = data.searchData;
 </script>
