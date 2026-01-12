@@ -1,0 +1,8 @@
+{
+  "name": "pokemouille",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "bun --filter '*' dev"
+  }
+}
