@@ -127,8 +127,8 @@ The most comprehensive page displaying all information about a specific Pokémon
 
 - Animated Pokémon sprite (Showdown GIF)
 - Pokémon name with special styling:
-  - **Legendary Pokémon**: Red-to-yellow gradient text
-  - **Mythical Pokémon**: Violet-to-purple gradient text
+    - **Legendary Pokémon**: Red-to-yellow gradient text
+    - **Mythical Pokémon**: Violet-to-purple gradient text
 - Generation introduction indicator
 
 #### Evolution Chain
@@ -143,11 +143,11 @@ The most comprehensive page displaying all information about a specific Pokémon
 - **ID**: National Pokédex number
 - **Height/Weight**: Displayed in meters and kilograms
 - **Types**: Type badge(s) with popup for weaknesses/resistances
-  - Shows combined type effectiveness for dual-types
-  - Shows 0.25x, 0.5x, 2x, 4x multipliers and immunities
+    - Shows combined type effectiveness for dual-types
+    - Shows 0.25x, 0.5x, 2x, 4x multipliers and immunities
 - **Abilities**: Links to ability detail pages
-  - Hidden abilities marked with "(hidden)" label
-  - Short effect description displayed
+    - Hidden abilities marked with "(hidden)" label
+    - Short effect description displayed
 - **Egg Groups**: Breeding compatibility groups
 
 #### Statistics
@@ -166,19 +166,19 @@ The most comprehensive page displaying all information about a specific Pokémon
 
 - Total move count
 - Sortable move list with 4 sort options:
-  - Sort by Power
-  - Sort by Accuracy
-  - Sort Alphabetically
-  - Sort by Level
+    - Sort by Power
+    - Sort by Accuracy
+    - Sort Alphabetically
+    - Sort by Level
 - Each move displays:
-  - Type badge
-  - Move category icon (Physical/Special/Status)
-  - Effect description
-  - Learn level (if applicable)
-  - Power (with STAB calculation shown)
-  - Accuracy
-  - PP
-  - Priority (if non-zero)
+    - Type badge
+    - Move category icon (Physical/Special/Status)
+    - Effect description
+    - Learn level (if applicable)
+    - Power (with STAB calculation shown)
+    - Accuracy
+    - PP
+    - Priority (if non-zero)
 
 **Dynamic Title:** Includes type emoji + Pokémon name
 
@@ -196,9 +196,9 @@ Displays detailed information about a Pokémon ability.
 - **Flavor Text**: In-game description
 - **Effect Description**: Detailed mechanical explanation
 - **Pokémon List**: Grid of all Pokémon that can have this ability
-  - Shows sprite and name for each
-  - Hidden ability users marked with "(hidden)"
-  - Total count displayed
+    - Shows sprite and name for each
+    - Hidden ability users marked with "(hidden)"
+    - Total count displayed
 
 ---
 
@@ -212,11 +212,11 @@ Displays detailed information about a Pokémon move.
 
 - **Header**: Move name + type badge + generation introduced
 - **General Info Grid**:
-  - Category (Physical/Special/Status with icon)
-  - Power
-  - Accuracy
-  - Priority
-  - PP
+    - Category (Physical/Special/Status with icon)
+    - Power
+    - Accuracy
+    - Priority
+    - PP
 - **Flavor Text**: In-game description
 - **Effect Description**: Detailed mechanical explanation with effect chance
   percentages
@@ -249,13 +249,13 @@ Displays type matchup information.
 
 - **Header**: Type name + type SVG icon
 - **Defending Card**: When this type is defending
-  - Weak to (takes 2x damage)
-  - Resistant to (takes 0.5x damage)
-  - Immune to (takes 0x damage)
+    - Weak to (takes 2x damage)
+    - Resistant to (takes 0.5x damage)
+    - Immune to (takes 0x damage)
 - **Attacking Card**: When this type is attacking
-  - Not very effective against (deals 0.5x damage)
-  - Super effective against (deals 2x damage)
-  - No effect against (deals 0x damage)
+    - Not very effective against (deals 0.5x damage)
+    - Super effective against (deals 2x damage)
+    - No effect against (deals 0x damage)
 
 ---
 
@@ -268,10 +268,10 @@ Acknowledges data sources and asset providers.
 **Sections:**
 
 - **Graphical Assets Credits**:
-  - Partywhale (Pokemon type icons as SVGs)
-  - PokéAPI (Pokemon sprites repository)
+    - Partywhale (Pokemon type icons as SVGs)
+    - PokéAPI (Pokemon sprites repository)
 - **Data Credits**:
-  - PokéAPI (all Pokemon data)
+    - PokéAPI (all Pokemon data)
 
 ---
 
@@ -324,15 +324,15 @@ The global search component that provides universal search functionality.
 - Activated by pressing any letter key (on desktop) or via mobile FAB button
 - Uses Skeleton UI Drawer component for overlay
 - Searches across 5 categories simultaneously:
-  - Pokémon (shows sprite, name, types)
-  - Types (shows type badge)
-  - Abilities (shows ability capsule icon)
-  - Moves (shows TM icon with move type)
-  - Items (shows item sprite)
+    - Pokémon (shows sprite, name, types)
+    - Types (shows type badge)
+    - Abilities (shows ability capsule icon)
+    - Moves (shows TM icon with move type)
+    - Items (shows item sprite)
 - Responsive result limits:
-  - Mobile (<768px): 5 results
-  - Tablet (768-1280px): 10 results
-  - Desktop (>1280px): 18 results
+    - Mobile (<768px): 5 results
+    - Tablet (768-1280px): 10 results
+    - Desktop (>1280px): 18 results
 - Keyboard navigation (Escape to close)
 
 ### 2. Type (`src/components/Type.svelte`)
@@ -1162,17 +1162,17 @@ architecture. **This is a long-term goal, not for V1 - may never come.**
 
 ### Core Technology Stack
 
-| # | Category             | Status    | Choice                           |
-| - | -------------------- | --------- | -------------------------------- |
-| 1 | Monorepo             | 🟢 CHOSEN | Bun Workspaces                   |
-| 2 | Linting/Formatting   | 🟢 CHOSEN | oxlint + oxfmt (Oxc)             |
-| 3 | Runtime              | 🟢 CHOSEN | Bun                              |
-| 4 | Backend Framework    | 🟢 CHOSEN | Hono                             |
-| 5 | Data Storage/Caching | 🟢 CHOSEN | In-Memory LRU + File Persistence |
-| 6 | Internationalization | 🟢 CHOSEN | Paraglide                        |
-| 7 | Frontend Framework   | 🟢 CHOSEN | SvelteKit 2 (Svelte 5)           |
-| 8 | Pokémon Cries        | 🟢 CHOSEN | PokéAPI Cries CDN                |
-| 9 | Battle Simulator     | 🟢 CHOSEN | Build from Scratch (Future)      |
+| #   | Category             | Status    | Choice                           |
+| --- | -------------------- | --------- | -------------------------------- |
+| 1   | Monorepo             | 🟢 CHOSEN | Bun Workspaces                   |
+| 2   | Linting/Formatting   | 🟢 CHOSEN | oxlint + oxfmt (Oxc)             |
+| 3   | Runtime              | 🟢 CHOSEN | Bun                              |
+| 4   | Backend Framework    | 🟢 CHOSEN | Hono                             |
+| 5   | Data Storage/Caching | 🟢 CHOSEN | In-Memory LRU + File Persistence |
+| 6   | Internationalization | 🟢 CHOSEN | Paraglide                        |
+| 7   | Frontend Framework   | 🟢 CHOSEN | SvelteKit 2 (Svelte 5)           |
+| 8   | Pokémon Cries        | 🟢 CHOSEN | PokéAPI Cries CDN                |
+| 9   | Battle Simulator     | 🟢 CHOSEN | Build from Scratch (Future)      |
 
 ### Additional Tooling
 
@@ -1337,21 +1337,21 @@ mkdir -p apps/api/src apps/web
 
 ```json
 {
-  "name": "pokemouille-v2",
-  "private": true,
-  "workspaces": ["packages/*", "apps/*"],
-  "scripts": {
-    "dev": "bun run --parallel dev:api dev:web",
-    "dev:api": "bun run --cwd apps/api dev",
-    "dev:web": "bun run --cwd apps/web dev",
-    "build": "bun run --parallel build:api build:web",
-    "build:api": "bun run --cwd apps/api build",
-    "build:web": "bun run --cwd apps/web build",
-    "lint": "oxlint .",
-    "format": "oxfmt .",
-    "test": "bun test",
-    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
-  }
+	"name": "pokemouille-v2",
+	"private": true,
+	"workspaces": ["packages/*", "apps/*"],
+	"scripts": {
+		"dev": "bun run --parallel dev:api dev:web",
+		"dev:api": "bun run --cwd apps/api dev",
+		"dev:web": "bun run --cwd apps/web dev",
+		"build": "bun run --parallel build:api build:web",
+		"build:api": "bun run --cwd apps/api build",
+		"build:web": "bun run --cwd apps/web build",
+		"lint": "oxlint .",
+		"format": "oxfmt .",
+		"test": "bun test",
+		"clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+	}
 }
 ```
 
@@ -1361,18 +1361,13 @@ mkdir -p apps/api/src apps/web
 
 ```json
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "rules": {
-    "no-unused-vars": "warn",
-    "no-console": "warn",
-    "eqeqeq": "error"
-  },
-  "ignorePatterns": [
-    "node_modules",
-    "dist",
-    ".svelte-kit",
-    ".cache"
-  ]
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"rules": {
+		"no-unused-vars": "warn",
+		"no-console": "warn",
+		"eqeqeq": "error"
+	},
+	"ignorePatterns": ["node_modules", "dist", ".svelte-kit", ".cache"]
 }
 ```
 
@@ -1400,17 +1395,17 @@ coverage = true
 
 ```json
 {
-  "name": "@pokemouille/shared",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./types": "./src/types/index.ts",
-    "./constants": "./src/constants/index.ts",
-    "./utils": "./src/utils/index.ts"
-  }
+	"name": "@pokemouille/shared",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./types": "./src/types/index.ts",
+		"./constants": "./src/constants/index.ts",
+		"./utils": "./src/utils/index.ts"
+	}
 }
 ```
 
@@ -1427,14 +1422,14 @@ coverage = true
 
 ```json
 {
-  "name": "@pokemouille/cache",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "dependencies": {
-    "lru-cache": "^10.0.0"
-  }
+	"name": "@pokemouille/cache",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"dependencies": {
+		"lru-cache": "^10.0.0"
+	}
 }
 ```
 
@@ -1455,22 +1450,22 @@ coverage = true
 
 ```json
 {
-  "name": "@pokemouille/api",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "bun --watch src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
-    "start": "bun dist/index.js",
-    "test": "bun test"
-  },
-  "dependencies": {
-    "@pokemouille/shared": "workspace:*",
-    "@pokemouille/cache": "workspace:*",
-    "hono": "^4.0.0",
-    "graphql-request": "^6.0.0",
-    "zod": "^3.22.0"
-  }
+	"name": "@pokemouille/api",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "bun --watch src/index.ts",
+		"build": "bun build src/index.ts --outdir dist --target bun",
+		"start": "bun dist/index.js",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@pokemouille/shared": "workspace:*",
+		"@pokemouille/cache": "workspace:*",
+		"hono": "^4.0.0",
+		"graphql-request": "^6.0.0",
+		"zod": "^3.22.0"
+	}
 }
 ```
 
@@ -1520,18 +1515,18 @@ bun add -D @inlang/paraglide-sveltekit tailwindcss postcss autoprefixer
 
 ```json
 {
-  "$schema": "https://inlang.com/schema/project-settings",
-  "sourceLanguageTag": "en",
-  "languageTags": ["en", "fr", "de", "es", "it", "ja", "ko", "zh-Hans"],
-  "modules": [
-    "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-empty-pattern/dist/index.js",
-    "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-missing-translation/dist/index.js",
-    "https://cdn.jsdelivr.net/npm/@inlang/plugin-message-format/dist/index.js",
-    "https://cdn.jsdelivr.net/npm/@inlang/plugin-m-function-matcher/dist/index.js"
-  ],
-  "plugin.inlang.messageFormat": {
-    "pathPattern": "./messages/{languageTag}.json"
-  }
+	"$schema": "https://inlang.com/schema/project-settings",
+	"sourceLanguageTag": "en",
+	"languageTags": ["en", "fr", "de", "es", "it", "ja", "ko", "zh-Hans"],
+	"modules": [
+		"https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-empty-pattern/dist/index.js",
+		"https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-missing-translation/dist/index.js",
+		"https://cdn.jsdelivr.net/npm/@inlang/plugin-message-format/dist/index.js",
+		"https://cdn.jsdelivr.net/npm/@inlang/plugin-m-function-matcher/dist/index.js"
+	],
+	"plugin.inlang.messageFormat": {
+		"pathPattern": "./messages/{languageTag}.json"
+	}
 }
 ```
 
