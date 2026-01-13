@@ -1620,11 +1620,11 @@ startCommand = "bun run preview --host"
 
 ### Milestone 1: Foundation ⏳
 
-- [ ] Monorepo with Bun workspaces
+- [x] Monorepo with Bun workspaces
 - [ ] Shared types package
 - [ ] Cache package with LRU + file persistence
-- [ ] Basic Hono API skeleton
-- [ ] Basic SvelteKit skeleton
+- [x] Basic Hono API skeleton
+- [x] Basic SvelteKit skeleton
 
 ### Milestone 2: Core API 🔜
 
