@@ -12,7 +12,7 @@ function getAppliedTheme(theme: Theme): Exclude<Theme, "system"> {
 
 export function applyTheme(theme: Theme): void {
 	const appliedTheme = getAppliedTheme(theme);
-	document.documentElement.dataset.theme = appliedTheme;
+	document.documentElement.classList.toggle("dark", appliedTheme === "dark");
 }
 
 export function getSavedTheme(): Theme {

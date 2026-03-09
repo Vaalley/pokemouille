@@ -7,6 +7,7 @@
         "lint": "bun --filter '*' lint",
         "lint:fix": "bun --filter '*' lint:fix",
         "fmt": "bun --filter '*' fmt",
-        "fmt:check": "bun --filter '*' fmt:check"
+        "fmt:check": "bun --filter '*' fmt:check",
+        "precommit": "bun run fmt && bun run lint"
     }
 }
