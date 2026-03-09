@@ -7,7 +7,7 @@
 		type Language,
 	} from '$lib/language';
 
-	let language: Language = 'en';
+	let language = $state<Language>('en');
 
 	function handleChange() {
 		setLanguage(language);
@@ -20,7 +20,7 @@
 
 <form>
 	<label for="languages">Choose a language:</label>
-	<select id="languages" name="languages" bind:value={language} on:change={handleChange}>
+	<select id="languages" name="languages" bind:value={language} onchange={handleChange}>
 		{#each languages as item}
 			<option value={item.code}>{item.label}</option>
 		{/each}
