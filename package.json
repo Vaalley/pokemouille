@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "bun --filter '*' dev",
         "lint": "bun --filter '*' lint",
-        "lint:fix": "bun --filter --parallel '*' lint:fix",
+        "lint:fix": "bun --filter '*' lint:fix",
         "fmt": "bun --filter '*' fmt",
         "fmt:check": "bun --filter '*' fmt:check"
     }
