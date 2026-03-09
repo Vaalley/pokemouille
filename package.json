@@ -1,19 +1,12 @@
 {
-	"name": "pokemouille",
-	"private": true,
-	"workspaces": [
-		"packages/*"
-	],
-	"scripts": {
-		"dev": "bun --filter '*' dev",
-		"lint": "oxlint",
-		"lint:fix": "oxlint --fix",
-		"fmt": "oxfmt",
-		"fmt:check": "oxfmt --check",
-		"precommit": "oxlint --fix && oxfmt ."
-	},
-	"devDependencies": {
-		"oxfmt": "^0.24.0",
-		"oxlint": "^1.39.0"
-	}
+    "name": "pokemouille",
+    "private": true,
+    "workspaces": ["packages/*"],
+    "scripts": {
+        "dev": "bun --filter '*' dev",
+        "lint": "bun --filter '*' lint",
+        "lint:fix": "bun --filter --parallel '*' lint:fix",
+        "fmt": "bun --filter '*' fmt",
+        "fmt:check": "bun --filter '*' fmt:check"
+    }
 }
