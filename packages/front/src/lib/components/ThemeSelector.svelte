@@ -13,7 +13,7 @@
 	});
 </script>
 
-<form>
+<form class="border-2 p-2">
 	<label for="themes">Choose a theme:</label>
 	<select id="themes" name="themes" bind:value={theme} onchange={handleChange}>
 		<option value="light">Light</option>

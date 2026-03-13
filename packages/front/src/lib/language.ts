@@ -22,7 +22,5 @@ export function getSavedLanguage(): Language {
 
 export function setLanguage(language: Language): void {
 	localStorage.setItem(storageKey, language);
-	window.dispatchEvent(
-		new CustomEvent("languagechange", { detail: language }),
-	);
+	window.dispatchEvent(new CustomEvent("languagechange", { detail: language }));
 }

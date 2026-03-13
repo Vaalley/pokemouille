@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import {
 		getSavedLanguage,
@@ -9,16 +10,54 @@
 
 	let language = $state<Language>('en');
 
-	function handleChange() {
+	async function handleChange() {
 		setLanguage(language);
+
+		const [, currentLanguage, currentGeneration, pokemonId] = window.location.pathname
+			.split('/')
+			.filter(Boolean);
+
+		if (!currentLanguage || !currentGeneration || !pokemonId) {
+			return;
+		}
+
+		if (window.location.pathname !== `/pokemon/${currentLanguage}/${currentGeneration}/${pokemonId}`) {
+			return;
+		}
+
+		if (currentLanguage === language) {
+			return;
+		}
+
+		await goto(`/pokemon/${language}/${currentGeneration}/${pokemonId}`);
 	}
 
 	onMount(() => {
 		language = getSavedLanguage();
+
+		function syncLanguage() {
+			language = getSavedLanguage();
+		}
+
+		function handleStorage(event: StorageEvent) {
+			if (event.key !== 'language') {
+				return;
+			}
+
+			syncLanguage();
+		}
+
+		window.addEventListener('languagechange', syncLanguage);
+		window.addEventListener('storage', handleStorage);
+
+		return () => {
+			window.removeEventListener('languagechange', syncLanguage);
+			window.removeEventListener('storage', handleStorage);
+		};
 	});
 </script>
 
-<form>
+<form class="border-2 p-2">
 	<label for="languages">Choose a language:</label>
 	<select id="languages" name="languages" bind:value={language} onchange={handleChange}>
 		{#each languages as item}
