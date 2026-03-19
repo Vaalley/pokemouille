@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { getCachedValue, queryGraphql, setCachedValue } from "./utilities";
+import { debug, getCachedValue, queryGraphql, setCachedValue } from "./utilities";
 
 export function registerRoutes(app: Hono, options: any) {
 	const { cache, getPokemonDetail, maxCacheSize, pokeApiGraphqlUrl, pokemonListCacheTtlMs } =
@@ -11,8 +11,10 @@ export function registerRoutes(app: Hono, options: any) {
 
 	app.get("/pokemon/all", async (c) => {
 		const language = c.req.query("language");
+		debug("GET /pokemon/all", { language });
 
 		if (!language) {
+			debug("Missing language parameter");
 			return c.json({ error: "language is required" }, 400);
 		}
 
@@ -20,8 +22,11 @@ export function registerRoutes(app: Hono, options: any) {
 		const cachedPokemon = getCachedValue<any>(cache, cacheKey);
 
 		if (cachedPokemon) {
+			debug("Cache hit for Pokemon list:", { cacheKey, count: cachedPokemon.length });
 			return c.json({ pokemon: cachedPokemon });
 		}
+
+		debug("Cache miss for Pokemon list, querying GraphQL:", cacheKey);
 
 		try {
 			const data = await queryGraphql<any>(
@@ -44,10 +49,12 @@ export function registerRoutes(app: Hono, options: any) {
 				name: item.name,
 			}));
 
+			debug("Caching Pokemon list:", { cacheKey, count: pokemon.length });
 			setCachedValue(cache, maxCacheSize, cacheKey, pokemon, pokemonListCacheTtlMs);
 
 			return c.json({ pokemon });
-		} catch {
+		} catch (error) {
+			debug("Error loading Pokemon list:", error);
 			return c.json({ error: "Could not load Pokémon list" }, 502);
 		}
 	});
@@ -56,11 +63,14 @@ export function registerRoutes(app: Hono, options: any) {
 		const generation = Number(c.req.query("generation"));
 		const language = c.req.query("language");
 		const id = c.req.query("id");
+		debug("GET /pokemon", { id, generation, language });
+
 		const hasValidGeneration =
 			Number.isInteger(generation) && generation >= 1 && generation <= 9;
 		const hasValidId = /^\d+$/.test(id ?? "");
 
 		if (!language || !hasValidId || !hasValidGeneration) {
+			debug("Invalid parameters:", { hasValidId, hasValidGeneration, language: !!language });
 			return c.json({ error: "generation, language and id are required" }, 400);
 		}
 
@@ -68,8 +78,10 @@ export function registerRoutes(app: Hono, options: any) {
 
 		try {
 			const pokemon = await getPokemonDetail(pokemonId, generation, language);
+			debug("Successfully fetched Pokemon:", { id: pokemonId, name: pokemon.name });
 			return c.json(pokemon);
-		} catch {
+		} catch (error) {
+			debug("Error loading Pokemon data:", error);
 			return c.json({ error: "Could not load Pokémon data" }, 502);
 		}
 	});

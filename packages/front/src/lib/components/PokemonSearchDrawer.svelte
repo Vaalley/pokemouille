@@ -110,7 +110,9 @@
 		onclick={closePokemonSearch}
 	></button>
 
-	<div class="fixed inset-x-4 top-6 z-50 mx-auto max-w-2xl rounded border bg-white p-4 shadow-lg">
+	<div
+		class="fixed inset-x-4 top-1/2 max-h-[80vh] -translate-y-1/2 overflow-hidden z-50 mx-auto max-w-2xl border bg-white p-4"
+	>
 		<input
 			bind:this={inputElement}
 			class="w-full border p-2"
@@ -129,15 +131,20 @@
 			{:else if $filteredPokemon.length === 0}
 				<p>No Pokémon found.</p>
 			{:else}
-				<div class="grid gap-2">
+				<div class="grid grid-cols-3 gap-2">
 					{#each $filteredPokemon as item}
 						<button
-							class="flex justify-between border p-2 text-left hover:bg-gray-100"
+							class="flex cursor-pointer items-center gap-2 border hover:bg-gray-100"
 							type="button"
 							onclick={async () => {
 								await handlePokemonSelect(item.id);
 							}}
 						>
+							<img
+								alt={item.name}
+								class="h-12 w-12"
+								src={`https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/${item.id}.png`}
+							/>
 							<span>{item.name}</span>
 							<span>#{item.id}</span>
 						</button>

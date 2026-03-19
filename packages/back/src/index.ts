@@ -1,7 +1,13 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { registerRoutes } from "./routes";
-import { getCachedValue, normalizeFlavorText, queryGraphql, setCachedValue } from "./utilities";
+import {
+	debug,
+	getCachedValue,
+	normalizeFlavorText,
+	queryGraphql,
+	setCachedValue,
+} from "./utilities";
 
 const app = new Hono();
 const pokeApiGraphqlUrl = Bun.env.POKEAPI_GRAPHQL_URL || "https://graphql.pokeapi.co/v1beta2";
@@ -10,13 +16,24 @@ const pokemonDetailCacheTtlMs = 1000 * 60 * 60;
 const pokemonListCacheTtlMs = 1000 * 60 * 15;
 const cache = new Map<string, { expiresAt: number; value: unknown }>();
 
+debug("Backend initialized with config:", {
+	pokeApiGraphqlUrl,
+	maxCacheSize,
+	pokemonDetailCacheTtlMs,
+	pokemonListCacheTtlMs,
+});
+
 async function getPokemonDetail(id: string, selectedGeneration: number, language: string) {
 	const cacheKey = `pokemon:${id}:${language}:${selectedGeneration}`;
+	debug("Fetching Pokemon detail:", { id, selectedGeneration, language, cacheKey });
 	const cachedPokemon = getCachedValue<any>(cache, cacheKey);
 
 	if (cachedPokemon) {
+		debug("Cache hit for Pokemon detail:", cacheKey);
 		return cachedPokemon;
 	}
+
+	debug("Cache miss for Pokemon detail, querying GraphQL:", cacheKey);
 
 	const data = await queryGraphql<any>(
 		pokeApiGraphqlUrl,
@@ -67,6 +84,7 @@ async function getPokemonDetail(id: string, selectedGeneration: number, language
 		selectedGeneration,
 	};
 
+	debug("Caching Pokemon detail:", { cacheKey, name: pokemon.name });
 	setCachedValue(cache, maxCacheSize, cacheKey, pokemon, pokemonDetailCacheTtlMs);
 
 	return pokemon;
@@ -78,6 +96,7 @@ app.use(
 		origin: Bun.env.FRONTEND_ORIGIN || "http://localhost:5173",
 	}),
 );
+
 registerRoutes(app, {
 	cache,
 	getPokemonDetail,
