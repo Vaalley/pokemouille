@@ -41,26 +41,18 @@ async function getPokemonDetail(id: string, selectedGeneration: number, language
 			query PokemonDetail($id: Int!, $language: String!) {
 				pokemonspecies(where: { id: { _eq: $id } }) {
 					generation_id
-				}
-				pokemonspeciesname(
-					where: {
-						pokemon_species_id: { _eq: $id }
-						language: { name: { _eq: $language } }
+					pokemonspeciesnames(where: { language: { name: { _eq: $language } } }) {
+						name
 					}
-				) {
-					name
-				}
-				pokemonspeciesflavortext(
-					where: {
-						pokemon_species_id: { _eq: $id }
-						language: { name: { _eq: $language } }
-					}
-					order_by: { version_id: desc }
-				) {
-					flavor_text
-					version {
-						versiongroup {
-							generation_id
+					pokemonspeciesflavortexts(
+						where: { language: { name: { _eq: $language } } }
+						order_by: { version_id: desc }
+					) {
+						flavor_text
+						version {
+							versiongroup {
+								generation_id
+							}
 						}
 					}
 				}
@@ -68,18 +60,19 @@ async function getPokemonDetail(id: string, selectedGeneration: number, language
 		`,
 		{ id: Number(id), language },
 	);
-	const introducedGeneration = data.pokemonspecies[0]?.generation_id || selectedGeneration;
+	const species = data.pokemonspecies[0];
+	const introducedGeneration = species?.generation_id || selectedGeneration;
 	const effectiveGeneration = Math.max(selectedGeneration, introducedGeneration);
 	const flavorTextEntry =
-		data.pokemonspeciesflavortext.find((entry: any) => {
+		species?.pokemonspeciesflavortexts?.find((entry: any) => {
 			return entry.version.versiongroup.generation_id === effectiveGeneration;
-		}) || data.pokemonspeciesflavortext[0];
+		}) || species?.pokemonspeciesflavortexts?.[0];
 	const pokemon = {
 		effectiveGeneration,
 		id,
 		introducedGeneration,
 		language,
-		name: data.pokemonspeciesname[0]?.name || "Unknown",
+		name: species?.pokemonspeciesnames?.[0]?.name || "Unknown",
 		flavorText: normalizeFlavorText(flavorTextEntry?.flavor_text || ""),
 		selectedGeneration,
 	};
