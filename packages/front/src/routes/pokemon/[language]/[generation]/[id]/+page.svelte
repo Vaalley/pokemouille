@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { setGeneration, type Generation } from '$lib/generation';
 	import { setLanguage, type Language } from '$lib/language';
+	import TypeBadge from '$lib/components/TypeBadge.svelte';
 
 	let { data } = $props<{
 		data: {
@@ -50,7 +51,15 @@
 				baseExperience: number | null;
 				spriteDefault: string | null;
 				spriteShiny: string | null;
-				types: string[];
+				types: { name: string; slug: string }[];
+				alternateForms: {
+					name: string;
+					spriteDefault: string | null;
+					spriteShiny: string | null;
+					types: { name: string; slug: string }[];
+					abilities: { name: string; isHidden: boolean }[];
+					stats: { base_stat: number; effort: number; stat: { name: string } }[];
+				}[];
 				abilities: { name: string; isHidden: boolean }[];
 				stats: { base_stat: number; effort: number; stat: { name: string } }[];
 				moves: { level: number; movelearnmethod: { name: string }; move: { name: string } }[];
@@ -79,13 +88,20 @@
 <section class="mx-auto max-w-3xl space-y-8 px-4 py-6">
 
 	<div class="flex gap-6 items-start">
-		<div class="flex gap-2 shrink-0">
-			{#if data.pokemon.spriteDefault}
-				<img alt="{data.pokemon.name} default" class="h-32 w-32 [image-rendering:pixelated]" src={data.pokemon.spriteDefault} />
-			{/if}
-			{#if data.pokemon.spriteShiny}
-				<img alt="{data.pokemon.name} shiny" class="h-32 w-32 [image-rendering:pixelated]" src={data.pokemon.spriteShiny} />
-			{/if}
+		<div class="flex flex-col items-center gap-3 shrink-0">
+			<img
+				alt="{data.pokemon.name} artwork"
+				class="h-40 w-40"
+				src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{data.id}.png"
+			/>
+			<div class="flex gap-2">
+				{#if data.pokemon.spriteDefault}
+					<img alt="{data.pokemon.name} default" class="h-16 w-16 [image-rendering:pixelated]" src={data.pokemon.spriteDefault} />
+				{/if}
+				{#if data.pokemon.spriteShiny}
+					<img alt="{data.pokemon.name} shiny" class="h-16 w-16 [image-rendering:pixelated]" src={data.pokemon.spriteShiny} />
+				{/if}
+			</div>
 		</div>
 		<div class="space-y-1">
 			<div class="flex gap-2 text-sm">
@@ -95,7 +111,11 @@
 			</div>
 			<h1 class="text-3xl font-bold">#{data.id} {data.pokemon.name}</h1>
 			{#if data.pokemon.genus}<p class="text-gray-500">{data.pokemon.genus} — Gen {data.pokemon.introducedGeneration}</p>{:else}<p class="text-gray-500">Gen {data.pokemon.introducedGeneration}</p>{/if}
-			<p class="text-sm">{data.pokemon.types.join(' / ')}</p>
+			<div class="flex gap-1">
+				{#each data.pokemon.types as type}
+					<TypeBadge slug={type.slug} name={type.name} />
+				{/each}
+			</div>
 			<p class="mt-2 text-sm leading-relaxed">{data.pokemon.flavorText}</p>
 		</div>
 	</div>
@@ -156,6 +176,47 @@
 						<span>{evo.name}</span>
 					</a>
 				{/each}
+			</div>
+		</div>
+	{/if}
+
+	{#if data.pokemon.alternateForms.length > 0}
+		<div>
+			<h2 class="mb-3 text-xl font-semibold">Alternate Forms</h2>
+			<div class="flex flex-wrap gap-3">
+				{#each data.pokemon.alternateForms as form}
+				<div class="rounded border p-3 text-sm">
+					<div class="flex items-start gap-3">
+						{#if form.spriteDefault}
+							<img alt={form.name} class="h-16 w-16 shrink-0 [image-rendering:pixelated]" src={form.spriteDefault} />
+						{/if}
+						<div class="space-y-1">
+							<p class="font-medium">{form.name}</p>
+							<div class="flex gap-1">
+								{#each form.types as type}
+									<TypeBadge slug={type.slug} name={type.name} />
+								{/each}
+							</div>
+							{#if form.abilities.length > 0}
+								<p class="text-xs text-gray-500">{form.abilities.map((a: { name: string; isHidden: boolean }) => a.name + (a.isHidden ? ' (hidden)' : '')).join(', ')}</p>
+							{/if}
+						</div>
+					</div>
+					{#if form.stats.length > 0}
+						<ul class="mt-2 space-y-1">
+							{#each form.stats as stat}
+								<li class="flex items-center gap-2">
+									<span class="w-28 shrink-0 text-xs font-medium">{stat.stat.name}</span>
+									<span class="w-7 text-right text-xs">{stat.base_stat}</span>
+									<div class="h-1.5 flex-1 rounded bg-gray-200">
+										<div class="h-1.5 rounded bg-blue-400" style="width: {Math.min(stat.base_stat / 255 * 100, 100)}%"></div>
+									</div>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+			{/each}
 			</div>
 		</div>
 	{/if}

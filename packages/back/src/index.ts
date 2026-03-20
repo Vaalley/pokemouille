@@ -135,6 +135,7 @@ async function getPokemonDetail(id: string, selectedGeneration: number, language
 						}
 						pokemontypes {
 							type {
+								name
 								typenames(where: { language: { name: { _eq: $language } } }) {
 									name
 								}
@@ -229,12 +230,35 @@ async function getPokemonDetail(id: string, selectedGeneration: number, language
 					: null,
 			};
 		}),
+		alternateForms: (species?.pokemons ?? [])
+			.filter((p: any) => !p.is_default)
+			.map((p: any) => ({
+				name: p.name,
+				spriteDefault: p.pokemonsprites?.[0]?.sprites?.front_default ?? null,
+				spriteShiny: p.pokemonsprites?.[0]?.sprites?.front_shiny ?? null,
+				types: (p.pokemontypes ?? []).map((t: any) => ({
+					name: t.type.typenames?.[0]?.name ?? "",
+					slug: t.type.name,
+				})),
+				abilities: (p.pokemonabilities ?? []).map((a: any) => ({
+					name: a.ability.abilitynames?.[0]?.name ?? "",
+					isHidden: a.is_hidden,
+				})),
+				stats: (p.pokemonstats ?? []).map((s: any) => ({
+					base_stat: s.base_stat,
+					effort: s.effort,
+					stat: { name: s.stat.statnames?.[0]?.name ?? "" },
+				})),
+			})),
 		height: primaryForm?.height ?? null,
 		weight: primaryForm?.weight ?? null,
 		baseExperience: primaryForm?.base_experience ?? null,
 		spriteDefault: sprites?.front_default ?? null,
 		spriteShiny: sprites?.front_shiny ?? null,
-		types: (primaryForm?.pokemontypes ?? []).map((t: any) => t.type.typenames?.[0]?.name ?? ""),
+		types: (primaryForm?.pokemontypes ?? []).map((t: any) => ({
+			name: t.type.typenames?.[0]?.name ?? "",
+			slug: t.type.name,
+		})),
 		abilities: (primaryForm?.pokemonabilities ?? []).map((a: any) => ({
 			name: a.ability.abilitynames?.[0]?.name ?? "",
 			isHidden: a.is_hidden,

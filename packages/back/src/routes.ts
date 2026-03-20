@@ -39,6 +39,9 @@ export function registerRoutes(app: Hono, options: any) {
 						) {
 							name
 							pokemon_species_id
+							pokemonspecy {
+								generation_id
+							}
 						}
 					}
 				`,
@@ -47,6 +50,7 @@ export function registerRoutes(app: Hono, options: any) {
 			const pokemon = data.pokemonspeciesname.map((item: any) => ({
 				id: item.pokemon_species_id,
 				name: item.name,
+				generationId: item.pokemonspecy?.generation_id ?? null,
 			}));
 
 			debug("Caching Pokemon list:", { cacheKey, count: pokemon.length });
