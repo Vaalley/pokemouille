@@ -3,6 +3,7 @@
 	import { setGeneration, type Generation } from '$lib/generation';
 	import { setLanguage, type Language } from '$lib/language';
 	import TypeBadge from '$lib/components/TypeBadge.svelte';
+	import TypeTooltip from '$lib/components/TypeTooltip.svelte';
 
 	let { data } = $props<{
 		data: {
@@ -111,11 +112,7 @@
 			</div>
 			<h1 class="text-3xl font-bold">#{data.id} {data.pokemon.name}</h1>
 			{#if data.pokemon.genus}<p class="text-gray-500">{data.pokemon.genus} — Gen {data.pokemon.introducedGeneration}</p>{:else}<p class="text-gray-500">Gen {data.pokemon.introducedGeneration}</p>{/if}
-			<div class="flex gap-1">
-				{#each data.pokemon.types as type}
-					<TypeBadge slug={type.slug} name={type.name} />
-				{/each}
-			</div>
+			<TypeTooltip types={data.pokemon.types} />
 			<p class="mt-2 text-sm leading-relaxed">{data.pokemon.flavorText}</p>
 		</div>
 	</div>
@@ -192,11 +189,7 @@
 						{/if}
 						<div class="space-y-1">
 							<p class="font-medium">{form.name}</p>
-							<div class="flex gap-1">
-								{#each form.types as type}
-									<TypeBadge slug={type.slug} name={type.name} />
-								{/each}
-							</div>
+							<TypeTooltip types={form.types} />
 							{#if form.abilities.length > 0}
 								<p class="text-xs text-gray-500">{form.abilities.map((a: { name: string; isHidden: boolean }) => a.name + (a.isHidden ? ' (hidden)' : '')).join(', ')}</p>
 							{/if}
