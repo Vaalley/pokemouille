@@ -58,10 +58,10 @@
 					spriteDefault: string | null;
 					spriteShiny: string | null;
 					types: { name: string; slug: string }[];
-					abilities: { name: string; isHidden: boolean }[];
+					abilities: { id: number; name: string; isHidden: boolean }[];
 					stats: { base_stat: number; effort: number; stat: { name: string } }[];
 				}[];
-				abilities: { name: string; isHidden: boolean }[];
+				abilities: { id: number; name: string; isHidden: boolean }[];
 				stats: { base_stat: number; effort: number; stat: { name: string } }[];
 				moves: { level: number; movelearnmethod: { name: string }; move: { name: string } }[];
 			};
@@ -140,7 +140,11 @@
 			<h2 class="mb-3 text-xl font-semibold">Abilities</h2>
 			<ul class="flex flex-wrap gap-2">
 				{#each data.pokemon.abilities as ability}
-					<li class="rounded border px-3 py-1 text-sm">{ability.name}{ability.isHidden ? ' (hidden)' : ''}</li>
+					<li>
+						<a href="/ability/{data.language}/{ability.id}" class="rounded border px-3 py-1 text-sm hover:bg-gray-50">
+							{ability.name}{ability.isHidden ? ' (hidden)' : ''}
+						</a>
+					</li>
 				{/each}
 			</ul>
 		</div>

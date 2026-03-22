@@ -13,23 +13,23 @@
 	async function handleChange() {
 		setLanguage(language);
 
-		const [, currentLanguage, currentGeneration, pokemonId] = window.location.pathname
-			.split('/')
-			.filter(Boolean);
+		const parts = window.location.pathname.split('/').filter(Boolean);
 
-		if (!currentLanguage || !currentGeneration || !pokemonId) {
+		if (parts[0] === 'pokemon' && parts.length === 4) {
+			const [, currentLanguage, currentGeneration, pokemonId] = parts;
+			if (currentLanguage !== language) {
+				await goto(`/pokemon/${language}/${currentGeneration}/${pokemonId}`);
+			}
 			return;
 		}
 
-		if (window.location.pathname !== `/pokemon/${currentLanguage}/${currentGeneration}/${pokemonId}`) {
+		if (parts[0] === 'ability' && parts.length === 3) {
+			const [, currentLanguage, abilityId] = parts;
+			if (currentLanguage !== language) {
+				await goto(`/ability/${language}/${abilityId}`);
+			}
 			return;
 		}
-
-		if (currentLanguage === language) {
-			return;
-		}
-
-		await goto(`/pokemon/${language}/${currentGeneration}/${pokemonId}`);
 	}
 
 	onMount(() => {

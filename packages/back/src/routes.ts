@@ -2,8 +2,15 @@ import type { Hono } from "hono";
 import { debug, getCachedValue, queryGraphql, setCachedValue } from "./utilities";
 
 export function registerRoutes(app: Hono, options: any) {
-	const { cache, getPokemonDetail, maxCacheSize, pokeApiGraphqlUrl, pokemonListCacheTtlMs } =
-		options;
+	const {
+		abilityListCacheTtlMs,
+		cache,
+		getAbilityDetail,
+		getPokemonDetail,
+		maxCacheSize,
+		pokeApiGraphqlUrl,
+		pokemonListCacheTtlMs,
+	} = options;
 
 	app.get("/", (c) => {
 		return c.text("Hello Hono!");
@@ -87,6 +94,74 @@ export function registerRoutes(app: Hono, options: any) {
 		} catch (error) {
 			debug("Error loading Pokemon data:", error);
 			return c.json({ error: "Could not load Pokémon data" }, 502);
+		}
+	});
+
+	app.get("/ability/all", async (c) => {
+		const language = c.req.query("language");
+		debug("GET /ability/all", { language });
+
+		if (!language) {
+			return c.json({ error: "language is required" }, 400);
+		}
+
+		const cacheKey = `ability:all:${language}`;
+		const cached = getCachedValue<any>(cache, cacheKey);
+
+		if (cached) {
+			debug("Cache hit for ability list:", { cacheKey, count: cached.length });
+			return c.json({ abilities: cached });
+		}
+
+		try {
+			const data = await queryGraphql<any>(
+				pokeApiGraphqlUrl,
+				`
+					query AbilityList($language: String!) {
+						abilityname(
+							where: { language: { name: { _eq: $language } } }
+							order_by: { ability_id: asc }
+						) {
+							name
+							ability_id
+						}
+					}
+				`,
+				{ language },
+			);
+
+			const abilities = data.abilityname.map((item: any) => ({
+				id: item.ability_id,
+				name: item.name,
+			}));
+
+			debug("Caching ability list:", { cacheKey, count: abilities.length });
+			setCachedValue(cache, maxCacheSize, cacheKey, abilities, abilityListCacheTtlMs);
+			return c.json({ abilities });
+		} catch (err) {
+			debug("Error loading ability list:", err);
+			return c.json({ error: "Could not load ability list" }, 502);
+		}
+	});
+
+	app.get("/ability", async (c) => {
+		const language = c.req.query("language");
+		const id = c.req.query("id");
+		debug("GET /ability", { id, language });
+
+		const hasValidId = /^\d+$/.test(id ?? "");
+
+		if (!language || !hasValidId) {
+			return c.json({ error: "language and id are required" }, 400);
+		}
+
+		try {
+			const ability = await getAbilityDetail(id ?? "", language);
+			debug("Successfully fetched ability:", { id, name: ability.name });
+			return c.json(ability);
+		} catch (err) {
+			debug("Error loading ability:", err);
+			return c.json({ error: "Could not load ability data" }, 502);
 		}
 	});
 }

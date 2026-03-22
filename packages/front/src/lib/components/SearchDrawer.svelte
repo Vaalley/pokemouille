@@ -6,6 +6,7 @@
 	import { getSavedLanguage } from '$lib/language';
 	import {
 		closePokemonSearch,
+		filteredAbilities,
 		filteredPokemon,
 		isPokemonListLoading,
 		isPokemonSearchOpen,
@@ -45,6 +46,12 @@
 		const generation = getSavedGeneration();
 		closePokemonSearch();
 		await goto(`/pokemon/${language}/${generation}/${id}`);
+	}
+
+	async function handleAbilitySelect(id: number) {
+		const language = getSavedLanguage();
+		closePokemonSearch();
+		await goto(`/ability/${language}/${id}`);
 	}
 
 	$effect(() => {
@@ -123,34 +130,57 @@
 			value={$pokemonSearchQuery}
 		/>
 
-		<div class="mt-4 max-h-96 overflow-y-auto">
+		<div class="mt-4 max-h-96 overflow-y-auto space-y-4">
 			{#if $isPokemonListLoading}
-				<p>Loading Pokémon list...</p>
+				<p>Loading...</p>
 			{:else if $pokemonListErrorMessage}
 				<p>{$pokemonListErrorMessage}</p>
-			{:else if $filteredPokemon.length === 0}
-				<p>No Pokémon found.</p>
 			{:else}
-				<div class="grid grid-cols-3 gap-2">
-					{#each $filteredPokemon as item}
-						<button
-							class="flex cursor-pointer items-center gap-2 border hover:bg-gray-100"
-							type="button"
-							onclick={async () => {
-								await handlePokemonSelect(item.id);
-							}}
-						>
-							<img
-								alt={item.name}
-								class="h-12 w-12"
-								src={`https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/${item.id}.png`}
-							/>
-							<span>{item.name}</span>
-							<span>#{item.id}</span>
-						</button>
-					{/each}
-				</div>
+				{#if $filteredPokemon.length > 0}
+					<div>
+						<p class="mb-1 text-xs font-semibold uppercase text-gray-400">Pokémon</p>
+						<div class="grid grid-cols-3 gap-2">
+							{#each $filteredPokemon as item}
+								<button
+									class="flex cursor-pointer items-center gap-2 border hover:bg-gray-100"
+									type="button"
+									onclick={async () => { await handlePokemonSelect(item.id); }}
+								>
+									<img
+										alt={item.name}
+										class="h-12 w-12"
+										src={`https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/${item.id}.png`}
+									/>
+									<span>{item.name}</span>
+									<span class="text-xs text-gray-400">#{item.id}</span>
+								</button>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if $filteredAbilities.length > 0}
+					<div>
+						<p class="mb-1 text-xs font-semibold uppercase text-gray-400">Abilities</p>
+						<div class="grid grid-cols-2 gap-2">
+							{#each $filteredAbilities as item}
+								<button
+									class="flex cursor-pointer items-center gap-2 border px-3 py-2 text-sm hover:bg-gray-100"
+									type="button"
+									onclick={async () => { await handleAbilitySelect(item.id); }}
+								>
+									<span>{item.name}</span>
+								</button>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if $filteredPokemon.length === 0 && $filteredAbilities.length === 0 && $pokemonSearchQuery.trim() !== ''}
+					<p class="text-sm text-gray-500">No results found.</p>
+				{/if}
 			{/if}
 		</div>
 	</div>
 {/if}
+

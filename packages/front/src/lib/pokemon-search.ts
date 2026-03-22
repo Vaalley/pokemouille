@@ -8,13 +8,19 @@ export type PokemonListItem = {
 	name: string;
 };
 
+export type AbilityListItem = {
+	id: number;
+	name: string;
+};
+
 export const isPokemonSearchOpen = writable(false);
 export const pokemonSearchQuery = writable("");
 export const pokemonList = writable<PokemonListItem[]>([]);
+export const abilityList = writable<AbilityListItem[]>([]);
 export const isPokemonListLoading = writable(false);
 export const pokemonListErrorMessage = writable("");
 
-const pokemonListLanguage = writable<Language>("en");
+const listLanguage = writable<Language>("en");
 let preloadPromise: Promise<void> | null = null;
 
 export const filteredPokemon = derived(
@@ -37,15 +43,26 @@ export const filteredPokemon = derived(
 	},
 );
 
+export const filteredAbilities = derived(
+	[abilityList, pokemonSearchQuery],
+	([$abilityList, $pokemonSearchQuery]) => {
+		const query = $pokemonSearchQuery.trim().toLowerCase();
+
+		if (!query) return [];
+
+		return $abilityList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+	},
+);
+
 export async function preloadPokemonList(language: Language): Promise<void> {
-	if (get(pokemonListLanguage) === language && get(pokemonList).length > 0) {
+	if (get(listLanguage) === language && get(pokemonList).length > 0) {
 		return;
 	}
 
 	if (preloadPromise) {
 		await preloadPromise;
 
-		if (get(pokemonListLanguage) === language && get(pokemonList).length > 0) {
+		if (get(listLanguage) === language && get(pokemonList).length > 0) {
 			return;
 		}
 	}
@@ -56,18 +73,26 @@ export async function preloadPokemonList(language: Language): Promise<void> {
 
 		try {
 			const searchParams = new URLSearchParams({ language });
-			const response = await fetch(`${apiBaseUrl}/pokemon/all?${searchParams.toString()}`);
+			const [pokemonRes, abilityRes] = await Promise.all([
+				fetch(`${apiBaseUrl}/pokemon/all?${searchParams.toString()}`),
+				fetch(`${apiBaseUrl}/ability/all?${searchParams.toString()}`),
+			]);
 
-			if (!response.ok) {
-				throw new Error("Failed to load Pokémon list.");
-			}
+			if (!pokemonRes.ok) throw new Error("Failed to load Pokémon list.");
+			if (!abilityRes.ok) throw new Error("Failed to load ability list.");
 
-			const data = await response.json();
-			pokemonList.set(data.pokemon || []);
-			pokemonListLanguage.set(language);
+			const [pokemonData, abilityData] = await Promise.all([
+				pokemonRes.json(),
+				abilityRes.json(),
+			]);
+
+			pokemonList.set(pokemonData.pokemon || []);
+			abilityList.set(abilityData.abilities || []);
+			listLanguage.set(language);
 		} catch {
 			pokemonList.set([]);
-			pokemonListErrorMessage.set("Could not load Pokémon list.");
+			abilityList.set([]);
+			pokemonListErrorMessage.set("Could not load search data.");
 		} finally {
 			isPokemonListLoading.set(false);
 		}
