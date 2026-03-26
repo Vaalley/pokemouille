@@ -63,7 +63,7 @@
 				}[];
 				abilities: { id: number; name: string; isHidden: boolean }[];
 				stats: { base_stat: number; effort: number; stat: { name: string } }[];
-				moves: { level: number; movelearnmethod: { name: string }; move: { name: string } }[];
+				moves: { move: { id: number; name: string }; learnMethods: { name: string; level: number }[] }[];
 			};
 		};
 	}>();
@@ -71,6 +71,10 @@
 	function getPokemonImageUrl(selectedPokemonId: string): string {
 		return `https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/${selectedPokemonId}.png`;
 	}
+
+	const mainStatMap = $derived(
+		new Map(data.pokemon.stats.map((s: { base_stat: number; effort: number; stat: { name: string } }) => [s.stat.name, s.base_stat])),
+	);
 
 	$effect(() => {
 		if (!browser) {
@@ -106,9 +110,9 @@
 		</div>
 		<div class="space-y-1">
 			<div class="flex gap-2 text-sm">
-				{#if data.pokemon.isLegendary}<span class="rounded bg-yellow-100 px-2 py-0.5 text-yellow-800">Legendary</span>{/if}
-				{#if data.pokemon.isMythical}<span class="rounded bg-purple-100 px-2 py-0.5 text-purple-800">Mythical</span>{/if}
-				{#if data.pokemon.isBaby}<span class="rounded bg-pink-100 px-2 py-0.5 text-pink-800">Baby</span>{/if}
+				{#if data.pokemon.isLegendary}<span class="bg-yellow-100 px-2 py-0.5 text-yellow-800">Legendary</span>{/if}
+				{#if data.pokemon.isMythical}<span class="bg-purple-100 px-2 py-0.5 text-purple-800">Mythical</span>{/if}
+				{#if data.pokemon.isBaby}<span class="bg-pink-100 px-2 py-0.5 text-pink-800">Baby</span>{/if}
 			</div>
 			<h1 class="text-3xl font-bold">#{data.id} {data.pokemon.name}</h1>
 			{#if data.pokemon.genus}<p class="text-gray-500">{data.pokemon.genus} — Gen {data.pokemon.introducedGeneration}</p>{:else}<p class="text-gray-500">Gen {data.pokemon.introducedGeneration}</p>{/if}
@@ -141,7 +145,7 @@
 			<ul class="flex flex-wrap gap-2">
 				{#each data.pokemon.abilities as ability}
 					<li>
-						<a href="/ability/{data.language}/{ability.id}" class="rounded border px-3 py-1 text-sm hover:bg-gray-50">
+						<a href="/ability/{data.language}/{data.generation}/{ability.id}" class="border-2 px-3 py-1 text-sm hover:bg-gray-50">
 							{ability.name}{ability.isHidden ? ' (hidden)' : ''}
 						</a>
 					</li>
@@ -172,7 +176,7 @@
 					{:else if i > 0}
 						<span class="text-gray-400">→</span>
 					{/if}
-					<a href="/pokemon/{data.language}/{data.pokemon.selectedGeneration}/{evo.id}" class="flex flex-col items-center rounded border px-3 py-2 text-sm hover:bg-gray-50 text-center">
+					<a href="/pokemon/{data.language}/{data.pokemon.selectedGeneration}/{evo.id}" class="flex flex-col items-center border-2 px-3 py-2 text-sm hover:bg-gray-50 text-center">
 						<img alt={evo.name} class="h-16 w-16 [image-rendering:pixelated]" src={getPokemonImageUrl(String(evo.id))} />
 						<span>{evo.name}</span>
 					</a>
@@ -186,7 +190,7 @@
 			<h2 class="mb-3 text-xl font-semibold">Alternate Forms</h2>
 			<div class="flex flex-wrap gap-3">
 				{#each data.pokemon.alternateForms as form}
-				<div class="rounded border p-3 text-sm">
+				<div class="border-2 p-3 text-sm">
 					<div class="flex items-start gap-3">
 						{#if form.spriteDefault}
 							<img alt={form.name} class="h-16 w-16 shrink-0 [image-rendering:pixelated]" src={form.spriteDefault} />
@@ -202,11 +206,17 @@
 					{#if form.stats.length > 0}
 						<ul class="mt-2 space-y-1">
 							{#each form.stats as stat}
+								{@const diff = stat.base_stat - (mainStatMap.get(stat.stat.name) ?? stat.base_stat)}
 								<li class="flex items-center gap-2">
 									<span class="w-28 shrink-0 text-xs font-medium">{stat.stat.name}</span>
 									<span class="w-7 text-right text-xs">{stat.base_stat}</span>
-									<div class="h-1.5 flex-1 rounded bg-gray-200">
-										<div class="h-1.5 rounded bg-blue-400" style="width: {Math.min(stat.base_stat / 255 * 100, 100)}%"></div>
+									{#if diff !== 0}
+										<span class="w-9 text-right text-xs font-medium {diff > 0 ? 'text-green-600' : 'text-red-500'}">{diff > 0 ? '+' : ''}{diff}</span>
+									{:else}
+										<span class="w-9"></span>
+									{/if}
+									<div class="h-1.5 flex-1 bg-gray-200">
+										<div class="h-1.5 bg-blue-400" style="width: {Math.min(stat.base_stat / 255 * 100, 100)}%"></div>
 									</div>
 								</li>
 							{/each}
@@ -226,8 +236,8 @@
 					<li class="flex items-center gap-3">
 						<span class="w-32 shrink-0 font-medium">{stat.stat.name}</span>
 						<span class="w-8 text-right">{stat.base_stat}</span>
-						<div class="h-2 flex-1 rounded bg-gray-200">
-							<div class="h-2 rounded bg-blue-400" style="width: {Math.min(stat.base_stat / 255 * 100, 100)}%"></div>
+						<div class="h-2 flex-1 bg-gray-200">
+							<div class="h-2 bg-blue-400" style="width: {Math.min(stat.base_stat / 255 * 100, 100)}%"></div>
 						</div>
 						{#if stat.effort > 0}<span class="text-xs text-gray-400">+{stat.effort} EV</span>{/if}
 					</li>
@@ -240,13 +250,16 @@
 		<div>
 			<h2 class="mb-3 text-xl font-semibold">Moves <span class="text-base font-normal text-gray-500">(Gen {data.pokemon.selectedGeneration})</span></h2>
 			<ul class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-3">
-				{#each data.pokemon.moves.toSorted((a: { level: number }, b: { level: number }) => a.level - b.level) as move}
-					<li class="flex gap-1">
-						<span class="font-medium">{move.move.name}</span>
-						<span class="text-gray-400 text-xs self-center">— {move.movelearnmethod.name}{move.level > 0 ? ` lv.${move.level}` : ''}</span>
-					</li>
+				{#each data.pokemon.moves.toSorted((a: { learnMethods: { level: number }[] }, b: { learnMethods: { level: number }[] }) => a.learnMethods[0].level - b.learnMethods[0].level) as move}
+				<li class="flex gap-1 border-2 p-2">
+					<a href="/move/{data.language}/{data.generation}/{move.move.id}" class="font-medium hover:underline">{move.move.name}</a>
+					<span class="text-gray-400 text-xs self-center">— {move.learnMethods.map((lm: { name: string; level: number }) => lm.name + (lm.level > 0 ? ` lv.${lm.level}` : '')).join(' or ')}</span>
+				</li>
 				{/each}
 			</ul>
 		</div>
+	{:else if data.generation > data.pokemon.introducedGeneration}
+		<p class="text-sm text-gray-500">{data.pokemon.name} is not available in Generation {data.generation}. Thus, no moves are listed for this generation.</p>
 	{/if}
+
 </section>

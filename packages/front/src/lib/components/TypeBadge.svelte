@@ -26,7 +26,7 @@
 </script>
 
 <span
-	class="inline-flex items-center gap-1 rounded px-3 py-1 text-xs font-semibold text-white"
+	class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-white"
 	style="background-color: {color}"
 >
 	<img

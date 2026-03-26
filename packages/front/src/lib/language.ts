@@ -11,6 +11,7 @@ export type Language = (typeof languages)[number]["code"];
 const storageKey = "language";
 
 export function getSavedLanguage(): Language {
+	if (typeof localStorage === "undefined") return "en";
 	const language = localStorage.getItem(storageKey);
 
 	if (language && languages.some((item) => item.code === language)) {

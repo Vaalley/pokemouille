@@ -24,3 +24,7 @@ bun run lint         # lint all
 bun run fmt          # format all
 bun run precommit    # fmt + lint (run before committing)
 ```
+
+## License
+
+[MIT](LICENSE)

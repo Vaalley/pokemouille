@@ -49,13 +49,13 @@
 	<div class="flex flex-wrap gap-3">
 		<input
 			bind:value={query}
-			class="min-w-0 flex-1 rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300"
+			class="min-w-0 flex-1 border-2 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300"
 			placeholder="Search by name or #id…"
 			type="search"
 		/>
 		<select
 			bind:value={genFilter}
-			class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300"
+			class="border-2 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300"
 		>
 			<option value={0}>All generations</option>
 			{#each generations as gen}
@@ -69,7 +69,7 @@
 			<li>
 				<a
 					href="/pokemon/{data.language}/{data.generation}/{pokemon.id}"
-					class="flex flex-col items-center rounded border px-2 py-3 text-center text-sm hover:bg-gray-50"
+					class="flex flex-col items-center border-2 px-2 py-3 text-center text-sm hover:bg-gray-50"
 				>
 					<img
 						alt={pokemon.name}

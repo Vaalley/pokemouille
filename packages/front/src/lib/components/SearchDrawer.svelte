@@ -1,21 +1,35 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { getSavedGeneration } from '$lib/generation';
-	import { get } from 'svelte/store';
 	import { onMount, tick } from 'svelte';
 	import { getSavedLanguage } from '$lib/language';
+	import TypeBadge from '$lib/components/TypeBadge.svelte';
 	import {
 		closePokemonSearch,
-		filteredAbilities,
-		filteredPokemon,
-		isPokemonListLoading,
-		isPokemonSearchOpen,
 		openPokemonSearch,
-		pokemonListErrorMessage,
-		pokemonSearchQuery,
+		searchState,
 		setPokemonSearchQuery,
 		syncPokemonListToSavedLanguage,
-	} from '$lib/pokemon-search';
+	} from '$lib/pokemon-search.svelte';
+
+	const filteredPokemon = $derived.by(() => {
+		const query = searchState.query.trim().toLowerCase();
+		if (!query) return searchState.pokemonList.slice(0, 60);
+		return searchState.pokemonList
+			.filter((item) => String(item.id).includes(query) || item.name.toLowerCase().includes(query))
+			.slice(0, 60);
+	});
+
+	const filteredAbilities = $derived.by(() => {
+		const query = searchState.query.trim().toLowerCase();
+		if (!query) return [];
+		return searchState.abilityList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+	});
+
+	const filteredMoves = $derived.by(() => {
+		const query = searchState.query.trim().toLowerCase();
+		if (!query) return [];
+		return searchState.moveList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+	});
 
 	let inputElement = $state<HTMLInputElement | null>(null);
 
@@ -41,21 +55,20 @@
 		inputElement?.setSelectionRange(inputElement.value.length, inputElement.value.length);
 	}
 
-	async function handlePokemonSelect(id: number) {
-		const language = getSavedLanguage();
-		const generation = getSavedGeneration();
-		closePokemonSearch();
-		await goto(`/pokemon/${language}/${generation}/${id}`);
+	function pokemonHref(id: number) {
+		return `/pokemon/${getSavedLanguage()}/${getSavedGeneration()}/${id}`;
 	}
 
-	async function handleAbilitySelect(id: number) {
-		const language = getSavedLanguage();
-		closePokemonSearch();
-		await goto(`/ability/${language}/${id}`);
+	function abilityHref(id: number) {
+		return `/ability/${getSavedLanguage()}/${getSavedGeneration()}/${id}`;
+	}
+
+	function moveHref(id: number) {
+		return `/move/${getSavedLanguage()}/${getSavedGeneration()}/${id}`;
 	}
 
 	$effect(() => {
-		if ($isPokemonSearchOpen) {
+		if (searchState.isOpen) {
 			void focusInput();
 		}
 	});
@@ -78,7 +91,7 @@
 				return;
 			}
 
-			if (event.key === 'Escape' && get(isPokemonSearchOpen)) {
+			if (event.key === 'Escape' && searchState.isOpen) {
 				closePokemonSearch();
 				return;
 			}
@@ -109,7 +122,7 @@
 	});
 </script>
 
-{#if $isPokemonSearchOpen}
+{#if searchState.isOpen}
 	<button
 		aria-label="Close pokemon search"
 		class="fixed inset-0 z-40 bg-black/40"
@@ -127,60 +140,92 @@
 				setPokemonSearchQuery(event.currentTarget.value);
 			}}
 			placeholder="Search pokemon"
-			value={$pokemonSearchQuery}
+			value={searchState.query}
 		/>
 
 		<div class="mt-4 max-h-96 overflow-y-auto space-y-4">
-			{#if $isPokemonListLoading}
+			{#if searchState.isLoading}
 				<p>Loading...</p>
-			{:else if $pokemonListErrorMessage}
-				<p>{$pokemonListErrorMessage}</p>
+			{:else if searchState.errorMessage}
+				<p>{searchState.errorMessage}</p>
 			{:else}
-				{#if $filteredPokemon.length > 0}
+				{#if filteredPokemon.length > 0}
 					<div>
 						<p class="mb-1 text-xs font-semibold uppercase text-gray-400">Pokémon</p>
 						<div class="grid grid-cols-3 gap-2">
-							{#each $filteredPokemon as item}
-								<button
+							{#each filteredPokemon as item}
+								<a
 									class="flex cursor-pointer items-center gap-2 border hover:bg-gray-100"
-									type="button"
-									onclick={async () => { await handlePokemonSelect(item.id); }}
+									data-sveltekit-preload-data="hover"
+									href={pokemonHref(item.id)}
+									onclick={closePokemonSearch}
 								>
-									<img
-										alt={item.name}
-										class="h-12 w-12"
-										src={`https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/${item.id}.png`}
-									/>
-									<span>{item.name}</span>
-									<span class="text-xs text-gray-400">#{item.id}</span>
-								</button>
+									{#if item.sprite}
+										<img alt={item.name} class="h-12 w-12" src={item.sprite} />
+									{/if}
+									<div class="flex flex-col items-start gap-1">
+										<span>{item.name}</span>
+										<div class="flex gap-1">
+											{#each item.types as t}
+												<TypeBadge slug={t} name={t} />
+											{/each}
+										</div>
+									</div>
+								</a>
 							{/each}
 						</div>
 					</div>
 				{/if}
 
-				{#if $filteredAbilities.length > 0}
+				{#if filteredAbilities.length > 0}
 					<div>
 						<p class="mb-1 text-xs font-semibold uppercase text-gray-400">Abilities</p>
 						<div class="grid grid-cols-2 gap-2">
-							{#each $filteredAbilities as item}
-								<button
-									class="flex cursor-pointer items-center gap-2 border px-3 py-2 text-sm hover:bg-gray-100"
-									type="button"
-									onclick={async () => { await handleAbilitySelect(item.id); }}
+							{#each filteredAbilities as item}
+								<a
+									class="flex cursor-pointer flex-col items-start border px-3 py-2 text-sm hover:bg-gray-100"
+									data-sveltekit-preload-data="hover"
+									href={abilityHref(item.id)}
+									onclick={closePokemonSearch}
 								>
-									<span>{item.name}</span>
-								</button>
+									<span class="font-medium">{item.name}</span>
+									{#if item.shortEffect}
+										<span class="text-xs text-gray-400 line-clamp-1">{item.shortEffect}</span>
+									{/if}
+								</a>
 							{/each}
 						</div>
 					</div>
 				{/if}
 
-				{#if $filteredPokemon.length === 0 && $filteredAbilities.length === 0 && $pokemonSearchQuery.trim() !== ''}
+				{#if filteredMoves.length > 0}
+					<div>
+						<p class="mb-1 text-xs font-semibold uppercase text-gray-400">Moves</p>
+						<div class="grid grid-cols-2 gap-2">
+							{#each filteredMoves as item}
+								<a
+									class="flex cursor-pointer items-center gap-2 border px-3 py-2 text-sm hover:bg-gray-100"
+									data-sveltekit-preload-data="hover"
+									href={moveHref(item.id)}
+									onclick={closePokemonSearch}
+								>
+									{#if item.typeSlug}
+										<TypeBadge slug={item.typeSlug} name={item.typeSlug} />
+									{/if}
+									<span>{item.name}</span>
+									{#if item.damageClass}
+										<span class="ml-auto text-xs text-gray-400">{item.damageClass}</span>
+									{/if}
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if filteredPokemon.length === 0 && filteredAbilities.length === 0 && filteredMoves.length === 0 && searchState.query.trim() !== ''}
 					<p class="text-sm text-gray-500">No results found.</p>
 				{/if}
 			{/if}
 		</div>
 	</div>
 {/if}
-

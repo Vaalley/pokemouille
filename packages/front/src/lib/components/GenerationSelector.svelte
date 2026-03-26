@@ -11,7 +11,11 @@
 	import { languages } from '$lib/language';
 
 	let generation = $state<Generation>(1);
-	let minimumGeneration = $derived((page.data.pokemon?.introducedGeneration as Generation) ?? 1);
+	let minimumGeneration = $derived(
+		((page.data.pokemon?.introducedGeneration ??
+			page.data.move?.generationId ??
+			page.data.ability?.generationId) as Generation) ?? 1,
+	);
 	let availableGenerations = $derived(
 		generations.filter((item) => item.value >= minimumGeneration),
 	);
@@ -19,23 +23,31 @@
 	async function handleChange() {
 		setGeneration(generation);
 
-		const [, currentLanguage, currentGeneration, pokemonId] = window.location.pathname
-			.split('/')
-			.filter(Boolean);
+		const parts = window.location.pathname.split('/').filter(Boolean);
 
-		if (!currentLanguage || !currentGeneration || !pokemonId) {
+		if (parts[0] === 'pokemon' && parts.length === 4) {
+			const [, currentLanguage, currentGeneration, pokemonId] = parts;
+			if (Number(currentGeneration) !== generation) {
+				await goto(`/pokemon/${currentLanguage}/${generation}/${pokemonId}`);
+			}
 			return;
 		}
 
-		if (window.location.pathname !== `/pokemon/${currentLanguage}/${currentGeneration}/${pokemonId}`) {
+		if (parts[0] === 'move' && parts.length === 4) {
+			const [, currentLanguage, currentGeneration, moveId] = parts;
+			if (Number(currentGeneration) !== generation) {
+				await goto(`/move/${currentLanguage}/${generation}/${moveId}`);
+			}
 			return;
 		}
 
-		if (Number(currentGeneration) === generation) {
+		if (parts[0] === 'ability' && parts.length === 4) {
+			const [, currentLanguage, currentGeneration, abilityId] = parts;
+			if (Number(currentGeneration) !== generation) {
+				await goto(`/ability/${currentLanguage}/${generation}/${abilityId}`);
+			}
 			return;
 		}
-
-		await goto(`/pokemon/${currentLanguage}/${generation}/${pokemonId}`);
 	}
 
 	onMount(() => {

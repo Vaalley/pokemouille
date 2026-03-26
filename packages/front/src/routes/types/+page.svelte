@@ -1,12 +1,35 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import TypeBadge from '$lib/components/TypeBadge.svelte';
+	import { getSavedGeneration } from '$lib/generation';
+	import { getSavedLanguage } from '$lib/language';
+	import { searchState } from '$lib/pokemon-search.svelte';
 	import {
 		ALL_TYPES,
+		chart,
 		getDefensiveEffectiveness,
 		getOffensiveEffectiveness,
 		type Effectiveness,
 	} from '$lib/type-effectiveness';
+
+	const iconUrl = (slug: string) =>
+		`https://raw.githubusercontent.com/partywhale/pokemon-type-icons/fcbe6978c61c359680bc07636c3f9bdc0f346b43/icons/${slug}.svg`;
+
+	function cellClass(atk: string, def: string): string {
+		const m = chart[atk]?.[def] ?? 1;
+		if (m === 0) return 'text-gray-400';
+		if (m === 0.5) return 'text-blue-500';
+		if (m === 2) return 'text-orange-500 font-semibold';
+		return 'text-gray-300';
+	}
+
+	function cellLabel(atk: string, def: string): string {
+		const m = chart[atk]?.[def] ?? 1;
+		if (m === 0) return '0';
+		if (m === 0.5) return '½';
+		if (m === 2) return '2';
+		return '1';
+	}
 
 	let { data } = $props<{ data: { selected: string[] } }>();
 
@@ -32,6 +55,15 @@
 
 	const offense = $derived(selected.length > 0 ? getOffensiveEffectiveness(selected) : null);
 	const defense = $derived(selected.length > 0 ? getDefensiveEffectiveness(selected) : null);
+	const selectedSet = $derived(new Set(selected));
+
+	const matchingPokemon = $derived(
+		selected.length > 0
+			? searchState.pokemonList.filter((p) =>
+					selected.every((t) => p.types.includes(t)) && p.types.length === selected.length,
+				)
+			: [],
+	);
 
 	type Row = { label: string; mult: string; types: string[]; color: string };
 
@@ -131,4 +163,64 @@
 			</div>
 		</div>
 	{/if}
+
+	{#if matchingPokemon.length > 0}
+		<div>
+			<h2 class="mb-2 text-lg font-semibold">
+				Pokémon with this type{selected.length > 1 ? ' combination' : ''}
+				<span class="text-sm font-normal text-gray-400">({matchingPokemon.length})</span>
+			</h2>
+			<div class="flex flex-wrap gap-2">
+			{#each matchingPokemon as p}
+				<a
+					class="flex flex-col items-center cursor-pointer border-2 hover:bg-gray-50 w-24"
+					data-sveltekit-preload-data="hover"
+					href={`/pokemon/${getSavedLanguage()}/${getSavedGeneration()}/${p.id}`}
+				>
+					{#if p.sprite}
+						<img alt={p.name} class="h-16 w-16" src={p.sprite} />
+					{/if}
+					<span class="text-xs pb-1 capitalize">{p.name}</span>
+				</a>
+			{/each}
+		</div>
+		</div>
+	{/if}
 </section>
+
+<div class="px-4 py-6 space-y-3">
+	<h2 class="text-xl font-bold">Full Type Chart</h2>
+	<p class="text-xs text-gray-500">Rows = attacking type · Columns = defending type</p>
+	<table class="border-collapse text-center text-xs mx-auto">
+		<thead>
+			<tr>
+				<th class="border border-gray-200 p-1"></th>
+				{#each ALL_TYPES as def}
+					<th class="border border-gray-200 p-1 {selectedSet.has(def) ? 'bg-gray-200' : ''}">
+					<img alt={def} title={def} class="h-5 w-5 mx-auto" src={iconUrl(def)} />
+				</th>
+				{/each}
+			</tr>
+		</thead>
+		<tbody>
+			{#each ALL_TYPES as atk}
+				<tr>
+					<td class="border border-gray-200 p-1 whitespace-nowrap {selectedSet.has(atk) ? 'bg-gray-200' : ''}">
+					<span class="inline-flex items-center gap-1">
+						<img alt={atk} class="h-4 w-4" src={iconUrl(atk)} />
+						<span class="font-medium capitalize">{atk}</span>
+					</span>
+				</td>
+					{#each ALL_TYPES as def}
+						<td class="border border-gray-200 p-1 {cellClass(atk, def)} {selected.length > 0 ? (selectedSet.has(atk) && selectedSet.has(def) ? 'bg-gray-200' : selectedSet.has(atk) || selectedSet.has(def) ? 'bg-gray-100' : 'opacity-20') : ''}">{cellLabel(atk, def)}</td>
+					{/each}
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+	<div class="flex gap-4 text-xs text-gray-500">
+		<span><span class="font-semibold text-orange-500">2</span> super effective</span>
+		<span><span class="font-medium text-blue-500">½</span> not very effective</span>
+		<span><span class="font-medium text-gray-400">0</span> immune</span>
+	</div>
+</div>

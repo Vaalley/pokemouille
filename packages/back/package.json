@@ -1,7 +1,7 @@
 {
 	"name": "pokemouille-back",
 	"scripts": {
-		"dev": "bun run --hot src/index.ts",
+		"dev": "bun run --hot src/main.ts",
 		"lint": "oxlint",
 		"lint:fix": "oxlint --fix",
 		"fmt": "oxfmt",

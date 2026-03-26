@@ -23,10 +23,18 @@
 			return;
 		}
 
-		if (parts[0] === 'ability' && parts.length === 3) {
-			const [, currentLanguage, abilityId] = parts;
+		if (parts[0] === 'ability' && parts.length === 4) {
+			const [, currentLanguage, generation, abilityId] = parts;
 			if (currentLanguage !== language) {
-				await goto(`/ability/${language}/${abilityId}`);
+				await goto(`/ability/${language}/${generation}/${abilityId}`);
+			}
+			return;
+		}
+
+		if (parts[0] === 'move' && parts.length === 4) {
+			const [, currentLanguage, generation, moveId] = parts;
+			if (currentLanguage !== language) {
+				await goto(`/move/${language}/${generation}/${moveId}`);
 			}
 			return;
 		}

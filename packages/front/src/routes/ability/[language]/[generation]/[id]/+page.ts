@@ -1,5 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { languages } from "$lib/language";
+import { generations } from "$lib/generation";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
@@ -7,17 +8,27 @@ export async function load({
 	params,
 	fetch,
 }: {
-	params: { language: string; id: string };
+	params: {
+		language: string;
+		generation: string;
+		id: string;
+	};
 	fetch: typeof globalThis.fetch;
 }) {
 	const hasSupportedLanguage = languages.some((item) => item.code === params.language);
 	const hasValidId = /^\d+$/.test(params.id);
+	const generation = Number(params.generation);
+	const hasValidGeneration = generations.some((g) => g.value === generation);
 
-	if (!hasSupportedLanguage || !hasValidId) {
+	if (!hasSupportedLanguage || !hasValidId || !hasValidGeneration) {
 		throw error(404, "Not found");
 	}
 
-	const searchParams = new URLSearchParams({ id: params.id, language: params.language });
+	const searchParams = new URLSearchParams({
+		id: params.id,
+		language: params.language,
+		generation: params.generation,
+	});
 	const response = await fetch(`${apiBaseUrl}/ability?${searchParams.toString()}`);
 
 	if (!response.ok) {
@@ -29,6 +40,7 @@ export async function load({
 	return {
 		id: params.id,
 		language: params.language,
+		generation,
 		ability,
 	};
 }

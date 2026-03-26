@@ -1,16 +1,19 @@
 const DEBUG_MODE = Bun.env.DEBUG_MODE === "true";
 
+export const POKEAPI_GRAPHQL_URL =
+	Bun.env.POKEAPI_GRAPHQL_URL || "https://graphql.pokeapi.co/v1beta2";
+export const MAX_CACHE_SIZE = 10000;
+export const cache = new Map<string, { expiresAt: number; value: unknown }>();
+
 export function debug(...args: unknown[]): void {
 	if (DEBUG_MODE) {
-		const timestamp = new Date().toISOString();
-		console.log(`[DEBUG ${timestamp}]`, ...args);
+		const now = new Date();
+		const timestamp = `${now.getDate().toString().padStart(2, "0")}/${(now.getMonth() + 1).toString().padStart(2, "0")}/${now.getFullYear()} ${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+		console.log(`[${timestamp}]`, ...args);
 	}
 }
 
-export function getCachedValue<T>(
-	cache: Map<string, { expiresAt: number; value: unknown }>,
-	key: string,
-): T | null {
+export function getCachedValue<T>(key: string): T | null {
 	const cachedEntry = cache.get(key);
 
 	if (!cachedEntry) {
@@ -30,13 +33,7 @@ export function getCachedValue<T>(
 	return cachedEntry.value as T;
 }
 
-export function setCachedValue(
-	cache: Map<string, { expiresAt: number; value: unknown }>,
-	maxCacheSize: number,
-	key: string,
-	value: unknown,
-	ttlMs: number,
-): void {
+export function setCachedValue(key: string, value: unknown, ttlMs: number): void {
 	if (cache.has(key)) {
 		cache.delete(key);
 	}
@@ -46,7 +43,7 @@ export function setCachedValue(
 		value,
 	});
 
-	if (cache.size > maxCacheSize) {
+	if (cache.size > MAX_CACHE_SIZE) {
 		const oldestKey = cache.keys().next().value;
 
 		if (oldestKey) {
@@ -64,21 +61,29 @@ export function normalizeFlavorText(flavorText: string): string {
 }
 
 export async function queryGraphql<T>(
-	pokeApiGraphqlUrl: string,
 	query: string,
 	variables: Record<string, unknown>,
 ): Promise<T> {
-	debug("GraphQL query:", { url: pokeApiGraphqlUrl, variables });
-	const response = await fetch(pokeApiGraphqlUrl, {
+	debug("GraphQL query:", {
+		url: POKEAPI_GRAPHQL_URL,
+		variables,
+	});
+	const response = await fetch(POKEAPI_GRAPHQL_URL, {
 		method: "POST",
 		headers: {
 			"content-type": "application/json",
 		},
-		body: JSON.stringify({ query, variables }),
+		body: JSON.stringify({
+			query,
+			variables,
+		}),
 	});
 
 	if (!response.ok) {
-		debug("GraphQL HTTP error:", { status: response.status, statusText: response.statusText });
+		debug("GraphQL HTTP error:", {
+			status: response.status,
+			statusText: response.statusText,
+		});
 		throw new Error("Could not load Pokémon data");
 	}
 

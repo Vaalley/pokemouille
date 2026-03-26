@@ -4,7 +4,7 @@
 	import GenerationSelector from './GenerationSelector.svelte';
 </script>
 
-<nav class="flex gap-4 items-center p-4 border-b-2 w-screen">
+<nav class="flex gap-4 items-center p-4 border-b-2 w-full">
 	<a class="text-3xl" href="/" title="Pokémouille">
 		Pokémouille
 	</a>

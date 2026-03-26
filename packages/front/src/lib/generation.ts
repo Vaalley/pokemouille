@@ -15,6 +15,7 @@ export type Generation = (typeof generations)[number]["value"];
 const storageKey = "generation";
 
 export function getSavedGeneration(): Generation {
+	if (typeof localStorage === "undefined") return 1;
 	const generation = Number(localStorage.getItem(storageKey));
 
 	if (generations.some((item) => item.value === generation)) {
