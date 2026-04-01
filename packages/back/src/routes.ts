@@ -1,6 +1,7 @@
 import type { Hono } from "hono";
 import { debug } from "./utilities";
 import { getAbilityDetail, getAbilityList } from "./ability";
+import { getItemDetail, getItemList } from "./item";
 import { getMoveDetail, getMoveList } from "./move";
 import { getPokemonDetail, getPokemonList } from "./pokemon";
 
@@ -214,6 +215,71 @@ export function setupRoutes(app: Hono) {
 			return c.json(
 				{
 					error: "Could not load move data",
+				},
+				502,
+			);
+		}
+	});
+
+	app.get("/item/all", async (c) => {
+		const language = c.req.query("language");
+		debug("GET /item/all", {
+			language,
+		});
+
+		if (!language) {
+			return c.json(
+				{
+					error: "language is required",
+				},
+				400,
+			);
+		}
+
+		try {
+			const items = await getItemList(language);
+			return c.json({
+				items,
+			});
+		} catch (err) {
+			debug("Error loading item list:", err);
+			return c.json(
+				{
+					error: "Could not load item list",
+				},
+				502,
+			);
+		}
+	});
+
+	app.get("/item", async (c) => {
+		const params = parseDetailParams(
+			c.req.query("id"),
+			c.req.query("generation"),
+			c.req.query("language"),
+		);
+		debug("GET /item", params);
+
+		if (!params)
+			return c.json(
+				{
+					error: "language, id and generation are required",
+				},
+				400,
+			);
+
+		try {
+			const item = await getItemDetail(params.id, params.language, params.generation);
+			debug("Successfully fetched item:", {
+				id: params.id,
+				name: item.name,
+			});
+			return c.json(item);
+		} catch (err) {
+			debug("Error loading item:", err);
+			return c.json(
+				{
+					error: "Could not load item data",
 				},
 				502,
 			);

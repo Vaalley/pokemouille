@@ -48,6 +48,16 @@
 			}
 			return;
 		}
+
+		if (parts[0] === 'item' && parts.length === 4) {
+			const [, currentLanguage, currentGeneration, itemId] = parts;
+			const hasValidLanguage = languages.some((item) => item.code === currentLanguage);
+			const hasValidId = /^\d+$/.test(itemId);
+			if (hasValidLanguage && hasValidId && Number(currentGeneration) !== generation) {
+				await goto(`/item/${currentLanguage}/${generation}/${itemId}`);
+			}
+			return;
+		}
 	}
 
 	onMount(() => {

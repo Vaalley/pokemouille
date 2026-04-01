@@ -38,6 +38,14 @@
 			}
 			return;
 		}
+
+		if (parts[0] === 'item' && parts.length === 4) {
+			const [, currentLanguage, generation, itemId] = parts;
+			if (currentLanguage !== language) {
+				await goto(`/item/${language}/${generation}/${itemId}`);
+			}
+			return;
+		}
 	}
 
 	onMount(() => {

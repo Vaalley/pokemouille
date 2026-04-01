@@ -10,6 +10,7 @@
 		setPokemonSearchQuery,
 		syncPokemonListToSavedLanguage,
 	} from '$lib/pokemon-search.svelte';
+	import type { ItemListItem } from '$lib/pokemon-search.svelte';
 
 	const filteredPokemon = $derived.by(() => {
 		const query = searchState.query.trim().toLowerCase();
@@ -29,6 +30,12 @@
 		const query = searchState.query.trim().toLowerCase();
 		if (!query) return [];
 		return searchState.moveList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+	});
+
+	const filteredItems = $derived.by(() => {
+		const query = searchState.query.trim().toLowerCase();
+		if (!query) return [];
+		return searchState.itemList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
 	});
 
 	let inputElement = $state<HTMLInputElement | null>(null);
@@ -65,6 +72,10 @@
 
 	function moveHref(id: number) {
 		return `/move/${getSavedLanguage()}/${getSavedGeneration()}/${id}`;
+	}
+
+	function itemHref(id: number) {
+		return `/item/${getSavedLanguage()}/${getSavedGeneration()}/${id}`;
 	}
 
 	$effect(() => {
@@ -222,7 +233,28 @@
 					</div>
 				{/if}
 
-				{#if filteredPokemon.length === 0 && filteredAbilities.length === 0 && filteredMoves.length === 0 && searchState.query.trim() !== ''}
+				{#if filteredItems.length > 0}
+					<div>
+						<p class="mb-1 text-xs font-semibold uppercase text-gray-400">Items</p>
+						<div class="grid grid-cols-2 gap-2">
+							{#each filteredItems as item (item.id)}
+								<a
+									class="flex cursor-pointer items-center gap-2 border px-3 py-2 text-sm hover:bg-gray-100"
+									data-sveltekit-preload-data="hover"
+									href={itemHref(item.id)}
+									onclick={closePokemonSearch}
+								>
+									<span>{item.name}</span>
+									{#if item.pocket}
+										<span class="ml-auto text-xs text-gray-400">{item.pocket}</span>
+									{/if}
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if filteredPokemon.length === 0 && filteredAbilities.length === 0 && filteredMoves.length === 0 && filteredItems.length === 0 && searchState.query.trim() !== ''}
 					<p class="text-sm text-gray-500">No results found.</p>
 				{/if}
 			{/if}

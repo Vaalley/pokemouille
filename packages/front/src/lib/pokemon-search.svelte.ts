@@ -22,12 +22,20 @@ export type MoveListItem = {
 	damageClass: string | null;
 };
 
+export type ItemListItem = {
+	id: number;
+	name: string;
+	sprite: string | null;
+	pocket: string | null;
+};
+
 export const searchState = $state({
 	isOpen: false,
 	query: "",
 	pokemonList: [] as PokemonListItem[],
 	abilityList: [] as AbilityListItem[],
 	moveList: [] as MoveListItem[],
+	itemList: [] as ItemListItem[],
 	isLoading: false,
 	errorMessage: "",
 	listLanguage: "" as Language | "",
@@ -40,7 +48,8 @@ export async function preloadPokemonList(language: Language): Promise<void> {
 		searchState.listLanguage === language &&
 		searchState.pokemonList.length > 0 &&
 		searchState.abilityList.length > 0 &&
-		searchState.moveList.length > 0
+		searchState.moveList.length > 0 &&
+		searchState.itemList.length > 0
 	) {
 		return;
 	}
@@ -51,7 +60,8 @@ export async function preloadPokemonList(language: Language): Promise<void> {
 			searchState.listLanguage === language &&
 			searchState.pokemonList.length > 0 &&
 			searchState.abilityList.length > 0 &&
-			searchState.moveList.length > 0
+			searchState.moveList.length > 0 &&
+			searchState.itemList.length > 0
 		) {
 			return;
 		}
@@ -65,30 +75,35 @@ export async function preloadPokemonList(language: Language): Promise<void> {
 			const searchParams = new URLSearchParams({
 				language,
 			});
-			const [pokemonRes, abilityRes, moveRes] = await Promise.all([
+			const [pokemonRes, abilityRes, moveRes, itemRes] = await Promise.all([
 				fetch(`${apiBaseUrl}/pokemon/all?${searchParams.toString()}`),
 				fetch(`${apiBaseUrl}/ability/all?${searchParams.toString()}`),
 				fetch(`${apiBaseUrl}/move/all?${searchParams.toString()}`),
+				fetch(`${apiBaseUrl}/item/all?${searchParams.toString()}`),
 			]);
 
 			if (!pokemonRes.ok) throw new Error("Failed to load Pokémon list.");
 			if (!abilityRes.ok) throw new Error("Failed to load ability list.");
 			if (!moveRes.ok) throw new Error("Failed to load move list.");
+			if (!itemRes.ok) throw new Error("Failed to load item list.");
 
-			const [pokemonData, abilityData, moveData] = await Promise.all([
+			const [pokemonData, abilityData, moveData, itemData] = await Promise.all([
 				pokemonRes.json(),
 				abilityRes.json(),
 				moveRes.json(),
+				itemRes.json(),
 			]);
 
 			searchState.pokemonList = pokemonData.pokemon || [];
 			searchState.abilityList = abilityData.abilities || [];
 			searchState.moveList = moveData.moves || [];
+			searchState.itemList = itemData.items || [];
 			searchState.listLanguage = language;
 		} catch {
 			searchState.pokemonList = [];
 			searchState.abilityList = [];
 			searchState.moveList = [];
+			searchState.itemList = [];
 			searchState.listLanguage = "";
 			searchState.errorMessage = "Could not load search data.";
 		} finally {
