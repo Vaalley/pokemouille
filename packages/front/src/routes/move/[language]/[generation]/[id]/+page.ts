@@ -34,12 +34,34 @@ export async function load({
 		throw error(502, "Could not load move data");
 	}
 
-	const move = await response.json();
+	let move = await response.json();
+
+	const introducedGen: number | null = move.generationId ?? null;
+
+	if (introducedGen !== null && generation < introducedGen) {
+		const clampedParams = new URLSearchParams({
+			id: params.id,
+			language: params.language,
+			generation: String(introducedGen),
+		});
+		const clampedResponse = await fetch(`${apiBaseUrl}/move?${clampedParams.toString()}`);
+		if (clampedResponse.ok) {
+			move = await clampedResponse.json();
+		}
+		return {
+			id: params.id,
+			language: params.language,
+			generation: introducedGen,
+			requestedGeneration: generation,
+			move,
+		};
+	}
 
 	return {
 		id: params.id,
 		language: params.language,
 		generation,
+		requestedGeneration: null,
 		move,
 	};
 }

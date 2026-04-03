@@ -18,6 +18,7 @@
 		language: string;
 		selectedGeneration: number;
 		name: string;
+		generationId: number | null;
 		accuracy: number | null;
 		power: number | null;
 		pp: number | null;
@@ -49,6 +50,7 @@
 			id: string;
 			language: string;
 			generation: number;
+			requestedGeneration: number | null;
 			move: MoveData;
 		};
 	}>();
@@ -86,6 +88,12 @@
 			<p class="text-sm leading-relaxed text-gray-600">{data.move.flavorText}</p>
 		{/if}
 	</div>
+
+	{#if data.requestedGeneration !== null}
+		<div class="border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+			{data.move.name} was introduced in Gen {data.move.generationId} and is not available in Generation {data.requestedGeneration}. Showing data for Gen {data.generation}.
+		</div>
+	{/if}
 
 	<div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
 		<div class="flex gap-2">

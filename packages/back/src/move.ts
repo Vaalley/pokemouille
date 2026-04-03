@@ -174,7 +174,16 @@ export async function getMoveDetail(id: string, selectedGeneration: number, lang
 	const raw = data.move[0];
 	if (!raw) throw new Error(`Move ${id} not found`);
 
-	const flavorText = normalizeFlavorText(raw.moveflavortexts?.[0]?.flavor_text ?? "");
+	const UNUSABLE_FLAVOR =
+		"This move can't be used. It's recommended that this move is forgotten. Once forgotten, this move can't be remembered.";
+	const usableFlavorTexts = (raw.moveflavortexts ?? []).filter(
+		(ft: any) => normalizeFlavorText(ft.flavor_text ?? "") !== UNUSABLE_FLAVOR,
+	);
+	const flavorTextEntry =
+		usableFlavorTexts.find(
+			(ft: any) => (ft.versiongroup?.generation_id ?? 0) <= selectedGeneration,
+		) ?? usableFlavorTexts[0];
+	const flavorText = normalizeFlavorText(flavorTextEntry?.flavor_text ?? "");
 	const meta = raw.movemeta ?? null;
 
 	const seen = new Set<number>();

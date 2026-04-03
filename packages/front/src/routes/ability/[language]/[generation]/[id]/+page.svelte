@@ -69,6 +69,12 @@
 		{/if}
 	</div>
 
+	{#if data.ability.generationId !== null && data.generation < data.ability.generationId}
+		<div class="border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+			{data.ability.name} was introduced in Gen {data.ability.generationId} and is not available in Generation {data.generation}.
+		</div>
+	{/if}
+
 	{#if data.ability.shortEffect}
 		<div>
 			<h2 class="mb-1 text-lg font-semibold">Effect</h2>
