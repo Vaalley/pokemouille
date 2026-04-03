@@ -178,7 +178,7 @@
 					href={`/pokemon/${getSavedLanguage()}/${getSavedGeneration()}/${p.id}`}
 				>
 					{#if p.sprite}
-						<img alt={p.name} class="h-16 w-16" src={p.sprite} />
+						<img alt={p.name} class="h-16 w-16" loading="lazy" src={p.sprite} />
 					{/if}
 					<span class="text-xs pb-1 capitalize">{p.name}</span>
 				</a>
@@ -197,7 +197,7 @@
 				<th class="border border-gray-200 p-1"></th>
 				{#each ALL_TYPES as def}
 					<th class="border border-gray-200 p-1 {selectedSet.has(def) ? 'bg-gray-200' : ''}">
-					<img alt={def} title={def} class="h-5 w-5 mx-auto" src={iconUrl(def)} />
+					<img alt={def} title={def} class="h-5 w-5 mx-auto" loading="lazy" src={iconUrl(def)} />
 				</th>
 				{/each}
 			</tr>
@@ -207,7 +207,7 @@
 				<tr>
 					<td class="border border-gray-200 p-1 whitespace-nowrap {selectedSet.has(atk) ? 'bg-gray-200' : ''}">
 					<span class="inline-flex items-center gap-1">
-						<img alt={atk} class="h-4 w-4" src={iconUrl(atk)} />
+						<img alt={atk} class="h-4 w-4" loading="lazy" src={iconUrl(atk)} />
 						<span class="font-medium capitalize">{atk}</span>
 					</span>
 				</td>

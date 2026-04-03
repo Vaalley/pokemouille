@@ -66,7 +66,7 @@
 <section class="mx-auto max-w-3xl space-y-8 px-4 py-6">
 	<div class="flex items-center gap-4">
 		{#if data.item.sprite}
-			<img alt={data.item.name} class="h-16 w-16 [image-rendering:pixelated]" src={data.item.sprite} />
+			<img alt={data.item.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={data.item.sprite} />
 		{/if}
 		<div class="space-y-1">
 			<p class="text-sm text-gray-500">Item — Gen {data.generation}</p>
@@ -130,14 +130,14 @@
 								data-sveltekit-preload-data="hover"
 								href={pokemonHref(p.speciesId)}
 							>
-								{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" src={p.sprite} />{/if}
-								<span class="mt-1 font-medium">{p.name}</span>
-								{#if p.rarity != null}<span class="text-xs text-gray-400">{p.rarity}% chance</span>{/if}
-								{#if p.version}<span class="text-xs text-gray-400">{p.version}</span>{/if}
-							</a>
-						{:else}
-							<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm">
-								{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" src={p.sprite} />{/if}
+							{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={p.sprite} />{/if}
+							<span class="mt-1 font-medium">{p.name}</span>
+							{#if p.rarity != null}<span class="text-xs text-gray-400">{p.rarity}% chance</span>{/if}
+							{#if p.version}<span class="text-xs text-gray-400">{p.version}</span>{/if}
+						</a>
+					{:else}
+						<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm">
+							{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={p.sprite} />{/if}
 								<span class="mt-1 font-medium">{p.name}</span>
 								{#if p.rarity != null}<span class="text-xs text-gray-400">{p.rarity}% chance</span>{/if}
 								{#if p.version}<span class="text-xs text-gray-400">{p.version}</span>{/if}

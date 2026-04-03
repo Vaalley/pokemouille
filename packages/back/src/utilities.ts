@@ -34,10 +34,6 @@ export function getCachedValue<T>(key: string): T | null {
 }
 
 export function setCachedValue(key: string, value: unknown, ttlMs: number): void {
-	if (cache.has(key)) {
-		cache.delete(key);
-	}
-
 	cache.set(key, {
 		expiresAt: Date.now() + ttlMs,
 		value,
@@ -77,6 +73,7 @@ export async function queryGraphql<T>(
 			query,
 			variables,
 		}),
+		signal: AbortSignal.timeout(10_000),
 	});
 
 	if (!response.ok) {

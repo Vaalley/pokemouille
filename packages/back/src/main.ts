@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { debug, MAX_CACHE_SIZE, POKEAPI_GRAPHQL_URL } from "./utilities";
 import { setupRoutes } from "./routes";
@@ -12,6 +13,7 @@ function main() {
 	});
 
 	app.use("*", cors({ origin: Bun.env.FRONTEND_ORIGIN || "http://localhost:5173" }));
+	app.use("*", compress());
 
 	setupRoutes(app);
 

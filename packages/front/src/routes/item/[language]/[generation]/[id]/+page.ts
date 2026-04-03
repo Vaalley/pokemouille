@@ -1,8 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { languages } from "$lib/language";
 import { generations } from "$lib/generation";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { apiBaseUrl } from "$lib/api";
 
 export async function load({
 	params,

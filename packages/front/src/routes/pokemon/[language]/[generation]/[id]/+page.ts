@@ -1,8 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { generations } from "$lib/generation";
 import { languages } from "$lib/language";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { apiBaseUrl } from "$lib/api";
 
 export async function load({
 	params,
@@ -31,10 +30,36 @@ export async function load({
 		throw error(502, "Could not load Pokémon data");
 	}
 
-	const pokemon = await response.json();
+	let pokemon = await response.json();
+
+	const gameIndices: { generationId: number | null }[] = pokemon.gameIndices ?? [];
+	const availableGens = gameIndices
+		.map((gi) => gi.generationId)
+		.filter((g): g is number => g !== null);
+	const maxAvailableGen = availableGens.length > 0 ? Math.max(...availableGens) : null;
+
+	if (maxAvailableGen !== null && generation > maxAvailableGen) {
+		const clampedParams = new URLSearchParams({
+			generation: String(maxAvailableGen),
+			id: params.id,
+			language: params.language,
+		});
+		const clampedResponse = await fetch(`${apiBaseUrl}/pokemon?${clampedParams.toString()}`);
+		if (clampedResponse.ok) {
+			pokemon = await clampedResponse.json();
+		}
+		return {
+			generation: maxAvailableGen,
+			requestedGeneration: generation,
+			id: params.id,
+			language: params.language,
+			pokemon,
+		};
+	}
 
 	return {
 		generation,
+		requestedGeneration: null,
 		id: params.id,
 		language: params.language,
 		pokemon,

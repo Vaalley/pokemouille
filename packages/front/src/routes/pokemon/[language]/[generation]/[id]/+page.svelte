@@ -8,6 +8,7 @@
 	let { data } = $props<{
 		data: {
 			generation: number;
+			requestedGeneration: number | null;
 			id: string;
 			language: string;
 			pokemon: {
@@ -64,16 +65,46 @@
 				abilities: { id: number; name: string; isHidden: boolean }[];
 				stats: { base_stat: number; effort: number; stat: { name: string } }[];
 				moves: { move: { id: number; name: string }; learnMethods: { name: string; level: number }[] }[];
+				gameIndices: { generationId: number | null; versionName: string }[];
+				dexNumbers: { number: number; dexName: string }[];
 			};
 		};
 	}>();
 
-	function getPokemonImageUrl(selectedPokemonId: string): string {
-		return `https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/${selectedPokemonId}.png`;
+	let showShiny = $state(false);
+
+	function getPokemonImageUrl(selectedPokemonId: string, shiny: boolean): string {
+		const base = 'https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon';
+		return shiny 
+			? `${base}/shiny/${selectedPokemonId}.png`
+			: `${base}/${selectedPokemonId}.png`;
+	}
+
+	function getOfficialArtworkUrl(selectedPokemonId: string, shiny: boolean): string {
+		const base = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other';
+		return shiny
+			? `${base}/official-artwork/shiny/${selectedPokemonId}.png`
+			: `${base}/official-artwork/${selectedPokemonId}.png`;
 	}
 
 	const mainStatMap = $derived(
 		new Map(data.pokemon.stats.map((s: { base_stat: number; effort: number; stat: { name: string } }) => [s.stat.name, s.base_stat])),
+	);
+
+	const gamesByGen = $derived(
+		data.pokemon.gameIndices.reduce((acc: Record<number, string[]>, gi: { generationId: number | null; versionName: string }) => {
+			if (gi.generationId === null || !gi.versionName) return acc;
+			acc[gi.generationId] ??= [];
+			acc[gi.generationId].push(gi.versionName);
+			return acc;
+		}, {}),
+	);
+
+	const sortedMoves = $derived(
+		data.pokemon.moves.toSorted(
+			(a: { learnMethods: { level: number }[] }, b: { learnMethods: { level: number }[] }) =>
+				(a.learnMethods[0]?.level ?? 0) - (b.learnMethods[0]?.level ?? 0),
+		),
 	);
 
 	$effect(() => {
@@ -88,6 +119,7 @@
 
 <svelte:head>
 	<title>{data.pokemon.name ? `${data.pokemon.name} | Pokemouille` : 'Pokemouille'}</title>
+	<link rel="preload" as="image" href={getOfficialArtworkUrl(data.id, showShiny)} />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl space-y-8 px-4 py-6">
@@ -97,16 +129,19 @@
 			<img
 				alt="{data.pokemon.name} artwork"
 				class="h-40 w-40"
-				src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{data.id}.png"
+				src={getOfficialArtworkUrl(data.id, showShiny)}
 			/>
 			<div class="flex gap-2">
 				{#if data.pokemon.spriteDefault}
-					<img alt="{data.pokemon.name} default" class="h-16 w-16 [image-rendering:pixelated]" src={data.pokemon.spriteDefault} />
-				{/if}
-				{#if data.pokemon.spriteShiny}
-					<img alt="{data.pokemon.name} shiny" class="h-16 w-16 [image-rendering:pixelated]" src={data.pokemon.spriteShiny} />
+					<img alt="{data.pokemon.name} default" class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={showShiny ? data.pokemon.spriteShiny || data.pokemon.spriteDefault : data.pokemon.spriteDefault} />
 				{/if}
 			</div>
+			<label class="flex items-center gap-2 cursor-pointer mt-1">
+				<input type="checkbox" bind:checked={showShiny} class="sr-only peer" />
+				<span class="text-xs peer-checked:text-yellow-600 font-medium">Shiny</span>
+				<div class="w-8 h-4 bg-gray-200 rounded-full peer peer-checked:bg-yellow-400 peer-checked:after:translate-x-4 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative">
+				</div>
+			</label>
 		</div>
 		<div class="space-y-1">
 			<div class="flex gap-2 text-sm">
@@ -121,40 +156,7 @@
 		</div>
 	</div>
 
-	<div>
-		<h2 class="mb-3 text-xl font-semibold">Info</h2>
-		<dl class="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
-			<div class="flex gap-1"><dt class="font-medium">Height</dt><dd>{data.pokemon.height != null ? `${data.pokemon.height / 10} m` : '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Weight</dt><dd>{data.pokemon.weight != null ? `${data.pokemon.weight / 10} kg` : '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Base EXP</dt><dd>{data.pokemon.baseExperience ?? '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Color</dt><dd>{data.pokemon.color ?? '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Shape</dt><dd>{data.pokemon.shape ?? '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Habitat</dt><dd>{data.pokemon.habitat ?? '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Capture Rate</dt><dd>{data.pokemon.captureRate}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Base Happiness</dt><dd>{data.pokemon.baseHappiness}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Growth Rate</dt><dd>{data.pokemon.growthRate ?? '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Egg Groups</dt><dd>{data.pokemon.eggGroups.join(', ') || '—'}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Hatch Counter</dt><dd>{data.pokemon.hatchCounter}</dd></div>
-			<div class="flex gap-1"><dt class="font-medium">Gender Rate</dt><dd>{data.pokemon.genderRate === -1 ? 'Genderless' : `${data.pokemon.genderRate * 12.5}% female`}</dd></div>
-		</dl>
-	</div>
-
-	{#if data.pokemon.abilities.length > 0}
-		<div>
-			<h2 class="mb-3 text-xl font-semibold">Abilities</h2>
-			<ul class="flex flex-wrap gap-2">
-				{#each data.pokemon.abilities as ability}
-					<li>
-						<a href="/ability/{data.language}/{data.generation}/{ability.id}" class="border-2 px-3 py-1 text-sm hover:bg-gray-50">
-							{ability.name}{ability.isHidden ? ' (hidden)' : ''}
-						</a>
-					</li>
-				{/each}
-			</ul>
-		</div>
-	{/if}
-
-	{#if data.pokemon.evolutionChain.length > 0}
+		{#if data.pokemon.evolutionChain.length > 0}
 		<div>
 			<h2 class="mb-3 text-xl font-semibold">Evolution Chain</h2>
 			<div class="flex flex-wrap items-center gap-2">
@@ -177,13 +179,92 @@
 						<span class="text-gray-400">→</span>
 					{/if}
 					<a href="/pokemon/{data.language}/{data.pokemon.selectedGeneration}/{evo.id}" class="flex flex-col items-center border-2 px-3 py-2 text-sm hover:bg-gray-50 text-center">
-						<img alt={evo.name} class="h-16 w-16 [image-rendering:pixelated]" src={getPokemonImageUrl(String(evo.id))} />
+						<img alt={evo.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={getPokemonImageUrl(String(evo.id), showShiny)} />
 						<span>{evo.name}</span>
 					</a>
 				{/each}
 			</div>
 		</div>
 	{/if}
+
+	<div>
+		<h2 class="mb-3 text-xl font-semibold">Info</h2>
+		<dl class="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
+			<div class="flex gap-1"><dt class="font-medium">Height</dt><dd>{data.pokemon.height != null ? `${data.pokemon.height / 10} m` : '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Weight</dt><dd>{data.pokemon.weight != null ? `${data.pokemon.weight / 10} kg` : '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Base EXP</dt><dd>{data.pokemon.baseExperience ?? '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Color</dt><dd>{data.pokemon.color ?? '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Shape</dt><dd>{data.pokemon.shape ?? '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Habitat</dt><dd>{data.pokemon.habitat ?? '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Capture Rate</dt><dd>{data.pokemon.captureRate}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Base Happiness</dt><dd>{data.pokemon.baseHappiness}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Growth Rate</dt><dd>{data.pokemon.growthRate ?? '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Egg Groups</dt><dd>{data.pokemon.eggGroups.join(', ') || '—'}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Hatch Counter</dt><dd>{data.pokemon.hatchCounter}</dd></div>
+			<div class="flex gap-1"><dt class="font-medium">Gender Rate</dt><dd>{data.pokemon.genderRate === -1 ? 'Genderless' : `${data.pokemon.genderRate * 12.5}% female`}</dd></div>
+		</dl>
+	</div>
+
+	{#if data.generation < data.pokemon.introducedGeneration}
+		<div class="border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+			{data.pokemon.name} was introduced in Gen {data.pokemon.introducedGeneration} and is not available in Generation {data.generation}.
+		</div>
+	{:else if data.requestedGeneration !== null}
+		<div class="border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+			{data.pokemon.name} is not available in Generation {data.requestedGeneration}. Showing data for Gen {data.generation} (last available).
+		</div>
+	{/if}
+
+	{#if data.pokemon.gameIndices.length > 0}
+		<div>
+			<h2 class="mb-3 text-xl font-semibold">Game Availability</h2>
+			<dl class="space-y-2 text-sm">
+				{#each (Object.entries(gamesByGen) as [string, string[]][]).sort(([a], [b]) => Number(a) - Number(b)) as [genId, versions]}
+					<div class="flex flex-wrap items-baseline gap-2">
+						<dt class="shrink-0 font-medium">Gen {genId}</dt>
+						<dd class="flex flex-wrap gap-1">
+							{#each versions as version}
+								<span class="border px-2 py-0.5 text-xs">{version}</span>
+							{/each}
+						</dd>
+					</div>
+				{/each}
+			</dl>
+		</div>
+	{/if}
+
+	{#if data.pokemon.dexNumbers.length > 0}
+		<div>
+			<h2 class="mb-3 text-xl font-semibold">Pokédex Numbers</h2>
+			<ul class="flex flex-wrap gap-2 text-sm">
+				{#each data.pokemon.dexNumbers as entry}
+					{#if entry.dexName}
+						<li class="border-2 px-3 py-1">
+							<span class="font-medium">#{entry.number}</span>
+							<span class="ml-1 text-xs text-gray-500">{entry.dexName}</span>
+						</li>
+					{/if}
+				{/each}
+			</ul>
+		</div>
+	{/if}
+
+	{#if data.pokemon.abilities.length > 0}
+		<div>
+			<h2 class="mb-3 text-xl font-semibold">Abilities</h2>
+			<ul class="flex flex-wrap gap-2">
+				{#each data.pokemon.abilities as ability}
+					<li>
+						<a href="/ability/{data.language}/{data.generation}/{ability.id}" class="border-2 px-3 py-1 text-sm hover:bg-gray-50">
+							{ability.name}{ability.isHidden ? ' (hidden)' : ''}
+						</a>
+					</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
+
+
 
 	{#if data.pokemon.alternateForms.length > 0}
 		<div>
@@ -193,7 +274,7 @@
 				<div class="border-2 p-3 text-sm">
 					<div class="flex items-start gap-3">
 						{#if form.spriteDefault}
-							<img alt={form.name} class="h-16 w-16 shrink-0 [image-rendering:pixelated]" src={form.spriteDefault} />
+							<img alt={form.name} class="h-16 w-16 shrink-0 [image-rendering:pixelated]" loading="lazy" src={form.spriteDefault} />
 						{/if}
 						<div class="space-y-1">
 							<p class="font-medium">{form.name}</p>
@@ -250,7 +331,7 @@
 		<div>
 			<h2 class="mb-3 text-xl font-semibold">Moves <span class="text-base font-normal text-gray-500">(Gen {data.pokemon.selectedGeneration})</span></h2>
 			<ul class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-3">
-				{#each data.pokemon.moves.toSorted((a: { learnMethods: { level: number }[] }, b: { learnMethods: { level: number }[] }) => a.learnMethods[0].level - b.learnMethods[0].level) as move}
+				{#each sortedMoves as move}
 				<li class="flex gap-1 border-2 p-2">
 					<a href="/move/{data.language}/{data.generation}/{move.move.id}" class="font-medium hover:underline">{move.move.name}</a>
 					<span class="text-gray-400 text-xs self-center">— {move.learnMethods.map((lm: { name: string; level: number }) => lm.name + (lm.level > 0 ? ` lv.${lm.level}` : '')).join(' or ')}</span>

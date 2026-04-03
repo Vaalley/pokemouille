@@ -86,15 +86,15 @@
 							data-sveltekit-preload-data="hover"
 							href={pokemonHref(p.speciesId)}
 						>
-							{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" src={p.sprite} />{/if}
-							<span class="mt-2 font-medium">{p.name}</span>
-							<div class="mt-2 flex flex-wrap justify-center gap-1">
-								{#each p.types as type}<TypeBadge slug={type.slug} name={type.name} />{/each}
-							</div>
-						</a>
-					{:else}
-						<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm">
-							{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" src={p.sprite} />{/if}
+						{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={p.sprite} />{/if}
+						<span class="mt-2 font-medium">{p.name}</span>
+						<div class="mt-2 flex flex-wrap justify-center gap-1">
+							{#each p.types as type}<TypeBadge slug={type.slug} name={type.name} />{/each}
+						</div>
+					</a>
+				{:else}
+					<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm">
+						{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={p.sprite} />{/if}
 							<span class="mt-2 font-medium">{p.name}</span>
 						</div>
 					{/if}
@@ -138,13 +138,13 @@
 								data-sveltekit-preload-data="hover"
 								href={pokemonHref(p.speciesId)}
 							>
-								{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated] grayscale" src={p.sprite} />{/if}
-								<span class="mt-2 font-medium">{p.name}</span>
-								{#if p.lostAtGenerationId}<span class="text-xs text-gray-400">Until Gen {p.lostAtGenerationId}</span>{/if}
-							</a>
-						{:else}
-							<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm opacity-70">
-								{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated] grayscale" src={p.sprite} />{/if}
+							{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated] grayscale" loading="lazy" src={p.sprite} />{/if}
+							<span class="mt-2 font-medium">{p.name}</span>
+							{#if p.lostAtGenerationId}<span class="text-xs text-gray-400">Until Gen {p.lostAtGenerationId}</span>{/if}
+						</a>
+					{:else}
+						<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm opacity-70">
+							{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated] grayscale" loading="lazy" src={p.sprite} />{/if}
 								<span class="mt-2 font-medium">{p.name}</span>
 								{#if p.lostAtGenerationId}<span class="text-xs text-gray-400">Until Gen {p.lostAtGenerationId}</span>{/if}
 							</div>

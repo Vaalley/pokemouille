@@ -1,10 +1,10 @@
 import { getSavedLanguage, type Language } from "$lib/language";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { apiBaseUrl } from "$lib/api";
 
 export type PokemonListItem = {
 	id: number;
 	name: string;
+	nameLower: string;
 	types: string[];
 	sprite: string | null;
 };
@@ -12,12 +12,14 @@ export type PokemonListItem = {
 export type AbilityListItem = {
 	id: number;
 	name: string;
+	nameLower: string;
 	shortEffect: string | null;
 };
 
 export type MoveListItem = {
 	id: number;
 	name: string;
+	nameLower: string;
 	typeSlug: string | null;
 	damageClass: string | null;
 };
@@ -25,6 +27,7 @@ export type MoveListItem = {
 export type ItemListItem = {
 	id: number;
 	name: string;
+	nameLower: string;
 	sprite: string | null;
 	pocket: string | null;
 };
@@ -94,10 +97,22 @@ export async function preloadPokemonList(language: Language): Promise<void> {
 				itemRes.json(),
 			]);
 
-			searchState.pokemonList = pokemonData.pokemon || [];
-			searchState.abilityList = abilityData.abilities || [];
-			searchState.moveList = moveData.moves || [];
-			searchState.itemList = itemData.items || [];
+			searchState.pokemonList = (pokemonData.pokemon || []).map((p: PokemonListItem) => ({
+				...p,
+				nameLower: p.name.toLowerCase(),
+			}));
+			searchState.abilityList = (abilityData.abilities || []).map((a: AbilityListItem) => ({
+				...a,
+				nameLower: a.name.toLowerCase(),
+			}));
+			searchState.moveList = (moveData.moves || []).map((m: MoveListItem) => ({
+				...m,
+				nameLower: m.name.toLowerCase(),
+			}));
+			searchState.itemList = (itemData.items || []).map((i: ItemListItem) => ({
+				...i,
+				nameLower: i.name.toLowerCase(),
+			}));
 			searchState.listLanguage = language;
 		} catch {
 			searchState.pokemonList = [];

@@ -1,8 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { generations } from "$lib/generation";
 import { languages } from "$lib/language";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { apiBaseUrl } from "$lib/api";
 
 export async function load({
 	params,
@@ -12,8 +11,9 @@ export async function load({
 	fetch: typeof globalThis.fetch;
 }) {
 	const hasSupportedLanguage = languages.some((item) => item.code === params.language);
-	const generation = Number(params.generation);
-	const hasSupportedGeneration = generations.some((item) => item.value === generation);
+	const isAll = params.generation === "all";
+	const generation = isAll ? null : Number(params.generation);
+	const hasSupportedGeneration = isAll || generations.some((item) => item.value === generation);
 
 	if (!hasSupportedLanguage || !hasSupportedGeneration) {
 		throw error(404, "Not found");

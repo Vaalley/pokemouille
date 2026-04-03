@@ -2,6 +2,8 @@
 	import ThemeSelector from './ThemeSelector.svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
 	import GenerationSelector from './GenerationSelector.svelte';
+	import { getSavedLanguage } from '$lib/language';
+	import { getSavedGeneration } from '$lib/generation';
 </script>
 
 <nav class="flex gap-4 items-center p-4 border-b-2 w-full">
@@ -11,5 +13,6 @@
 	<ThemeSelector />
 	<LanguageSelector />
 	<GenerationSelector />
+	<a class="border-2 px-3 py-1 hover:bg-gray-50" href="/pokemon/{getSavedLanguage()}/all">Pokédex</a>
 	<a class="border-2 px-3 py-1 hover:bg-gray-50" href="/types">Types</a>
 </nav>

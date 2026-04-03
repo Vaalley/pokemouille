@@ -16,26 +16,26 @@
 		const query = searchState.query.trim().toLowerCase();
 		if (!query) return searchState.pokemonList.slice(0, 60);
 		return searchState.pokemonList
-			.filter((item) => String(item.id).includes(query) || item.name.toLowerCase().includes(query))
+			.filter((item) => String(item.id).includes(query) || item.nameLower.includes(query))
 			.slice(0, 60);
 	});
 
 	const filteredAbilities = $derived.by(() => {
 		const query = searchState.query.trim().toLowerCase();
 		if (!query) return [];
-		return searchState.abilityList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+		return searchState.abilityList.filter((item) => item.nameLower.includes(query)).slice(0, 20);
 	});
 
 	const filteredMoves = $derived.by(() => {
 		const query = searchState.query.trim().toLowerCase();
 		if (!query) return [];
-		return searchState.moveList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+		return searchState.moveList.filter((item) => item.nameLower.includes(query)).slice(0, 20);
 	});
 
 	const filteredItems = $derived.by(() => {
 		const query = searchState.query.trim().toLowerCase();
 		if (!query) return [];
-		return searchState.itemList.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 20);
+		return searchState.itemList.filter((item) => item.nameLower.includes(query)).slice(0, 20);
 	});
 
 	let inputElement = $state<HTMLInputElement | null>(null);
@@ -172,7 +172,7 @@
 									onclick={closePokemonSearch}
 								>
 									{#if item.sprite}
-										<img alt={item.name} class="h-12 w-12" src={item.sprite} />
+										<img alt={item.name} class="h-12 w-12" loading="lazy" src={item.sprite} />
 									{/if}
 									<div class="flex flex-col items-start gap-1">
 										<span>{item.name}</span>

@@ -155,16 +155,16 @@
 										data-sveltekit-preload-data="hover"
 										href={pokemonHref(p.speciesId)}
 									>
-										{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" src={p.sprite} />{/if}
-										<span class="mt-1 font-medium">{p.name}</span>
-										{#if p.level > 0}<span class="text-xs text-gray-400">Lv. {p.level}</span>{/if}
-										<div class="mt-1 flex flex-wrap justify-center gap-1">
-											{#each p.types as type}<TypeBadge slug={type.slug} name={type.name} />{/each}
-										</div>
-									</a>
-								{:else}
-									<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm">
-										{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" src={p.sprite} />{/if}
+									{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={p.sprite} />{/if}
+									<span class="mt-1 font-medium">{p.name}</span>
+									{#if p.level > 0}<span class="text-xs text-gray-400">Lv. {p.level}</span>{/if}
+									<div class="mt-1 flex flex-wrap justify-center gap-1">
+										{#each p.types as type}<TypeBadge slug={type.slug} name={type.name} />{/each}
+									</div>
+								</a>
+							{:else}
+								<div class="flex w-full flex-col items-center border-2 p-2 text-center text-sm">
+									{#if p.sprite}<img alt={p.name} class="h-16 w-16 [image-rendering:pixelated]" loading="lazy" src={p.sprite} />{/if}
 										<span class="mt-1 font-medium">{p.name}</span>
 										{#if p.level > 0}<span class="text-xs text-gray-400">Lv. {p.level}</span>{/if}
 									</div>

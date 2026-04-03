@@ -5,6 +5,9 @@ import { getItemDetail, getItemList } from "./item";
 import { getMoveDetail, getMoveList } from "./move";
 import { getPokemonDetail, getPokemonList } from "./pokemon";
 
+const LIST_CACHE_CONTROL = "public, max-age=300, stale-while-revalidate=600";
+const DETAIL_CACHE_CONTROL = "public, max-age=120, stale-while-revalidate=300";
+
 function parseDetailParams(
 	id: string | undefined,
 	generation: string | undefined,
@@ -43,6 +46,7 @@ export function setupRoutes(app: Hono) {
 
 		try {
 			const pokemon = await getPokemonList(language);
+			c.header("Cache-Control", LIST_CACHE_CONTROL);
 			return c.json({
 				pokemon,
 			});
@@ -79,6 +83,7 @@ export function setupRoutes(app: Hono) {
 				id: params.id,
 				name: pokemon.name,
 			});
+			c.header("Cache-Control", DETAIL_CACHE_CONTROL);
 			return c.json(pokemon);
 		} catch (error) {
 			debug("Error loading Pokemon data:", error);
@@ -108,6 +113,7 @@ export function setupRoutes(app: Hono) {
 
 		try {
 			const abilities = await getAbilityList(language);
+			c.header("Cache-Control", LIST_CACHE_CONTROL);
 			return c.json({
 				abilities,
 			});
@@ -144,6 +150,7 @@ export function setupRoutes(app: Hono) {
 				id: params.id,
 				name: ability.name,
 			});
+			c.header("Cache-Control", DETAIL_CACHE_CONTROL);
 			return c.json(ability);
 		} catch (err) {
 			debug("Error loading ability:", err);
@@ -173,6 +180,7 @@ export function setupRoutes(app: Hono) {
 
 		try {
 			const moves = await getMoveList(language);
+			c.header("Cache-Control", LIST_CACHE_CONTROL);
 			return c.json({
 				moves,
 			});
@@ -209,6 +217,7 @@ export function setupRoutes(app: Hono) {
 				id: params.id,
 				name: move.name,
 			});
+			c.header("Cache-Control", DETAIL_CACHE_CONTROL);
 			return c.json(move);
 		} catch (err) {
 			debug("Error loading move:", err);
@@ -238,6 +247,7 @@ export function setupRoutes(app: Hono) {
 
 		try {
 			const items = await getItemList(language);
+			c.header("Cache-Control", LIST_CACHE_CONTROL);
 			return c.json({
 				items,
 			});
@@ -274,6 +284,7 @@ export function setupRoutes(app: Hono) {
 				id: params.id,
 				name: item.name,
 			});
+			c.header("Cache-Control", DETAIL_CACHE_CONTROL);
 			return c.json(item);
 		} catch (err) {
 			debug("Error loading item:", err);

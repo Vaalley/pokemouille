@@ -25,6 +25,12 @@
 
 		const parts = window.location.pathname.split('/').filter(Boolean);
 
+		if (parts[0] === 'pokemon' && parts.length === 3) {
+			const [, currentLanguage] = parts;
+			await goto(`/pokemon/${currentLanguage}/${generation}`);
+			return;
+		}
+
 		if (parts[0] === 'pokemon' && parts.length === 4) {
 			const [, currentLanguage, currentGeneration, pokemonId] = parts;
 			if (Number(currentGeneration) !== generation) {

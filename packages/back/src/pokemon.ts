@@ -96,6 +96,14 @@ const POKEMON_DETAIL_QUERY = `
 					}
 				}
 			}
+			pokemondexnumbers {
+				pokedex_number
+				pokedex {
+					pokedexnames(where: { language: { name: { _eq: $language } } }) {
+						name
+					}
+				}
+			}
 			pokemons {
 				is_default
 				name
@@ -128,6 +136,16 @@ const POKEMON_DETAIL_QUERY = `
 					stat {
 						statnames(where: { language: { name: { _eq: $language } } }) {
 							name
+						}
+					}
+				}
+				pokemongameindices {
+					version {
+						versionnames(where: { language: { name: { _eq: $language } } }) {
+							name
+						}
+						versiongroup {
+							generation_id
 						}
 					}
 				}
@@ -298,6 +316,14 @@ export async function getPokemonDetail(id: string, selectedGeneration: number, l
 		types: mapTypes(primaryForm?.pokemontypes ?? []),
 		abilities: mapAbilities(primaryForm?.pokemonabilities ?? []),
 		stats: mapStats(primaryForm?.pokemonstats ?? []),
+		gameIndices: (primaryForm?.pokemongameindices ?? []).map((gi: any) => ({
+			generationId: gi.version?.versiongroup?.generation_id ?? null,
+			versionName: gi.version?.versionnames?.[0]?.name ?? gi.version?.name ?? "",
+		})),
+		dexNumbers: (species?.pokemondexnumbers ?? []).map((dn: any) => ({
+			number: dn.pokedex_number,
+			dexName: dn.pokedex?.pokedexnames?.[0]?.name ?? "",
+		})),
 		moves: (() => {
 			const byMoveId = new Map<
 				number,
