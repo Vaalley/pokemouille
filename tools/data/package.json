@@ -1,0 +1,26 @@
+{
+  "name": "@pokemouille/data-tools",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "refresh": "node src/cli.ts refresh",
+    "status": "node src/cli.ts status",
+    "publish": "node src/cli.ts publish",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "build": "tsc --project tsconfig.json",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "proper-lockfile": "^4.1.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^7.4.6",
+    "@graphql-codegen/typescript-operations": "^6.1.10",
+    "@types/node": "catalog:",
+    "@types/proper-lockfile": "^4.1.4",
+    "graphql": "^17.0.2",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

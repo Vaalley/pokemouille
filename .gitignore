@@ -34,3 +34,8 @@ dist-ssr
 !.vscode/
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Local ingestion state and generated static datasets
+.data/
+apps/website/static/data/
+tools/data/graphql/schema.json

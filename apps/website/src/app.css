@@ -1,0 +1,264 @@
+/* Layout and functional Bits UI data-* rules only: no visual theme or palette yet. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+header,
+main,
+noscript p {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+main {
+  padding-block: 1rem 3rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+}
+
+main:focus {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100vh;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+}
+
+.site-name {
+  font-weight: bold;
+}
+
+.site-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.inline-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-selector p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.species-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.25rem 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.species-number {
+  font-variant-numeric: tabular-nums;
+}
+
+.search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* 44px touch target (WCAG 2.5.5); this is the only search entry point on touch devices. */
+  min-height: 2.75rem;
+}
+
+.search-dialog {
+  width: min(40rem, 100% - 2rem);
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+}
+
+.search-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: calc(100dvh - 2rem);
+  padding: 1rem;
+}
+
+.search-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.search-dialog h2,
+.search-dialog p {
+  margin: 0;
+}
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.search-results {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+/* Bits UI ships unstyled: functional layering, scrolling, and active-item indicators. */
+[data-dialog-overlay] {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(0 0 0 / 0.25);
+}
+
+[data-dialog-content] {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  z-index: 50;
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  transform: translateX(-50%);
+  background: Canvas;
+  color: CanvasText;
+  border: 1px solid;
+}
+
+[data-select-trigger],
+[data-collapsible-trigger],
+[data-tabs-trigger] {
+  font: inherit;
+}
+
+[data-select-content] {
+  z-index: 60;
+  max-height: min(24rem, calc(100dvh - 4rem));
+  overflow-y: auto;
+  padding: 0.25rem;
+  background: Canvas;
+  color: CanvasText;
+  border: 1px solid;
+}
+
+[data-select-group-label] {
+  padding: 0.25rem 0.5rem;
+  font-weight: bold;
+}
+
+[data-select-item] {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+[data-select-item][data-selected]::after {
+  content: " ✓";
+}
+
+[data-command-item] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Comboboxes keep DOM focus on the trigger/input; highlighted options need an indicator. */
+[data-select-item][data-highlighted],
+[data-command-item][data-selected] {
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+[data-tabs-list] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-end: 0.75rem;
+}
+
+[data-tabs-trigger][data-state="active"] {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+[data-meter-root] {
+  display: inline-block;
+  width: 6rem;
+  height: 0.75rem;
+  vertical-align: middle;
+  border: 1px solid;
+}
+
+.meter-fill {
+  display: block;
+  height: 100%;
+  background: currentColor;
+}
+
+@media (max-width: 40rem) {
+  .site-header,
+  .site-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}

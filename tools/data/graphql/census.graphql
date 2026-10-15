@@ -1,0 +1,291 @@
+query CensusBefore {
+  ...SourceCensus
+}
+query CensusAfter {
+  ...SourceCensus
+}
+
+fragment SourceCensus on query_root {
+  species: pokemonspecies_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  pokemon: pokemon_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  forms: pokemonform_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  learnsets: pokemonmove_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  evolutions: pokemonevolution_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  names: pokemonspeciesname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  flavorTexts: pokemonspeciesflavortext_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  types: pokemontype_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  typeHistory: pokemontypepast_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  stats: pokemonstat_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  statHistory: pokemonstatpast_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  abilities: pokemonability_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  abilityHistory: pokemonabilitypast_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  sprites: pokemonsprites_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  formNames: pokemonformname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  generations: generation_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  versionGroups: versiongroup_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  versions: version_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  referenceTypes: type_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  referenceStats: stat_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  referenceAbilities: ability_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  moves: move_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  learnMethods: movelearnmethod_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  items: item_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  evolutionTriggers: evolutiontrigger_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  abilityFlavorTexts: abilityflavortext_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  abilityEffects: abilityeffecttext_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  typeNames: typename_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  statNames: statname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  abilityNames: abilityname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  moveNames: movename_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  learnMethodNames: movelearnmethodname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  itemNames: itemname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  evolutionTriggerNames: evolutiontriggername_aggregate(
+    where: { language_id: { _in: [1, 5, 9, 11] } }
+  ) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  versionNames: versionname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+}

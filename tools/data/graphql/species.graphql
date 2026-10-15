@@ -1,0 +1,229 @@
+query SpeciesPage($after: Int!, $limit: Int!) {
+  species: pokemonspecies(where: { id: { _gt: $after } }, order_by: { id: asc }, limit: $limit) {
+    id
+    identifier: name
+    generationId: generation_id
+    evolvesFromSpeciesId: evolves_from_species_id
+    evolutionChainId: evolution_chain_id
+    genderRate: gender_rate
+    captureRate: capture_rate
+    baseHappiness: base_happiness
+    isBaby: is_baby
+    isLegendary: is_legendary
+    isMythical: is_mythical
+    hatch_counter
+    growth_rate_id
+    pokemon_color_id
+    pokemon_shape_id
+    pokemon_habitat_id
+    order
+    forms_switchable
+    has_gender_differences
+    names: pokemonspeciesnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+      genus
+    }
+    namesCount: pokemonspeciesnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+    flavorTexts: pokemonspeciesflavortexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 1000
+    ) {
+      languageId: language_id
+      versionId: version_id
+      text: flavor_text
+    }
+    flavorTextsCount: pokemonspeciesflavortexts_aggregate(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    evolutions: pokemonevolutions(order_by: { id: asc }, limit: 128) {
+      id
+      evolvedSpeciesId: evolved_species_id
+      versionGroupId: version_group_id
+      isDefault: is_default
+      triggerId: evolution_trigger_id
+      condition_expression
+      evolution_item_id
+      evolved_pokemon_form_id
+      gender_id
+      held_item_id
+      known_move_id
+      known_move_type_id
+      location_id
+      min_affection
+      min_beauty
+      min_damage_taken
+      min_happiness
+      min_level
+      min_move_count
+      min_steps
+      nature_bitmask
+      near_special_rock
+      needs_multiplayer
+      needs_overworld_rain
+      party_species_id
+      party_type_id
+      percentage_chance
+      region_id
+      relative_physical_stats
+      required_pokemon_form_id
+      time_of_day
+      trade_species_id
+      turn_upside_down
+      used_move_id
+    }
+    evolutionsCount: pokemonevolutions_aggregate {
+      aggregate {
+        count
+      }
+    }
+    varieties: pokemons(order_by: { id: asc }, limit: 128) {
+      id
+      identifier: name
+      isDefault: is_default
+      height
+      weight
+      baseExperience: base_experience
+      order
+      speciesId: pokemon_species_id
+      types: pokemontypes(order_by: { slot: asc }, limit: 8) {
+        slot
+        typeId: type_id
+      }
+      typesCount: pokemontypes_aggregate {
+        aggregate {
+          count
+        }
+      }
+      typeHistory: pokemontypepasts(order_by: [{ generation_id: asc }, { slot: asc }], limit: 128) {
+        generationId: generation_id
+        slot
+        typeId: type_id
+      }
+      typeHistoryCount: pokemontypepasts_aggregate {
+        aggregate {
+          count
+        }
+      }
+      stats: pokemonstats(order_by: { stat_id: asc }, limit: 16) {
+        statId: stat_id
+        baseStat: base_stat
+        effort
+      }
+      statsCount: pokemonstats_aggregate {
+        aggregate {
+          count
+        }
+      }
+      statHistory: pokemonstatpasts(
+        order_by: [{ generation_id: asc }, { stat_id: asc }]
+        limit: 256
+      ) {
+        generationId: generation_id
+        statId: stat_id
+        baseStat: base_stat
+        effort
+      }
+      statHistoryCount: pokemonstatpasts_aggregate {
+        aggregate {
+          count
+        }
+      }
+      abilities: pokemonabilities(order_by: { slot: asc }, limit: 16) {
+        slot
+        abilityId: ability_id
+        isHidden: is_hidden
+      }
+      abilitiesCount: pokemonabilities_aggregate {
+        aggregate {
+          count
+        }
+      }
+      abilityHistory: pokemonabilitypasts(
+        order_by: [{ generation_id: asc }, { slot: asc }]
+        limit: 256
+      ) {
+        generationId: generation_id
+        slot
+        abilityId: ability_id
+        isHidden: is_hidden
+      }
+      abilityHistoryCount: pokemonabilitypasts_aggregate {
+        aggregate {
+          count
+        }
+      }
+      forms: pokemonforms(order_by: { id: asc }, limit: 128) {
+        id
+        pokemonId: pokemon_id
+        identifier: name
+        formIdentifier: form_name
+        versionGroupId: version_group_id
+        isDefault: is_default
+        isBattleOnly: is_battle_only
+        isMega: is_mega
+        order
+        formOrder: form_order
+        names: pokemonformnames(
+          where: { language_id: { _in: [1, 5, 9, 11] } }
+          order_by: { language_id: asc }
+          limit: 8
+        ) {
+          languageId: language_id
+          name
+          pokemonName: pokemon_name
+        }
+        namesCount: pokemonformnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+          aggregate {
+            count
+          }
+        }
+      }
+      formsCount: pokemonforms_aggregate {
+        aggregate {
+          count
+        }
+      }
+      learnsets: pokemonmoves(order_by: { id: asc }, limit: 10000) {
+        id
+        moveId: move_id
+        versionGroupId: version_group_id
+        learnMethodId: move_learn_method_id
+        level
+        mastery
+        order
+      }
+      learnsetsCount: pokemonmoves_aggregate {
+        aggregate {
+          count
+        }
+      }
+      sprites: pokemonsprites(order_by: { id: asc }, limit: 2) {
+        sprites
+      }
+      spritesCount: pokemonsprites_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+    varietiesCount: pokemons_aggregate {
+      aggregate {
+        count
+      }
+    }
+  }
+}

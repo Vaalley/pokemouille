@@ -1,0 +1,244 @@
+query References {
+  generations: generation(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+  }
+  generationsCount: generation_aggregate {
+    aggregate {
+      count
+    }
+  }
+  versionGroups: versiongroup(order_by: [{ order: asc }, { id: asc }], limit: 256) {
+    id
+    identifier: name
+    generationId: generation_id
+    order
+    learnsetsCount: pokemonmoves_aggregate {
+      aggregate {
+        count
+      }
+    }
+    versions: versions(order_by: { id: asc }, limit: 32) {
+      id
+      identifier: name
+      versionGroupId: version_group_id
+      names: versionnames(
+        where: { language_id: { _in: [1, 5, 9, 11] } }
+        order_by: { language_id: asc }
+        limit: 8
+      ) {
+        languageId: language_id
+        name
+      }
+      namesCount: versionnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+        aggregate {
+          count
+        }
+      }
+      flavorTextsCount: pokemonspeciesflavortexts_aggregate(
+        where: { language_id: { _in: [1, 5, 9, 11] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+    versionsCount: versions_aggregate {
+      aggregate {
+        count
+      }
+    }
+  }
+  versionGroupsCount: versiongroup_aggregate {
+    aggregate {
+      count
+    }
+  }
+  versionsCount: version_aggregate {
+    aggregate {
+      count
+    }
+  }
+  types: type(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: typenames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: typenames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  typesCount: type_aggregate {
+    aggregate {
+      count
+    }
+  }
+  stats: stat(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: statnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: statnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  statsCount: stat_aggregate {
+    aggregate {
+      count
+    }
+  }
+  abilities: ability(order_by: { id: asc }, limit: 1024) {
+    id
+    identifier: name
+    names: abilitynames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: abilitynames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+    flavorTexts: abilityflavortexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 1000
+    ) {
+      languageId: language_id
+      versionGroupId: version_group_id
+      text: flavor_text
+    }
+    flavorTextsCount: abilityflavortexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+    effects: abilityeffecttexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      effect
+      shortEffect: short_effect
+    }
+    effectsCount: abilityeffecttexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  abilitiesCount: ability_aggregate {
+    aggregate {
+      count
+    }
+  }
+  moves: move(order_by: { id: asc }, limit: 4096) {
+    id
+    identifier: name
+    names: movenames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: movenames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  movesCount: move_aggregate {
+    aggregate {
+      count
+    }
+  }
+  learnMethods: movelearnmethod(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: movelearnmethodnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: movelearnmethodnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  learnMethodsCount: movelearnmethod_aggregate {
+    aggregate {
+      count
+    }
+  }
+  items: item(order_by: { id: asc }, limit: 4096) {
+    id
+    identifier: name
+    names: itemnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: itemnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  itemsCount: item_aggregate {
+    aggregate {
+      count
+    }
+  }
+  evolutionTriggers: evolutiontrigger(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: evolutiontriggernames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: evolutiontriggernames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  evolutionTriggersCount: evolutiontrigger_aggregate {
+    aggregate {
+      count
+    }
+  }
+}

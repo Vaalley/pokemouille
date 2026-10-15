@@ -8,9 +8,7 @@ export default defineConfig({
       // https://tsdown.dev/options/dependencies#deps-resolvedepsubpath
       resolveDepSubpath: true,
     },
-    dts: {
-      generator: "tsgo",
-    },
+    dts: true,
     exports: true,
   },
 });

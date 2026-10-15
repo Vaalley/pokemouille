@@ -3,13 +3,23 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "imports": {
+    "#lib/*": "./src/lib/*"
+  },
   "scripts": {
     "dev": "vp dev",
-    "build": "tsc && vp build",
+    "build": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && vp build",
     "preview": "vp preview"
   },
   "devDependencies": {
-    "typescript": "^7.0.2",
+    "@internationalized/date": "catalog:",
+    "@sveltejs/adapter-static": "^4.0.0",
+    "@sveltejs/kit": "^3.1.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "bits-ui": "catalog:",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   }
