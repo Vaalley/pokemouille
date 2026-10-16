@@ -1,0 +1,4 @@
+# Other assets (HTML, _app/version.json, icons) keep the Workers default:
+# public, max-age=0, must-revalidate, with an ETag. Dataset headers are set in worker/index.ts.
+/_app/immutable/*
+  Cache-Control: public, max-age=31536000, immutable

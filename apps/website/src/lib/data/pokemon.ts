@@ -1,26 +1,17 @@
 import { resolvePokemon } from "../../../../../packages/pokemon-data/src/index.ts";
 import type {
   EvolutionChainProjection,
-  GameOption,
   ReferenceData,
   ResolvedPokemon,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 import type { PokemonContext } from "./context.ts";
-import {
-  DataError,
-  getEvolutionChain,
-  getGames,
-  getManifest,
-  getReferences,
-  getSpecies,
-} from "./loader.ts";
+import { DataError, getEvolutionChain, getManifest, getReferences, getSpecies } from "./loader.ts";
 
 export interface PokemonView {
   pokemon: ResolvedPokemon;
   record: SpeciesRecord;
   references: ReferenceData;
-  games: GameOption[];
   chain: EvolutionChainProjection | null;
   datasetRevision: string;
 }
@@ -31,11 +22,10 @@ export async function loadPokemonView(
   fetchImpl: typeof fetch = fetch,
 ): Promise<PokemonView> {
   const { language, version, form } = context;
-  const [manifest, record, references, games] = await Promise.all([
+  const [manifest, record, references] = await Promise.all([
     getManifest(fetchImpl),
     getSpecies(speciesId, fetchImpl),
     getReferences(fetchImpl),
-    getGames(fetchImpl),
   ]);
   // resolvePokemon accepts variety and form identifiers; anything else is a bad URL.
   if (
@@ -56,5 +46,5 @@ export async function loadPokemonView(
     chainId !== null && manifest.files.evolution[String(chainId)]
       ? await getEvolutionChain(chainId, fetchImpl)
       : null;
-  return { pokemon, record, references, games, chain, datasetRevision: manifest.datasetRevision };
+  return { pokemon, record, references, chain, datasetRevision: manifest.datasetRevision };
 }

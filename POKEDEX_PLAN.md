@@ -1,6 +1,6 @@
 # Pokémouille: product and implementation plan
 
-**Status: phases 1–5 complete. The data pipeline, Pokémon-data module, localized Pokémon detail route, and instant global search are implemented and release-verified locally; hosting/CI provider and visual design remain open (§8).**
+**Status: phases 1–5 complete. The data pipeline, Pokémon-data module, localized Pokémon detail route, and instant global search are implemented and release-verified locally. Hosting is Cloudflare Workers Paid + R2 with a GitHub Actions deploy/refresh workflow (README “Deployment”), verified locally with `wrangler dev` but not yet deployed; visual design remains open (§8).**
 
 Build a multilingual, game-aware Pokémon reference. Start with Pokémon detail pages and instant global search; extend to moves, abilities, items, and other game entities as source coverage permits. Historical correctness and consistent navigation matter more than adding many pages early.
 
@@ -381,4 +381,4 @@ Decision: no splitting now. A cold visit costs about 370 KB gzip of data, plus a
 
 `vp check` (62 files), `vp test` (83 tests), and `vp run -r build` pass.
 
-Remaining before a public release (outside this phase): choose a host/CDN and configure its headers; choose a CI refresh runner with persisted `.data/state`; review the fr/ja "not introduced" wording with native speakers; validate `@sveltejs/kit@3.1.0` in `minimumReleaseAgeExclude`; choose the visual design / UI library.
+Remaining before a public release (outside this phase): complete the Cloudflare one-time setup and first deploy (README “Deployment”); review the fr/ja "not introduced" wording with native speakers; validate `@sveltejs/kit@3.1.0` in `minimumReleaseAgeExclude`; choose the visual design / UI library.

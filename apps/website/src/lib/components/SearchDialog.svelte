@@ -39,8 +39,8 @@
   let shortcut = $state<{ label: string; keys: string } | null>(null);
   // Element focused before opening; focus goes back there on close.
   let previousFocus: HTMLElement | null = null;
-  // One prepared index for the current language. Typing only reads it; loading happens
-  // ahead of time (idle preload) or when the dialog opens.
+  // One prepared index for the current language. Typing only reads it; it loads when the
+  // dialog opens, never ahead of time (it needs the full references file).
   let index = $state.raw<{ lang: Language; prepared: PreparedIndex } | null>(null);
   let failedLang = $state<Language | null>(null);
   let pendingLang: Language | null = null;
@@ -68,16 +68,9 @@
     index?.lang === lang ? "ready" : failedLang === lang ? "error" : "loading",
   );
 
-  // Preload without competing with the page: when the browser is idle, again per language.
+  // Load on open, and again if the language changes while it stays open.
   $effect(() => {
-    const target = lang;
-    const run = () => ensureIndex(target);
-    if (typeof requestIdleCallback === "function") {
-      const handle = requestIdleCallback(run, { timeout: 4000 });
-      return () => cancelIdleCallback(handle);
-    }
-    const handle = setTimeout(run, 2000);
-    return () => clearTimeout(handle);
+    if (isOpen) ensureIndex(lang);
   });
 
   const groupOrders = $derived.by(() => {
@@ -196,7 +189,6 @@
       } else {
         previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         isOpen = true;
-        ensureIndex(lang);
       }
       return;
     }
@@ -209,7 +201,6 @@
     previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     query = seed;
     isOpen = true;
-    ensureIndex(lang);
     void tick().then(() => {
       input?.focus();
       input?.setSelectionRange(seed.length, seed.length);
@@ -230,8 +221,7 @@
 <Dialog.Root
   bind:open={isOpen}
   onOpenChange={(next) => {
-    if (next) ensureIndex(lang);
-    else query = "";
+    if (!next) query = "";
   }}
 >
   <Dialog.Trigger class="search-trigger" aria-keyshortcuts={shortcut?.keys}>

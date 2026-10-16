@@ -47,7 +47,7 @@ Move pages show type, damage category, generation, power, accuracy, PP, priority
 
 Item details live at `/{lang}/item/{itemId}/`, prerendered for all 2,223 items in English, French, and Japanese. Pages show current short/full effects and descriptions grouped by their exact source version group; absent translations use marked fallbacks, and missing source text remains explicitly unavailable. These records do not establish historical mechanics or game availability. Item prices are not presented as a single global cost: upstream prices vary by game and currency.
 
-`ItemLink.svelte` combines the localized name, a decorative 30 × 30px icon, and a game-preserving item link without unrelated form parameters. Evolution item/held-item requirements use it; global search also includes items with icons. Structured item references are linked by source ID, not guessed from arbitrary localized effect prose. Icons are served locally from `static/item-icons/`, vendored from [PokeAPI/sprites commit `6e7928dcbd547d50b5c644fe76e093e8da98ac3f`](https://github.com/PokeAPI/sprites/tree/6e7928dcbd547d50b5c644fe76e093e8da98ac3f/sprites/items). There are 863 exact identifier matches in the current item dataset; 1,360 items without matching sprites use a neutral placeholder, never another item's image or a missing-asset request. The upstream CC0 notice is retained in `static/item-icons/LICENCE.txt`; image contents remain copyright The Pokémon Company, as the notice states.
+`ItemLink.svelte` combines the localized name, a decorative 30 × 30px icon, and a game-preserving item link without unrelated form parameters. Evolution item/held-item requirements use it; global search also includes items with icons. Structured item references are linked by source ID, not guessed from arbitrary localized effect prose. `ItemIcon.svelte` reads every item icon from one locally served sprite sheet, so item lists add one image request rather than one per item. The 898 source icons are vendored in `tools/sprites/item-icons/` from [PokeAPI/sprites commit `6e7928dcbd547d50b5c644fe76e093e8da98ac3f`](https://github.com/PokeAPI/sprites/tree/6e7928dcbd547d50b5c644fe76e093e8da98ac3f/sprites/items); `vp run sprites:item-icons` packs them losslessly into `static/item-icons/sheet.png` (SHA-256 `62450fcc176536d4fe56273f2fefe02dad3a36f539b0ae386065ff1b83de5a7e`, 960 × 870px RGBA: 30 × 30px cells, 32 columns, sorted identifiers) and regenerates the identifier → slot map in `src/lib/data/item-icons.ts`. Most sources are 30 × 30px; 62 older 24 × 24px icons are centred unscaled, and 11 Legends: Arceus 32 × 32px balls lose only their fully transparent 1px margin. There are 863 exact identifier matches in the current item dataset; 1,360 items without matching sprites use a neutral placeholder, never another item's image or a missing-asset request. The upstream CC0 notice is retained in `static/item-icons/LICENCE.txt` and `tools/sprites/item-icons/LICENCE.txt`; image contents remain copyright The Pokémon Company, as the notice states.
 
 Moves show a TM disc colored by the move's current source type (`MoveIcon.svelte`, reusing the vendored `tm-<type>.png` sprites) on move pages, learnsets, evolution move conditions, and search. The disc only illustrates type; it does not imply the move is available as a TM. Abilities have no per-ability icons in the games, so `AbilityIcon.svelte` uses the Ability Capsule sprite as a category marker on ability pages, Pokémon ability lists, and search. Search results also show Pokémon box icons and item icons, and the result list scrolls inside a viewport-bounded dialog.
 
@@ -102,7 +102,7 @@ Start a weekly or manually requested update with:
 node tools/data/src/cli.ts refresh --state-dir .data/state --out-dir apps/website/static/data --fresh
 ```
 
-Use `--fresh` **once** to start the new refresh; subsequent resumptions omit it. It deliberately discards reuse of previous-run responses, not the last-good published snapshot or rate ledger. Do not start a new refresh every website deployment. A CI scheduler is not configured until the provider is chosen. Persist state between CI runners, including successful responses, active-run metadata, and rate/cooldown timestamps.
+Use `--fresh` **once** to start the new refresh; subsequent resumptions omit it. It deliberately discards reuse of previous-run responses, not the last-good published snapshot or rate ledger. Do not start a new refresh every website deployment. In CI, `.github/workflows/deploy.yml` restores and saves `.data/state` (successful responses, active-run metadata, rate/cooldown timestamps) as one archive in R2; see [Deployment](#deployment-cloudflare).
 
 To validate and republish cached complete input without network access:
 
@@ -117,13 +117,41 @@ Missing cached pages exit incomplete; invalid or truncated data never replaces a
 `manifest.json` points to immutable content-versioned assets under `revisions/{datasetRevision}/`:
 
 - `references.json`: game mappings, localized labels, complete move detail records, ability/item effects and descriptions, source counts, and coverage.
+- `games.json`: the precomputed main-series game list (selector options and coverage), so `getGames()` no longer downloads `references.json`.
 - `pokemon/{speciesId}.json`: one complete locale-independent species/variety bundle.
 - `search/{en,fr,ja}.json`: compact names, aliases, and stable species/variety/form identities.
 - `evolution/{chainId}.json`: chain membership and incoming source methods, with unresolved game applicability explicitly preserved.
 
 Every manifest entry includes a relative path, SHA-256, and byte count. Publish assets first and atomically switch the manifest only after validation. Keep previous revisions available for active visitors; a failed refresh leaves the last-good manifest unchanged. Do not garbage-collect older revisions without an explicit retention policy.
 
-For hosting, revalidate the root manifest, all prerendered HTML, and `_app/version.json` (`Cache-Control: no-cache` plus an `ETag` or `Last-Modified` validator). Serve `data/revisions/*` and `_app/immutable/*` with `Cache-Control: public, max-age=31536000, immutable`, and keep the previous deploy's `_app/immutable/*` files, as with data revisions, so open tabs keep working after a redeploy. With these headers, a repeat visit costs 304s for the manifest and HTML plus only the species files not yet seen. `vp preview` sends neither header, so it cannot demonstrate repeat-visit caching. The browser pins one manifest revision per page session. No host/CDN is chosen yet, so these headers are not configured anywhere.
+Caching contract: revalidate the root manifest, all prerendered HTML, and `_app/version.json` (`no-cache`/`must-revalidate` plus an `ETag`). Serve `data/revisions/*` and `_app/immutable/*` with `Cache-Control: public, max-age=31536000, immutable`, and keep the previous deploy's `_app/immutable/*` files, as with data revisions, so open tabs keep working after a redeploy. With these headers, a repeat visit costs 304s for the manifest and HTML plus only the species files not yet seen. `vp preview` sends neither header, so it cannot demonstrate repeat-visit caching; use `vp run cf:dev`. The browser pins one manifest revision per page session.
+
+## Deployment (Cloudflare)
+
+The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the build has ~27k files, over the free plan's 20,000). Config: `apps/website/wrangler.jsonc`.
+
+- **Pages and app code** are uploaded from `apps/website/build`. `static/_headers` marks `_app/immutable/*` immutable; everything else keeps the Workers default `public, max-age=0, must-revalidate` with an ETag.
+- **The dataset is not uploaded with the Worker** (`static/.assetsignore` excludes `/data`). It lives in the R2 bucket `pokemouille-data` under the same keys (`data/manifest.json`, `data/revisions/...`). `apps/website/worker/index.ts` serves those keys, plus `_app/immutable/*` chunks from earlier deploys, only for requests no static asset matched. The manifest is `no-cache` with ETag/304; everything else is immutable and cached at the edge with the Cache API (a no-op on `*.workers.dev`, active on a custom domain).
+- **Retention:** R2 keeps every published revision and every deploy's immutable chunks; nothing is garbage-collected. One revision is ~100 MB, so R2's 10 GB free storage holds ~100 refreshes.
+
+`apps/website/scripts/r2.ts` moves files (Node 24):
+
+| Command                     | Effect                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `sync`                      | Uploads missing revision files and `_app/immutable/*` (never overwrites; size mismatch fails), then `data/manifest.json` last. |
+| `data-pull`                 | Downloads the files listed in the R2 manifest into `static/data`, verifying each SHA-256.                                      |
+| `state-pull` / `state-push` | Restores / saves `.data/state` as `state/state.tar.gz` (not served by the Worker).                                             |
+
+Add `--local` to use Wrangler's local bucket instead of R2. Local Workers preview: `vp run website#build`, `node apps/website/scripts/r2.ts sync --local`, `vp run cf:dev`.
+
+**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker. The weekly schedule (and manual runs with `refresh`) first restores `.data/state`, starts a `--fresh` refresh (or resumes an incomplete one), and saves state even when the refresh stops early; an incomplete refresh deploys the last-good dataset and warns.
+
+One-time setup:
+
+1. Subscribe to Workers Paid; enable R2; `wrangler r2 bucket create pokemouille-data`.
+2. Create an API token with **Workers Scripts: Edit** and **Workers R2 Storage: Edit** (dashboard → My Profile → API Tokens).
+3. Add GitHub secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+4. Seed R2 from a machine holding the current state, after `wrangler login`: `vp run website#build`, `node apps/website/scripts/r2.ts sync`, `node apps/website/scripts/r2.ts state-push`.
 
 ## GraphQL types and schema updates
 

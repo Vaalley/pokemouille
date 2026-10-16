@@ -36,6 +36,22 @@ export default defineConfig({
         command: "node node_modules/@graphql-codegen/cli/cjs/bin.js --config tools/data/codegen.ts",
         cache: false,
       },
+      "sprites:item-icons": {
+        command:
+          "node tools/sprites/src/item-icons.ts --source tools/sprites/item-icons --sheet apps/website/static/item-icons/sheet.png --map apps/website/src/lib/data/item-icons.ts",
+        cache: false,
+      },
+      // Local Workers preview of apps/website/build; seed its bucket with `r2.ts sync --local`.
+      "cf:dev": {
+        command:
+          "node node_modules/wrangler/bin/wrangler.js dev --config apps/website/wrangler.jsonc",
+        cache: false,
+      },
+      "cf:deploy": {
+        command:
+          "node node_modules/wrangler/bin/wrangler.js deploy --config apps/website/wrangler.jsonc",
+        cache: false,
+      },
     },
   },
 });

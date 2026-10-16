@@ -6,16 +6,24 @@ packages:
 nodeLinker: hoisted
 packageImportMethod: copy
 hoistWorkspacePackages: false
+# Platform binaries come from optional dependencies; wrangler/workerd run without scripts.
+allowBuilds:
+  esbuild: false
+  workerd: false
 
 catalogMode: prefer
 
 catalog:
+  "@cloudflare/workers-types": ^5.20261015.1
   "@internationalized/date": ^3.12.4
   "@types/node": ^24
+  "@types/pngjs": ^6.0.5
   bits-ui: ^2.19.5
+  pngjs: ^7.0.0
   typescript: ^6.0.3
   vite: npm:@voidzero-dev/vite-plus-core@1.2.0
   vite-plus: 1.2.0
+  wrangler: ^4.151.0
 overrides:
   vite@*: "catalog:"
 peerDependencyRules:

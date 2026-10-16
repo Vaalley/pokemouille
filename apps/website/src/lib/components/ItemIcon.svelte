@@ -1,25 +1,22 @@
 <script lang="ts">
   import { asset } from "$app/paths";
   import type { AssetPath } from "$app/types";
-  import { itemIconIdentifiers } from "#lib/data/item-icons.ts";
+  import { itemIconColumns, itemIconSlots } from "#lib/data/item-icons.ts";
 
   let { identifier }: { identifier: string } = $props();
-  let failedIdentifier = $state<string | null>(null);
-  const available = $derived(itemIconIdentifiers[identifier] === true && failedIdentifier !== identifier);
+  // Object.hasOwn: identifiers such as "constructor" must not hit prototype keys.
+  const slot = $derived(Object.hasOwn(itemIconSlots, identifier) ? itemIconSlots[identifier] : undefined);
 </script>
 
 <span class="item-icon" aria-hidden="true">
-  {#if available}
-    <img
-      src={asset(`item-icons/${identifier}.png` as AssetPath)}
-      alt=""
-      width="30"
-      height="30"
-      loading="lazy"
-      onerror={() => { failedIdentifier = identifier; }}
-    />
-  {:else}
+  {#if slot === undefined}
     <span class="unavailable"></span>
+  {:else}
+    <span
+      class="sprite"
+      style:background-image={`url("${asset("item-icons/sheet.png" as AssetPath)}")`}
+      style:background-position={`${-(slot % itemIconColumns) * 30}px ${-Math.floor(slot / itemIconColumns) * 30}px`}
+    ></span>
   {/if}
 </span>
 
@@ -33,10 +30,10 @@
     height: 30px;
     vertical-align: middle;
   }
-  img {
+  .sprite {
     width: 30px;
     height: 30px;
-    object-fit: contain;
+    background-repeat: no-repeat;
     image-rendering: pixelated;
   }
   .unavailable {

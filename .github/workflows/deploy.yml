@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly dataset refresh (Monday 03:17 UTC).
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: Refresh the dataset from PokéAPI (resumes an incomplete refresh)
+        type: boolean
+        default: false
+
+# One writer for the R2 dataset, ingestion state and Worker deployment.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: voidzero-dev/setup-vp@v1.21.2
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Refresh dataset
+        if: github.event_name == 'schedule' || inputs.refresh
+        run: |
+          node apps/website/scripts/r2.ts state-pull
+          phase=$(node tools/data/src/cli.ts status --state-dir .data/state --out-dir apps/website/static/data | jq -r '.active.phase // "none"')
+          fresh=""
+          if [ "$phase" = complete ] || [ "$phase" = none ]; then fresh="--fresh"; fi
+          set +e
+          node tools/data/src/cli.ts refresh --state-dir .data/state --out-dir apps/website/static/data $fresh
+          code=$?
+          set -e
+          # Persist cached responses and the rate ledger even when the refresh stopped early.
+          node apps/website/scripts/r2.ts state-push
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::Refresh incomplete (budget or cooldown); run this workflow again with refresh to resume."
+          elif [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+
+      # Without a successful refresh in this run, build the last published snapshot.
+      - name: Download published dataset
+        if: hashFiles('apps/website/static/data/manifest.json') == ''
+        run: node apps/website/scripts/r2.ts data-pull
+
+      - run: vp run website#build
+
+      # Revisions and immutable chunks first, then the manifest, then the Worker:
+      # clients of either deployment always find the files they reference.
+      - run: node apps/website/scripts/r2.ts sync
+
+      - run: vp run cf:deploy

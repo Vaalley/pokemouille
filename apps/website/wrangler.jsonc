@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "pokemouille",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-16",
+  // adapter-static output. static/.assetsignore keeps the dataset out of the upload:
+  // it is served from R2 so earlier revisions outlive each deploy.
+  "assets": {
+    "directory": "./build",
+    "binding": "ASSETS",
+  },
+  "r2_buckets": [{ "binding": "DATA", "bucket_name": "pokemouille-data" }],
+  "observability": { "enabled": true },
+  // Used only by scripts/r2.ts: the same bucket through a remote binding
+  // (authenticated by `wrangler login` or CLOUDFLARE_API_TOKEN). Never deployed.
+  "env": {
+    "r2sync": {
+      "r2_buckets": [{ "binding": "DATA", "bucket_name": "pokemouille-data", "remote": true }],
+    },
+  },
+}

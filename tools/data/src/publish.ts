@@ -8,7 +8,11 @@ import type {
   Provenance,
   SnapshotInput,
 } from "../../../packages/pokemon-data/src/index.ts";
-import { buildSearchIndex, validateSnapshot } from "../../../packages/pokemon-data/src/index.ts";
+import {
+  buildSearchIndex,
+  getMainSeriesGames,
+  validateSnapshot,
+} from "../../../packages/pokemon-data/src/index.ts";
 import {
   OUTPUT_VERSION,
   canonicalJson,
@@ -45,6 +49,8 @@ export async function publishSnapshot(
     }
     try {
       await emit("references.json", input.references);
+      // Precomputed so the game selector does not need the full references file.
+      await emit("games.json", getMainSeriesGames(input.references));
       for (const language of ["en", "fr", "ja"] as const)
         await emit(`search/${language}.json`, buildSearchIndex(input, language));
       // Stable source ordering is not part of semantic identity.
@@ -128,6 +134,7 @@ export async function publishSnapshot(
         },
         files: {
           references: asset("references.json"),
+          games: asset("games.json"),
           search: {
             en: asset("search/en.json"),
             fr: asset("search/fr.json"),

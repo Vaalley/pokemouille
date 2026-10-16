@@ -20,6 +20,7 @@ function manifest(revision: string) {
     datasetRevision: revision,
     files: {
       references: asset("references.json"),
+      games: asset("games.json"),
       search: { en: asset("search/en.json") },
       pokemon: { "25": asset("pokemon/25.json"), "26": asset("pokemon/26.json") },
       evolution: {},
@@ -104,5 +105,24 @@ describe("snapshot loader", () => {
     expect(count("/data/a/pokemon/26.json")).toBe(1);
     expect(count("/data/b/pokemon/26.json")).toBe(0);
     expect(count(MANIFEST)).toBe(1);
+  });
+
+  it("loads games from their own asset without fetching references", async () => {
+    const games = [{ version: { identifier: "scarlet" } }];
+    const { fetchImpl, count } = host({
+      [MANIFEST]: () => json(manifest("a")),
+      "/data/a/games.json": () => json(games),
+    });
+    await expect(loader.getGames(fetchImpl)).resolves.toEqual(games);
+    await loader.getGames(fetchImpl);
+    expect(count("/data/a/games.json")).toBe(1);
+    expect(count("/data/a/references.json")).toBe(0);
+  });
+
+  it("rejects a manifest without a games asset", async () => {
+    const { files, ...rest } = manifest("a");
+    const { games: _, ...withoutGames } = files;
+    const { fetchImpl } = host({ [MANIFEST]: () => json({ ...rest, files: withoutGames }) });
+    await expect(loader.getManifest(fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
   });
 });

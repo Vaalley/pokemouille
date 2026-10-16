@@ -12,6 +12,7 @@
     "preview": "vp preview"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "@internationalized/date": "catalog:",
     "@sveltejs/adapter-static": "^4.0.0",
     "@sveltejs/kit": "^3.1.0",
@@ -21,6 +22,7 @@
     "svelte-check": "^4.7.6",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "wrangler": "catalog:"
   }
 }

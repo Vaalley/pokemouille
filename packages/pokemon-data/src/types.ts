@@ -339,6 +339,8 @@ export interface DatasetManifest {
   counts: { species: number; pokemon: number; forms: number; learnsets: number };
   files: {
     references: Asset;
+    /** Precomputed main-series `GameOption[]` (see getMainSeriesGames). */
+    games: Asset;
     search: Record<Language, Asset>;
     pokemon: Record<string, Asset>;
     evolution: Record<string, Asset>;

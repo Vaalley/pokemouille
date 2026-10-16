@@ -1,7 +1,6 @@
 import { browser } from "$app/env";
 import { asset } from "$app/paths";
 import type { AssetPath } from "$app/types";
-import { getMainSeriesGames } from "../../../../../packages/pokemon-data/src/index.ts";
 import type {
   Asset,
   DatasetManifest,
@@ -96,6 +95,7 @@ export function getManifest(fetchImpl: typeof fetch = fetch): Promise<DatasetMan
         typeof value.datasetRevision === "string" &&
         isObject(value.files) &&
         isObject(value.files.references) &&
+        isObject(value.files.games) &&
         isObject(value.files.search) &&
         isObject(value.files.pokemon) &&
         isObject(value.files.evolution),
@@ -111,6 +111,7 @@ export function getManifest(fetchImpl: typeof fetch = fetch): Promise<DatasetMan
 }
 
 const referencesCache = new PromiseCache<ReferenceData>(1);
+const gamesCache = new PromiseCache<GameOption[]>(1);
 const searchCache = new PromiseCache<SearchEntry[]>(3);
 const speciesCache = new PromiseCache<SpeciesRecord>(24);
 const evolutionCache = new PromiseCache<EvolutionChainProjection>(24);
@@ -127,9 +128,10 @@ export async function getReferences(fetchImpl: typeof fetch = fetch): Promise<Re
   );
 }
 
-/** Main-series games of the pinned references (memoized per references object). */
+/** Main-series games of the pinned revision, without loading the full references. */
 export async function getGames(fetchImpl: typeof fetch = fetch): Promise<GameOption[]> {
-  return getMainSeriesGames(await getReferences(fetchImpl));
+  const { path } = (await getManifest(fetchImpl)).files.games;
+  return gamesCache.get(path, () => loadJson(path, fetchImpl, Array.isArray));
 }
 
 export async function getSpecies(

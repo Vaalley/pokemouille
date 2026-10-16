@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import { fixture } from "../../../packages/pokemon-data/tests/fixtures.ts";
+import { getMainSeriesGames } from "../../../packages/pokemon-data/src/index.ts";
 import { publishSnapshot } from "../src/publish.ts";
 import { digest, withWriterLock } from "../src/state.ts";
 import type { Provenance } from "../../../packages/pokemon-data/src/index.ts";
@@ -47,6 +48,17 @@ describe("last-good static publication", () => {
     expect(JSON.parse(await readFile(join(outDir, "manifest.json"), "utf8")).datasetRevision).toBe(
       second.datasetRevision,
     );
+  });
+
+  it("publishes the precomputed main-series games as their own asset", async () => {
+    const outDir = await outputDirectory();
+    const input = fixture();
+    const manifest = await publishSnapshot(outDir, input, provenance);
+    const text = await readFile(join(outDir, manifest.files.games.path), "utf8");
+    expect(digest(text)).toBe(manifest.files.games.sha256);
+    const games = JSON.parse(text);
+    expect(games.length).toBeGreaterThan(0);
+    expect(games).toEqual(JSON.parse(JSON.stringify(getMainSeriesGames(input.references))));
   });
 
   it("keeps semantic identity stable across honest retrieval timestamp changes", async () => {
