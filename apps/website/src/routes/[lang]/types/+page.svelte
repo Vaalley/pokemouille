@@ -13,7 +13,7 @@
   import { pokemonHref } from "#lib/data/context.ts";
   import { filterTypeMembers } from "#lib/data/type-membership.ts";
   import { getGames, getReferences } from "#lib/data/loader.ts";
-  import { defensiveMatchups } from "#lib/data/type-matchups.ts";
+  import { defensiveMatchups, isIntroduced } from "#lib/data/type-matchups.ts";
   import { readTypeSelection, typeSelectionUrl } from "#lib/data/type-selection.ts";
   import { t } from "#lib/i18n/types.ts";
   import type { PageProps } from "./$types";
@@ -79,7 +79,7 @@
         <option value="">{t(data.lang, "choose")}</option>
         {#each types as type (type.id)}
           {@const localized = name(type.id)}
-          <option value={type.id} disabled={selection.ids[1 - slot] === type.id} lang={localized.fallback && localized.sourceLanguageId === 9 ? "en" : undefined}>{localized.text}</option>
+          <option value={type.id} disabled={!generation || !isIntroduced(type.id, generation) || selection.ids[1 - slot] === type.id} lang={localized.fallback && localized.sourceLanguageId === 9 ? "en" : undefined}>{localized.text}</option>
         {/each}
       </select>
     </div>

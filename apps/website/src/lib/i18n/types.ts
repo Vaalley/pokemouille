@@ -22,7 +22,7 @@ const en = {
   immunities: "Immunities",
   none: "None",
   pokemonHeading: "Pokémon with these types",
-  pokemonCount: "{count} Pokémon / forms",
+  pokemonCount: "{count} Pokémon",
   pokemonEmpty: "No Pokémon or forms match these types in the selected game’s context.",
   pokemonScope:
     "One type includes both single- and dual-type Pokémon; two types require that exact pair, in either order. Includes alternate varieties using generation-based historical typing and source introduction dates; cosmetic forms with identical typing are grouped together. Introduction does not prove obtainability; this is not a regional Pokédex or a list of game-specific battle mechanics. Form icons depict the base species.",
@@ -56,7 +56,7 @@ const fr = {
   immunities: "Immunités",
   none: "Aucune",
   pokemonHeading: "Pokémon de ces types",
-  pokemonCount: "{count} Pokémon / formes",
+  pokemonCount: "{count} Pokémon",
   pokemonEmpty:
     "Aucun Pokémon ni aucune forme ne correspond à ces types dans le contexte du jeu sélectionné.",
   pokemonScope:

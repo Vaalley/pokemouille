@@ -24,7 +24,7 @@ const chart: readonly (readonly [readonly number[], readonly number[], readonly 
   [[2, 16, 17], [4, 9, 10], []], // Fairy
 ];
 
-function isIntroduced(typeId: number, generationId: number): boolean {
+export function isIntroduced(typeId: number, generationId: number): boolean {
   return (
     Number.isInteger(typeId) &&
     typeId >= 1 &&

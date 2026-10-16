@@ -24,7 +24,7 @@ const en = {
   abilityScope:
     "The Ability Capsule icon identifies the category; abilities have no individual game icons.",
   itemScope: "Icons use the available item artwork; a dashed marker means no icon is available.",
-  count: "{filtered} of {total} entries",
+  count: "Results: {filtered} / {total}",
   empty: "No entries match these filters.",
   reset: "Reset filters",
   loading: "Loading the filters from this URL…",
