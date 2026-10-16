@@ -23,6 +23,50 @@ describe("bounded upstream response validation", () => {
     expect(() => validateBoundedRelationships(response)).toThrow("missing relationship aggregate");
   });
 
+  it("rejects truncated move flavor text and shared effect relationships", () => {
+    const response = {
+      moves: [
+        {
+          id: 85,
+          flavorTexts: [{ languageId: 9, versionGroupId: 25, text: "An electric attack." }],
+          flavorTextsCount: { aggregate: { count: 2 } },
+        },
+      ],
+      movesCount: { aggregate: { count: 1 } },
+    };
+    expect(() => validateBoundedRelationships(response)).toThrow("$.moves[0].flavorTexts");
+    const effects = {
+      moveEffects: [
+        {
+          id: 5,
+          effects: [],
+          effectsCount: { aggregate: { count: 1 } },
+        },
+      ],
+      moveEffectsCount: { aggregate: { count: 1 } },
+    };
+    expect(() => validateBoundedRelationships(effects)).toThrow("$.moveEffects[0].effects");
+  });
+
+  it("rejects truncated item flavor text and effect relationships", () => {
+    const response = {
+      items: [
+        {
+          id: 83,
+          flavorTexts: [],
+          flavorTextsCount: { aggregate: { count: 1 } },
+          effects: [],
+          effectsCount: { aggregate: { count: 0 } },
+        },
+      ],
+      itemsCount: { aggregate: { count: 1 } },
+    };
+    expect(() => validateBoundedRelationships(response)).toThrow("$.items[0].flavorTexts");
+    response.items[0]!.flavorTextsCount.aggregate.count = 0;
+    response.items[0]!.effectsCount.aggregate.count = 1;
+    expect(() => validateBoundedRelationships(response)).toThrow("$.items[0].effects");
+  });
+
   it("accepts complete bounded relationships, including truthful zero-row histories", () => {
     const response = {
       species: [

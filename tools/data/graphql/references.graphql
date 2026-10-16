@@ -156,6 +156,15 @@ query References {
   moves: move(order_by: { id: asc }, limit: 4096) {
     id
     identifier: name
+    generationId: generation_id
+    typeId: type_id
+    damageClassId: move_damage_class_id
+    power
+    accuracy
+    pp
+    priority
+    effectChance: move_effect_chance
+    effectId: move_effect_id
     names: movenames(
       where: { language_id: { _in: [1, 5, 9, 11] } }
       order_by: { language_id: asc }
@@ -169,8 +178,44 @@ query References {
         count
       }
     }
+    flavorTexts: moveflavortexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 1000
+    ) {
+      languageId: language_id
+      versionGroupId: version_group_id
+      text: flavor_text
+    }
+    flavorTextsCount: moveflavortexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
   }
   movesCount: move_aggregate {
+    aggregate {
+      count
+    }
+  }
+  moveEffects: moveeffect(order_by: { id: asc }, limit: 4096) {
+    id
+    effects: moveeffecteffecttexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      effect
+      shortEffect: short_effect
+    }
+    effectsCount: moveeffecteffecttexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  moveEffectsCount: moveeffect_aggregate {
     aggregate {
       count
     }
@@ -209,6 +254,34 @@ query References {
       name
     }
     namesCount: itemnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+    flavorTexts: itemflavortexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 1000
+    ) {
+      languageId: language_id
+      versionGroupId: version_group_id
+      text: flavor_text
+    }
+    flavorTextsCount: itemflavortexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+    effects: itemeffecttexts(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      effect
+      shortEffect: short_effect
+    }
+    effectsCount: itemeffecttexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
       aggregate {
         count
       }

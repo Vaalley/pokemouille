@@ -34,6 +34,11 @@ export type CensusBeforeQuery = {
   evolutionTriggers: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveEffectTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  itemFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  itemEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
   typeNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   statNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
@@ -74,6 +79,11 @@ export type CensusAfterQuery = {
   evolutionTriggers: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveEffectTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  itemFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  itemEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
   typeNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   statNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
@@ -112,6 +122,11 @@ export type SourceCensusFragment = {
   evolutionTriggers: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveEffectTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  itemFlavorTexts: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  itemEffects: { aggregate: { count: number; max: { id: number | null } | null } | null };
   typeNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   statNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   abilityNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
@@ -172,11 +187,28 @@ export type ReferencesQuery = {
   abilitiesCount: { aggregate: { count: number } | null };
   moves: Array<{
     id: number;
+    power: number | null;
+    accuracy: number | null;
+    pp: number | null;
+    priority: number | null;
     identifier: string;
+    generationId: number | null;
+    typeId: number | null;
+    damageClassId: number | null;
+    effectChance: number | null;
+    effectId: number | null;
     names: Array<{ name: string; languageId: number | null }>;
     namesCount: { aggregate: { count: number } | null };
+    flavorTexts: Array<{ languageId: number | null; versionGroupId: number | null; text: string }>;
+    flavorTextsCount: { aggregate: { count: number } | null };
   }>;
   movesCount: { aggregate: { count: number } | null };
+  moveEffects: Array<{
+    id: number;
+    effects: Array<{ effect: string; languageId: number | null; shortEffect: string }>;
+    effectsCount: { aggregate: { count: number } | null };
+  }>;
+  moveEffectsCount: { aggregate: { count: number } | null };
   learnMethods: Array<{
     id: number;
     identifier: string;
@@ -189,6 +221,10 @@ export type ReferencesQuery = {
     identifier: string;
     names: Array<{ name: string; languageId: number | null }>;
     namesCount: { aggregate: { count: number } | null };
+    flavorTexts: Array<{ languageId: number | null; versionGroupId: number | null; text: string }>;
+    flavorTextsCount: { aggregate: { count: number } | null };
+    effects: Array<{ effect: string; languageId: number | null; shortEffect: string }>;
+    effectsCount: { aggregate: { count: number } | null };
   }>;
   itemsCount: { aggregate: { count: number } | null };
   evolutionTriggers: Array<{

@@ -6,8 +6,8 @@ describe("snapshot integrity", () => {
   it("uses numeric resource identity while rejecting duplicate primary IDs", () => {
     const snapshot = fixture();
     snapshot.references.items = [
-      { id: 723, identifier: "roseli-berry", names: [] },
-      { id: 2279, identifier: "roseli-berry", names: [] },
+      { id: 723, identifier: "roseli-berry", names: [], flavorTexts: [], effects: [] },
+      { id: 2279, identifier: "roseli-berry", names: [], flavorTexts: [], effects: [] },
     ];
     snapshot.references.sourceCounts.items = 2;
     validateSnapshot(snapshot);
@@ -50,6 +50,77 @@ describe("snapshot integrity", () => {
     expect(() => validateSnapshot(broken)).toThrow();
     const malformed: unknown = { references: null, species: [] };
     expect(() => validateSnapshot(malformed)).toThrow();
+  });
+
+  it("validates real move stats while preserving nullable source values", () => {
+    const snapshot = fixture();
+    const move = snapshot.references.moves[0]!;
+    move.power = null;
+    move.accuracy = null;
+    move.pp = null;
+    move.effectChance = null;
+    move.priority = -6;
+    validateSnapshot(snapshot);
+    move.power = -1;
+    expect(() => validateSnapshot(snapshot)).toThrow("move.power");
+    move.power = null;
+    move.damageClassId = 0;
+    expect(() => validateSnapshot(snapshot)).toThrow("move.damageClassId");
+  });
+
+  it("rejects missing move fields and invalid detail relationships", () => {
+    const missing = fixture();
+    Reflect.deleteProperty(missing.references.moves[0]!, "power");
+    expect(() => validateSnapshot(missing)).toThrow("move.power");
+    const invalidType = fixture();
+    invalidType.references.moves[0]!.typeId = 999999;
+    expect(() => validateSnapshot(invalidType)).toThrow("move.typeId");
+    const invalidGeneration = fixture();
+    invalidGeneration.references.moves[0]!.generationId = 999999;
+    expect(() => validateSnapshot(invalidGeneration)).toThrow("move.generationId");
+    const invalidVersion = fixture();
+    invalidVersion.references.moves[0]!.flavorTexts[0]!.versionGroupId = 999999;
+    expect(() => validateSnapshot(invalidVersion)).toThrow("move.flavorText.versionGroupId");
+  });
+
+  it("rejects duplicate localized move descriptions and effects", () => {
+    const flavors = fixture();
+    const move = flavors.references.moves[0]!;
+    move.flavorTexts.push({ ...move.flavorTexts[0]! });
+    expect(() => validateSnapshot(flavors)).toThrow("move.flavorTexts");
+    const effects = fixture();
+    const effectMove = effects.references.moves[0]!;
+    effectMove.effects.push({ ...effectMove.effects[0]! });
+    expect(() => validateSnapshot(effects)).toThrow("move.effects");
+  });
+
+  it("requires item text collections and validates exact game/language identities", () => {
+    const snapshot = fixture();
+    snapshot.references.items = [
+      {
+        id: 83,
+        identifier: "thunder-stone",
+        names: [{ languageId: 5, name: "Pierre Foudre" }],
+        flavorTexts: [{ languageId: 5, versionGroupId: 25, text: "Une pierre particulière." }],
+        effects: [{ languageId: 9, effect: "Evolves certain Pokémon.", shortEffect: "Evolution." }],
+      },
+    ];
+    snapshot.references.sourceCounts.items = 1;
+    validateSnapshot(snapshot);
+    const item = snapshot.references.items[0]!;
+    item.flavorTexts[0]!.versionGroupId = 999999;
+    expect(() => validateSnapshot(snapshot)).toThrow("item.flavorText.versionGroupId");
+    item.flavorTexts[0]!.versionGroupId = 25;
+    item.flavorTexts.push({ ...item.flavorTexts[0]! });
+    expect(() => validateSnapshot(snapshot)).toThrow("item.flavorTexts");
+    item.flavorTexts.pop();
+    item.effects.push({ ...item.effects[0]! });
+    expect(() => validateSnapshot(snapshot)).toThrow("item.effects");
+    item.effects = [];
+    item.flavorTexts = [];
+    validateSnapshot(snapshot);
+    Reflect.deleteProperty(item, "effects");
+    expect(() => validateSnapshot(snapshot)).toThrow("item.effects");
   });
 
   it("rejects duplicate historical identities even if all extraction counts agree", () => {

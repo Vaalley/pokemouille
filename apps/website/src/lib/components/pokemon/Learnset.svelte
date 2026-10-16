@@ -1,12 +1,16 @@
 <script lang="ts">
   import { Tabs } from "bits-ui";
+  import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import type {
     LocalizedText,
     ResolvedPokemon,
+    ReferenceData,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { reasonText, t } from "#lib/i18n/pokemon.ts";
   import Localized from "./Localized.svelte";
+  import MoveIcon from "../MoveIcon.svelte";
 
   type Move = Extract<ResolvedPokemon["learnset"], { status: "available" }>["value"][number];
 
@@ -14,12 +18,20 @@
     lang,
     learnset,
     games,
+    referenceMoves,
   }: {
     lang: Language;
     learnset: ResolvedPokemon["learnset"];
     /** Localized names of the selected version group's games. */
     games: string;
+    referenceMoves: ReadonlyArray<Pick<ReferenceData["moves"][number], "id" | "typeId">>;
   } = $props();
+
+  const moveTypes = $derived.by(() => {
+    const types = new Map<number, number | null>();
+    for (const move of referenceMoves) types.set(move.id, move.typeId);
+    return types;
+  });
 
   // Learn method 1 is "level-up": the only method whose rows are ordered by level.
   const LEVEL_UP = 1;
@@ -87,7 +99,11 @@
                 {#each group.moves as move, index (index)}
                   <tr>
                     {#if group.levelUp}<td>{move.level}</td>{/if}
-                    <th scope="row"><Localized text={move.name} /></th>
+                    <th scope="row">
+                      <a
+                        href={`${resolve(`${lang}/move/${move.moveId}/`)}${page.url.searchParams.has("version") ? `?version=${encodeURIComponent(page.url.searchParams.get("version")!)}` : ""}`}
+                      ><MoveIcon typeId={moveTypes.get(move.moveId)} /><Localized text={move.name} /></a>
+                    </th>
                     {#if group.hasMastery}<td>{move.mastery ?? ""}</td>{/if}
                   </tr>
                 {/each}
@@ -101,3 +117,8 @@
     <p>{reasonText(lang, learnset.reason)}</p>
   {/if}
 </section>
+
+<style>
+  th[scope="row"] { text-align: start; }
+  th a { display: inline-flex; align-items: center; gap: 0.375rem; }
+</style>

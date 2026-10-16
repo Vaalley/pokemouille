@@ -142,6 +142,21 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
       sourceCount(before.data.abilityEffects)
   )
     throw new Error("Incomplete ability text relationships");
+  if (
+    referenceResponse.data.moves.reduce((total, row) => total + row.flavorTexts.length, 0) !==
+      sourceCount(before.data.moveFlavorTexts) ||
+    referenceResponse.data.moveEffects.length !== sourceCount(before.data.moveEffects) ||
+    referenceResponse.data.moveEffects.reduce((total, row) => total + row.effects.length, 0) !==
+      sourceCount(before.data.moveEffectTexts)
+  )
+    throw new Error("Incomplete move text relationships");
+  if (
+    referenceResponse.data.items.reduce((total, row) => total + row.flavorTexts.length, 0) !==
+      sourceCount(before.data.itemFlavorTexts) ||
+    referenceResponse.data.items.reduce((total, row) => total + row.effects.length, 0) !==
+      sourceCount(before.data.itemEffects)
+  )
+    throw new Error("Incomplete item text relationships");
   const nameTables = {
     types: "typeNames",
     stats: "statNames",

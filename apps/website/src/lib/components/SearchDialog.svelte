@@ -5,14 +5,20 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
-  import type { GameOption, SearchEntry } from "../../../../../packages/pokemon-data/src/index.ts";
+  import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
   import Localized from "#lib/components/pokemon/Localized.svelte";
+  import AbilityIcon from "#lib/components/AbilityIcon.svelte";
+  import ItemIcon from "#lib/components/ItemIcon.svelte";
+  import MoveIcon from "#lib/components/MoveIcon.svelte";
+  import PokemonIcon from "#lib/components/PokemonIcon.svelte";
   import { pokemonHref } from "#lib/data/context.ts";
-  import { getSearchIndex } from "#lib/data/loader.ts";
+  import { getReferences, getSearchIndex } from "#lib/data/loader.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/messages.ts";
   import { versionName } from "#lib/i18n/pokemon.ts";
-  import { prepareSearchIndex, searchPokemon } from "#lib/search/rank.ts";
+  import { buildSearchEntries } from "#lib/search/entries.ts";
+  import type { GlobalSearchEntry } from "#lib/search/entries.ts";
+  import { prepareSearchIndex, searchEntries } from "#lib/search/rank.ts";
   import type { PreparedIndex, SearchGame, SearchResult } from "#lib/search/rank.ts";
 
   interface Props {
@@ -43,12 +49,12 @@
     if (index?.lang === target || pendingLang === target) return;
     pendingLang = target;
     failedLang = null;
-    getSearchIndex(target).then(
-      (entries) => {
+    Promise.all([getSearchIndex(target), getReferences()]).then(
+      ([entries, references]) => {
         // A newer language request supersedes this one.
         if (pendingLang !== target) return;
         pendingLang = null;
-        index = { lang: target, prepared: prepareSearchIndex(entries) };
+        index = { lang: target, prepared: prepareSearchIndex(buildSearchEntries(entries, references, target)) };
       },
       () => {
         if (pendingLang !== target) return;
@@ -101,7 +107,7 @@
   const hasQuery = $derived(query.trim() !== "");
   const results = $derived<SearchResult[]>(
     index && index.lang === lang && hasQuery
-      ? searchPokemon(index.prepared, query, { game: searchGame })
+      ? searchEntries(index.prepared, query, { game: searchGame })
       : [],
   );
   const statusMessage = $derived.by(() => {
@@ -118,8 +124,18 @@
    * Detail-page link keeping the current game: the header's resolved game, else the URL's
    * `?version=` while games load, else a context-free link the detail page resolves itself.
    */
-  function hrefFor(entry: SearchEntry): string {
+  function hrefFor(entry: GlobalSearchEntry): string {
     const target = version ?? page.url.searchParams.get("version");
+    if (entry.kind !== "pokemon") {
+      const path = entry.kind === "move"
+        ? resolve(`${lang}/move/${entry.id}/`)
+        : entry.kind === "ability"
+          ? resolve(`${lang}/ability/${entry.id}/`)
+          : resolve(`${lang}/item/${entry.id}/`);
+      const params = new URLSearchParams();
+      if (target) params.set("version", target);
+      return path + (params.size ? `?${params}` : "");
+    }
     if (!target) return resolve(`${lang}/pokemon/${entry.speciesId}/`);
     const path = pokemonHref(lang, entry.speciesId, {
       version: target,
@@ -246,7 +262,7 @@
         <Command.Root shouldFilter={false} vimBindings={false} label={t(lang, "search.label")}>
           {#snippet child({ props })}
             {@const { role: _role, ...commandProps } = props}
-            <div {...commandProps}>
+            <div {...commandProps} class="search-command">
               <div class="search-field">
                 <Label.Root for="{id}-input">{t(lang, "search.input")}</Label.Root>
                 <Command.Input
@@ -273,22 +289,34 @@
                 hidden={results.length === 0}
               >
                 <Command.Viewport>
-                  {#each results as result (`${result.entry.pokemonId}:${result.entry.formId}`)}
+                  {#each results as result (result.entry.key)}
                     {@const entry = result.entry}
                     {@const href = hrefFor(entry)}
                     <Command.LinkItem
-                      value={`${result.entry.pokemonId}:${result.entry.formId}`}
+                      value={entry.key}
                       {href}
                       tabindex={-1}
                       onclick={(e) => onResultClick(e, href)}
                     >
+                      <span class="search-result-kind">{t(lang, `search.kind.${entry.kind}`)}</span>
                       <span class="species-number">
-                        {t(lang, "home.number", { number: entry.speciesId })}
+                        {entry.kind === "pokemon" ? t(lang, "home.number", { number: entry.id }) : `#${entry.id}`}
                       </span>
-                      <Localized text={entry.name} />
-                      {#if entry.speciesName.text !== entry.name.text}
-                        <span>(<Localized text={entry.speciesName} />)</span>
+                      {#if entry.kind === "pokemon"}
+                        <PokemonIcon speciesId={entry.speciesId} />
+                      {:else if entry.kind === "move"}
+                        <MoveIcon typeId={entry.typeId} />
+                      {:else if entry.kind === "ability"}
+                        <AbilityIcon />
+                      {:else}
+                        <ItemIcon identifier={entry.identifier} />
                       {/if}
+                      <span class="search-result-name">
+                        <Localized text={entry.name} />
+                        {#if entry.kind === "pokemon" && entry.speciesName.text !== entry.name.text}
+                          (<Localized text={entry.speciesName} />)
+                        {/if}
+                      </span>
                       {#if selectedGame && result.introduction === "not-introduced"}
                         <span>{t(lang, "search.notIntroduced", { game: gameName })}</span>
                       {:else if selectedGame && result.introduction === "unknown"}

@@ -89,6 +89,7 @@ export async function loadOperations() {
         !Array.isArray(data.stats) ||
         !Array.isArray(data.abilities) ||
         !Array.isArray(data.moves) ||
+        !Array.isArray(data.moveEffects) ||
         !Array.isArray(data.items) ||
         !Array.isArray(data.learnMethods) ||
         !Array.isArray(data.evolutionTriggers)

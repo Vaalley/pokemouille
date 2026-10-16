@@ -1,6 +1,8 @@
 import type {
   Ability,
+  Item,
   Name,
+  Move,
   NamedResource,
   PokemonVariety,
   ReferenceData,
@@ -25,6 +27,11 @@ export function required<T>(value: T | null | undefined, field: string): T {
   if (value === null || value === undefined)
     throw new Error(`Missing required source field: ${field}`);
   return value;
+}
+
+/** Some upstream flavor rows store the escape sequence `\n` as literal text instead of a line break. */
+function flavorText(text: string): string {
+  return text.replaceAll("\\n", "\n");
 }
 
 export function validateCensus(data: SourceCensusFragment): void {
@@ -56,6 +63,11 @@ export function validateCensus(data: SourceCensusFragment): void {
     "evolutionTriggers",
     "abilityFlavorTexts",
     "abilityEffects",
+    "moveFlavorTexts",
+    "moveEffects",
+    "moveEffectTexts",
+    "itemFlavorTexts",
+    "itemEffects",
     "typeNames",
     "statNames",
     "abilityNames",
@@ -128,7 +140,7 @@ export function mapReferences(
       .map((text) => ({
         languageId: required(text.languageId, "ability.flavor.languageId"),
         versionGroupId: required(text.versionGroupId, "ability.flavor.versionGroupId"),
-        text: required(text.text, "ability.flavor.text"),
+        text: flavorText(required(text.text, "ability.flavor.text")),
       })),
     effects: row.effects
       .filter((text) => text.effect !== null || text.shortEffect !== null)
@@ -138,6 +150,63 @@ export function mapReferences(
         shortEffect: text.shortEffect ?? "",
       })),
   }));
+  // Effects are shared by moves upstream; fetch each effect once and retain
+  // genuine missing text as an empty collection rather than inventing prose.
+  const moveEffects = new Map<number, Move["effects"]>();
+  for (const row of raw.moveEffects) {
+    if (moveEffects.has(row.id)) throw new Error(`Duplicate source move effect id ${row.id}`);
+    const translations = new Map<number, Move["effects"][number]>();
+    for (const text of row.effects) {
+      const languageId = required(text.languageId, "move.effect.languageId");
+      const previous = translations.get(languageId);
+      // The source can contain repeated, identical translations. Raw row counts
+      // are still checked independently; normalize only lossless duplicates.
+      if (previous) {
+        if (previous.effect !== text.effect || previous.shortEffect !== text.shortEffect)
+          throw new Error(`Conflicting source move effect translation: ${row.id}/${languageId}`);
+      } else {
+        translations.set(languageId, {
+          languageId,
+          effect: text.effect,
+          shortEffect: text.shortEffect,
+        });
+      }
+    }
+    moveEffects.set(row.id, [...translations.values()]);
+  }
+  const moves: Move[] = raw.moves.map((row) => ({
+    ...namedResource(row),
+    generationId: required(row.generationId, "move.generationId"),
+    typeId: required(row.typeId, "move.typeId"),
+    damageClassId: required(row.damageClassId, "move.damageClassId"),
+    power: row.power,
+    accuracy: row.accuracy,
+    pp: row.pp,
+    priority: required(row.priority, "move.priority"),
+    effectChance: row.effectChance,
+    flavorTexts: row.flavorTexts.map((text) => ({
+      languageId: required(text.languageId, "move.flavor.languageId"),
+      versionGroupId: required(text.versionGroupId, "move.flavor.versionGroupId"),
+      text: flavorText(text.text),
+    })),
+    effects:
+      row.effectId === null
+        ? []
+        : required(moveEffects.get(row.effectId), `move.effectId ${row.effectId}`),
+  }));
+  const items: Item[] = raw.items.map((row) => ({
+    ...namedResource(row),
+    flavorTexts: row.flavorTexts.map((text) => ({
+      languageId: required(text.languageId, "item.flavor.languageId"),
+      versionGroupId: required(text.versionGroupId, "item.flavor.versionGroupId"),
+      text: flavorText(text.text),
+    })),
+    effects: row.effects.map((text) => ({
+      languageId: required(text.languageId, "item.effect.languageId"),
+      effect: text.effect,
+      shortEffect: text.shortEffect,
+    })),
+  }));
   return {
     generations: raw.generations.map((row) => ({ id: row.id, identifier: row.identifier })),
     versionGroups,
@@ -145,9 +214,9 @@ export function mapReferences(
     types: raw.types.map(namedResource),
     stats: raw.stats.map(namedResource),
     abilities,
-    moves: raw.moves.map(namedResource),
+    moves,
     learnMethods: raw.learnMethods.map(namedResource),
-    items: raw.items.map(namedResource),
+    items,
     evolutionTriggers: raw.evolutionTriggers.map(namedResource),
     coverage: raw.versionGroups.map((group) => ({
       versionGroupId: group.id,
@@ -304,7 +373,7 @@ export function mapSpecies(raw: RawSpecies): SpeciesRecord {
     flavorTexts: raw.flavorTexts.map((row) => ({
       languageId: required(row.languageId, "flavor.languageId"),
       versionId: required(row.versionId, "flavor.versionId"),
-      text: required(row.text, "flavor.text"),
+      text: flavorText(required(row.text, "flavor.text")),
     })),
     genderRate: required(raw.genderRate, "species.genderRate"),
     captureRate: required(raw.captureRate, "species.captureRate"),

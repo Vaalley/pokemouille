@@ -1,7 +1,11 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
+  import { page } from "$app/state";
+  import type { PathnameWithSearchOrHash } from "$app/types";
   import type { ResolvedPokemon } from "../../../../../../packages/pokemon-data/src/index.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { reasonText, t } from "#lib/i18n/pokemon.ts";
+  import AbilityIcon from "../AbilityIcon.svelte";
   import Localized from "./Localized.svelte";
 
   let {
@@ -14,6 +18,11 @@
     /** Localized names of the selected version group's games. */
     games: string;
   } = $props();
+
+  const versionQuery = $derived.by(() => {
+    const version = page.url.searchParams.get("version");
+    return version === null ? "" : `?${new URLSearchParams({ version })}`;
+  });
 </script>
 
 <section aria-labelledby="abilities-heading">
@@ -23,7 +32,12 @@
       {#each abilities.value as ability (ability.slot)}
         <li>
           <h3>
-            <Localized text={ability.name} />
+            <a
+              class="ability-link"
+              href={resolve(
+                `${lang}/ability/${ability.id}/${versionQuery}` as PathnameWithSearchOrHash,
+              )}><AbilityIcon /><Localized text={ability.name} /></a
+            >
             {#if ability.isHidden}<small>({t(lang, "abilities.hidden")})</small>{/if}
           </h3>
           <dl>
@@ -54,3 +68,7 @@
     <p>{reasonText(lang, abilities.reason)}</p>
   {/if}
 </section>
+
+<style>
+  .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; }
+</style>

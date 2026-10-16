@@ -1,5 +1,5 @@
 import { introductionStatus } from "../../../../../packages/pokemon-data/src/index.ts";
-import type { SearchEntry } from "../../../../../packages/pokemon-data/src/index.ts";
+import type { GlobalSearchEntry } from "./entries.ts";
 
 export type MatchKind = "number" | "exact" | "prefix" | "substring" | "typo";
 export type Introduction = "available" | "not-introduced" | "unknown";
@@ -12,9 +12,9 @@ export interface SearchGame {
 }
 
 export interface SearchResult {
-  entry: SearchEntry;
+  entry: GlobalSearchEntry;
   match: MatchKind;
-  /** null when no game is given. */
+  /** Pokémon introduction only; null for other resources or when no game is given. */
   introduction: Introduction | null;
 }
 
@@ -32,12 +32,12 @@ interface PreparedKey {
 }
 
 interface PreparedEntry {
-  entry: SearchEntry;
+  entry: GlobalSearchEntry;
   /** Deduplicated by compact key, ordered name → speciesName → aliases. */
   keys: PreparedKey[];
 }
 
-/** Opaque to callers: build with `prepareSearchIndex`, consume with `searchPokemon`. */
+/** Opaque to callers: build with `prepareSearchIndex`, consume with `searchEntries`. */
 export interface PreparedIndex {
   readonly entries: readonly PreparedEntry[];
 }
@@ -76,7 +76,7 @@ export function normalizeSearchText(text: string): string {
   return fold(text).replace(SEPARATORS, "");
 }
 
-export function prepareSearchIndex(entries: readonly SearchEntry[]): PreparedIndex {
+export function prepareSearchIndex(entries: readonly GlobalSearchEntry[]): PreparedIndex {
   return {
     entries: entries.map((entry) => {
       const byCompact = new Map<string, PreparedKey>();
@@ -93,7 +93,7 @@ export function prepareSearchIndex(entries: readonly SearchEntry[]): PreparedInd
           for (const word of words) if (!key.tokens.includes(word)) key.tokens.push(word);
       };
       add(entry.name.text, NAME);
-      add(entry.speciesName.text, SPECIES_NAME);
+      if (entry.kind === "pokemon") add(entry.speciesName.text, SPECIES_NAME);
       for (const alias of entry.aliases) add(alias, ALIAS);
       return { entry, keys: [...byCompact.values()] };
     }),
@@ -170,7 +170,7 @@ class TypoMatcher {
 }
 
 interface Candidate {
-  entry: SearchEntry;
+  entry: GlobalSearchEntry;
   tier: number;
   distance: number;
   field: number;
@@ -182,8 +182,8 @@ function parseNumberQuery(query: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
-function introductionOf(entry: SearchEntry, game: SearchGame | null | undefined) {
-  if (!game) return null;
+function introductionOf(entry: GlobalSearchEntry, game: SearchGame | null | undefined) {
+  if (!game || entry.kind !== "pokemon") return null;
   const groupOrder =
     entry.introducedVersionGroupId == null
       ? null
@@ -191,20 +191,31 @@ function introductionOf(entry: SearchEntry, game: SearchGame | null | undefined)
   return introductionStatus(entry.generationId, groupOrder, game);
 }
 
+function categoryOrder(entry: GlobalSearchEntry): number {
+  // Comparable base Pokémon first; don't let a species' many forms bury other resources.
+  if (entry.kind === "pokemon") return entry.isDefault ? 0 : 4;
+  return entry.kind === "move" ? 1 : entry.kind === "ability" ? 2 : 3;
+}
+
 function compareCandidates(a: Candidate, b: Candidate): number {
-  return (
+  const rank =
     a.tier - b.tier ||
     a.distance - b.distance ||
     a.field - b.field ||
     Number(a.introduction === "not-introduced") - Number(b.introduction === "not-introduced") ||
-    Number(b.entry.isDefault) - Number(a.entry.isDefault) ||
-    a.entry.speciesId - b.entry.speciesId ||
-    a.entry.pokemonId - b.entry.pokemonId ||
-    (a.entry.formId ?? -Infinity) - (b.entry.formId ?? -Infinity)
-  );
+    categoryOrder(a.entry) - categoryOrder(b.entry);
+  if (rank) return rank;
+  if (a.entry.kind === "pokemon" && b.entry.kind === "pokemon") {
+    return (
+      a.entry.speciesId - b.entry.speciesId ||
+      a.entry.pokemonId - b.entry.pokemonId ||
+      (a.entry.formId ?? -Infinity) - (b.entry.formId ?? -Infinity)
+    );
+  }
+  return a.entry.id - b.entry.id;
 }
 
-export function searchPokemon(
+export function searchEntries(
   index: PreparedIndex,
   query: string,
   options: { game?: SearchGame | null; limit?: number } = {},
@@ -212,10 +223,10 @@ export function searchPokemon(
   const limit = options.limit ?? 20;
   if (limit <= 0) return [];
   const candidates: Candidate[] = [];
-  const speciesNumber = parseNumberQuery(query);
-  if (speciesNumber !== null) {
+  const number = parseNumberQuery(query);
+  if (number !== null) {
     for (const { entry } of index.entries)
-      if (entry.speciesId === speciesNumber)
+      if (entry.id === number)
         candidates.push({
           entry,
           tier: NUMBER,

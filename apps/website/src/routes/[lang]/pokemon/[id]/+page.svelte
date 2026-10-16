@@ -14,6 +14,7 @@
   import FormSelector from "#lib/components/pokemon/FormSelector.svelte";
   import Identity from "#lib/components/pokemon/Identity.svelte";
   import Learnset from "#lib/components/pokemon/Learnset.svelte";
+  import Sprites from "#lib/components/pokemon/Sprites.svelte";
   import Stats from "#lib/components/pokemon/Stats.svelte";
   import Types from "#lib/components/pokemon/Types.svelte";
   import {
@@ -284,7 +285,12 @@
     {/if}
 
     <div class="panels">
-      <Types {lang} types={pokemon.types} />
+      <Types
+        {lang}
+        types={pokemon.types}
+        generationId={pokemon.context.generationId}
+        referenceTypes={view.references.types}
+      />
       <Stats {lang} stats={pokemon.stats} game={gameName} />
       <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
       <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
@@ -300,7 +306,10 @@
         references={view.references}
       />
     </div>
-    <Learnset {lang} learnset={pokemon.learnset} games={groupName} />
+    {#key pokemon.pokemonId}
+      <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} />
+    {/key}
+    <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
     <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
   {/if}
 </article>

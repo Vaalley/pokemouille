@@ -34,6 +34,22 @@ export interface Ability extends NamedResource {
   flavorTexts: { languageId: number; versionGroupId: number; text: string }[];
   effects: { languageId: number; effect: string; shortEffect: string }[];
 }
+export interface Item extends NamedResource {
+  flavorTexts: { languageId: number; versionGroupId: number; text: string }[];
+  effects: { languageId: number; effect: string; shortEffect: string }[];
+}
+export interface Move extends NamedResource {
+  generationId: number;
+  typeId: number;
+  damageClassId: number;
+  power: number | null;
+  accuracy: number | null;
+  pp: number | null;
+  priority: number;
+  effectChance: number | null;
+  flavorTexts: { languageId: number; versionGroupId: number; text: string }[];
+  effects: { languageId: number; effect: string; shortEffect: string }[];
+}
 export interface Coverage {
   versionGroupId: number;
   learnsetRows: number;
@@ -46,9 +62,9 @@ export interface ReferenceData {
   types: NamedResource[];
   stats: NamedResource[];
   abilities: Ability[];
-  moves: NamedResource[];
+  moves: Move[];
   learnMethods: NamedResource[];
-  items: NamedResource[];
+  items: Item[];
   evolutionTriggers: NamedResource[];
   coverage: Coverage[];
   // Exact upstream counts, taken independently from the exported row arrays.

@@ -10,4 +10,11 @@ export default defineConfig({
       prerender: { handleHttpError: "fail", handleMissingId: "fail" },
     }),
   ],
+  server: {
+    watch: {
+      // adapter-static writes thousands of page directories here, outside Vite's outDir.
+      // Watching a previous build stalls Windows development startup on filesystem work.
+      ignored: ["**/build/**"],
+    },
+  },
 });

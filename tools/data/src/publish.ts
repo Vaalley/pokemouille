@@ -1,4 +1,4 @@
-import { mkdir, readFile, rename, rm } from "node:fs/promises";
+import { access, cp, mkdir, readFile, rename, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import type {
@@ -83,7 +83,15 @@ export async function publishSnapshot(
           !isFileError(error, "EPERM")
         )
           throw error;
-        // Same semantic revision may already exist. Never overwrite immutable data.
+        // Windows also reports EPERM when a scanner/indexer holds a staged file and the
+        // target does not exist yet; install by copying instead of assuming it exists.
+        const exists = await access(revisionPath).then(
+          () => true,
+          () => false,
+        );
+        if (!exists)
+          await cp(staging, revisionPath, { recursive: true, errorOnExist: true, force: false });
+        // Existing or copied revision: verify; never overwrite immutable data.
         for (const [path, expected] of Object.entries(assets)) {
           const contents = await readFile(join(revisionPath, path));
           if (
@@ -92,7 +100,6 @@ export async function publishSnapshot(
           )
             throw new Error(`Existing immutable asset is corrupt: ${path}`);
         }
-        await rm(staging, { recursive: true, force: true });
       }
       function asset(path: string): Asset {
         const metadata = assets[path];

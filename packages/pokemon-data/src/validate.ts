@@ -216,7 +216,7 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
     const row = resource(entry, "version");
     integer(row.versionGroupId, "version.versionGroupId", 1);
   }
-  for (const key of ["types", "stats", "moves", "learnMethods", "items", "evolutionTriggers"])
+  for (const key of ["types", "stats", "learnMethods", "evolutionTriggers"])
     for (const row of array(refs[key], `references.${key}`)) resource(row, `references.${key}`);
   for (const entry of array(refs.abilities, "references.abilities")) {
     const row = resource(entry, "ability");
@@ -231,6 +231,41 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
       integer(effect.languageId, "ability.effect.languageId", 1);
       text(effect.effect, "ability.effect.effect", true);
       text(effect.shortEffect, "ability.effect.shortEffect", true);
+    }
+  }
+  for (const entry of array(refs.items, "references.items")) {
+    const row = resource(entry, "item");
+    for (const entry of array(row.flavorTexts, "item.flavorTexts")) {
+      const flavor = object(entry, "item.flavorText");
+      integer(flavor.languageId, "item.flavorText.languageId", 1);
+      integer(flavor.versionGroupId, "item.flavorText.versionGroupId", 1);
+      text(flavor.text, "item.flavorText.text", true);
+    }
+    for (const entry of array(row.effects, "item.effects")) {
+      const effect = object(entry, "item.effect");
+      integer(effect.languageId, "item.effect.languageId", 1);
+      text(effect.effect, "item.effect.effect", true);
+      text(effect.shortEffect, "item.effect.shortEffect", true);
+    }
+  }
+  for (const entry of array(refs.moves, "references.moves")) {
+    const row = resource(entry, "move");
+    for (const key of ["generationId", "typeId", "damageClassId"])
+      integer(row[key], `move.${key}`, 1);
+    for (const key of ["power", "accuracy", "pp", "effectChance"])
+      nullableInteger(row[key], `move.${key}`, 0);
+    integer(row.priority, "move.priority", -7);
+    for (const entry of array(row.flavorTexts, "move.flavorTexts")) {
+      const flavor = object(entry, "move.flavorText");
+      integer(flavor.languageId, "move.flavorText.languageId", 1);
+      integer(flavor.versionGroupId, "move.flavorText.versionGroupId", 1);
+      text(flavor.text, "move.flavorText.text", true);
+    }
+    for (const entry of array(row.effects, "move.effects")) {
+      const effect = object(entry, "move.effect");
+      integer(effect.languageId, "move.effect.languageId", 1);
+      text(effect.effect, "move.effect.effect", true);
+      text(effect.shortEffect, "move.effect.shortEffect", true);
     }
   }
   for (const entry of array(refs.coverage, "references.coverage")) {
@@ -304,6 +339,28 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
     unique(ability.effects, (row) => row.languageId, "ability.effects");
     for (const row of ability.flavorTexts)
       relationship(groups, row.versionGroupId, "ability.flavorText.versionGroupId");
+  }
+  for (const move of refs.moves) {
+    relationship(generations, move.generationId, "move.generationId");
+    relationship(types, move.typeId, "move.typeId");
+    unique(
+      move.flavorTexts,
+      (row) => `${row.languageId}/${row.versionGroupId}`,
+      "move.flavorTexts",
+    );
+    unique(move.effects, (row) => row.languageId, "move.effects");
+    for (const row of move.flavorTexts)
+      relationship(groups, row.versionGroupId, "move.flavorText.versionGroupId");
+  }
+  for (const item of refs.items) {
+    unique(
+      item.flavorTexts,
+      (row) => `${row.languageId}/${row.versionGroupId}`,
+      "item.flavorTexts",
+    );
+    unique(item.effects, (row) => row.languageId, "item.effects");
+    for (const row of item.flavorTexts)
+      relationship(groups, row.versionGroupId, "item.flavorText.versionGroupId");
   }
   const versionGroups = new Map(refs.versions.map((row) => [row.id, row.versionGroupId]));
   const learnsetCounts = new Map<number, number>();
