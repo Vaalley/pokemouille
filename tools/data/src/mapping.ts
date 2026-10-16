@@ -29,9 +29,29 @@ export function required<T>(value: T | null | undefined, field: string): T {
   return value;
 }
 
-/** Some upstream flavor rows store the escape sequence `\n` as literal text instead of a line break. */
-function flavorText(text: string): string {
-  return text.replaceAll("\\n", "\n");
+const cjk = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\u3000-\u303f\uff00-\uffef]/u;
+
+/**
+ * In-game text keeps the cartridge text-box wrapping: `\n` line wraps, `\f` page breaks,
+ * soft hyphens splitting words across lines, and sometimes a literal `\n` escape sequence.
+ * None of these are paragraph breaks, so join them into flowing prose. Breaks next to
+ * Japanese text join without a space; Japanese already separates words with U+3000.
+ */
+export function gameText(text: string): string {
+  return text
+    .replaceAll("\\n", "\n")
+    .replace(/\u00ad[ \t]*[\n\f]\s*/g, "")
+    .replace(/(\S)[ \t]*[\n\f]\s*/gu, (match, before: string, offset: number, all: string) => {
+      const rest = all.slice(offset + match.length);
+      // "Fire-\nand Ice-type" is a suspended hyphen, not a word split.
+      if (before === "-" && !/^(?:and|or)\b/.test(rest)) return before;
+      if (cjk.test(before) || cjk.test(rest[0] ?? "")) return before;
+      return `${before} `;
+    })
+    .replace(/\s*[\n\f]\s*/g, " ")
+    .replaceAll("\u00ad", "")
+    .replace(/ {2,}/g, " ")
+    .trim();
 }
 
 export function validateCensus(data: SourceCensusFragment): void {
@@ -140,7 +160,7 @@ export function mapReferences(
       .map((text) => ({
         languageId: required(text.languageId, "ability.flavor.languageId"),
         versionGroupId: required(text.versionGroupId, "ability.flavor.versionGroupId"),
-        text: flavorText(required(text.text, "ability.flavor.text")),
+        text: gameText(required(text.text, "ability.flavor.text")),
       })),
     effects: row.effects
       .filter((text) => text.effect !== null || text.shortEffect !== null)
@@ -187,7 +207,7 @@ export function mapReferences(
     flavorTexts: row.flavorTexts.map((text) => ({
       languageId: required(text.languageId, "move.flavor.languageId"),
       versionGroupId: required(text.versionGroupId, "move.flavor.versionGroupId"),
-      text: flavorText(text.text),
+      text: gameText(text.text),
     })),
     effects:
       row.effectId === null
@@ -199,7 +219,7 @@ export function mapReferences(
     flavorTexts: row.flavorTexts.map((text) => ({
       languageId: required(text.languageId, "item.flavor.languageId"),
       versionGroupId: required(text.versionGroupId, "item.flavor.versionGroupId"),
-      text: flavorText(text.text),
+      text: gameText(text.text),
     })),
     effects: row.effects.map((text) => ({
       languageId: required(text.languageId, "item.effect.languageId"),
@@ -373,7 +393,7 @@ export function mapSpecies(raw: RawSpecies): SpeciesRecord {
     flavorTexts: raw.flavorTexts.map((row) => ({
       languageId: required(row.languageId, "flavor.languageId"),
       versionId: required(row.versionId, "flavor.versionId"),
-      text: flavorText(required(row.text, "flavor.text")),
+      text: gameText(required(row.text, "flavor.text")),
     })),
     genderRate: required(raw.genderRate, "species.genderRate"),
     captureRate: required(raw.captureRate, "species.captureRate"),

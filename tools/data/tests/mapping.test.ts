@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import type { ReferencesQuery } from "../src/generated/operations.ts";
-import { mapReferences } from "../src/mapping.ts";
+import { gameText, mapReferences } from "../src/mapping.ts";
 import { validateBoundedRelationships } from "../src/operations.ts";
 
 const census = { species: 0, pokemon: 0, forms: 0, learnsets: 0, evolutions: 0 };
@@ -200,8 +200,23 @@ describe("item reference mapping", () => {
   });
 });
 
-describe("flavor text mapping", () => {
-  it("turns literal upstream \\n escape sequences into real line breaks", () => {
+describe("game text normalization", () => {
+  it("joins cartridge text-box wrapping into prose", () => {
+    expect(
+      gameText("Exposure to sun\u00ad\nlight adds to its\nstrength. Sunlight\falso grows."),
+    ).toBe("Exposure to sunlight adds to its strength. Sunlight also grows.");
+    expect(gameText("Heightens the critical-\nhit ratios of moves.")).toBe(
+      "Heightens the critical-hit ratios of moves.",
+    );
+    expect(gameText("Boosts resistance to Fire-\nand Ice-type moves.")).toBe(
+      "Boosts resistance to Fire- and Ice-type moves.",
+    );
+    expect(gameText("でんきタイプの　技を　自分に\n寄せつけ")).toBe(
+      "でんきタイプの　技を　自分に寄せつけ",
+    );
+  });
+
+  it("treats literal upstream \\n escape sequences as wraps in mapped flavor text", () => {
     const raw = moveReferences();
     raw.abilities = [
       {
@@ -218,11 +233,9 @@ describe("flavor text mapping", () => {
       },
     ];
     raw.abilitiesCount.aggregate!.count = 1;
-    raw.moves[0]!.flavorTexts[0]!.text = "Une attaque\\nélectrique.";
     const references = mapReferences(raw, census);
     expect(references.abilities[0]!.flavorTexts[0]!.text).toBe(
-      "Attire les capacités\nde type Électrik.",
+      "Attire les capacités de type Électrik.",
     );
-    expect(references.moves[0]!.flavorTexts[0]!.text).toBe("Une attaque\nélectrique.");
   });
 });

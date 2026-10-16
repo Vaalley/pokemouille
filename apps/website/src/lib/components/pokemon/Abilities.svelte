@@ -53,7 +53,7 @@
               {t(lang, "abilities.effect")}
               <small>({t(lang, "scope.current")})</small>
             </dt>
-            <dd>
+            <dd class="effect-text">
               {#if ability.currentEffect.status === "available"}
                 <Localized text={ability.currentEffect.value} />
               {:else}
@@ -71,4 +71,5 @@
 
 <style>
   .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; }
+  .effect-text { white-space: pre-line; }
 </style>
