@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { defensiveMatchups } from "./type-matchups.ts";
+import { defensiveMatchups, offensiveMatchups } from "./type-matchups.ts";
 
 describe("defensiveMatchups", () => {
   it("multiplies dual weaknesses and resistances", () => {
@@ -79,5 +79,38 @@ describe("defensiveMatchups", () => {
     for (const generation of [0, -1, 1.5, NaN, Infinity]) {
       expect(defensiveMatchups([1], generation)).toBeNull();
     }
+  });
+});
+
+describe("offensiveMatchups", () => {
+  it("mirrors the defensive chart for a single defender", () => {
+    for (const generation of [1, 2, 5, 6, 9]) {
+      for (const row of offensiveMatchups(8, generation) ?? []) {
+        expect(defensiveMatchups([row.typeId], generation)).toContainEqual({
+          typeId: 8,
+          multiplier: row.multiplier,
+        });
+      }
+    }
+  });
+
+  it("applies historical factors to the attacking type", () => {
+    expect(offensiveMatchups(8, 1)).toContainEqual({ typeId: 14, multiplier: 0 });
+    expect(offensiveMatchups(8, 5)).toContainEqual({ typeId: 9, multiplier: 0.5 });
+    expect(offensiveMatchups(8, 6)).toContainEqual({ typeId: 9, multiplier: 1 });
+    expect(offensiveMatchups(16, 9)).toContainEqual({ typeId: 18, multiplier: 0 });
+  });
+
+  it("lists only defenders introduced in the generation", () => {
+    expect(offensiveMatchups(1, 1)?.map(({ typeId }) => typeId)).not.toContain(9);
+    expect(offensiveMatchups(1, 5)?.map(({ typeId }) => typeId)).not.toContain(18);
+    expect(offensiveMatchups(1, 6)).toHaveLength(18);
+  });
+
+  it("rejects unknown or not-yet-introduced attackers and invalid generations", () => {
+    for (const typeId of [0, 19, 1.5, NaN]) expect(offensiveMatchups(typeId, 9)).toBeNull();
+    expect(offensiveMatchups(18, 5)).toBeNull();
+    expect(offensiveMatchups(17, 1)).toBeNull();
+    for (const generation of [0, 1.5, NaN]) expect(offensiveMatchups(1, generation)).toBeNull();
   });
 });

@@ -7,13 +7,13 @@
   import type { GameOption, ReferenceData } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../packages/pokemon-data/src/localization.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
-  import TypeBadge from "#lib/components/TypeBadge.svelte";
+  import MatchupGroups from "#lib/components/MatchupGroups.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
   import { pokemonHref } from "#lib/data/context.ts";
   import { filterTypeMembers } from "#lib/data/type-membership.ts";
   import { getGames, getReferences } from "#lib/data/loader.ts";
-  import { defensiveMatchups, isIntroduced } from "#lib/data/type-matchups.ts";
+  import { defensiveMatchups, isIntroduced, offensiveMatchups } from "#lib/data/type-matchups.ts";
   import { readTypeSelection, typeSelectionUrl } from "#lib/data/type-selection.ts";
   import { t } from "#lib/i18n/types.ts";
   import type { PageProps } from "./$types";
@@ -34,11 +34,25 @@
   const membership = $derived(game && !selection.invalid && selection.ids.length
     ? filterTypeMembers(data.typeMembers, selection.ids, game.group)
     : { rows: [], missingIntroduction: 0, missingTypes: 0 });
-  const groups = $derived([
+  const defensive = $derived([
     { label: t(data.lang, "weaknesses"), rows: matchups?.filter((row) => row.multiplier > 1) ?? [] },
     { label: t(data.lang, "resistances"), rows: matchups?.filter((row) => row.multiplier > 0 && row.multiplier < 1) ?? [] },
     { label: t(data.lang, "immunities"), rows: matchups?.filter((row) => row.multiplier === 0) ?? [] },
   ]);
+  // Moves have one type, so attacks are listed per selected type rather than combined.
+  const offensive = $derived(matchups && generation
+    ? selection.ids.map((typeId) => {
+        const rows = offensiveMatchups(typeId, generation) ?? [];
+        return {
+          typeId,
+          groups: [
+            { label: t(data.lang, "superEffective"), rows: rows.filter((row) => row.multiplier > 1) },
+            { label: t(data.lang, "notVeryEffective"), rows: rows.filter((row) => row.multiplier > 0 && row.multiplier < 1) },
+            { label: t(data.lang, "noEffect"), rows: rows.filter((row) => row.multiplier === 0) },
+          ],
+        };
+      })
+    : []);
   async function load() {
     failed = false;
     try {
@@ -101,19 +115,19 @@
   <p role="status">{t(data.lang, "empty")}</p>
 {:else}
   {#if matchups}
-    <div class="matchups" aria-live="polite">
-      {#each groups as group}
-        <section aria-label={group.label}>
-          <h2>{group.label}</h2>
-          {#if group.rows.length}
-            <ul class="matchup-list">{#each group.rows as row (row.typeId)}
-              <li><TypeBadge typeId={row.typeId} name={name(row.typeId)} /><strong>×{row.multiplier}</strong></li>
-            {/each}</ul>
-          {:else}<p>{t(data.lang, "none")}</p>{/if}
-        </section>
+    <section aria-labelledby={`${id}-defensive`} aria-live="polite">
+      <h2 id={`${id}-defensive`}>{t(data.lang, "defensive")}</h2>
+      <MatchupGroups groups={defensive} {name} heading="h3" none={t(data.lang, "none")} />
+      <p class="note">{t(data.lang, "scope", { generation: game.group.generationId })}</p>
+    </section>
+    <section aria-labelledby={`${id}-offensive`} aria-live="polite">
+      <h2 id={`${id}-offensive`}>{t(data.lang, "offensive")}</h2>
+      {#each offensive as attack (attack.typeId)}
+        {#if offensive.length > 1}<h3>{t(data.lang, "attacking", { type: name(attack.typeId).text })}</h3>{/if}
+        <MatchupGroups groups={attack.groups} {name} heading={offensive.length > 1 ? "h4" : "h3"} none={t(data.lang, "none")} />
       {/each}
-    </div>
-    <p class="note">{t(data.lang, "scope", { generation: game.group.generationId })}</p>
+      <p class="note">{t(data.lang, "offensiveScope", { generation: game.group.generationId })}</p>
+    </section>
   {:else}<p role="status">{t(data.lang, "unavailable")}</p>{/if}
   <section aria-labelledby={`${id}-pokemon-heading`} aria-describedby={`${id}-pokemon-scope`}>
     <h2 id={`${id}-pokemon-heading`}>{t(data.lang, "pokemonHeading")}</h2>
@@ -145,10 +159,7 @@
 {/if}
 
 <style>
-  .matchups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0 2rem; }
   ul { list-style: none; padding: 0; }
-  .matchup-list { display: grid; gap: 0.5rem; justify-items: start; }
-  .matchup-list li { display: flex; align-items: center; gap: 0.5rem; }
   .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.25rem 1rem; }
   .pokemon-list li { min-width: 0; }
   .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; overflow-wrap: anywhere; }

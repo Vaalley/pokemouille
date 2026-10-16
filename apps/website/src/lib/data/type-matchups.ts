@@ -78,3 +78,24 @@ export function defensiveMatchups(
   }
   return matchups;
 }
+
+/** Damage one attacking type deals to each defending type introduced by `generationId`. */
+export function offensiveMatchups(
+  attackingTypeId: number,
+  generationId: number,
+): { typeId: number; multiplier: number }[] | null {
+  if (
+    !Number.isInteger(generationId) ||
+    generationId < 1 ||
+    !isIntroduced(attackingTypeId, generationId)
+  ) {
+    return null;
+  }
+
+  const matchups: { typeId: number; multiplier: number }[] = [];
+  for (let typeId = 1; typeId <= 18; typeId++) {
+    if (!isIntroduced(typeId, generationId)) continue;
+    matchups.push({ typeId, multiplier: damageFactor(attackingTypeId, typeId, generationId) });
+  }
+  return matchups;
+}

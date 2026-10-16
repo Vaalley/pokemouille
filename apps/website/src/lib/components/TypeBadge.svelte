@@ -24,6 +24,7 @@
 <script lang="ts">
   import { asset, resolve } from "$app/paths";
   import type { AssetPath, PathnameWithSearchOrHash } from "$app/types";
+  import type { HTMLAnchorAttributes } from "svelte/elements";
   import { page } from "$app/state";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import { typesHref } from "#lib/data/type-selection.ts";
@@ -31,7 +32,8 @@
   import type { LocalizedText } from "../../../../../packages/pokemon-data/src/index.ts";
   import Localized from "./pokemon/Localized.svelte";
 
-  let { typeId, name, defendingTypes }: {
+  // Extra attributes (e.g. LinkPreview trigger props) land on the link.
+  let { typeId, name, defendingTypes, ...rest }: Omit<HTMLAnchorAttributes, "href"> & {
     typeId: number;
     name: LocalizedText;
     defendingTypes?: readonly number[];
@@ -45,7 +47,7 @@
   // https://github.com/partywhale/pokemon-type-icons/tree/fcbe6978c61c359680bc07636c3f9bdc0f346b43
 </script>
 
-<a class="type-badge" {href}>
+<a {...rest} class="type-badge" {href}>
   {#if icon}
     <img src={asset(`/type-icons/${icon}.svg` as AssetPath)} alt="" width="22" height="22" />
   {/if}

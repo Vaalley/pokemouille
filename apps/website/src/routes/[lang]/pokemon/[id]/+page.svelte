@@ -309,7 +309,7 @@
     <!-- Two columns on wide screens: figures on the left, prose on the right. -->
     <div class="overview">
       <div class="column">
-        <Types {lang} types={pokemon.types} />
+        <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
         <Stats {lang} stats={pokemon.stats} game={gameName} />
         <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
       </div>
