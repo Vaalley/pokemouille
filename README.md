@@ -1,6 +1,23 @@
 # Pokémouille
 
-A multilingual, game-aware Pokédex built with Vite+ and SvelteKit. The data pipeline, localized Pokémon detail pages, and instant global search (Ctrl/Cmd+K) are implemented and release-verified locally (see POKEDEX_PLAN.md §13). See [POKEDEX_PLAN.md](POKEDEX_PLAN.md) for product decisions and audit evidence.
+A multilingual, game-aware Pokédex built with Vite+ and SvelteKit, live at <https://pokemouille.vaaleyou.workers.dev>. The data pipeline, localized Pokémon, move, ability and item pages, and instant global search (Ctrl/Cmd+K) are implemented.
+
+## Product rules
+
+- **Scope:** all main-series games (remakes, Let's Go, Legends), selector grouped by generation, default **Scarlet**. Languages **en, fr, ja**, interface included. No accounts, favorites, team building or collection tracking.
+- **Data source:** public PokéAPI GraphQL `v1beta2`, ingested in bounded, resumable weekly/manual refreshes. No Docker or database operations; CSV/REST sources only with explicit agreement.
+- **Historical correctness:** never let modern types, stats, abilities, learnsets or effects leak into older games. Resolve each field by its real generation / version group / version semantics, never from numeric ID order. Unsupported facts are shown as unknown or omitted with an explanation, never guessed (no guessed inheritance, availability or modern-data substitutes).
+- **Missing states stay distinct:** not introduced yet, unavailable in this game, missing source data, missing translation.
+- **Text fallback:** requested language → English → identifier (Japanese: `ja` → `ja-hrkt` → English). Never substitute another game's text to get a translation.
+- **URLs carry meaning:** language, game and form live in the URL; navigation and search results preserve them; explicit localized links are never redirected to the visitor's language.
+- **Static delivery:** visitors never call PokéAPI. Game/form panels resolve in the browser (no default-game mechanics in prerendered HTML) and need JavaScript.
+
+## Open items
+
+- Visual direction and layout (current CSS is minimal layout only).
+- Game-specific evolution applicability and special game-mechanics rules: need sufficient source evidence before display.
+- Native-speaker review of the fr/ja "not introduced" wording.
+- Validate `@sveltejs/kit@3.1.0` before removing it from `minimumReleaseAgeExclude`.
 
 ## Setup and verification
 
