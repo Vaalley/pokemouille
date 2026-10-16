@@ -1,8 +1,8 @@
 import { introductionStatus } from "../../../../../packages/pokemon-data/src/index.ts";
 import type { GlobalSearchEntry } from "./entries.ts";
 
-export type MatchKind = "number" | "exact" | "prefix" | "substring" | "typo";
-export type Introduction = "available" | "not-introduced" | "unknown";
+type MatchKind = "number" | "exact" | "prefix" | "substring" | "typo";
+type Introduction = "available" | "not-introduced" | "unknown";
 
 export interface SearchGame {
   generationId: number;

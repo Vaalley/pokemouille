@@ -23,7 +23,7 @@ export function sourceCount(
   return count;
 }
 
-export function required<T>(value: T | null | undefined, field: string): T {
+function required<T>(value: T | null | undefined, field: string): T {
   if (value === null || value === undefined)
     throw new Error(`Missing required source field: ${field}`);
   return value;

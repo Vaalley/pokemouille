@@ -34,7 +34,7 @@ jobs:
 
       - uses: voidzero-dev/setup-vp@v1.21.2
         with:
-          node-version: "24"
+          # Node comes from .node-version.
           cache: true
 
       - name: Refresh dataset

@@ -15,7 +15,7 @@ interface ResourceSearchEntryBase {
   identifier: string;
   aliases: string[];
 }
-export type ResourceSearchEntry = ResourceSearchEntryBase &
+type ResourceSearchEntry = ResourceSearchEntryBase &
   ({ kind: "move"; typeId: number } | { kind: "ability" | "item" });
 export type GlobalSearchEntry = PokemonSearchEntry | ResourceSearchEntry;
 

@@ -1,4 +1,4 @@
-// R2 transfers for the Cloudflare deployment (Node 24+, run from anywhere):
+// R2 transfers for the Cloudflare deployment (run from anywhere):
 //   node apps/website/scripts/r2.ts sync [--local]        upload dataset + _app/immutable, manifest last
 //   node apps/website/scripts/r2.ts data-pull [--local]   download the published snapshot to static/data
 //   node apps/website/scripts/r2.ts state-pull [--local]  restore .data/state from R2

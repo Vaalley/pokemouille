@@ -11,7 +11,7 @@ import { fetchSchema } from "./schema.ts";
 import { PUBLIC_ENDPOINT, readJson, withWriterLock } from "./state.ts";
 import type { RefreshRun } from "./state.ts";
 
-const HELP = `Pokémouille data pipeline (Node 24+)
+const HELP = `Pokémouille data pipeline
 
 Usage: node tools/data/src/cli.ts <command> [options]
 

@@ -21,7 +21,7 @@ A multilingual, game-aware Pokédex built with Vite+ and SvelteKit, live at <htt
 
 ## Setup and verification
 
-Use Node 24+ and the repository's Vite+/pnpm versions.
+Use the repository's pinned toolchain: Node 26 (`.node-version`; `vp` downloads it) and the Vite+/pnpm versions.
 
 ```sh
 vp install
@@ -39,7 +39,7 @@ The workspace uses copied/hoisted dependencies and disables automatic workspace-
 ```sh
 vp run dev               # development server
 vp run website#build     # svelte-check + prerender to apps/website/build
-cd apps/website && vp preview
+vp run cf:dev            # production-like Workers preview with real cache headers (see Deployment)
 ```
 
 Development ignores the adapter's generated `apps/website/build/` tree when installing file watchers. A full static export contains thousands of page directories; watching that old output caused multi-minute Windows startup stalls even after Vite reported “ready.” Keep this exclusion if the dev-server configuration changes, and update it if the adapter output directory is renamed. Source files and `static/data/` remain watched; no build deletion or dataset refresh is required.
@@ -151,7 +151,7 @@ The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the 
 - **The dataset is not uploaded with the Worker** (`static/.assetsignore` excludes `/data`). It lives in the R2 bucket `pokemouille-data` under the same keys (`data/manifest.json`, `data/revisions/...`). `apps/website/worker/index.ts` serves those keys, plus `_app/immutable/*` chunks from earlier deploys, only for requests no static asset matched. The manifest is `no-cache` with ETag/304; everything else is immutable and cached at the edge with the Cache API (a no-op on `*.workers.dev`, active on a custom domain).
 - **Retention:** R2 keeps every published revision and every deploy's immutable chunks; nothing is garbage-collected. One revision is ~100 MB, so R2's 10 GB free storage holds ~100 refreshes.
 
-`apps/website/scripts/r2.ts` moves files (Node 24):
+`apps/website/scripts/r2.ts` moves files:
 
 | Command                     | Effect                                                                                                                         |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |

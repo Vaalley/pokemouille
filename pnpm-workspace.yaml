@@ -16,7 +16,7 @@ catalogMode: prefer
 catalog:
   "@cloudflare/workers-types": ^5.20261015.1
   "@internationalized/date": ^3.12.4
-  "@types/node": ^24
+  "@types/node": ^26.6.5
   "@types/pngjs": ^6.0.5
   bits-ui: ^2.19.5
   pngjs: ^7.0.0
