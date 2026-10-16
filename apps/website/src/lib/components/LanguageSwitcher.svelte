@@ -18,7 +18,7 @@
   });
 
   const source = $derived(
-    hydrated ? page.url : { pathname: page.url.pathname, search: "", hash: "" },
+    hydrated ? (page.shallow?.url ?? page.url) : { pathname: page.url.pathname, search: "", hash: "" },
   );
 </script>
 

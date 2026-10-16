@@ -19,6 +19,8 @@ import {
   type RelatedPokemon,
   type RelatedPokemonData,
 } from "../data/catalogue.ts";
+import type { ResourceCatalogue, ResourceEntry, ResourceKind } from "../data/resource-catalogue.ts";
+import { compareTypeMembers, type TypeMember } from "../data/type-membership.ts";
 
 const LANGUAGES: readonly Language[] = ["en", "fr", "ja"];
 // Like the prerender route loaders, the server runs with apps/website as cwd.
@@ -44,9 +46,11 @@ interface AbilityRelation {
 
 interface SnapshotIndex {
   catalogue: Record<Language, Catalogue>;
+  resources: Record<Language, Record<ResourceKind, ResourceCatalogue>>;
   learnMethods: Record<Language, RelatedPokemonData["learnMethods"]>;
   moves: Map<number, MoveRelation[]>;
   abilities: Map<number, AbilityRelation[]>;
+  typeMembers: Record<Language, TypeMember[]>;
 }
 
 /** One current default-variety typing per species, never a historical game typing. */
@@ -90,6 +94,36 @@ export function projectRelatedIdentity(
   };
 }
 
+/** Typing belongs to a variety; cosmetic forms share its current and historical types. */
+export function projectTypeMembers(
+  record: SpeciesRecord,
+  groups: ReadonlyMap<number, number>,
+): Record<Language, TypeMember[]> {
+  const projected: Record<Language, TypeMember[]> = { en: [], fr: [], ja: [] };
+  for (const variety of record.varieties) {
+    const form =
+      variety.forms.find((entry) => entry.isDefault) ??
+      (variety.forms.length === 1 ? variety.forms[0]! : null);
+    for (const lang of LANGUAGES) {
+      projected[lang].push({
+        speciesId: record.id,
+        pokemonId: variety.id,
+        form: variety.isDefault ? null : (form?.identifier ?? variety.identifier),
+        name: variety.isDefault
+          ? localize(record.names, lang, record.identifier)
+          : pokemonName(record, variety, form, lang),
+        generationId: record.generationId,
+        introductionOrder:
+          form?.versionGroupId == null ? null : (groups.get(form.versionGroupId) ?? null),
+        types: variety.types,
+        typeHistory: variety.typeHistory,
+      });
+    }
+  }
+  for (const lang of LANGUAGES) projected[lang].sort(compareTypeMembers);
+  return projected;
+}
+
 async function readJson<T>(path: string): Promise<T> {
   return JSON.parse(await readFile(join(DATA_DIR, path), "utf8")) as T;
 }
@@ -112,8 +146,13 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
     types,
     generations: sourceGenerations,
     learnMethods,
+    moves: sourceMoves,
+    abilities: sourceAbilities,
+    items: sourceItems,
+    versionGroups,
   } = await readJson<ReferenceData>(manifest.files.references.path);
   const generations = sourceGenerations.map((row) => row.id).sort((a, b) => a - b);
+  const groupOrders = new Map(versionGroups.map((group) => [group.id, group.order]));
   const catalogue = (language: Language): Catalogue => ({
     species: [],
     types: types.map((row) => ({
@@ -127,11 +166,47 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
       id: row.id,
       name: localize(row.names, language, row.identifier),
     }));
+  const resources = (language: Language): Record<ResourceKind, ResourceCatalogue> => {
+    const identity = (row: ReferenceData["items"][number]): ResourceEntry => ({
+      id: row.id,
+      identifier: row.identifier,
+      name: localize(row.names, language, row.identifier),
+      englishName: localize(row.names, "en", row.identifier).text,
+    });
+    return {
+      move: {
+        kind: "move",
+        entries: sourceMoves
+          .toSorted((a, b) => a.id - b.id)
+          .map((row) => ({
+            ...identity(row),
+            typeId: row.typeId,
+            damageClassId: row.damageClassId,
+          })),
+        types: catalogue(language).types,
+        categories: [...new Set(sourceMoves.map((row) => row.damageClassId))].sort((a, b) => a - b),
+      },
+      ability: {
+        kind: "ability",
+        entries: sourceAbilities.toSorted((a, b) => a.id - b.id).map(identity),
+        types: [],
+        categories: [],
+      },
+      item: {
+        kind: "item",
+        entries: sourceItems.toSorted((a, b) => a.id - b.id).map(identity),
+        types: [],
+        categories: [],
+      },
+    };
+  };
   const index: SnapshotIndex = {
     catalogue: { en: catalogue("en"), fr: catalogue("fr"), ja: catalogue("ja") },
+    resources: { en: resources("en"), fr: resources("fr"), ja: resources("ja") },
     learnMethods: { en: methods("en"), fr: methods("fr"), ja: methods("ja") },
     moves: new Map(),
     abilities: new Map(),
+    typeMembers: { en: [], fr: [], ja: [] },
   };
   const assets = Object.values(manifest.files.pokemon);
   let next = 0;
@@ -140,6 +215,8 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
       const asset = assets[next++]!;
       const record = await readJson<SpeciesRecord>(asset.path);
       const species = projectCatalogueSpecies(record);
+      const typeMembers = projectTypeMembers(record, groupOrders);
+      for (const language of LANGUAGES) index.typeMembers[language].push(...typeMembers[language]);
       for (const language of LANGUAGES) index.catalogue[language].species.push(species[language]);
       const speciesGenerations = generations.filter((id) => id >= record.generationId);
       for (const variety of record.varieties) {
@@ -167,6 +244,7 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
     Array.from({ length: Math.min(READ_CONCURRENCY, assets.length) }, () => worker()),
   );
   for (const language of LANGUAGES) index.catalogue[language].species.sort((a, b) => a.id - b.id);
+  for (const language of LANGUAGES) index.typeMembers[language].sort(compareTypeMembers);
   for (const rows of index.moves.values()) rows.sort(byIdentity);
   for (const rows of index.abilities.values()) rows.sort(byIdentity);
   return index;
@@ -217,6 +295,19 @@ function getSnapshot(): Promise<SnapshotIndex> {
 
 export async function getCatalogue(lang: Language): Promise<Catalogue> {
   return (await getSnapshot()).catalogue[lang];
+}
+
+/** Reference-only list metadata; no detail payload or client-side record fanout. */
+export async function getResourceCatalogue(
+  kind: ResourceKind,
+  lang: Language,
+): Promise<ResourceCatalogue> {
+  return (await getSnapshot()).resources[lang][kind];
+}
+
+/** Compact historical typing and form chronology, shared by all static locale pages. */
+export async function getTypeMembers(lang: Language): Promise<TypeMember[]> {
+  return (await getSnapshot()).typeMembers[lang];
 }
 
 /** Only the requested resource's projected relationships cross the page boundary. */

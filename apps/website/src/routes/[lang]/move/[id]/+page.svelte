@@ -3,6 +3,7 @@
   import Localized from "#lib/components/pokemon/Localized.svelte";
   import RelatedPokemon from "#lib/components/RelatedPokemon.svelte";
   import MoveIcon from "#lib/components/MoveIcon.svelte";
+  import TypeBadge from "#lib/components/TypeBadge.svelte";
   import { t } from "#lib/i18n/move.ts";
   import type { PageProps } from "./$types";
 
@@ -30,7 +31,7 @@
   <p>{t(lang, "scope")}</p>
   <dl>
     <dt>{t(lang, "type")}</dt>
-    <dd>{#if data.type}<Localized text={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
+    <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
     <dt>{t(lang, "category")}</dt><dd>{category}</dd>
     <dt>{t(lang, "power")}</dt><dd>{data.power ?? t(lang, "variable")}</dd>
     <dt>{t(lang, "accuracy")}</dt><dd>{data.accuracy === null ? t(lang, "variable") : `${data.accuracy}%`}</dd>

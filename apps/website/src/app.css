@@ -68,6 +68,19 @@ main:focus {
   gap: 1rem;
 }
 
+.browse-navigation {
+  flex-basis: 100%;
+}
+
+.browse-navigation a {
+  display: inline-block;
+  padding-block: 0.4rem;
+}
+
+.browse-navigation a[aria-current="page"] {
+  font-weight: bold;
+}
+
 .inline-list {
   display: flex;
   flex-wrap: wrap;

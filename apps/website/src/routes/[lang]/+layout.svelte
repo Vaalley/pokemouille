@@ -3,6 +3,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
   import GameSelector, { setSelectedVersion } from "#lib/components/GameSelector.svelte";
   import LanguageSwitcher from "#lib/components/LanguageSwitcher.svelte";
@@ -10,6 +11,7 @@
   import { readPreference, resolveContext, writePreference } from "#lib/data/context.ts";
   import { getGames } from "#lib/data/loader.ts";
   import { t } from "#lib/i18n/messages.ts";
+  import { t as navigation } from "#lib/i18n/navigation.ts";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
@@ -17,6 +19,14 @@
   let games = $state<GameOption[] | null>(null);
   let gamesFailed = $state(false);
   let savedVersion = $state<string | null>(null);
+  const currentUrl = $derived(page.shallow?.url ?? page.url);
+  const sections = [
+    { key: "pokemon", path: "" },
+    { key: "moves", path: "move/" },
+    { key: "abilities", path: "ability/" },
+    { key: "items", path: "item/" },
+    { key: "types", path: "types/" },
+  ] as const;
 
   // Games and the saved preference exist only in the browser, so prerendered HTML and the
   // first client render show a disabled selector rather than a guessed default game.
@@ -34,7 +44,7 @@
 
   const version = $derived(
     games
-      ? resolveContext({ url: page.url, language: data.lang, games, savedVersion }).version
+      ? resolveContext({ url: currentUrl, language: data.lang, games, savedVersion }).version
       : null,
   );
 
@@ -43,10 +53,14 @@
   function selectVersion(next: string) {
     writePreference("version", next);
     savedVersion = next;
-    // Pokémon pages (and any URL already carrying a game) keep the game in the URL so the
-    // choice is shareable and Back/Forward restores it; `form` and other params are kept.
-    if (page.route.id?.startsWith("/[lang]/pokemon/") || page.url.searchParams.has("version")) {
-      const url = new URL(page.url.href);
+    // Context-sensitive pages keep explicit game choices shareable. Start from the
+    // shallow URL so catalogue filters and selected types survive game changes.
+    if (
+      page.route.id?.startsWith("/[lang]/pokemon/") ||
+      page.route.id === "/[lang]/types" ||
+      currentUrl.searchParams.has("version")
+    ) {
+      const url = new URL(currentUrl.href);
       url.searchParams.set("version", next);
       void goto(url, { reset: false });
     }
@@ -68,6 +82,18 @@
       error={gamesFailed}
     />
   </div>
+  <nav class="browse-navigation" aria-label={navigation(data.lang, "label")}>
+    <ul class="inline-list">
+      {#each sections as section (section.key)}
+        <li>
+          <a
+            href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
+            aria-current={page.url.pathname === `/${data.lang}/${section.path}` ? "page" : undefined}
+          >{navigation(data.lang, section.key)}</a>
+        </li>
+      {/each}
+    </ul>
+  </nav>
 </header>
 
 <noscript>

@@ -185,6 +185,22 @@ export function introductionStatus(
   return formGroupOrder > game.order ? "not-introduced" : "available";
 }
 
+/** Sparse type histories use the earliest inclusive generation upper bound. */
+export function pokemonTypesAtGeneration(
+  variety: Pick<PokemonVariety, "types" | "typeHistory">,
+  generationId: number,
+): PokemonVariety["types"] {
+  let rows = variety.types;
+  let bound = Infinity;
+  for (const history of variety.typeHistory) {
+    if (history.generationId >= generationId && history.generationId < bound) {
+      bound = history.generationId;
+      rows = history.types;
+    }
+  }
+  return rows;
+}
+
 /** Resolve immutable normalized data. Unknown game/form/language inputs throw.
  * "available" means introduced, never proof of obtainability in that game.
  * Modern generation histories do not establish game-specific battle mechanics.
@@ -229,14 +245,7 @@ export function resolvePokemon(
   let learnset: ResolvedPokemon["learnset"] = blocked();
   let flavorText: ResolvedPokemon["flavorText"] = blocked();
   if (eligible) {
-    let typeRows = variety.types;
-    let bound = Infinity;
-    for (const history of variety.typeHistory) {
-      if (history.generationId >= generationId && history.generationId < bound) {
-        bound = history.generationId;
-        typeRows = history.types;
-      }
-    }
+    const typeRows = pokemonTypesAtGeneration(variety, generationId);
     types = typeRows.length
       ? available(
           typeRows

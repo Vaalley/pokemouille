@@ -16,6 +16,7 @@
   import PokemonIcon from "../PokemonIcon.svelte";
   import ItemLink from "../ItemLink.svelte";
   import MoveIcon from "../MoveIcon.svelte";
+  import TypeBadge from "../TypeBadge.svelte";
   import Localized from "./Localized.svelte";
 
   type ChainNode = EvolutionChainProjection["nodes"][number];
@@ -84,6 +85,7 @@
     code: boolean;
     item?: NamedResource;
     move?: { typeId: number | null | undefined };
+    typeId?: number;
   }
 
   function conditions(method: EvolutionMethod): Condition[] {
@@ -97,9 +99,11 @@
       const enumPrefix = ENUM_CONDITIONS[key];
       let item: NamedResource | undefined;
       let move: Condition["move"];
+      let typeId: number | undefined;
       if (resource && typeof raw === "number") {
         const row = references[resource].find((entry) => entry.id === raw);
         if (resource === "items") item = row;
+        if (resource === "types") typeId = raw;
         if (resource === "moves") {
           move = {
             typeId: row && "typeId" in row && typeof row.typeId === "number" ? row.typeId : undefined,
@@ -121,7 +125,7 @@
       } else if (key === "percentage_chance") {
         value = t(lang, "evolution.percent", { value: String(raw) });
       }
-      rows.push({ key, label, value, item, move, code: key === "condition_expression" });
+      rows.push({ key, label, value, item, move, typeId, code: key === "condition_expression" });
     }
     return rows;
   }
@@ -161,6 +165,8 @@
                 <dd>
                   {#if row.item}
                     <ItemLink item={row.item} {lang} {version} />
+                  {:else if row.typeId && typeof row.value !== "string"}
+                    <TypeBadge typeId={row.typeId} name={row.value} />
                   {:else if row.move}
                     <MoveIcon typeId={row.move.typeId} />
                     {#if typeof row.value === "string"}{row.value}{:else}<Localized text={row.value} />{/if}

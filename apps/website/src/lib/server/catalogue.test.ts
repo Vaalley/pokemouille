@@ -4,7 +4,12 @@ import type {
   PokemonVariety,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
-import { projectCatalogueSpecies, projectRelatedIdentity } from "./catalogue.ts";
+import { filterTypeMembers } from "../data/type-membership.ts";
+import {
+  projectCatalogueSpecies,
+  projectRelatedIdentity,
+  projectTypeMembers,
+} from "./catalogue.ts";
 
 function form(overrides: Partial<PokemonForm> = {}): PokemonForm {
   return {
@@ -230,5 +235,21 @@ describe("projectRelatedIdentity", () => {
     const projected = projectRelatedIdentity(species([selected]), selected);
     expect(projected.form).toBe("sample-mouse-unlisted");
     expect(projected.introducedVersionGroupId).toBeNull();
+  });
+});
+
+describe("projectTypeMembers", () => {
+  it("retains resolvable unknown fallback selections without borrowing cosmetic chronology", () => {
+    const selected = variety({
+      forms: [
+        form({ identifier: "sample-mouse-first", isDefault: false }),
+        form({ identifier: "sample-mouse-second", isDefault: false, versionGroupId: null }),
+      ],
+    });
+    const projected = projectTypeMembers(species([selected]), new Map([[28, 1]])).en;
+    expect(filterTypeMembers(projected, [18], { generationId: 6, order: 20 })).toMatchObject({
+      missingIntroduction: 1,
+      rows: [],
+    });
   });
 });

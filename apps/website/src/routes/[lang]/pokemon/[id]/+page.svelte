@@ -288,8 +288,6 @@
       <Types
         {lang}
         types={pokemon.types}
-        generationId={pokemon.context.generationId}
-        referenceTypes={view.references.types}
       />
       <Stats {lang} stats={pokemon.stats} game={gameName} />
       <Abilities {lang} abilities={pokemon.abilities} games={groupName} />

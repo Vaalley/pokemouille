@@ -22,24 +22,35 @@
 </script>
 
 <script lang="ts">
-  import { asset } from "$app/paths";
-  import type { AssetPath } from "$app/types";
+  import { asset, resolve } from "$app/paths";
+  import type { AssetPath, PathnameWithSearchOrHash } from "$app/types";
+  import { page } from "$app/state";
+  import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
+  import { typesHref } from "#lib/data/type-selection.ts";
+  import type { Language } from "#lib/i18n/core.ts";
   import type { LocalizedText } from "../../../../../packages/pokemon-data/src/index.ts";
   import Localized from "./pokemon/Localized.svelte";
 
-  let { typeId, name }: { typeId: number; name: LocalizedText } = $props();
+  let { typeId, name, defendingTypes }: {
+    typeId: number;
+    name: LocalizedText;
+    defendingTypes?: readonly number[];
+  } = $props();
   const icon = $derived(TYPE_ICONS[typeId]);
+  const selectedVersion = getSelectedVersion();
+  const lang = $derived(page.params.lang as Language);
+  const href = $derived(resolve(typesHref(lang, defendingTypes ?? [typeId], selectedVersion()) as PathnameWithSearchOrHash));
 
   // Icons: MIT © James Watkins; see static/type-icons/LICENSE.
   // https://github.com/partywhale/pokemon-type-icons/tree/fcbe6978c61c359680bc07636c3f9bdc0f346b43
 </script>
 
-<span class="type-badge">
+<a class="type-badge" {href}>
   {#if icon}
     <img src={asset(`/type-icons/${icon}.svg` as AssetPath)} alt="" width="22" height="22" />
   {/if}
   <span class="type-name"><Localized text={name} /></span>
-</span>
+</a>
 
 <style>
   .type-badge {
