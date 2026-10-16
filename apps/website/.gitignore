@@ -26,6 +26,3 @@ dist-ssr
 # SvelteKit generated output
 .svelte-kit
 build
-
-# Wrangler local state (dev bucket, caches)
-.wrangler

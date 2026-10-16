@@ -39,3 +39,6 @@ dist-ssr
 .data/
 apps/website/static/data/
 tools/data/graphql/schema.json
+
+# Wrangler local state (dev bucket, caches) wherever wrangler runs
+.wrangler/
