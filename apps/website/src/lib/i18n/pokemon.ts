@@ -23,6 +23,7 @@ const en = {
   "identity.adjacent": "Neighbouring Pokémon",
   "identity.previous": "Previous: No. {number} {name}",
   "identity.next": "Next: No. {number} {name}",
+  "identity.toc": "On this page",
 
   "sprites.heading": "Sprites",
   "sprites.note":
@@ -66,7 +67,6 @@ const en = {
   "status.unknown": "Our data doesn’t say whether {name} exists in {game}.",
   "status.alternative": "View it in {game}",
 
-  "forms.heading": "Forms",
   "forms.label": "Form",
   "forms.status.available": "introduced",
   "forms.status.notIntroduced": "not introduced in this game",
@@ -229,6 +229,7 @@ const messages = {
     "identity.adjacent": "Pokémon voisins",
     "identity.previous": "Précédent : n° {number} {name}",
     "identity.next": "Suivant : n° {number} {name}",
+    "identity.toc": "Sur cette page",
 
     "sprites.heading": "Sprites",
     "sprites.note":
@@ -275,7 +276,6 @@ const messages = {
     "status.unknown": "Nos données ne disent pas si {name} existe dans {game}.",
     "status.alternative": "Voir dans {game}",
 
-    "forms.heading": "Formes",
     "forms.label": "Forme",
     "forms.status.available": "introduite",
     "forms.status.notIntroduced": "pas encore introduite dans ce jeu",
@@ -435,6 +435,7 @@ const messages = {
     "identity.adjacent": "前後のポケモン",
     "identity.previous": "前：No.{number} {name}",
     "identity.next": "次：No.{number} {name}",
+    "identity.toc": "このページの内容",
 
     "sprites.heading": "スプライト",
     "sprites.note":
@@ -481,7 +482,6 @@ const messages = {
     "status.unknown": "{game}に{name}がいるかどうかは、データからは分かりません。",
     "status.alternative": "{game}で表示",
 
-    "forms.heading": "すがた",
     "forms.label": "すがた",
     "forms.status.available": "登場済み",
     "forms.status.notIntroduced": "このゲームでは未登場",

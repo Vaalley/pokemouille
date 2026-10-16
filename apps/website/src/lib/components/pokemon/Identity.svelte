@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import type { LocalizedText } from "../../../../../../packages/pokemon-data/src/index.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/pokemon.ts";
@@ -12,6 +13,7 @@
     generationId,
     formName,
     artwork,
+    children,
   }: {
     lang: Language;
     speciesId: number;
@@ -22,13 +24,15 @@
     formName: LocalizedText | null;
     /** Form artwork URL; `undefined` until the game/form context has resolved. */
     artwork: string | null | undefined;
+    /** Page-level controls shown under the facts (game context, form picker). */
+    children?: Snippet;
   } = $props();
 </script>
 
 <header class="identity">
-  <div>
+  <div class="summary">
     <h1><Localized text={name} /></h1>
-    <dl>
+    <dl class="properties">
       <dt>{t(lang, "identity.number")}</dt>
       <dd>{t(lang, "identity.numberValue", { number: speciesId })}</dd>
       {#if genus}
@@ -42,6 +46,7 @@
         <dd><Localized text={formName} /></dd>
       {/if}
     </dl>
+    {@render children?.()}
   </div>
   {#if artwork !== undefined}
     <figure>
@@ -52,24 +57,46 @@
           width="240"
           height="240"
         />
-        <figcaption>{t(lang, "identity.artworkNote")}</figcaption>
+        <figcaption class="note">{t(lang, "identity.artworkNote")}</figcaption>
       {:else}
-        <figcaption>{t(lang, "identity.artworkMissing")}</figcaption>
+        <figcaption class="note">{t(lang, "identity.artworkMissing")}</figcaption>
       {/if}
     </figure>
   {/if}
 </header>
 
 <style>
+  /* The artwork keeps a fixed column so the facts don't move once it loads. */
   .identity {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+
+  .summary {
+    min-width: 0;
   }
 
   figure {
+    grid-column: 2;
     margin: 0;
-    max-width: 15rem;
+    text-align: center;
+  }
+
+  figcaption {
+    margin-block-start: 0.25rem;
+  }
+
+  @media (max-width: 40rem) {
+    .identity {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    figure {
+      grid-column: 1;
+      max-width: 12rem;
+      margin-inline: auto;
+    }
   }
 </style>

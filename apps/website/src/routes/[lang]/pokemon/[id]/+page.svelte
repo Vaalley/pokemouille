@@ -157,6 +157,18 @@
     preference: "context.source.preference",
     default: "context.source.default",
   } as const;
+  // Section heading ids, in page order (the overview's left column comes first).
+  const TOC = [
+    { id: "types-heading", key: "types.heading" },
+    { id: "stats-heading", key: "stats.heading" },
+    { id: "facts-heading", key: "facts.heading" },
+    { id: "abilities-heading", key: "abilities.heading" },
+    { id: "dex-heading", key: "dex.heading" },
+    { id: "evolution-heading", key: "evolution.heading" },
+    { id: "sprites-heading", key: "sprites.heading" },
+    { id: "moves-heading", key: "moves.heading" },
+    { id: "coverage-heading", key: "coverage.heading" },
+  ] as const;
 </script>
 
 <svelte:head>
@@ -179,22 +191,13 @@
 </svelte:head>
 
 <article>
-  <Identity
-    {lang}
-    speciesId={data.speciesId}
-    name={data.name}
-    genus={data.genus}
-    generationId={data.generationId}
-    formName={pokemon && !isDefaultForm ? pokemon.name : null}
-    artwork={pokemon ? pokemon.media.artwork : undefined}
-  />
-
-  <nav aria-label={t(lang, "identity.adjacent")}>
+  <nav class="pager" aria-label={t(lang, "identity.adjacent")}>
     <ul class="inline-list">
       {#each neighbours as { key, entry } (key)}
         {#if entry}
-          <li>
+          <li class={key === "identity.next" ? "next" : "previous"}>
             <a
+              rel={key === "identity.next" ? "next" : "prev"}
               href={context
                 ? href(pokemonHref(lang, entry.speciesId, { version: context.version, form: null }))
                 : resolve(`${lang}/pokemon/${entry.speciesId}/`)}
@@ -206,20 +209,33 @@
     </ul>
   </nav>
 
-  {#if context}
-    <p>
-      {t(lang, "context.game", { game: gameName })}
-      <small>({t(lang, SOURCE_KEYS[context.versionSource])})</small>
-    </p>
-    {#if context.rejectedVersion}
+  <Identity
+    {lang}
+    speciesId={data.speciesId}
+    name={data.name}
+    genus={data.genus}
+    generationId={data.generationId}
+    formName={pokemon && !isDefaultForm ? pokemon.name : null}
+    artwork={pokemon ? pokemon.media.artwork : undefined}
+  >
+    {#if context}
       <p>
-        {t(lang, "context.rejected", { version: context.rejectedVersion, game: gameName })}
-        <a href={href(pokemonHref(lang, data.speciesId, context))}
-          >{t(lang, "context.rejectedLink", { game: gameName })}</a
-        >
+        {t(lang, "context.game", { game: gameName })}
+        <small>({t(lang, SOURCE_KEYS[context.versionSource])})</small>
       </p>
+      {#if context.rejectedVersion}
+        <p>
+          {t(lang, "context.rejected", { version: context.rejectedVersion, game: gameName })}
+          <a href={href(pokemonHref(lang, data.speciesId, context))}
+            >{t(lang, "context.rejectedLink", { game: gameName })}</a
+          >
+        </p>
+      {/if}
     {/if}
-  {/if}
+    {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
+      <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
+    {/if}
+  </Identity>
 
   <div aria-live="polite">
     {#if errorMessage}
@@ -275,24 +291,34 @@
       </ul>
     {/if}
 
-    <p>{reasonText(lang, pokemon.availability.reason)}</p>
-    {#if pokemon.mechanics.gameSpecificRules === "unverified"}
-      <p>{t(lang, "context.mechanics")}</p>
-    {/if}
+    <div class="context-notes note">
+      <p>{reasonText(lang, pokemon.availability.reason)}</p>
+      {#if pokemon.mechanics.gameSpecificRules === "unverified"}
+        <p>{t(lang, "context.mechanics")}</p>
+      {/if}
+    </div>
 
-    {#if pokemon.forms.length > 1 && selectedForm}
-      <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
-    {/if}
+    <nav class="toc" aria-label={t(lang, "identity.toc")}>
+      <ul class="inline-list">
+        {#each TOC as entry (entry.id)}
+          <li><a href="#{entry.id}">{t(lang, entry.key)}</a></li>
+        {/each}
+      </ul>
+    </nav>
 
-    <div class="panels">
-      <Types
-        {lang}
-        types={pokemon.types}
-      />
-      <Stats {lang} stats={pokemon.stats} game={gameName} />
-      <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
-      <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
-      <Dex {lang} flavorText={pokemon.flavorText} game={gameName} />
+    <!-- Two columns on wide screens: figures on the left, prose on the right. -->
+    <div class="overview">
+      <div class="column">
+        <Types {lang} types={pokemon.types} />
+        <Stats {lang} stats={pokemon.stats} game={gameName} />
+        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
+      </div>
+      <div class="column">
+        <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
+        <Dex {lang} flavorText={pokemon.flavorText} game={gameName} />
+      </div>
+    </div>
+    <div class="page-sections">
       <Evolution
         {lang}
         chain={view.chain}
@@ -305,19 +331,79 @@
         game={gameName}
         references={view.references}
       />
+      {#key pokemon.pokemonId}
+        <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} />
+      {/key}
+      <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
+      <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
     </div>
-    {#key pokemon.pokemonId}
-      <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} />
-    {/key}
-    <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
-    <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
   {/if}
 </article>
 
 <style>
-  .panels {
+  .pager {
+    margin-block-end: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .pager ul {
+    justify-content: space-between;
+  }
+
+  .pager .next {
+    margin-inline-start: auto;
+  }
+
+  .pager .previous a::before {
+    content: "← " / "";
+  }
+
+  .pager .next a::after {
+    content: " →" / "";
+  }
+
+  .context-notes {
+    margin-block: 1.5rem;
+    padding-inline-start: 0.75rem;
+    border-inline-start: 0.2rem solid var(--border);
+  }
+
+  .context-notes p {
+    margin-block: 0.25rem;
+  }
+
+  .toc {
+    padding-block: 0.75rem;
+    border-block: 1px solid var(--border);
+  }
+
+  .toc ul {
+    gap: 0.25rem 1.25rem;
+  }
+
+  .overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-    gap: 1rem 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 3rem;
+  }
+
+  .column {
+    min-width: 0;
+  }
+
+  /* Long full-width sections get a rule so each starts visibly. */
+  .page-sections > :global(section) {
+    margin-block-start: 3rem;
+    border-block-start: 1px solid var(--border);
+  }
+
+  .page-sections > :global(section > h2) {
+    margin-block-start: 1.25rem;
+  }
+
+  @media (max-width: 48rem) {
+    .overview {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>

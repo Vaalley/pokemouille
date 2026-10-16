@@ -235,9 +235,9 @@
 <section aria-labelledby="evolution-heading">
   <h2 id="evolution-heading">{t(lang, "evolution.heading")}</h2>
   {#if chain}
-    <p class="scope">{evolutionText(lang, "scope")}</p>
+    <p class="note">{evolutionText(lang, "scope")}</p>
     {#if chain.applicability === "unresolved"}
-      <p>{t(lang, "evolution.note", { game })}</p>
+      <p class="note">{t(lang, "evolution.note", { game })}</p>
     {/if}
     {@render branch(roots)}
   {:else if hasChain}
@@ -249,11 +249,7 @@
 
 <style>
   section {
-    grid-column: 1 / -1;
     min-width: 0;
-  }
-  .scope {
-    max-width: 75ch;
   }
   .branches {
     display: grid;

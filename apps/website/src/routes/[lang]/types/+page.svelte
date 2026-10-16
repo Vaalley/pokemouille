@@ -69,9 +69,9 @@
 <svelte:head><title>{t(data.lang, "heading")} | Pokémouille</title></svelte:head>
 <h1>{t(data.lang, "heading")}</h1>
 <p>{t(data.lang, "intro")}</p>
-<form onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
+<form class="filters" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
   {#each [0, 1] as slot}
-    <div>
+    <div class="filter-field">
       <label for="{id}-type-{slot}">{t(data.lang, slot === 0 ? "first" : "second")}</label>
       <select id="{id}-type-{slot}" name={slot === 0 ? "type" : "type2"}
         disabled={!mounted || !references || (slot === 1 && !selection.ids.length)}
@@ -100,33 +100,30 @@
 {:else if !selection.ids.length}
   <p role="status">{t(data.lang, "empty")}</p>
 {:else}
-  <div class="selected-types">
-    {#each selection.ids as typeId (typeId)}<TypeBadge {typeId} name={name(typeId)} />{/each}
-  </div>
   {#if matchups}
-    <div aria-live="polite">
+    <div class="matchups" aria-live="polite">
       {#each groups as group}
         <section aria-label={group.label}>
           <h2>{group.label}</h2>
           {#if group.rows.length}
-            <ul>{#each group.rows as row (row.typeId)}
+            <ul class="matchup-list">{#each group.rows as row (row.typeId)}
               <li><TypeBadge typeId={row.typeId} name={name(row.typeId)} /><strong>×{row.multiplier}</strong></li>
             {/each}</ul>
           {:else}<p>{t(data.lang, "none")}</p>{/if}
         </section>
       {/each}
     </div>
-    <p>{t(data.lang, "scope", { generation: game.group.generationId })}</p>
+    <p class="note">{t(data.lang, "scope", { generation: game.group.generationId })}</p>
   {:else}<p role="status">{t(data.lang, "unavailable")}</p>{/if}
   <section aria-labelledby={`${id}-pokemon-heading`} aria-describedby={`${id}-pokemon-scope`}>
     <h2 id={`${id}-pokemon-heading`}>{t(data.lang, "pokemonHeading")}</h2>
-    <p id={`${id}-pokemon-scope`}>{t(data.lang, "pokemonScope")}</p>
-    <p role="status" aria-live="polite">{t(data.lang, "pokemonCount", { count: membership.rows.length })}</p>
+    <p class="note" id={`${id}-pokemon-scope`}>{t(data.lang, "pokemonScope")}</p>
+    <p class="result-count" role="status" aria-live="polite">{t(data.lang, "pokemonCount", { count: membership.rows.length })}</p>
     {#if membership.missingIntroduction}
-      <p>{t(data.lang, "introductionGap", { count: membership.missingIntroduction })}</p>
+      <p class="note">{t(data.lang, "introductionGap", { count: membership.missingIntroduction })}</p>
     {/if}
     {#if membership.missingTypes}
-      <p>{t(data.lang, "typeGap", { count: membership.missingTypes })}</p>
+      <p class="note">{t(data.lang, "typeGap", { count: membership.missingTypes })}</p>
     {/if}
     {#if membership.rows.length}
       <ul class="pokemon-list">
@@ -148,13 +145,11 @@
 {/if}
 
 <style>
-  form { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin-block: 1.5rem; }
-  form > div { display: grid; gap: 0.35rem; }
-  select, button { font: inherit; min-height: 2.75rem; padding: 0.5rem; }
-  .selected-types, ul { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .matchups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0 2rem; }
   ul { list-style: none; padding: 0; }
-  li { display: inline-flex; align-items: center; gap: 0.35rem; }
-  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+  .matchup-list { display: grid; gap: 0.5rem; justify-items: start; }
+  .matchup-list li { display: flex; align-items: center; gap: 0.5rem; }
+  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.25rem 1rem; }
   .pokemon-list li { min-width: 0; }
   .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; overflow-wrap: anywhere; }
 </style>

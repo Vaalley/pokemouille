@@ -52,8 +52,8 @@
 <h1>{t(data.lang, "home.title")}</h1>
 <p>{t(data.lang, "home.intro")}</p>
 
-<form class="home-filters" onsubmit={(event) => event.preventDefault()} aria-label={home(data.lang, "filters")} aria-describedby="{id}-scope">
-  <div class="filter-field name-filter">
+<form class="filters" onsubmit={(event) => event.preventDefault()} aria-label={home(data.lang, "filters")} aria-describedby="{id}-scope">
+  <div class="filter-field wide">
     <label for="{id}-query">{home(data.lang, "query")}</label>
     <input
       id="{id}-query"
@@ -88,7 +88,7 @@
   <button type="button" disabled={!mounted || (!active && !searchParams.has("q") && !searchParams.has("type") && !searchParams.has("generation"))}
     onclick={() => update({ q: "", type: null, generation: null })}>{home(data.lang, "reset")}</button>
 </form>
-<p class="filter-scope" id="{id}-scope">{home(data.lang, "scope")}</p>
+<p class="note" id="{id}-scope">{home(data.lang, "scope")}</p>
 
 {#snippet speciesList(entries: typeof species)}
   <ol class="species-list" aria-label={t(data.lang, "home.listLabel")}>
@@ -114,7 +114,7 @@
     {@render speciesList(data.catalogue.species)}
   </noscript>
 {:else}
-  <p role="status" aria-live="polite" aria-atomic="true">
+  <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
     {home(data.lang, "count", { filtered: species.length, total: data.catalogue.species.length })}
   </p>
   {#if species.length === 0}
@@ -124,16 +124,3 @@
   {/if}
 {/if}
 
-<style>
-  .home-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-block: 1.5rem 0.75rem; }
-  .filter-field { display: grid; gap: 0.35rem; flex: 1 1 12rem; min-width: 0; }
-  .name-filter { flex-grow: 2; }
-  label { font-weight: 600; }
-  input, select, button { font: inherit; padding: 0.6rem 0.75rem; min-height: 2.75rem; border: 1px solid currentColor; border-radius: 0.35rem; }
-  input, select { width: 100%; box-sizing: border-box; background: Canvas; color: CanvasText; }
-  button { cursor: pointer; }
-  button:disabled { cursor: default; opacity: 0.6; }
-  .filter-scope { max-width: 80ch; font-size: 0.9rem; }
-  .species-list a { min-height: 2.75rem; }
-  @media (max-width: 30rem) { .filter-field { flex-basis: 100%; } }
-</style>

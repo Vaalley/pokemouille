@@ -43,12 +43,11 @@
     groups.some((group) => group.id === selectedTab) ? selectedTab : (groups[0]?.id ?? "pixel"),
   );
   let failedUrls = $state<string[]>([]);
-  const id = $props.id();
 </script>
 
-<section aria-labelledby="{id}-heading" class="sprite-gallery">
-  <h2 id="{id}-heading">{t(lang, "sprites.heading")}</h2>
-  <p>{t(lang, "sprites.note")}</p>
+<section aria-labelledby="sprites-heading" class="sprite-gallery">
+  <h2 id="sprites-heading">{t(lang, "sprites.heading")}</h2>
+  <p class="note">{t(lang, "sprites.note")}</p>
   {#if groups.length === 0}
     <p>{t(lang, "sprites.missing")}</p>
   {:else}

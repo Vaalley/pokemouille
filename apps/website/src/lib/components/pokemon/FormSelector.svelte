@@ -47,8 +47,7 @@
   );
 </script>
 
-<section aria-labelledby="forms-heading">
-  <h2 id="forms-heading">{t(lang, "forms.heading")}</h2>
+<div class="form-selector">
   <Label.Root for="{id}-form">{t(lang, "forms.label")}</Label.Root>
   <Select.Root
     type="single"
@@ -76,7 +75,14 @@
       </Select.Content>
     </Select.Portal>
   </Select.Root>
-  {#if current}
-    <p><Localized text={current.form.name} /> ({current.details})</p>
-  {/if}
-</section>
+</div>
+
+<style>
+  .form-selector {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+</style>

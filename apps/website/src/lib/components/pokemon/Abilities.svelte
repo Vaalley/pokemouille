@@ -28,7 +28,7 @@
 <section aria-labelledby="abilities-heading">
   <h2 id="abilities-heading">{t(lang, "abilities.heading")}</h2>
   {#if abilities.status === "available"}
-    <ul>
+    <ul class="ability-list">
       {#each abilities.value as ability (ability.slot)}
         <li>
           <h3>
@@ -40,7 +40,7 @@
             >
             {#if ability.isHidden}<small>({t(lang, "abilities.hidden")})</small>{/if}
           </h3>
-          <dl>
+          <dl class="definitions">
             <dt>{t(lang, "abilities.gameText", { games })}</dt>
             <dd>
               {#if ability.flavorText.status === "available"}
@@ -70,6 +70,11 @@
 </section>
 
 <style>
+  .ability-list { margin: 0; padding: 0; list-style: none; }
+  .ability-list > li + li { margin-block-start: 1.5rem; }
+  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin-block: 0 0.5rem; font-size: 1.125rem; }
   .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; }
+  h3 small { font-weight: normal; }
+  dt small { font-weight: normal; }
   .effect-text { white-space: pre-line; }
 </style>

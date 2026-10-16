@@ -74,7 +74,7 @@
 <section aria-labelledby="moves-heading">
   <h2 id="moves-heading">{t(lang, "moves.heading")}</h2>
   {#if learnset.status === "available"}
-    <p>{t(lang, "moves.context", { games })}</p>
+    <p class="note">{t(lang, "moves.context", { games })}</p>
     {#if groups.length > 0}
       <Tabs.Root value={activeTab} onValueChange={(v) => (selectedTab = v)}>
         <Tabs.List>
@@ -87,24 +87,24 @@
         {#each groups as group (group.methodId)}
           <Tabs.Content value={String(group.methodId)}>
             <table>
-              <caption><Localized text={group.method} /></caption>
+              <caption class="visually-hidden"><Localized text={group.method} /></caption>
               <thead>
                 <tr>
-                  {#if group.levelUp}<th scope="col">{t(lang, "moves.level")}</th>{/if}
+                  {#if group.levelUp}<th scope="col" class="numeric">{t(lang, "moves.level")}</th>{/if}
                   <th scope="col">{t(lang, "moves.move")}</th>
-                  {#if group.hasMastery}<th scope="col">{t(lang, "moves.mastery")}</th>{/if}
+                  {#if group.hasMastery}<th scope="col" class="numeric">{t(lang, "moves.mastery")}</th>{/if}
                 </tr>
               </thead>
               <tbody>
                 {#each group.moves as move, index (index)}
                   <tr>
-                    {#if group.levelUp}<td>{move.level}</td>{/if}
+                    {#if group.levelUp}<td class="numeric">{move.level}</td>{/if}
                     <th scope="row">
                       <a
                         href={`${resolve(`${lang}/move/${move.moveId}/`)}${page.url.searchParams.has("version") ? `?version=${encodeURIComponent(page.url.searchParams.get("version")!)}` : ""}`}
                       ><MoveIcon typeId={moveTypes.get(move.moveId)} /><Localized text={move.name} /></a>
                     </th>
-                    {#if group.hasMastery}<td>{move.mastery ?? ""}</td>{/if}
+                    {#if group.hasMastery}<td class="numeric">{move.mastery ?? ""}</td>{/if}
                   </tr>
                 {/each}
               </tbody>
@@ -119,6 +119,8 @@
 </section>
 
 <style>
-  th[scope="row"] { text-align: start; }
+  table { width: min(100%, 32rem); }
+  th, td { vertical-align: middle; }
+  th[scope="row"] { width: 100%; font-weight: normal; }
   th a { display: inline-flex; align-items: center; gap: 0.375rem; }
 </style>

@@ -29,11 +29,8 @@
 
 <section aria-labelledby="facts-heading">
   <h2 id="facts-heading">{t(lang, "facts.heading")}</h2>
-  {#if physical.status === "available" || speciesFacts.status === "available"}
-    <p>{t(lang, "scope.current")}</p>
-  {/if}
   {#if physical.status === "available"}
-    <dl>
+    <dl class="properties">
       <dt>{t(lang, "facts.height")}</dt>
       <dd>{metres.format(physical.value.height / 10)}</dd>
       <dt>{t(lang, "facts.weight")}</dt>
@@ -46,7 +43,7 @@
   {/if}
   {#if speciesFacts.status === "available"}
     {@const facts = speciesFacts.value}
-    <dl>
+    <dl class="properties">
       <dt>{t(lang, "facts.gender")}</dt>
       <dd>
         <!-- Source gender rate: -1 genderless, otherwise eighths female. -->
@@ -73,7 +70,7 @@
     <Collapsible.Root>
       <Collapsible.Trigger>{t(lang, "facts.source")}</Collapsible.Trigger>
       <Collapsible.Content>
-        <dl>
+        <dl class="properties">
           {#each Object.entries(facts.sourceFacts) as [key, value] (key)}
             {@const label = messageKey(`facts.source.${key}`)}
             <dt>{#if label}{t(lang, label)}{:else}<code>{key}</code>{/if}</dt>
@@ -93,4 +90,14 @@
   {:else}
     <p>{reasonText(lang, speciesFacts.reason)}</p>
   {/if}
+  {#if physical.status === "available" || speciesFacts.status === "available"}
+    <p class="note">{t(lang, "scope.current")}</p>
+  {/if}
 </section>
+
+<style>
+  /* Several lists stack here: a shared label width keeps their values aligned. */
+  dl {
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  }
+</style>

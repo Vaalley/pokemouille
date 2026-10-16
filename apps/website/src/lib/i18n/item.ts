@@ -17,6 +17,8 @@ const en = {
     "Descriptions are grouped by the exact games they come from, and games without one aren’t listed. The wording doesn’t confirm exact mechanics in those games, or that the item is available there.",
   "flavor.missing": "No description available for these games.",
   "flavor.empty": "Our data has no in-game descriptions for this item.",
+  "flavor.games": "Games",
+  "flavor.text": "Description",
 } as const satisfies Record<string, string>;
 
 type MessageKey = keyof typeof en;
@@ -40,6 +42,8 @@ const messages = {
       "Les descriptions sont classées selon les jeux exacts dont elles proviennent ; les jeux sans description ne sont pas affichés. Leur formulation ne confirme ni les mécaniques exactes dans ces jeux, ni que l’objet y est disponible.",
     "flavor.missing": "Aucune description en français ni en anglais pour ces jeux.",
     "flavor.empty": "Nos données ne contiennent aucune description en jeu pour cet objet.",
+    "flavor.games": "Jeux",
+    "flavor.text": "Description",
   },
   ja: {
     "meta.title": "{name} | 道具 | Pokémouille",
@@ -57,6 +61,8 @@ const messages = {
       "説明文は元のゲームごとにまとめ、説明文がないゲームは表示しません。説明文からは、そのゲームでの正確な仕様や、その道具があるかどうかまでは分かりません。",
     "flavor.missing": "このゲームには日本語・英語の説明文がありません。",
     "flavor.empty": "データには、この道具のゲーム内説明がありません。",
+    "flavor.games": "ゲーム",
+    "flavor.text": "説明",
   },
 } satisfies Record<Language, Record<MessageKey, string>>;
 

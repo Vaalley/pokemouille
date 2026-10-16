@@ -22,23 +22,25 @@
 </svelte:head>
 
 <article>
-  <header>
-    <p>{t(lang, "number", { id: data.id })}</p>
+  <header class="page-header">
+    <p class="kicker">{t(lang, "number", { id: data.id })}</p>
     <h1><MoveIcon typeId={data.typeId} /><Localized text={data.name} /></h1>
     <p>{t(lang, "generation", { generation: data.generationId })}</p>
   </header>
 
-  <p>{t(lang, "scope")}</p>
-  <dl>
-    <dt>{t(lang, "type")}</dt>
-    <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
-    <dt>{t(lang, "category")}</dt><dd>{category}</dd>
-    <dt>{t(lang, "power")}</dt><dd>{data.power ?? t(lang, "variable")}</dd>
-    <dt>{t(lang, "accuracy")}</dt><dd>{data.accuracy === null ? t(lang, "variable") : `${data.accuracy}%`}</dd>
-    <dt>{t(lang, "pp")}</dt><dd>{data.pp ?? t(lang, "variable")}</dd>
-    <dt>{t(lang, "priority")}</dt><dd>{data.priority}</dd>
-    <dt>{t(lang, "effectChance")}</dt><dd>{data.effectChance === null ? t(lang, "variable") : `${data.effectChance}%`}</dd>
+  <dl class="figures">
+    <div>
+      <dt>{t(lang, "type")}</dt>
+      <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
+    </div>
+    <div><dt>{t(lang, "category")}</dt><dd>{category}</dd></div>
+    <div><dt>{t(lang, "power")}</dt><dd>{data.power ?? t(lang, "variable")}</dd></div>
+    <div><dt>{t(lang, "accuracy")}</dt><dd>{data.accuracy === null ? t(lang, "variable") : `${data.accuracy}%`}</dd></div>
+    <div><dt>{t(lang, "pp")}</dt><dd>{data.pp ?? t(lang, "variable")}</dd></div>
+    <div><dt>{t(lang, "priority")}</dt><dd>{data.priority}</dd></div>
+    <div><dt>{t(lang, "effectChance")}</dt><dd>{data.effectChance === null ? t(lang, "variable") : `${data.effectChance}%`}</dd></div>
   </dl>
+  <p class="note">{t(lang, "scope")}</p>
 
   <section aria-labelledby="effect-heading">
     <h2 id="effect-heading">{t(lang, "effect")}</h2>
@@ -68,6 +70,5 @@
 </article>
 
 <style>
-  h1 { display: flex; align-items: center; gap: 0.5rem; }
   .effect-text { white-space: pre-line; }
 </style>

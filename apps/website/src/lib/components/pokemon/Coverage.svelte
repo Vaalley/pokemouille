@@ -32,7 +32,7 @@
 
 <section aria-labelledby="coverage-heading">
   <h2 id="coverage-heading">{t(lang, "coverage.heading")}</h2>
-  <p>{t(lang, "coverage.context")}</p>
+  <p class="note">{t(lang, "coverage.context")}</p>
   {#each scopes as scope (scope.key)}
     {#if scope.label}<h3>{scope.label}</h3>{/if}
     <ul>

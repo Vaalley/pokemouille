@@ -20,13 +20,20 @@
   let gamesFailed = $state(false);
   let savedVersion = $state<string | null>(null);
   const currentUrl = $derived(page.shallow?.url ?? page.url);
+  // `detail` is the per-entry route under each section, so detail pages mark their section.
   const sections = [
-    { key: "pokemon", path: "" },
-    { key: "moves", path: "move/" },
-    { key: "abilities", path: "ability/" },
-    { key: "items", path: "item/" },
-    { key: "types", path: "types/" },
+    { key: "pokemon", path: "", detail: "pokemon/" },
+    { key: "moves", path: "move/", detail: "move/" },
+    { key: "abilities", path: "ability/", detail: "ability/" },
+    { key: "items", path: "item/", detail: "item/" },
+    { key: "types", path: "types/", detail: "types/" },
   ] as const;
+
+  function current(section: (typeof sections)[number]) {
+    const pathname = page.url.pathname;
+    if (pathname === `/${data.lang}/${section.path}`) return "page";
+    return pathname.startsWith(`/${data.lang}/${section.detail}`) ? "true" : undefined;
+  }
 
   // Games and the saved preference exist only in the browser, so prerendered HTML and the
   // first client render show a disabled selector rather than a guessed default game.
@@ -70,8 +77,22 @@
 <a class="skip-link" href="#main">{t(data.lang, "site.skipToContent")}</a>
 
 <header class="site-header">
-  <a class="site-name" href={resolve(`${data.lang}/`)}>{t(data.lang, "site.name")}</a>
-  <SearchDialog lang={data.lang} {games} {version} />
+  <div class="site-bar">
+    <a class="site-name" href={resolve(`${data.lang}/`)}>{t(data.lang, "site.name")}</a>
+    <nav class="browse-navigation" aria-label={navigation(data.lang, "label")}>
+      <ul class="inline-list">
+        {#each sections as section (section.key)}
+          <li>
+            <a
+              href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
+              aria-current={current(section)}
+            >{navigation(data.lang, section.key)}</a>
+          </li>
+        {/each}
+      </ul>
+    </nav>
+    <SearchDialog lang={data.lang} {games} {version} />
+  </div>
   <div class="site-controls" role="group" aria-label={t(data.lang, "site.controls")}>
     <LanguageSwitcher lang={data.lang} />
     <GameSelector
@@ -82,18 +103,6 @@
       error={gamesFailed}
     />
   </div>
-  <nav class="browse-navigation" aria-label={navigation(data.lang, "label")}>
-    <ul class="inline-list">
-      {#each sections as section (section.key)}
-        <li>
-          <a
-            href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
-            aria-current={page.url.pathname === `/${data.lang}/${section.path}` ? "page" : undefined}
-          >{navigation(data.lang, section.key)}</a>
-        </li>
-      {/each}
-    </ul>
-  </nav>
 </header>
 
 <noscript>

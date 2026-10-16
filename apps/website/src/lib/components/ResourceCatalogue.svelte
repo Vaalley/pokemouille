@@ -47,8 +47,8 @@
 
 <h1>{t(lang, catalogue.kind)}</h1>
 <p>{t(lang, "intro")}</p>
-<form class="catalogue-filters" onsubmit={(event) => event.preventDefault()} aria-label={t(lang, "filters")} aria-describedby="{id}-scope">
-  <div class="filter-field name-filter">
+<form class="filters" onsubmit={(event) => event.preventDefault()} aria-label={t(lang, "filters")} aria-describedby="{id}-scope">
+  <div class="filter-field wide">
     <label for="{id}-query">{t(lang, "query")}</label>
     <input id="{id}-query" type="search" name="q" value={filters.q} placeholder={t(lang, "placeholder")}
       disabled={!mounted} oninput={(event) => update({ q: event.currentTarget.value })} />
@@ -77,7 +77,7 @@
   {/if}
   <button type="button" disabled={!mounted || !active} onclick={() => update({ q: "", type: null, category: null })}>{t(lang, "reset")}</button>
 </form>
-<div class="scope" id="{id}-scope">
+<div class="note" id="{id}-scope">
   <p>{t(lang, "scope")}</p>
   <p>{t(lang, catalogue.kind === "move" ? "moveScope" : catalogue.kind === "ability" ? "abilityScope" : "itemScope")}</p>
 </div>
@@ -114,25 +114,16 @@
     {@render resourceList(catalogue.entries)}
   </noscript>
 {:else}
-  <p role="status" aria-live="polite" aria-atomic="true">{t(lang, "count", { filtered: entries.length, total: catalogue.entries.length })}</p>
+  <p class="result-count" role="status" aria-live="polite" aria-atomic="true">{t(lang, "count", { filtered: entries.length, total: catalogue.entries.length })}</p>
   {#if entries.length === 0}<p>{t(lang, "empty")}</p>
   {:else}{@render resourceList(entries)}{/if}
 {/if}
 
 <style>
-  .catalogue-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-block: 1.5rem 0.75rem; }
-  .filter-field { display: grid; gap: 0.35rem; flex: 1 1 12rem; min-width: 0; }
-  .name-filter { flex-grow: 2; }
-  label { font-weight: 600; }
-  input, select, button { font: inherit; padding: 0.6rem 0.75rem; min-height: 2.75rem; border: 1px solid currentColor; border-radius: 0.35rem; }
-  input, select { width: 100%; box-sizing: border-box; background: Canvas; color: CanvasText; }
-  button { cursor: pointer; }
-  button:disabled { cursor: default; opacity: 0.6; }
-  .scope { max-width: 80ch; font-size: 0.9rem; }
-  .resource-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0.5rem 1rem; }
+  .note p { margin-block: 0.25rem; }
+  .resource-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0.25rem 1rem; }
   .resource-list li { min-width: 0; }
   .resource-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
   .metadata { display: block; margin-inline-start: 2.375rem; font-size: 0.85rem; }
   .damage-class { display: inline-flex; align-items: center; gap: 0.35rem; vertical-align: middle; }
-  @media (max-width: 30rem) { .filter-field { flex-basis: 100%; } }
 </style>

@@ -105,7 +105,7 @@
 
 <section class="related" aria-labelledby={`${id}-heading`} aria-describedby={`${id}-scope`}>
   <h2 id={`${id}-heading`}>{t(lang, kind === "move" ? "move.heading" : "ability.heading")}</h2>
-  <p id={`${id}-scope`}>{t(lang, kind === "move" ? "move.scope" : "ability.scope")}</p>
+  <p class="note" id={`${id}-scope`}>{t(lang, kind === "move" ? "move.scope" : "ability.scope")}</p>
 
   <div role="status" aria-live="polite" aria-atomic="true">
     {#if failed || (games && version && !game)}
@@ -113,8 +113,11 @@
     {:else if !game || !gameName}
       <p>{t(lang, "loading")}</p>
     {:else}
-      <p>{t(lang, "game")} <strong><Localized text={gameName} /></strong></p>
-      <p>{t(lang, "count", { count: matches.rows.length })}</p>
+      <p class="result-count">
+        {t(lang, "count", { count: matches.rows.length })}
+        <span aria-hidden="true">·</span>
+        {t(lang, "game")} <strong><Localized text={gameName} /></strong>
+      </p>
     {/if}
   </div>
 
@@ -139,10 +142,12 @@
                 <span><Localized text={match.pokemon.name} /></span>
               </a>
             </h3>
-            <p class="identity">{t(lang, "number", { id: match.pokemon.speciesId })}</p>
-            {#if match.pokemon.form}
-              <p class="form">{t(lang, "form")} <code>{match.pokemon.form}</code></p>
-            {/if}
+            <p class="detail">
+              {t(lang, "number", { id: match.pokemon.speciesId })}
+              {#if match.pokemon.form}
+                <br />{t(lang, "form")} <code>{match.pokemon.form}</code>
+              {/if}
+            </p>
             {#if kind === "move"}
               <ul class="methods">
                 {#each match.learnsets as learnset (`${learnset.learnMethodId}:${learnset.level}`)}
@@ -175,27 +180,26 @@
 </section>
 
 <style>
-  .related { margin-block: 2rem; }
   .pokemon-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 0.5rem;
     padding: 0;
     list-style: none;
   }
   .pokemon-card {
     min-width: 0;
-    padding: 1rem;
-    border: 1px solid currentColor;
+    padding: 0.25rem 0.75rem 0.625rem;
+    border: 1px solid var(--border);
     border-radius: 0.5rem;
     overflow-wrap: anywhere;
   }
-  h3 { margin: 0; font-size: 1.05rem; }
+  h3 { margin: 0; font-size: 1rem; }
   h3 a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
   h3 a > span { min-width: 0; }
-  .identity, .form { margin-block: 0.4rem; font-size: 0.875rem; }
-  .form code { white-space: normal; }
-  .methods, .assignments { margin-block: 0.75rem 0; padding-inline-start: 1.25rem; }
-  .methods li + li, .assignments li + li { margin-block-start: 0.35rem; }
+  /* Details line up under the name, past the 40px icon and its gap. */
+  .detail, .methods, .assignments { margin: 0; padding-inline-start: 3rem; font-size: 0.875rem; }
+  .detail code { white-space: normal; }
+  .methods, .assignments { display: flex; flex-wrap: wrap; gap: 0 0.75rem; margin-block-start: 0.25rem; list-style: none; }
   .source-gap { border-inline-start: 0.2rem solid currentColor; padding-inline-start: 0.75rem; }
 </style>
