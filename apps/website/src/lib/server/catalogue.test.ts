@@ -4,6 +4,8 @@ import type {
   PokemonVariety,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
+import { resolvePokemon } from "../../../../../packages/pokemon-data/src/resolve.ts";
+import { fixture } from "../../../../../packages/pokemon-data/tests/fixtures.ts";
 import { filterTypeMembers } from "../data/type-membership.ts";
 import {
   projectCatalogueSpecies,
@@ -239,14 +241,49 @@ describe("projectRelatedIdentity", () => {
 });
 
 describe("projectTypeMembers", () => {
-  it("retains resolvable unknown fallback selections without borrowing cosmetic chronology", () => {
+  it("links grouped varieties to the earliest known cosmetic form with matching detail chronology", () => {
     const selected = variety({
       forms: [
-        form({ identifier: "sample-mouse-first", isDefault: false }),
+        form({ identifier: "sample-mouse-later", isDefault: false, versionGroupId: 17 }),
+        form({ identifier: "sample-mouse-unknown", isDefault: false, versionGroupId: null }),
+        form({
+          identifier: "sample-mouse-first",
+          isDefault: false,
+          versionGroupId: 15,
+          names: [{ languageId: 9, name: "Early Mouse" }],
+        }),
+        form({ identifier: "sample-mouse-unmapped", isDefault: false, versionGroupId: 99 }),
+      ],
+    });
+    const record = species([selected]);
+    const { references } = fixture();
+    const projected = projectTypeMembers(
+      record,
+      new Map(references.versionGroups.map((group) => [group.id, group.order])),
+    ).en;
+    expect(filterTypeMembers(projected, [18], { generationId: 6, order: 14 }).rows).toEqual([]);
+    const result = filterTypeMembers(projected, [18], { generationId: 6, order: 15 });
+    expect(result.missingIntroduction).toBe(0);
+    expect(result.rows.map((row) => row.pokemonId)).toEqual([125]);
+    const member = result.rows[0]!;
+    expect(member.name.text).toBe("Early Mouse");
+    const detail = resolvePokemon(record, references, {
+      language: "en",
+      version: "x",
+      form: member.form ?? undefined,
+    });
+    expect(detail.status).toBe("available");
+    expect(detail.name.text).toBe(member.name.text);
+  });
+
+  it("reports unknown chronology when no cosmetic form has a known introduction", () => {
+    const selected = variety({
+      forms: [
+        form({ identifier: "sample-mouse-first", isDefault: false, versionGroupId: 99 }),
         form({ identifier: "sample-mouse-second", isDefault: false, versionGroupId: null }),
       ],
     });
-    const projected = projectTypeMembers(species([selected]), new Map([[28, 1]])).en;
+    const projected = projectTypeMembers(species([selected]), new Map([[28, 10]])).en;
     expect(filterTypeMembers(projected, [18], { generationId: 6, order: 20 })).toMatchObject({
       missingIntroduction: 1,
       rows: [],

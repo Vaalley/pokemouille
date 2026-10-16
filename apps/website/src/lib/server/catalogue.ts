@@ -101,20 +101,35 @@ export function projectTypeMembers(
 ): Record<Language, TypeMember[]> {
   const projected: Record<Language, TypeMember[]> = { en: [], fr: [], ja: [] };
   for (const variety of record.varieties) {
-    const form =
+    let form =
       variety.forms.find((entry) => entry.isDefault) ??
       (variety.forms.length === 1 ? variety.forms[0]! : null);
+    const groupedFallback = form === null;
+    let introductionOrder =
+      form?.versionGroupId == null ? null : (groups.get(form.versionGroupId) ?? null);
+    if (!form) {
+      // Keep chronology and navigation tied to the same earliest known form.
+      for (const candidate of variety.forms) {
+        const order =
+          candidate.versionGroupId == null ? undefined : groups.get(candidate.versionGroupId);
+        if (order !== undefined && (introductionOrder === null || order < introductionOrder)) {
+          introductionOrder = order;
+          form = candidate;
+        }
+      }
+    }
     for (const lang of LANGUAGES) {
       projected[lang].push({
         speciesId: record.id,
         pokemonId: variety.id,
-        form: variety.isDefault ? null : (form?.identifier ?? variety.identifier),
-        name: variety.isDefault
-          ? localize(record.names, lang, record.identifier)
-          : pokemonName(record, variety, form, lang),
+        form:
+          variety.isDefault && !groupedFallback ? null : (form?.identifier ?? variety.identifier),
+        name:
+          variety.isDefault && !groupedFallback
+            ? localize(record.names, lang, record.identifier)
+            : pokemonName(record, variety, form, lang),
         generationId: record.generationId,
-        introductionOrder:
-          form?.versionGroupId == null ? null : (groups.get(form.versionGroupId) ?? null),
+        introductionOrder,
         types: variety.types,
         typeHistory: variety.typeHistory,
       });
