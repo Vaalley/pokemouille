@@ -5,27 +5,27 @@ const en = {
   "move.heading": "Pokémon that learn this move",
   "ability.heading": "Pokémon with this ability",
   "move.scope":
-    "Only learnsets recorded for the selected game's exact version group are shown. Methods and levels belong to that group; this does not establish that a Pokémon can be obtained in that game.",
+    "Only learnsets recorded for the selected game’s exact version group are shown, with that group’s methods and levels. Being on this list doesn’t mean a Pokémon can be obtained in that game.",
   "ability.scope":
-    "Ability assignments are resolved for the selected game's generation, not independently verified for each game. This does not establish obtainability or battle mechanics, especially in games such as Let's Go and Pokémon Legends. Forms introduced after the selected game are excluded.",
+    "Abilities come from the selected game’s generation and aren’t checked game by game. They don’t confirm that a Pokémon can be obtained or how it behaves in battle, especially in games like Let's Go and Pokémon Legends. Forms introduced after the selected game are left out.",
   game: "Selected game:",
   count: "{count} matching Pokémon varieties",
-  loading: "Loading the selected game and Pokémon relationships…",
+  loading: "Loading the selected game and related Pokémon…",
   error:
-    "The game data could not be loaded. Pokémon relationships cannot be determined. Reload the page to try again.",
+    "Couldn’t load the game data, so related Pokémon can’t be shown. Reload the page to try again.",
   "move.empty":
-    "No matching learnsets are recorded for this version group. This is not evidence that the move is unavailable.",
+    "No matching learnsets recorded for this version group. That doesn’t mean the move is unavailable.",
   "ability.empty":
-    "No matching ability assignments are recorded for this generation and these form introductions. This is not evidence of unavailability in the selected game.",
-  noSource: "No Pokémon relationships for this entry are recorded in the local dataset.",
-  beforeAbilities: "Abilities did not exist in Generations I and II.",
+    "No Pokémon have this ability recorded for this generation, counting forms introduced by then. That doesn’t mean it’s unavailable in the selected game.",
+  noSource: "Our data doesn’t link any Pokémon to this entry.",
+  beforeAbilities: "Abilities didn’t exist in Generations I and II.",
   sourceGap:
-    "{count} candidate varieties were omitted because their form introduction could not be placed in the game's chronology. The source is incomplete; these varieties are not marked unavailable.",
+    "{count} possible matches are hidden because our data can’t place their form’s introduction in this game’s timeline. The data is incomplete; these Pokémon aren’t marked as unavailable.",
   number: "National Pokédex No. {id}",
   form: "Form:",
   ordinary: "Ordinary ability",
   hidden: "Hidden ability",
-  level: "Level {level}",
+  level: "level {level}",
   levelUp: "Level-up",
   missingMethod: "Learning method {id} (name not recorded)",
 };
@@ -34,28 +34,27 @@ const fr = {
   "move.heading": "Pokémon apprenant cette capacité",
   "ability.heading": "Pokémon possédant ce talent",
   "move.scope":
-    "Seuls les apprentissages renseignés pour le groupe de versions exact du jeu sélectionné sont affichés. Les méthodes et niveaux concernent ce groupe ; ils ne garantissent pas qu’un Pokémon puisse être obtenu dans ce jeu.",
+    "Seuls les apprentissages enregistrés pour le groupe de versions exact du jeu sélectionné sont affichés, avec les méthodes et niveaux de ce groupe. Figurer dans cette liste ne veut pas dire qu’un Pokémon peut être obtenu dans ce jeu.",
   "ability.scope":
-    "Les talents sont déterminés pour la génération du jeu sélectionné, sans vérification propre à chaque jeu. Cela ne garantit ni l’obtention ni les mécaniques de combat, notamment dans les jeux Let's Go et Légendes Pokémon. Les formes apparues après le jeu sélectionné sont exclues.",
+    "Les talents viennent de la génération du jeu sélectionné et ne sont pas vérifiés jeu par jeu. Ils ne confirment ni qu’un Pokémon peut être obtenu, ni son comportement en combat, notamment dans les jeux Let's Go et Légendes Pokémon. Les formes apparues après le jeu sélectionné ne sont pas incluses.",
   game: "Jeu sélectionné :",
   count: "{count} variétés de Pokémon correspondantes",
   loading: "Chargement du jeu sélectionné et des Pokémon associés…",
   error:
-    "Les données des jeux n’ont pas pu être chargées. Les Pokémon associés ne peuvent pas être déterminés. Rechargez la page pour réessayer.",
+    "Impossible de charger les données des jeux : les Pokémon associés ne peuvent pas être affichés. Rechargez la page pour réessayer.",
   "move.empty":
-    "Aucun apprentissage correspondant n’est renseigné pour ce groupe de versions. Cela ne signifie pas que la capacité est indisponible.",
+    "Aucun apprentissage correspondant n’est enregistré pour ce groupe de versions. Cela ne veut pas dire que la capacité est indisponible.",
   "ability.empty":
-    "Aucun talent correspondant n’est renseigné pour cette génération et ces introductions de formes. Cela ne signifie pas qu’il est indisponible dans le jeu sélectionné.",
-  noSource:
-    "Aucune relation avec des Pokémon n’est renseignée pour cette entrée dans les données locales.",
+    "Aucun Pokémon n’a ce talent dans nos données pour cette génération, en comptant les formes apparues jusque-là. Cela ne veut pas dire qu’il est indisponible dans le jeu sélectionné.",
+  noSource: "Nos données ne relient aucun Pokémon à cette entrée.",
   beforeAbilities: "Les talents n’existaient pas dans les générations I et II.",
   sourceGap:
-    "{count} variétés candidates ont été omises car l’apparition de leur forme n’a pas pu être située dans la chronologie du jeu. La source est incomplète ; ces variétés ne sont pas indiquées comme indisponibles.",
-  number: "Pokédex national nº {id}",
+    "{count} correspondances possibles sont masquées : nos données ne permettent pas de situer l’apparition de leur forme par rapport à ce jeu. Les données sont incomplètes ; ces Pokémon ne sont pas marqués comme indisponibles.",
+  number: "Pokédex National nº {id}",
   form: "Forme :",
   ordinary: "Talent ordinaire",
   hidden: "Talent caché",
-  level: "Niveau {level}",
+  level: "niveau {level}",
   levelUp: "Montée de niveau",
   missingMethod: "Méthode d’apprentissage {id} (nom non renseigné)",
 } satisfies Record<keyof typeof en, string>;
@@ -64,22 +63,22 @@ const ja = {
   "move.heading": "このわざを覚えるポケモン",
   "ability.heading": "このとくせいを持つポケモン",
   "move.scope":
-    "選択したゲームと同じバージョングループに記録された習得データのみを表示します。方法とレベルはそのグループの情報であり、そのゲームでポケモンを入手できることを示すものではありません。",
+    "選択したゲームと同じバージョングループで記録された習得データだけを、そのグループでの方法とレベルで表示します。一覧にいても、そのゲームでポケモンを入手できるとは限りません。",
   "ability.scope":
-    "選択したゲームの世代におけるとくせいの割り当てです。ゲームごとの検証ではなく、入手可能性や戦闘の仕様を保証しません。特に『Let's Go』や『Pokémon LEGENDS』などでは注意が必要です。選択したゲームより後に登場したフォルムは除外しています。",
+    "とくせいは選択したゲームの世代のデータで、ゲームごとには確認していません。入手できるかどうかや戦闘での動きを保証するものではありません。特に『Let's Go』や『Pokémon LEGENDS』などでは注意してください。選択したゲームより後に登場したフォルムは含みません。",
   game: "選択したゲーム：",
   count: "該当するポケモン：{count}種類",
   loading: "選択したゲームと関連するポケモンを読み込み中…",
   error:
-    "ゲームデータを読み込めなかったため、関連するポケモンを判定できません。ページを再読み込みしてください。",
+    "ゲームデータを読み込めなかったため、関連するポケモンを表示できません。ページを再読み込みしてください。",
   "move.empty":
-    "このバージョングループには該当する習得データが記録されていません。このわざを使えないことを示すものではありません。",
+    "このバージョングループには該当する習得データがありません。このわざを使えないという意味ではありません。",
   "ability.empty":
-    "この世代とフォルムの登場時期に該当するとくせいの割り当ては記録されていません。選択したゲームで利用できないことを示すものではありません。",
-  noSource: "ローカルデータには、この項目に関連するポケモンの記録がありません。",
+    "この世代（その時点までに登場したフォルムを含む）で、このとくせいを持つポケモンの記録はありません。選択したゲームで使えないという意味ではありません。",
+  noSource: "データには、この項目に関連するポケモンがありません。",
   beforeAbilities: "第1・第2世代には、とくせいは存在しませんでした。",
   sourceGap:
-    "フォルムの登場時期をゲームの時系列で確認できないため、候補のうち{count}種類を表示していません。元データが不完全であり、利用不可と判定したものではありません。",
+    "フォルムの登場時期をこのゲームの時系列に当てはめられないため、候補のうち{count}種類を表示していません。データが不完全なためで、使えないと判定したわけではありません。",
   number: "全国図鑑番号 {id}",
   form: "フォルム：",
   ordinary: "通常のとくせい",

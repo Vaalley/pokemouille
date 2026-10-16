@@ -17,8 +17,8 @@
 </script>
 
 <svelte:head>
-  <title>{data.name.text} — {t(lang, "heading")} — Pokémouille</title>
-  <meta name="description" content={`${data.name.text} — ${t(lang, "heading")}. ${data.shortEffect?.text ?? t(lang, "scope")}`} />
+  <title>{data.name.text} | {t(lang, "heading")} | Pokémouille</title>
+  <meta name="description" content={`${data.name.text} (${t(lang, "heading")}). ${data.shortEffect?.text ?? t(lang, "scope")}`} />
 </svelte:head>
 
 <article>

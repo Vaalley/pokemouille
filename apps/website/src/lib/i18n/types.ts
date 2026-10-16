@@ -3,19 +3,19 @@ import type { Language } from "./core.ts";
 
 const en = {
   heading: "Defensive type matchups",
-  combined: "View these types’ combined defensive matchups",
+  combined: "See defensive matchups for this type combination",
   first: "First type",
   second: "Second type (optional)",
   choose: "Choose a type",
   reset: "Reset types",
   intro:
-    "Choose one or two types to see matching Pokémon and defensive matchups for the selected game.",
-  empty: "Select a type to see matching Pokémon and defensive matchups.",
+    "Pick one or two types to see which Pokémon have them and how they take damage in the selected game.",
+  empty: "Pick a type to see matching Pokémon and defensive matchups.",
   invalid:
-    "Invalid or unsupported type selection. Choose up to two different standard types (IDs 1–18).",
+    "This type selection isn’t valid. Choose up to two different standard types (IDs 1 to 18).",
   loading: "Loading type matchups…",
-  javascript: "JavaScript is required to read the selected types and game from the URL.",
-  error: "Type data could not be loaded.",
+  javascript: "Turn on JavaScript to load the types and game from the link.",
+  error: "Couldn’t load type data.",
   retry: "Retry",
   weaknesses: "Weaknesses",
   resistances: "Resistances",
@@ -23,32 +23,32 @@ const en = {
   none: "None",
   pokemonHeading: "Pokémon with these types",
   pokemonCount: "{count} Pokémon",
-  pokemonEmpty: "No Pokémon or forms match these types in the selected game’s context.",
+  pokemonEmpty: "No Pokémon or forms have these types in the selected game.",
   pokemonScope:
-    "One type includes both single- and dual-type Pokémon; two types require that exact pair, in either order. Includes alternate varieties using generation-based historical typing and source introduction dates; cosmetic forms with identical typing are grouped together. Introduction does not prove obtainability; this is not a regional Pokédex or a list of game-specific battle mechanics. Form icons depict the base species.",
+    "With one type, the list includes both single- and dual-type Pokémon. With two, it shows only that exact pair, in either order. Alternate forms are included, using the types they had in each generation and the introduction dates in our data. Cosmetic forms with the same types are grouped. A Pokémon that had appeared by this game may still be impossible to obtain in it, and this list is neither a regional Pokédex nor a guide to game-specific battle rules. Form icons show the base species.",
   introductionGap:
-    "{count} matching Pokémon / forms omitted: the source does not establish their introduction chronology.",
+    "{count} matching Pokémon or forms are hidden because our data doesn’t say when they were introduced.",
   typeGap:
-    "{count} potentially introduced Pokémon / forms have no type facts for this context and cannot be classified.",
+    "{count} Pokémon or forms that may be in this game have no type data here, so they can’t be sorted by type.",
   scope:
-    "Generation {generation} type chart. Multipliers show incoming damage against the selected types combined. Neutral matchups (×1) are omitted. Abilities, items, moves and battle effects are excluded; special game rules may differ.",
+    "Generation {generation} type chart. Multipliers show the damage this type combination takes. Neutral matchups (×1) are left out. Abilities, items, moves and other battle effects aren’t counted, and special rules in some games may change the result.",
   unavailable:
-    "One or more selected types did not exist in this game’s generation, or this generation has no supported chart. No matchup chart is shown.",
+    "At least one selected type didn’t exist in this game’s generation, or there’s no chart for this generation, so no matchups are shown.",
 };
 const fr = {
   heading: "Affinités défensives des types",
-  combined: "Voir les affinités défensives combinées de ces types",
+  combined: "Voir les affinités défensives de cette combinaison de types",
   first: "Premier type",
   second: "Second type (facultatif)",
   choose: "Choisir un type",
   reset: "Réinitialiser les types",
   intro:
-    "Choisissez un ou deux types pour voir les Pokémon correspondants et leurs affinités défensives dans le jeu sélectionné.",
-  empty: "Sélectionnez un type pour voir les Pokémon correspondants et leurs affinités défensives.",
+    "Choisissez un ou deux types pour voir les Pokémon qui les ont et les dégâts qu’ils subissent dans le jeu sélectionné.",
+  empty: "Choisissez un type pour voir les Pokémon correspondants et leurs affinités défensives.",
   invalid:
-    "Sélection de types invalide ou non prise en charge. Choisissez au maximum deux types standards différents (identifiants 1 à 18).",
+    "Cette sélection de types n’est pas valide. Choisissez au plus deux types standards différents (identifiants 1 à 18).",
   loading: "Chargement des affinités…",
-  javascript: "JavaScript est nécessaire pour lire les types et le jeu sélectionnés dans l’URL.",
+  javascript: "Activez JavaScript pour charger les types et le jeu indiqués dans le lien.",
   error: "Impossible de charger les types.",
   retry: "Réessayer",
   weaknesses: "Faiblesses",
@@ -57,32 +57,31 @@ const fr = {
   none: "Aucune",
   pokemonHeading: "Pokémon de ces types",
   pokemonCount: "{count} Pokémon",
-  pokemonEmpty:
-    "Aucun Pokémon ni aucune forme ne correspond à ces types dans le contexte du jeu sélectionné.",
+  pokemonEmpty: "Aucun Pokémon ni aucune forme n’a ces types dans le jeu sélectionné.",
   pokemonScope:
-    "Un type inclut les Pokémon à un ou deux types ; deux types exigent cette paire exacte, dans n’importe quel ordre. Les variétés alternatives sont incluses selon les types historiques par génération et les dates d’introduction de la source ; les formes cosmétiques de même typage sont regroupées. Une introduction ne prouve pas l’obtention : ce n’est ni un Pokédex régional ni une liste des mécaniques propres au jeu. Les icônes représentent l’espèce de base.",
+    "Avec un seul type, la liste inclut les Pokémon à un ou deux types. Avec deux, seule cette paire exacte s’affiche, dans n’importe quel ordre. Les formes alternatives sont incluses, avec les types qu’elles avaient à chaque génération et les dates d’apparition de nos données. Les formes cosmétiques de mêmes types sont regroupées. Un Pokémon déjà apparu dans ce jeu n’y est pas forcément obtenable, et cette liste n’est ni un Pokédex régional ni un guide des règles de combat propres à chaque jeu. Les icônes des formes représentent l’espèce de base.",
   introductionGap:
-    "{count} Pokémon / formes correspondants omis : la source n’établit pas leur chronologie d’introduction.",
+    "{count} Pokémon ou formes correspondants sont masqués : nos données ne disent pas quand ils sont apparus.",
   typeGap:
-    "{count} Pokémon / formes potentiellement introduits n’ont aucune donnée de type dans ce contexte et ne peuvent pas être classés.",
+    "{count} Pokémon ou formes peut-être présents dans ce jeu n’ont pas de données de type ici et ne peuvent pas être classés.",
   scope:
-    "Table des types de la génération {generation}. Les multiplicateurs indiquent les dégâts reçus par les types sélectionnés combinés. Les affinités neutres (×1) sont omises. Talents, objets, capacités et effets de combat exclus ; les règles spéciales de certains jeux peuvent différer.",
+    "Table des types de la génération {generation}. Les multiplicateurs indiquent les dégâts subis par cette combinaison de types. Les affinités neutres (×1) ne sont pas affichées. Les talents, objets, capacités et autres effets de combat ne sont pas pris en compte, et les règles spéciales de certains jeux peuvent changer le résultat.",
   unavailable:
-    "Au moins un type sélectionné n’existait pas dans la génération de ce jeu, ou cette génération n’a pas de table prise en charge. Aucune affinité n’est affichée.",
+    "Au moins un des types sélectionnés n’existait pas dans la génération de ce jeu, ou il n’y a pas de table pour cette génération : aucune affinité n’est affichée.",
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   heading: "防御のタイプ相性",
-  combined: "このタイプの複合防御相性を見る",
+  combined: "このタイプの組み合わせの防御相性を見る",
   first: "タイプ1",
   second: "タイプ2（任意）",
   choose: "タイプを選択",
   reset: "タイプをリセット",
-  intro: "タイプを1つまたは2つ選ぶと、選択したゲームで該当するポケモンと防御相性が表示されます。",
+  intro:
+    "タイプを1つか2つ選ぶと、そのタイプを持つポケモンと、選択したゲームで受けるダメージの倍率が表示されます。",
   empty: "タイプを選ぶと、該当するポケモンと防御相性が表示されます。",
-  invalid:
-    "無効または未対応のタイプ指定です。異なる通常タイプを2つまで選んでください（ID 1～18）。",
+  invalid: "このタイプ指定は無効です。異なる通常タイプを2つまで選んでください（ID 1から18）。",
   loading: "タイプ相性を読み込み中…",
-  javascript: "URLのタイプとゲームを読み取るにはJavaScriptが必要です。",
+  javascript: "リンクのタイプとゲームを読み込むにはJavaScriptを有効にしてください。",
   error: "タイプデータを読み込めませんでした。",
   retry: "再試行",
   weaknesses: "弱点",
@@ -91,17 +90,16 @@ const ja = {
   none: "なし",
   pokemonHeading: "このタイプのポケモン",
   pokemonCount: "{count} 匹・フォルム",
-  pokemonEmpty: "選択したゲームの条件で、このタイプに該当するポケモン・フォルムはありません。",
+  pokemonEmpty: "選択したゲームで、このタイプを持つポケモン・フォルムはいません。",
   pokemonScope:
-    "タイプ1つでは単タイプと複合タイプを含み、2つでは順序を問わずその組み合わせと完全一致するものを表示します。別の姿も、世代別の過去のタイプと出典の登場時期に基づいて含めます。同じタイプの外見上のフォルムはまとめて表示します。登場済みでも入手できるとは限りません。地方図鑑やゲーム固有の戦闘仕様の一覧ではありません。アイコンは基本の種族を表します。",
-  introductionGap:
-    "該当する{count}匹・フォルムは、出典から登場時期を確認できないため表示していません。",
+    "タイプ1つでは単タイプと複合タイプの両方を、2つではその組み合わせのポケモンだけを表示します（順序は問いません）。別の姿も、各世代でのタイプとデータ上の登場時期に基づいて含めます。タイプが同じ外見違いのフォルムはまとめて表示します。このゲームまでに登場していても、入手できるとは限りません。また、地方図鑑やゲームごとの戦闘ルールの一覧ではありません。フォルムのアイコンは基本の種族の姿です。",
+  introductionGap: "該当する{count}匹・フォルムは、データに登場時期がないため表示していません。",
   typeGap:
-    "登場している可能性のある{count}匹・フォルムは、この条件のタイプ情報がなく分類できません。",
+    "このゲームにいる可能性のある{count}匹・フォルムは、タイプのデータがないため分類できません。",
   scope:
-    "第{generation}世代のタイプ相性。倍率は選択した複合タイプで受けるダメージを示します。等倍（×1）は省略しています。特性・持ち物・技・戦闘中の効果は含みません。ゲーム固有のルールでは異なる場合があります。",
+    "第{generation}世代のタイプ相性表。倍率はこのタイプの組み合わせが受けるダメージです。等倍（×1）は省略しています。特性・持ち物・わざなどの戦闘中の効果は含まず、ゲームによっては特別なルールで結果が変わることがあります。",
   unavailable:
-    "選択したタイプがこのゲームの世代に存在しないか、この世代の相性表に対応していません。相性表は表示されません。",
+    "選択したタイプのいずれかがこのゲームの世代に存在しないか、この世代の相性表がないため、相性は表示されません。",
 } satisfies Record<keyof typeof en, string>;
 export const t = createTranslator({ en, fr, ja } satisfies Record<
   Language,

@@ -10,6 +10,8 @@
     ReferenceData,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { pokemonHref } from "#lib/data/context.ts";
+  import { evolutionTree } from "#lib/data/evolution-tree.ts";
+  import type { EvolutionForm, EvolutionTreeNode } from "#lib/data/evolution-tree.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { messageKey, t, versionGroupName } from "#lib/i18n/pokemon.ts";
   import { t as evolutionText } from "#lib/i18n/evolution.ts";
@@ -19,13 +21,13 @@
   import TypeBadge from "../TypeBadge.svelte";
   import Localized from "./Localized.svelte";
 
-  type ChainNode = EvolutionChainProjection["nodes"][number];
-
   let {
     lang,
     chain,
+    forms,
     hasChain,
     speciesId,
+    formId,
     version,
     generationId,
     game,
@@ -33,9 +35,13 @@
   }: {
     lang: Language;
     chain: EvolutionChainProjection | null;
+    /** Forms named by the chain's evolution conditions, keyed by form ID. */
+    forms: Record<number, EvolutionForm>;
     /** Whether the species record names an evolution chain at all. */
     hasChain: boolean;
     speciesId: number;
+    /** Form shown on this page; null when the form could not be resolved. */
+    formId: number | null;
     version: string;
     /** Generation of the selected game. */
     generationId: number;
@@ -43,22 +49,20 @@
     references: ReferenceData;
   } = $props();
 
-  const descendants = $derived.by(() => {
-    const byParent: Record<number, ChainNode[]> = {};
-    for (const node of chain?.nodes ?? []) {
-      const parent = node.evolvesFromSpeciesId ?? 0;
-      (byParent[parent] ??= []).push(node);
-    }
-    return byParent;
+  const roots = $derived(chain ? evolutionTree(chain, forms) : []);
+  // A variety with its own card is "this page" there; every other form of the species
+  // (default, cosmetic, or without a card) marks the species card.
+  const currentKey = $derived.by(() => {
+    const formKey = `${speciesId}:${formId}`;
+    const hasCard = (nodes: EvolutionTreeNode[]): boolean =>
+      nodes.some((node) => node.key === formKey || hasCard(node.children));
+    return formId !== null && hasCard(roots) ? formKey : String(speciesId);
   });
-  const roots = $derived.by(() => {
-    const nodes = chain?.nodes ?? [];
-    return nodes.filter(
-      (node) =>
-        node.evolvesFromSpeciesId === null ||
-        !nodes.some((other) => other.speciesId === node.evolvesFromSpeciesId),
-    );
-  });
+  function introducedGeneration(node: EvolutionTreeNode): number {
+    const group = node.form?.versionGroupId;
+    const formGeneration = references.versionGroups.find((row) => row.id === group)?.generationId;
+    return Math.max(node.generationId, formGeneration ?? 0);
+  }
 
   // Source condition columns that hold IDs of reference resources we can name.
   const RESOURCE_CONDITIONS: Record<string, "items" | "moves" | "types"> = {
@@ -121,7 +125,8 @@
           ? localize(node.names, lang, node.identifier)
           : t(lang, "value.id", { id: String(raw) });
       } else if (key === "evolved_pokemon_form_id" || key === "required_pokemon_form_id") {
-        value = t(lang, "evolution.form", { id: String(raw) });
+        value = (typeof raw === "number" ? forms[raw]?.name : undefined) ??
+          t(lang, "evolution.form", { id: String(raw) });
       } else if (key === "percentage_chance") {
         value = t(lang, "evolution.percent", { value: String(raw) });
       }
@@ -187,39 +192,40 @@
   </div>
 {/snippet}
 
-{#snippet branch(nodes: ChainNode[])}
+{#snippet branch(nodes: EvolutionTreeNode[])}
   <ul class="branches">
-    {#each nodes as node (node.speciesId)}
-      {@const name = localize(node.names, lang, node.identifier)}
+    {#each nodes as node (node.key)}
+      {@const name = node.form?.name ?? localize(node.names, lang, node.identifier)}
       <li class="branch">
-        <article class:current={node.speciesId === speciesId} class="card">
+        <article class:current={node.key === currentKey} class="card">
           <div class="identity">
             <PokemonIcon speciesId={node.speciesId} />
             <div>
               <span class="dex"><span class="sr-only">{evolutionText(lang, "dex")} </span>#{String(node.speciesId).padStart(4, "0")}</span>
-              {#if node.speciesId === speciesId}
+              {#if node.key === currentKey}
                 <strong aria-current="page"><Localized text={name} /></strong>
                 <span class="badge">{t(lang, "evolution.current")}</span>
               {:else}
                 <a
                   href={resolve(
-                    pokemonHref(lang, node.speciesId, { version, form: null }).slice(
-                      1,
-                    ) as PathnameWithSearchOrHash,
+                    pokemonHref(lang, node.speciesId, {
+                      version,
+                      form: node.form?.identifier ?? null,
+                    }).slice(1) as PathnameWithSearchOrHash,
                   )}><Localized text={name} /></a
                 >
               {/if}
             </div>
           </div>
-          {#if node.generationId > generationId}
+          {#if introducedGeneration(node) > generationId}
             <p class="badge">{t(lang, "evolution.notIntroduced", { game })}</p>
           {/if}
           {#if node.methods.length}
             {@render methodList(node.methods)}
           {/if}
         </article>
-        {#if descendants[node.speciesId]}
-          {@render branch(descendants[node.speciesId]!)}
+        {#if node.children.length}
+          {@render branch(node.children)}
         {/if}
       </li>
     {/each}

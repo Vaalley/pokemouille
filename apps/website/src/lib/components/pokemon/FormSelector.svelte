@@ -77,6 +77,6 @@
     </Select.Portal>
   </Select.Root>
   {#if current}
-    <p><Localized text={current.form.name} /> — {current.details}</p>
+    <p><Localized text={current.form.name} /> ({current.details})</p>
   {/if}
 </section>

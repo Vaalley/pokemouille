@@ -296,8 +296,10 @@
       <Evolution
         {lang}
         chain={view.chain}
+        forms={data.evolutionForms}
         hasChain={view.record.evolutionChainId !== null}
         speciesId={data.speciesId}
+        formId={pokemon.formId}
         version={context.version}
         generationId={pokemon.context.generationId}
         game={gameName}

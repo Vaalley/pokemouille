@@ -11,16 +11,16 @@ const en = {
   allGenerations: "All generations",
   generationNumber: "Generation {number}",
   scope:
-    "Types are the current default variety’s types, not historical types for the selected game. Generation means the species’ introduction. This list does not establish availability in any game.",
+    "Types are the default form’s current types, not the ones it had in the selected game. Generation is when the species first appeared. Being on this list doesn’t mean a Pokémon is available in any particular game.",
   count: "{filtered} of {total} Pokémon",
   empty: "No Pokémon match these filters.",
   reset: "Reset filters",
-  loading: "Loading the filters from this URL…",
-  javascript: "Enable JavaScript to filter the National Pokédex and restore filters from the URL.",
+  loading: "Loading filters from the link…",
+  javascript: "Turn on JavaScript to filter the National Pokédex or use filters saved in a link.",
 };
 const fr = {
-  filters: "Filtrer le Pokédex national",
-  query: "Nom ou numéro du Pokédex national",
+  filters: "Filtrer le Pokédex National",
+  query: "Nom ou numéro du Pokédex National",
   placeholder: "Ex. Pikachu ou nº 25",
   type: "Type",
   allTypes: "Tous les types",
@@ -28,13 +28,13 @@ const fr = {
   allGenerations: "Toutes les générations",
   generationNumber: "Génération {number}",
   scope:
-    "Les types sont ceux actuels de la variété par défaut, et non les types historiques du jeu sélectionné. La génération est celle de l’apparition de l’espèce. Cette liste ne garantit pas sa disponibilité dans un jeu.",
+    "Les types sont ceux de la forme par défaut aujourd’hui, pas ceux qu’elle avait dans le jeu sélectionné. La génération indique la première apparition de l’espèce. Figurer dans cette liste ne veut pas dire qu’un Pokémon est disponible dans un jeu donné.",
   count: "{filtered} Pokémon sur {total}",
   empty: "Aucun Pokémon ne correspond à ces filtres.",
   reset: "Réinitialiser les filtres",
-  loading: "Chargement des filtres de cette URL…",
+  loading: "Chargement des filtres du lien…",
   javascript:
-    "Activez JavaScript pour filtrer le Pokédex national et restaurer les filtres de l’URL.",
+    "Activez JavaScript pour filtrer le Pokédex National ou utiliser les filtres enregistrés dans un lien.",
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   filters: "全国図鑑を絞り込む",
@@ -46,12 +46,13 @@ const ja = {
   allGenerations: "すべての世代",
   generationNumber: "第{number}世代",
   scope:
-    "タイプは現在の標準のすがたのもので、選択したゲームの過去のタイプではありません。世代はその種が初めて登場した世代です。この一覧は各ゲームでの入手の可否を示すものではありません。",
+    "タイプは標準のすがたの現在のタイプで、選択したゲーム当時のタイプではありません。世代はその種が初めて登場した世代です。一覧にいても、各ゲームで入手できるとは限りません。",
   count: "全{total}匹中{filtered}匹",
   empty: "条件に一致するポケモンはいません。",
   reset: "絞り込みをリセット",
-  loading: "URLの絞り込み条件を読み込み中…",
-  javascript: "全国図鑑の絞り込みとURLの条件の復元にはJavaScriptを有効にしてください。",
+  loading: "リンクの絞り込み条件を読み込み中…",
+  javascript:
+    "全国図鑑の絞り込みや、リンクに保存された条件の利用にはJavaScriptを有効にしてください。",
 } satisfies Record<keyof typeof en, string>;
 
 export const t = createTranslator({ en, fr, ja } satisfies Record<

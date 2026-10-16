@@ -46,7 +46,7 @@
 </script>
 
 <svelte:head>
-  <title>{t(data.lang, "home.title")} – {t(data.lang, "site.name")}</title>
+  <title>{t(data.lang, "home.title")} | {t(data.lang, "site.name")}</title>
 </svelte:head>
 
 <h1>{t(data.lang, "home.title")}</h1>

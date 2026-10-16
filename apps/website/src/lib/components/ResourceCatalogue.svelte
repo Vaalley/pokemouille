@@ -41,8 +41,8 @@
 </script>
 
 <svelte:head>
-  <title>{t(lang, catalogue.kind)} — Pokémouille</title>
-  <meta name="description" content={`${t(lang, catalogue.kind)} — ${t(lang, "intro")}`} />
+  <title>{t(lang, catalogue.kind)} | Pokémouille</title>
+  <meta name="description" content={`${t(lang, catalogue.kind)}. ${t(lang, "intro")}`} />
 </svelte:head>
 
 <h1>{t(lang, catalogue.kind)}</h1>

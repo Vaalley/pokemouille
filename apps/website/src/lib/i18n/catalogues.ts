@@ -5,9 +5,9 @@ const en = {
   move: "Moves",
   ability: "Abilities",
   item: "Items",
-  intro: "Browse the published snapshot. Select a name to view its details.",
+  intro: "Browse the full list and select a name to see its details.",
   filters: "Catalogue filters",
-  query: "Localized or English name",
+  query: "Name, in your language or English",
   placeholder: "Search by name…",
   type: "Current type",
   allTypes: "All types",
@@ -18,26 +18,26 @@ const en = {
   special: "Special",
   unknown: "Unknown category ({id})",
   scope:
-    "This catalogue includes all entries in the snapshot, not only those available in the selected game. Names may fall back to English. Game context is preserved when opening details.",
+    "This list has every entry in our data, not only the ones in the selected game. Names with no translation appear in English. Links to details keep the selected game.",
   moveScope:
-    "Type and damage category are current source values, not historical mechanics for the selected game. Disc icons illustrate type only, not TM availability.",
+    "Type and damage category are today’s values and may not match the selected game. Disc icons show the type only; they don’t mean a TM exists.",
   abilityScope:
-    "The Ability Capsule icon identifies the category; abilities have no individual game icons.",
-  itemScope: "Icons use the available item artwork; a dashed marker means no icon is available.",
-  count: "Results: {filtered} / {total}",
+    "Abilities don’t have their own icons in the games, so every ability uses the Ability Capsule icon.",
+  itemScope: "Items without artwork show a dashed placeholder.",
+  count: "{filtered} of {total}",
   empty: "No entries match these filters.",
   reset: "Reset filters",
-  loading: "Loading the filters from this URL…",
+  loading: "Loading filters from the link…",
   javascript:
-    "Enable JavaScript to filter this catalogue and restore URL filters. The complete unfiltered catalogue is shown below.",
+    "Turn on JavaScript to filter this list or use filters saved in a link. The full list is below.",
 };
 const fr = {
   move: "Capacités",
   ability: "Talents",
   item: "Objets",
-  intro: "Parcourez les données publiées. Sélectionnez un nom pour afficher sa fiche.",
+  intro: "Parcourez la liste complète et sélectionnez un nom pour afficher sa fiche.",
   filters: "Filtres du catalogue",
-  query: "Nom localisé ou anglais",
+  query: "Nom, en français ou en anglais",
   placeholder: "Rechercher par nom…",
   type: "Type actuel",
   allTypes: "Tous les types",
@@ -48,25 +48,24 @@ const fr = {
   special: "Spéciale",
   unknown: "Catégorie inconnue ({id})",
   scope:
-    "Ce catalogue contient toutes les entrées des données publiées, pas uniquement celles disponibles dans le jeu sélectionné. Les noms manquants peuvent être en anglais. Le jeu sélectionné est conservé dans les liens vers les fiches.",
+    "Cette liste contient toutes les entrées de nos données, pas seulement celles du jeu sélectionné. Les noms sans traduction s’affichent en anglais. Les liens vers les fiches conservent le jeu sélectionné.",
   moveScope:
-    "Le type et la catégorie de dégâts sont les valeurs actuelles de la source, et non les mécaniques historiques du jeu sélectionné. Les disques illustrent uniquement le type, pas la disponibilité d’une CT.",
+    "Le type et la catégorie de dégâts sont les valeurs actuelles et peuvent différer dans le jeu sélectionné. Les disques indiquent seulement le type ; ils ne signifient pas qu’une CT existe.",
   abilityScope:
-    "L’icône de la Pilule Talent indique la catégorie ; les talents n’ont pas d’icône individuelle dans les jeux.",
-  itemScope:
-    "Les icônes utilisent les illustrations d’objets disponibles ; un repère en pointillés indique une icône absente.",
-  count: "Résultats : {filtered} / {total}",
+    "Les talents n’ont pas d’icône propre dans les jeux : ils utilisent tous l’icône de la Pilule Talent.",
+  itemScope: "Un repère en pointillés remplace l’icône des objets sans illustration.",
+  count: "{filtered} sur {total}",
   empty: "Aucune entrée ne correspond à ces filtres.",
   reset: "Réinitialiser les filtres",
-  loading: "Chargement des filtres de cette URL…",
+  loading: "Chargement des filtres du lien…",
   javascript:
-    "Activez JavaScript pour filtrer ce catalogue et restaurer les filtres de l’URL. Le catalogue complet, sans filtre, est affiché ci-dessous.",
+    "Activez JavaScript pour filtrer cette liste ou utiliser les filtres enregistrés dans un lien. La liste complète est affichée ci-dessous.",
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   move: "わざ",
   ability: "とくせい",
   item: "どうぐ",
-  intro: "公開済みのデータを一覧できます。名前を選ぶと詳細が表示されます。",
+  intro: "全項目を一覧できます。名前を選ぶと詳細が表示されます。",
   filters: "一覧の絞り込み",
   query: "日本語名または英語名",
   placeholder: "名前で検索…",
@@ -79,18 +78,18 @@ const ja = {
   special: "特殊",
   unknown: "不明な分類（{id}）",
   scope:
-    "この一覧は公開済みデータの全項目を含み、選択したゲームで使えるものだけではありません。翻訳がない名前は英語で表示されることがあります。詳細へのリンクには選択したゲームが引き継がれます。",
+    "この一覧にはデータ内の全項目が含まれ、選択したゲームのものに限りません。翻訳がない名前は英語で表示されます。詳細へのリンクでは選択したゲームが引き継がれます。",
   moveScope:
-    "タイプと分類は現在のデータの値であり、選択したゲームの過去の仕様ではありません。ディスクのアイコンはタイプのみを表し、わざマシンの有無を示しません。",
+    "タイプと分類は現在の値で、選択したゲームとは異なる場合があります。ディスクのアイコンはタイプを表すだけで、わざマシンがあることを示すものではありません。",
   abilityScope:
-    "とくせいカプセルのアイコンは項目の種類を表します。とくせいに個別のゲーム内アイコンはありません。",
-  itemScope: "利用可能などうぐの画像を表示します。点線のマークは画像がないことを示します。",
+    "ゲーム内でとくせいごとのアイコンはないため、すべてとくせいカプセルのアイコンを使っています。",
+  itemScope: "画像がないどうぐには点線のマークを表示します。",
   count: "全{total}件中{filtered}件",
   empty: "条件に一致する項目はありません。",
   reset: "絞り込みをリセット",
-  loading: "URLの絞り込み条件を読み込み中…",
+  loading: "リンクの絞り込み条件を読み込み中…",
   javascript:
-    "絞り込みとURLの条件の復元にはJavaScriptを有効にしてください。以下に絞り込み前の全項目を表示します。",
+    "絞り込みや、リンクに保存された条件の利用にはJavaScriptを有効にしてください。以下に全項目を表示しています。",
 } satisfies Record<keyof typeof en, string>;
 
 export const t = createTranslator({ en, fr, ja } satisfies Record<

@@ -66,7 +66,7 @@
   }
 </script>
 
-<svelte:head><title>{t(data.lang, "heading")} — Pokémouille</title></svelte:head>
+<svelte:head><title>{t(data.lang, "heading")} | Pokémouille</title></svelte:head>
 <h1>{t(data.lang, "heading")}</h1>
 <p>{t(data.lang, "intro")}</p>
 <form onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>

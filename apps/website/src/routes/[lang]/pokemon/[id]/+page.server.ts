@@ -4,11 +4,13 @@ import { error } from "@sveltejs/kit";
 import { localize } from "../../../../../../../packages/pokemon-data/src/localization.ts";
 import type {
   DatasetManifest,
+  EvolutionChainProjection,
   LocalizedText,
-  Name,
   SearchEntry,
   SpeciesRecord,
 } from "../../../../../../../packages/pokemon-data/src/index.ts";
+import type { EvolutionForm } from "#lib/data/evolution-tree.ts";
+import { projectEvolutionForms } from "#lib/server/evolution-forms.ts";
 import { LANGUAGES, isLanguage } from "#lib/i18n/core.ts";
 import type { Language } from "#lib/i18n/core.ts";
 import type { EntryGenerator, PageServerLoad } from "./$types";
@@ -60,8 +62,30 @@ function languageIndex(lang: Language): LanguageIndex {
   return index;
 }
 
-// Species files are large; keep only the genus rows, shared by all three languages.
-const genera: Record<number, Name[]> = {};
+// Species files are large; keep only what pages need, shared by all three languages.
+const species: Record<number, Pick<SpeciesRecord, "genera" | "evolutionChainId">> = {};
+function speciesSummary(speciesId: number, path: string) {
+  if (!species[speciesId]) {
+    const { genera, evolutionChainId } = readJson<SpeciesRecord>(path);
+    species[speciesId] = { genera, evolutionChainId };
+  }
+  return species[speciesId];
+}
+
+const evolutionForms = new Map<number, Record<Language, Record<number, EvolutionForm>>>();
+function chainForms(chainId: number) {
+  let forms = evolutionForms.get(chainId);
+  if (!forms) {
+    const files = getManifest().files;
+    const chain = readJson<EvolutionChainProjection>(files.evolution[String(chainId)]!.path);
+    const records = chain.nodes.map((node) =>
+      readJson<SpeciesRecord>(files.pokemon[String(node.speciesId)]!.path),
+    );
+    forms = projectEvolutionForms(chain, records);
+    evolutionForms.set(chainId, forms);
+  }
+  return forms;
+}
 
 export const entries: EntryGenerator = () => {
   const ids = Object.keys(getManifest().files.pokemon);
@@ -77,11 +101,8 @@ export const load: PageServerLoad = ({ params }) => {
   const asset = getManifest().files.pokemon[params.id];
   if (position === undefined || !asset) error(404, "Unknown Pokémon");
   const identity = index.ordered[position]!;
-  const genus = localize(
-    (genera[speciesId] ??= readJson<SpeciesRecord>(asset.path).genera),
-    params.lang,
-    "",
-  );
+  const summary = speciesSummary(speciesId, asset.path);
+  const genus = localize(summary.genera, params.lang, "");
   return {
     speciesId,
     name: identity.name,
@@ -89,5 +110,7 @@ export const load: PageServerLoad = ({ params }) => {
     generationId: identity.generationId,
     previous: index.ordered[position - 1] ?? null,
     next: index.ordered[position + 1] ?? null,
+    evolutionForms:
+      summary.evolutionChainId === null ? {} : chainForms(summary.evolutionChainId)[params.lang],
   };
 };

@@ -17,13 +17,13 @@ const en = {
   effectChance: "Effect chance",
   effect: "Effect",
   scope:
-    "Current move data, not specific to the selected game. Earlier games may use different values or effects. A listed move does not establish availability in a game.",
+    "Current move data, not specific to the selected game. Older games may use different values or effects, and being listed doesn’t mean a move is available in a given game.",
   missing: "Not recorded",
-  variable: "Not applicable or variable",
+  variable: "Varies or doesn’t apply",
   descriptions: "In-game descriptions",
   games: "Games",
   description: "Description",
-  noDescriptions: "No in-game descriptions are recorded.",
+  noDescriptions: "No in-game descriptions recorded.",
   back: "National Pokédex",
 };
 const fr = {
@@ -42,14 +42,14 @@ const fr = {
   effectChance: "Probabilité de l’effet",
   effect: "Effet",
   scope:
-    "Données actuelles, indépendantes du jeu sélectionné. Les valeurs et effets peuvent différer dans les jeux antérieurs. La présence d’une capacité ne garantit pas sa disponibilité dans un jeu.",
+    "Données actuelles, indépendantes du jeu sélectionné. Les valeurs et effets peuvent différer dans les jeux plus anciens, et une capacité listée n’est pas forcément disponible dans un jeu donné.",
   missing: "Non renseigné",
-  variable: "Sans objet ou variable",
+  variable: "Variable ou sans objet",
   descriptions: "Descriptions dans les jeux",
   games: "Jeux",
   description: "Description",
-  noDescriptions: "Aucune description de jeu n’est renseignée.",
-  back: "Pokédex national",
+  noDescriptions: "Aucune description en jeu n’est renseignée.",
+  back: "Pokédex National",
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   heading: "わざ",
@@ -67,9 +67,9 @@ const ja = {
   effectChance: "追加効果の発生率",
   effect: "効果",
   scope:
-    "現在のわざデータであり、選択したゲーム固有のものではありません。過去のゲームでは数値や効果が異なる場合があります。掲載されていても、そのゲームで使用できるとは限りません。",
+    "現在のわざデータで、選択したゲーム固有のものではありません。過去のゲームでは数値や効果が違う場合があり、掲載されていても、そのゲームで使えるとは限りません。",
   missing: "データなし",
-  variable: "対象外または変動",
+  variable: "変動または該当なし",
   descriptions: "ゲーム内の説明",
   games: "ゲーム",
   description: "説明",

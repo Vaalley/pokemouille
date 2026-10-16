@@ -156,7 +156,7 @@
                       {t(lang, "missingMethod", { id: learnset.learnMethodId })}
                     {/if}
                     {#if learnset.learnMethodId === 1 || learnset.level > 0}
-                      — {t(lang, "level", { level: learnset.level })}
+                      ({t(lang, "level", { level: learnset.level })})
                     {/if}
                   </li>
                 {/each}
