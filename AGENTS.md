@@ -1,3 +1,9 @@
+# Git authorization
+
+- Leave changes uncommitted by default. Commit only when the user explicitly asks for a commit for the current changes.
+- Push to `main` only when the user explicitly asks to push the current changes to `main`. Permission to commit does not grant permission to push.
+- Requests to implement, fix, or revert changes are not authorization to commit or push. Previous authorization does not carry over to later changes.
+
 <!--VITE PLUS START-->
 
 # Using Vite+, the Unified Toolchain for the Web

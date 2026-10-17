@@ -8,6 +8,8 @@
   import GameSelector, { setSelectedVersion } from "#lib/components/GameSelector.svelte";
   import LanguageSwitcher from "#lib/components/LanguageSwitcher.svelte";
   import SearchDialog from "#lib/components/SearchDialog.svelte";
+  import SpriteSelector, { setSelectedSprite } from "#lib/components/SpriteSelector.svelte";
+  import { spriteStyle } from "#lib/data/sprite-preference.ts";
   import { readPreference, resolveContext, writePreference } from "#lib/data/context.ts";
   import { getGames } from "#lib/data/loader.ts";
   import { t } from "#lib/i18n/messages.ts";
@@ -19,6 +21,14 @@
   let games = $state<GameOption[] | null>(null);
   let gamesFailed = $state(false);
   let savedVersion = $state<string | null>(null);
+  let selectedSprite = $state("official");
+  let spriteReady = $state(false);
+  setSelectedSprite(() => spriteStyle(selectedSprite));
+
+  function selectSprite(next: string) {
+    selectedSprite = spriteStyle(next).id;
+    writePreference("sprite", selectedSprite);
+  }
   const currentUrl = $derived(page.shallow?.url ?? page.url);
   // `detail` is the per-entry route under each section, so detail pages mark their section.
   const sections = [
@@ -39,6 +49,8 @@
   // first client render show a disabled selector rather than a guessed default game.
   onMount(() => {
     savedVersion = readPreference("version");
+    selectedSprite = spriteStyle(readPreference("sprite")).id;
+    spriteReady = true;
     getGames().then(
       (loaded) => {
         games = loaded;
@@ -102,6 +114,7 @@
       onchange={selectVersion}
       error={gamesFailed}
     />
+    <SpriteSelector lang={data.lang} {games} value={selectedSprite} ready={spriteReady && !!games} onchange={selectSprite} />
   </div>
 </header>
 

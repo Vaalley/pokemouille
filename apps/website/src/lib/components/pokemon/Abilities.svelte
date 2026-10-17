@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
+  import { LinkPreview } from "bits-ui";
   import type { ResolvedPokemon } from "../../../../../../packages/pokemon-data/src/index.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { reasonText, t } from "#lib/i18n/pokemon.ts";
@@ -32,35 +33,34 @@
       {#each abilities.value as ability (ability.slot)}
         <li>
           <h3>
-            <a
-              class="ability-link"
-              href={resolve(
-                `${lang}/ability/${ability.id}/${versionQuery}` as PathnameWithSearchOrHash,
-              )}><AbilityIcon /><Localized text={ability.name} /></a
-            >
+            <LinkPreview.Root openDelay={150} closeDelay={250}>
+              <LinkPreview.Trigger>
+                {#snippet child({ props })}
+                  {@const { role: _role, ...linkProps } = props}
+                  <a
+                    {...linkProps}
+                    class="ability-link"
+                    href={resolve(
+                      `${lang}/ability/${ability.id}/${versionQuery}` as PathnameWithSearchOrHash,
+                    )}><AbilityIcon /><Localized text={ability.name} /></a
+                  >
+                {/snippet}
+              </LinkPreview.Trigger>
+              <LinkPreview.Portal>
+                <LinkPreview.Content class="ability-preview" side="bottom" align="start" sideOffset={8} collisionPadding={12}>
+                  <p class="ability-preview-scope">{t(lang, "abilities.gameText", { games })}</p>
+                  <p>
+                    {#if ability.flavorText.status === "available"}
+                      <Localized text={ability.flavorText.value} />
+                    {:else}
+                      {reasonText(lang, ability.flavorText.reason)}
+                    {/if}
+                  </p>
+                </LinkPreview.Content>
+              </LinkPreview.Portal>
+            </LinkPreview.Root>
             {#if ability.isHidden}<small>({t(lang, "abilities.hidden")})</small>{/if}
           </h3>
-          <dl class="definitions">
-            <dt>{t(lang, "abilities.gameText", { games })}</dt>
-            <dd>
-              {#if ability.flavorText.status === "available"}
-                <Localized text={ability.flavorText.value} />
-              {:else}
-                {reasonText(lang, ability.flavorText.reason)}
-              {/if}
-            </dd>
-            <dt>
-              {t(lang, "abilities.effect")}
-              <small>({t(lang, "scope.current")})</small>
-            </dt>
-            <dd class="effect-text">
-              {#if ability.currentEffect.status === "available"}
-                <Localized text={ability.currentEffect.value} />
-              {:else}
-                {reasonText(lang, ability.currentEffect.reason)}
-              {/if}
-            </dd>
-          </dl>
         </li>
       {/each}
     </ul>
@@ -71,10 +71,24 @@
 
 <style>
   .ability-list { margin: 0; padding: 0; list-style: none; }
-  .ability-list > li + li { margin-block-start: 1.5rem; }
-  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin-block: 0 0.5rem; font-size: 1.125rem; }
+  .ability-list > li + li { margin-block-start: 0.75rem; }
+  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin: 0; font-size: 1.125rem; }
   .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; }
   h3 small { font-weight: normal; }
-  dt small { font-weight: normal; }
-  .effect-text { white-space: pre-line; }
+  :global(.ability-preview) {
+    z-index: 60;
+    width: min(22rem, calc(100vw - 1.5rem));
+    max-height: var(--bits-floating-available-height, calc(100dvh - 1.5rem));
+    overflow-y: auto;
+    padding: 1rem;
+    border: 1px solid;
+    border-radius: 0.75rem;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.15);
+    font-size: 1rem;
+    font-weight: normal;
+  }
+  :global(.ability-preview p) { margin: 0; white-space: pre-line; }
+  :global(.ability-preview .ability-preview-scope) { margin-block-end: 0.5rem; font-size: 0.875rem; }
 </style>

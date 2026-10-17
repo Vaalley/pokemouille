@@ -22,6 +22,7 @@
       <dt>{t(lang, "identity.number")}</dt>
       <dd>{data.abilityId}</dd>
     </dl>
+    <p>{t(lang, "generation", { generation: data.generationId })}</p>
   </header>
 
   <section aria-labelledby="effects-heading" aria-describedby="effects-scope">
@@ -45,6 +46,32 @@
       </dd>
     </dl>
     <p class="note" id="effects-scope">{t(lang, "effect.scope")}</p>
+  </section>
+
+  <section aria-labelledby="history-heading" aria-describedby="history-scope">
+    <h2 id="history-heading">{t(lang, "history.heading")}</h2>
+    <p class="note" id="history-scope">{t(lang, "history.scope")}</p>
+    {#if data.history.length}
+      {#each data.history as change (change.versionGroupId)}
+        <h3>
+          {t(lang, "history.before")}
+          {#each change.games as game, index}
+            {#if index > 0} / {/if}<Localized text={game} />
+          {/each}
+        </h3>
+        {#each change.texts as text}
+          <p class="source-text">
+            {#if text}
+              <Localized {text} />
+            {:else}
+              {t(lang, "history.missing")}
+            {/if}
+          </p>
+        {/each}
+      {/each}
+    {:else}
+      <p>{t(lang, "history.empty")}</p>
+    {/if}
   </section>
 
   <section aria-labelledby="descriptions-heading" aria-describedby="descriptions-scope">

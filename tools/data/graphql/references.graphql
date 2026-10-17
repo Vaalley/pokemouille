@@ -106,6 +106,7 @@ query References {
   abilities: ability(order_by: { id: asc }, limit: 1024) {
     id
     identifier: name
+    generationId: generation_id
     names: abilitynames(
       where: { language_id: { _in: [1, 5, 9, 11] } }
       order_by: { language_id: asc }
@@ -143,6 +144,29 @@ query References {
       shortEffect: short_effect
     }
     effectsCount: abilityeffecttexts_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+    effectChanges: abilitychanges(order_by: { id: asc }, limit: 128) {
+      versionGroupId: version_group_id
+      effects: abilitychangeeffecttexts(
+        where: { language_id: { _in: [1, 5, 9, 11] } }
+        order_by: { id: asc }
+        limit: 8
+      ) {
+        languageId: language_id
+        effect
+      }
+      effectsCount: abilitychangeeffecttexts_aggregate(
+        where: { language_id: { _in: [1, 5, 9, 11] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+    effectChangesCount: abilitychanges_aggregate {
       aggregate {
         count
       }

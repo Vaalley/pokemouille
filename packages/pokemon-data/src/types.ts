@@ -31,8 +31,17 @@ export interface FlavorText {
   text: string;
 }
 export interface Ability extends NamedResource {
+  generationId: number;
   flavorTexts: { languageId: number; versionGroupId: number; text: string }[];
   effects: { languageId: number; effect: string; shortEffect: string }[];
+  /** Records describe effects BEFORE the change at versionGroupId and may
+   * cover only the changed aspect, not the complete previous mechanics.
+   * Missing records or translations do not establish unchanged mechanics.
+   */
+  effectChanges: {
+    versionGroupId: number;
+    effects: { languageId: number; effect: string }[];
+  }[];
 }
 export interface Item extends NamedResource {
   flavorTexts: { languageId: number; versionGroupId: number; text: string }[];

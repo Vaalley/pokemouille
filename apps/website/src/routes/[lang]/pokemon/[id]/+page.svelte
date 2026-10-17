@@ -199,18 +199,6 @@
     preference: "context.source.preference",
     default: "context.source.default",
   } as const;
-  // Section heading ids, in page order (the overview's left column comes first).
-  const TOC = [
-    { id: "types-heading", key: "types.heading" },
-    { id: "stats-heading", key: "stats.heading" },
-    { id: "facts-heading", key: "facts.heading" },
-    { id: "abilities-heading", key: "abilities.heading" },
-    { id: "dex-heading", key: "dex.heading" },
-    { id: "evolution-heading", key: "evolution.heading" },
-    { id: "sprites-heading", key: "sprites.heading" },
-    { id: "moves-heading", key: "moves.heading" },
-    { id: "coverage-heading", key: "coverage.heading" },
-  ] as const;
 </script>
 
 <svelte:head>
@@ -257,8 +245,12 @@
     name={data.name}
     genus={data.genus}
     generationId={data.generationId}
+    isLegendary={data.isLegendary}
+    isMythical={data.isMythical}
     formName={pokemon && !isDefaultForm ? pokemon.name : null}
     artwork={pokemon ? pokemon.media.artwork : undefined}
+    sprites={pokemon?.media.sprites}
+    games={games ?? []}
   >
     {#if context}
       <p>
@@ -340,27 +332,6 @@
       {/if}
     </div>
 
-    <nav class="toc" aria-label={t(lang, "identity.toc")}>
-      <ul class="inline-list">
-        {#each TOC as entry (entry.id)}
-          <li><a href="#{entry.id}">{t(lang, entry.key)}</a></li>
-        {/each}
-      </ul>
-    </nav>
-
-    <!-- Two columns on wide screens: figures on the left, prose on the right. -->
-    <div class="overview">
-      <div class="column">
-        <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
-        <Stats {lang} stats={pokemon.stats} game={gameName} />
-        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
-      </div>
-      <div class="column">
-        <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
-        <Dex {lang} flavorText={pokemon.flavorText} game={gameName} />
-      </div>
-    </div>
-    <div class="page-sections">
       <Evolution
         {lang}
         {chain}
@@ -376,8 +347,21 @@
         game={gameName}
         references={view.references}
       />
+    <!-- Two columns on wide screens: figures on the left, prose on the right. -->
+    <div class="overview">
+      <div class="column">
+        <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
+        <Stats {lang} stats={pokemon.stats} game={gameName} />
+        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
+      </div>
+      <div class="column">
+        <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
+        <Dex {lang} flavorText={pokemon.flavorText} game={gameName} />
+      </div>
+    </div>
+    <div class="page-sections">
       {#key pokemon.pokemonId}
-        <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} />
+        <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} versions={view.references.versions} versionGroups={view.references.versionGroups} />
       {/key}
       <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
       <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
@@ -415,15 +399,6 @@
 
   .context-notes p {
     margin-block: 0.25rem;
-  }
-
-  .toc {
-    padding-block: 0.75rem;
-    border-block: 1px solid var(--border);
-  }
-
-  .toc ul {
-    gap: 0.25rem 1.25rem;
   }
 
   .overview {

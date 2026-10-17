@@ -143,8 +143,8 @@
 </script>
 
 {#snippet methodList(methods: EvolutionMethod[])}
-  <div class="methods">
-    <p class="methods-label">{t(lang, "evolution.methods")}</p>
+  <details class="methods">
+    <summary>{t(lang, "evolution.methods")}</summary>
     {#each methods as method, index (method.id)}
       {@const trigger = references.evolutionTriggers.find((row) => row.id === method.triggerId)}
       {@const rows = conditions(method)}
@@ -195,7 +195,7 @@
         {/if}
       </div>
     {/each}
-  </div>
+  </details>
 {/snippet}
 
 {#snippet branch(nodes: EvolutionTreeNode[])}
@@ -250,7 +250,9 @@
     {#if chain.applicability === "unresolved"}
       <p class="note">{t(lang, "evolution.note", { game })}</p>
     {/if}
-    {@render branch(roots)}
+    {#key currentKey}
+      {@render branch(roots)}
+    {/key}
   {:else if hasChain}
     <p>{t(lang, "evolution.missing")}</p>
   {:else}
@@ -347,7 +349,19 @@
   .methods {
     margin-top: 0.75rem;
   }
-  .methods-label,
+  .methods summary {
+    cursor: pointer;
+    padding-block: 0.35rem;
+    font-weight: 600;
+  }
+  .methods summary:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+  .methods[open] summary {
+    margin-bottom: 0.4rem;
+  }
   .trigger {
     margin: 0 0 0.4rem;
     font-weight: 600;

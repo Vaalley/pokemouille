@@ -220,6 +220,7 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
     for (const row of array(refs[key], `references.${key}`)) resource(row, `references.${key}`);
   for (const entry of array(refs.abilities, "references.abilities")) {
     const row = resource(entry, "ability");
+    integer(row.generationId, "ability.generationId", 1);
     for (const entry of array(row.flavorTexts, "ability.flavorTexts")) {
       const flavor = object(entry, "ability.flavorText");
       integer(flavor.languageId, "ability.flavorText.languageId", 1);
@@ -231,6 +232,15 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
       integer(effect.languageId, "ability.effect.languageId", 1);
       text(effect.effect, "ability.effect.effect", true);
       text(effect.shortEffect, "ability.effect.shortEffect", true);
+    }
+    for (const entry of array(row.effectChanges, "ability.effectChanges")) {
+      const change = object(entry, "ability.effectChange");
+      integer(change.versionGroupId, "ability.effectChange.versionGroupId", 1);
+      for (const entry of array(change.effects, "ability.effectChange.effects")) {
+        const effect = object(entry, "ability.effectChange.effect");
+        integer(effect.languageId, "ability.effectChange.effect.languageId", 1);
+        text(effect.effect, "ability.effectChange.effect.effect", true);
+      }
     }
   }
   for (const entry of array(refs.items, "references.items")) {
@@ -331,6 +341,7 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
   for (const version of refs.versions)
     relationship(groups, version.versionGroupId, "version.versionGroupId");
   for (const ability of refs.abilities) {
+    relationship(generations, ability.generationId, "ability.generationId");
     unique(
       ability.flavorTexts,
       (row) => `${row.languageId}/${row.versionGroupId}`,
@@ -339,6 +350,11 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
     unique(ability.effects, (row) => row.languageId, "ability.effects");
     for (const row of ability.flavorTexts)
       relationship(groups, row.versionGroupId, "ability.flavorText.versionGroupId");
+    unique(ability.effectChanges, (row) => row.versionGroupId, "ability.effectChanges");
+    for (const change of ability.effectChanges) {
+      relationship(groups, change.versionGroupId, "ability.effectChange.versionGroupId");
+      unique(change.effects, (row) => row.languageId, "ability.effectChange.effects");
+    }
   }
   for (const move of refs.moves) {
     relationship(generations, move.generationId, "move.generationId");

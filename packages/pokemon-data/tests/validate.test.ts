@@ -52,6 +52,47 @@ describe("snapshot integrity", () => {
     expect(() => validateSnapshot(malformed)).toThrow();
   });
 
+  it("requires ability introduction and history collections and validates their references", () => {
+    const snapshot = fixture();
+    const ability = snapshot.references.abilities[0]!;
+    ability.effectChanges = [
+      { versionGroupId: 11, effects: [{ languageId: 9, effect: "Previous mechanics." }] },
+      { versionGroupId: 15, effects: [] },
+    ];
+    validateSnapshot(snapshot);
+    ability.generationId = 999999;
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.generationId");
+    ability.generationId = 3;
+    ability.effectChanges[0]!.versionGroupId = 999999;
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.effectChange.versionGroupId");
+    ability.effectChanges[0]!.versionGroupId = 11;
+    ability.effectChanges[0]!.effects[0]!.languageId = 0;
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.effectChange.effect.languageId");
+    ability.effectChanges[0]!.effects[0]!.languageId = 9;
+    ability.effectChanges = [];
+    validateSnapshot(snapshot);
+    Reflect.deleteProperty(ability, "effectChanges");
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.effectChanges");
+    ability.effectChanges = [];
+    Reflect.deleteProperty(ability, "generationId");
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.generationId");
+  });
+
+  it("rejects duplicate change boundaries and translations without requiring complete history", () => {
+    const snapshot = fixture();
+    const ability = snapshot.references.abilities[0]!;
+    ability.effectChanges = [
+      { versionGroupId: 11, effects: [{ languageId: 9, effect: "Previous mechanics." }] },
+      { versionGroupId: 11, effects: [] },
+    ];
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.effectChanges");
+    ability.effectChanges.pop();
+    ability.effectChanges[0]!.effects.push({ languageId: 9, effect: "Conflicting prose." });
+    expect(() => validateSnapshot(snapshot)).toThrow("ability.effectChange.effects");
+    ability.effectChanges[0]!.effects.pop();
+    validateSnapshot(snapshot);
+  });
+
   it("validates real move stats while preserving nullable source values", () => {
     const snapshot = fixture();
     const move = snapshot.references.moves[0]!;

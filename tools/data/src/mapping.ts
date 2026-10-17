@@ -83,6 +83,8 @@ export function validateCensus(data: SourceCensusFragment): void {
     "evolutionTriggers",
     "abilityFlavorTexts",
     "abilityEffects",
+    "abilityEffectChanges",
+    "abilityEffectChangeTexts",
     "moveFlavorTexts",
     "moveEffects",
     "moveEffectTexts",
@@ -155,6 +157,7 @@ export function mapReferences(
   );
   const abilities: Ability[] = raw.abilities.map((row) => ({
     ...namedResource(row),
+    generationId: required(row.generationId, "ability.generationId"),
     flavorTexts: row.flavorTexts
       .filter((text) => text.text !== null)
       .map((text) => ({
@@ -169,6 +172,13 @@ export function mapReferences(
         effect: text.effect ?? "",
         shortEffect: text.shortEffect ?? "",
       })),
+    effectChanges: row.effectChanges.map((change) => ({
+      versionGroupId: required(change.versionGroupId, "ability.effectChange.versionGroupId"),
+      effects: change.effects.map((text) => ({
+        languageId: required(text.languageId, "ability.effectChange.languageId"),
+        effect: text.effect,
+      })),
+    })),
   }));
   // Effects are shared by moves upstream; fetch each effect once and retain
   // genuine missing text as an empty collection rather than inventing prose.

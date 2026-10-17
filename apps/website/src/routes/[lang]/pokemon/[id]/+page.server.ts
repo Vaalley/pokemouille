@@ -63,11 +63,14 @@ function languageIndex(lang: Language): LanguageIndex {
 }
 
 // Species files are large; keep only what pages need, shared by all three languages.
-const species: Record<number, Pick<SpeciesRecord, "genera" | "evolutionChainId">> = {};
+const species: Record<
+  number,
+  Pick<SpeciesRecord, "genera" | "evolutionChainId" | "isLegendary" | "isMythical">
+> = {};
 function speciesSummary(speciesId: number, path: string) {
   if (!species[speciesId]) {
-    const { genera, evolutionChainId } = readJson<SpeciesRecord>(path);
-    species[speciesId] = { genera, evolutionChainId };
+    const { genera, evolutionChainId, isLegendary, isMythical } = readJson<SpeciesRecord>(path);
+    species[speciesId] = { genera, evolutionChainId, isLegendary, isMythical };
   }
   return species[speciesId];
 }
@@ -108,6 +111,8 @@ export const load: PageServerLoad = ({ params }) => {
     name: identity.name,
     genus: genus.sourceLanguageId === null ? null : genus,
     generationId: identity.generationId,
+    isLegendary: summary.isLegendary,
+    isMythical: summary.isMythical,
     previous: index.ordered[position - 1] ?? null,
     next: index.ordered[position + 1] ?? null,
     evolutionForms:

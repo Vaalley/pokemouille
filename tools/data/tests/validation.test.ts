@@ -67,6 +67,31 @@ describe("bounded upstream response validation", () => {
     expect(() => validateBoundedRelationships(response)).toThrow("$.items[0].effects");
   });
 
+  it("rejects truncated ability change records and their nested localized effects", () => {
+    const response = {
+      abilities: [
+        {
+          id: 31,
+          effectChanges: [
+            {
+              versionGroupId: 11,
+              effects: [],
+              effectsCount: { aggregate: { count: 0 } },
+            },
+          ],
+          effectChangesCount: { aggregate: { count: 2 } },
+        },
+      ],
+      abilitiesCount: { aggregate: { count: 1 } },
+    };
+    expect(() => validateBoundedRelationships(response)).toThrow("$.abilities[0].effectChanges");
+    response.abilities[0]!.effectChangesCount.aggregate.count = 1;
+    response.abilities[0]!.effectChanges[0]!.effectsCount.aggregate.count = 1;
+    expect(() => validateBoundedRelationships(response)).toThrow(
+      "$.abilities[0].effectChanges[0].effects",
+    );
+  });
+
   it("accepts complete bounded relationships, including truthful zero-row histories", () => {
     const response = {
       species: [

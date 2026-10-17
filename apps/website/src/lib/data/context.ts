@@ -76,10 +76,11 @@ export function pickRootLanguage(
   return DEFAULT_LANGUAGE;
 }
 
-export type PreferenceKey = "version" | "language";
+export type PreferenceKey = "version" | "language" | "sprite";
 const STORAGE_KEYS: Record<PreferenceKey, string> = {
   version: "pokemouille.version",
   language: "pokemouille.language",
+  sprite: "pokemouille.sprite",
 };
 
 // Storage is absent during SSR/prerender and may throw when blocked by the browser;

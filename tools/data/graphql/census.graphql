@@ -222,6 +222,24 @@ fragment SourceCensus on query_root {
       }
     }
   }
+  abilityEffectChanges: abilitychange_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  abilityEffectChangeTexts: abilitychangeeffecttext_aggregate(
+    where: { language_id: { _in: [1, 5, 9, 11] } }
+  ) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
   moveFlavorTexts: moveflavortext_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
     aggregate {
       count

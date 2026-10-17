@@ -139,7 +139,14 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
     referenceResponse.data.abilities.reduce((total, row) => total + row.flavorTexts.length, 0) !==
       sourceCount(before.data.abilityFlavorTexts) ||
     referenceResponse.data.abilities.reduce((total, row) => total + row.effects.length, 0) !==
-      sourceCount(before.data.abilityEffects)
+      sourceCount(before.data.abilityEffects) ||
+    referenceResponse.data.abilities.reduce((total, row) => total + row.effectChanges.length, 0) !==
+      sourceCount(before.data.abilityEffectChanges) ||
+    referenceResponse.data.abilities.reduce(
+      (total, row) =>
+        total + row.effectChanges.reduce((subtotal, change) => subtotal + change.effects.length, 0),
+      0,
+    ) !== sourceCount(before.data.abilityEffectChangeTexts)
   )
     throw new Error("Incomplete ability text relationships");
   if (

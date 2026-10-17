@@ -81,8 +81,38 @@ export const load: PageServerLoad = async ({ params }) => {
       a.versionGroupId - b.versionGroupId,
   );
 
+  const historyRows = new Map<number, (LocalizedText | null)[]>();
+  for (const change of ability.effectChanges) {
+    const texts = historyRows.get(change.versionGroupId) ?? [];
+    texts.push(
+      localizeText(
+        change.effects.map((row) => ({ languageId: row.languageId, name: row.effect })),
+        lang,
+      ),
+    );
+    historyRows.set(change.versionGroupId, texts);
+  }
+  const history = [...historyRows].map(([versionGroupId, texts]) => {
+    const group = groups.get(versionGroupId);
+    const games = refs.versions
+      .filter((version) => version.versionGroupId === versionGroupId)
+      .map((version) => localizeVersion(lang, version));
+    return {
+      versionGroupId,
+      games: games.length
+        ? games
+        : [localize([], lang, group?.identifier ?? String(versionGroupId))],
+      texts,
+    };
+  });
+  history.sort(
+    (a, b) =>
+      (groups.get(a.versionGroupId)?.order ?? Infinity) -
+        (groups.get(b.versionGroupId)?.order ?? Infinity) || a.versionGroupId - b.versionGroupId,
+  );
   return {
     abilityId: ability.id,
+    generationId: ability.generationId,
     related: await getRelatedPokemon("ability", ability.id, lang),
     name: localize(ability.names, lang, ability.identifier),
     effect: localizeText(
@@ -94,5 +124,6 @@ export const load: PageServerLoad = async ({ params }) => {
       lang,
     ),
     descriptions,
+    history,
   };
 };

@@ -61,6 +61,87 @@ function moveReferences(): ReferencesQuery {
   };
 }
 
+describe("ability reference mapping", () => {
+  function abilityReferences(): ReferencesQuery {
+    const raw = moveReferences();
+    raw.abilities = [
+      {
+        id: 31,
+        identifier: "lightning-rod",
+        generationId: 3,
+        names: [],
+        namesCount: { aggregate: { count: 0 } },
+        flavorTexts: [],
+        flavorTextsCount: { aggregate: { count: 0 } },
+        effects: [{ languageId: 9, effect: "Current mechanics.", shortEffect: "Current summary." }],
+        effectsCount: { aggregate: { count: 1 } },
+        effectChanges: [
+          {
+            versionGroupId: 11,
+            effects: [
+              { languageId: 5, effect: "Ancien effet.\n\nUn second paragraphe." },
+              { languageId: 9, effect: "Previous mechanics." },
+            ],
+            effectsCount: { aggregate: { count: 2 } },
+          },
+          {
+            versionGroupId: 15,
+            effects: [],
+            effectsCount: { aggregate: { count: 0 } },
+          },
+        ],
+        effectChangesCount: { aggregate: { count: 2 } },
+      },
+    ];
+    raw.abilitiesCount.aggregate!.count = 1;
+    return raw;
+  }
+
+  it("preserves introduction and localized pre-change prose without conflating current effects", () => {
+    const raw = abilityReferences();
+    validateBoundedRelationships(raw);
+    expect(mapReferences(raw, census).abilities[0]).toEqual({
+      id: 31,
+      identifier: "lightning-rod",
+      generationId: 3,
+      names: [],
+      flavorTexts: [],
+      effects: raw.abilities[0]!.effects,
+      effectChanges: [
+        {
+          versionGroupId: 11,
+          effects: [
+            { languageId: 5, effect: "Ancien effet.\n\nUn second paragraphe." },
+            { languageId: 9, effect: "Previous mechanics." },
+          ],
+        },
+        { versionGroupId: 15, effects: [] },
+      ],
+    });
+  });
+
+  it("preserves an absent history without deriving records from current effects", () => {
+    const raw = abilityReferences();
+    raw.abilities[0]!.effectChanges = [];
+    raw.abilities[0]!.effectChangesCount.aggregate!.count = 0;
+    validateBoundedRelationships(raw);
+    expect(mapReferences(raw, census).abilities[0]!.effectChanges).toEqual([]);
+  });
+
+  it("rejects missing introduction and historical reference facts", () => {
+    const raw = abilityReferences();
+    const ability = raw.abilities[0]!;
+    ability.generationId = null;
+    expect(() => mapReferences(raw, census)).toThrow("ability.generationId");
+    ability.generationId = 3;
+    ability.effectChanges[0]!.versionGroupId = null;
+    expect(() => mapReferences(raw, census)).toThrow("ability.effectChange.versionGroupId");
+    ability.effectChanges[0]!.versionGroupId = 11;
+    ability.effectChanges[0]!.effects[0]!.languageId = null;
+    expect(() => mapReferences(raw, census)).toThrow("ability.effectChange.languageId");
+  });
+});
+
 describe("move reference mapping", () => {
   it("preserves source stats, localized descriptions and shared effect templates", () => {
     const raw = moveReferences();
@@ -222,6 +303,7 @@ describe("game text normalization", () => {
       {
         id: 31,
         identifier: "lightning-rod",
+        generationId: 3,
         names: [{ languageId: 5, name: "Paratonnerre" }],
         namesCount: { aggregate: { count: 1 } },
         flavorTexts: [
@@ -230,6 +312,8 @@ describe("game text normalization", () => {
         flavorTextsCount: { aggregate: { count: 1 } },
         effects: [],
         effectsCount: { aggregate: { count: 0 } },
+        effectChanges: [],
+        effectChangesCount: { aggregate: { count: 0 } },
       },
     ];
     raw.abilitiesCount.aggregate!.count = 1;

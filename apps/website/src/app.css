@@ -1,4 +1,4 @@
-/* Layout and functional Bits UI data-* rules only: no visual theme or palette yet. */
+/* Shared layout, typography, link styling, and functional Bits UI data-* rules. */
 
 :root {
   /* Neutral rule colour derived from the text colour, so it follows any future theme. */
@@ -21,6 +21,47 @@ body {
   margin: 0;
   font-family: system-ui, sans-serif;
   line-height: 1.5;
+}
+
+/* Keep links recognisable without the browser's bright blue, tight underlines. */
+a:any-link {
+  color: #245b83;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: auto;
+}
+
+a:visited {
+  color: #6b527f;
+}
+
+a:any-link:is(:hover, :focus-visible) {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 0.12em;
+}
+
+/* Navigation reads as navigation; prose and data links stay underlined. */
+.site-name:any-link,
+.browse-navigation a:any-link {
+  color: inherit;
+  text-decoration-line: none;
+}
+
+.site-name:any-link:is(:hover, :focus-visible),
+.browse-navigation a:any-link:is(:hover, :focus-visible, [aria-current]) {
+  text-decoration-line: underline;
+}
+
+@media (forced-colors: active) {
+  a:any-link {
+    color: LinkText;
+  }
+
+  a:visited {
+    color: VisitedText;
+  }
 }
 
 .site-bar,
@@ -140,7 +181,7 @@ main p {
   font-weight: bold;
 }
 
-/* Language and game pickers sit together on the right, as page-wide settings. */
+/* Page-wide display and game settings wrap together on narrow screens. */
 .site-controls {
   display: flex;
   flex-wrap: wrap;
@@ -357,6 +398,9 @@ button:disabled {
 
 .species-list a > :last-child {
   text-decoration: underline;
+  text-decoration-color: inherit;
+  text-decoration-thickness: inherit;
+  text-underline-offset: inherit;
 }
 
 .species-list .species-number {
