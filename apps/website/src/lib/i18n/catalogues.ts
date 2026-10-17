@@ -29,11 +29,7 @@ const en = {
   reset: "Reset filters",
   loading: "Loading filters from the link…",
   javascript:
-    "Turn on JavaScript to filter this list or use filters saved in a link. Browse all entries using the page links.",
-  pagination: "Catalogue pages",
-  previous: "Previous",
-  next: "Next",
-  pagePosition: "Page {page} of {pages}",
+    "Turn on JavaScript to filter this list or use filters saved in a link. The full list is below.",
 };
 const fr = {
   move: "Capacités",
@@ -63,11 +59,7 @@ const fr = {
   reset: "Réinitialiser les filtres",
   loading: "Chargement des filtres du lien…",
   javascript:
-    "Activez JavaScript pour filtrer cette liste ou utiliser les filtres enregistrés dans un lien. Les liens de pagination permettent de parcourir toutes les entrées.",
-  pagination: "Pages du catalogue",
-  previous: "Précédent",
-  next: "Suivant",
-  pagePosition: "Page {page} sur {pages}",
+    "Activez JavaScript pour filtrer cette liste ou utiliser les filtres enregistrés dans un lien. La liste complète est affichée ci-dessous.",
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   move: "わざ",
@@ -97,11 +89,7 @@ const ja = {
   reset: "絞り込みをリセット",
   loading: "リンクの絞り込み条件を読み込み中…",
   javascript:
-    "絞り込みや、リンクに保存された条件の利用にはJavaScriptを有効にしてください。ページのリンクですべての項目を閲覧できます。",
-  pagination: "一覧のページ",
-  previous: "前へ",
-  next: "次へ",
-  pagePosition: "{pages}ページ中{page}ページ",
+    "絞り込みや、リンクに保存された条件の利用にはJavaScriptを有効にしてください。以下に全項目を表示しています。",
 } satisfies Record<keyof typeof en, string>;
 
 export const t = createTranslator({ en, fr, ja } satisfies Record<

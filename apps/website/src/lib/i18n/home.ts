@@ -17,10 +17,6 @@ const en = {
   reset: "Reset filters",
   loading: "Loading filters from the link…",
   javascript: "Turn on JavaScript to filter the National Pokédex or use filters saved in a link.",
-  pagination: "National Pokédex pages",
-  previous: "Previous",
-  next: "Next",
-  pagePosition: "Page {page} of {pages}",
 };
 const fr = {
   filters: "Filtrer le Pokédex National",
@@ -39,10 +35,6 @@ const fr = {
   loading: "Chargement des filtres du lien…",
   javascript:
     "Activez JavaScript pour filtrer le Pokédex National ou utiliser les filtres enregistrés dans un lien.",
-  pagination: "Pages du Pokédex National",
-  previous: "Précédent",
-  next: "Suivant",
-  pagePosition: "Page {page} sur {pages}",
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   filters: "全国図鑑を絞り込む",
@@ -61,10 +53,6 @@ const ja = {
   loading: "リンクの絞り込み条件を読み込み中…",
   javascript:
     "全国図鑑の絞り込みや、リンクに保存された条件の利用にはJavaScriptを有効にしてください。",
-  pagination: "全国図鑑のページ",
-  previous: "前へ",
-  next: "次へ",
-  pagePosition: "{pages}ページ中{page}ページ",
 } satisfies Record<keyof typeof en, string>;
 
 export const t = createTranslator({ en, fr, ja } satisfies Record<

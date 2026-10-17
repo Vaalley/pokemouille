@@ -32,7 +32,6 @@
   function current(section: (typeof sections)[number]) {
     const pathname = currentUrl.pathname;
     if (pathname === `/${data.lang}/${section.path}`) return "page";
-    if (section.key === "pokemon" && pathname.startsWith(`/${data.lang}/page/`)) return "true";
     return pathname.startsWith(`/${data.lang}/${section.detail}`) ? "true" : undefined;
   }
 

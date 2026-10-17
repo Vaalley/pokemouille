@@ -72,10 +72,10 @@
     <rect x="644" y="678" width="270" height="158" rx="10"/>
   </g>
   <text x="62" y="706" font-size="16" font-weight="700">Lists + resource pages</text>
-  <text x="62" y="733" font-size="13">Lists show 50 rows per page</text>
+  <text x="62" y="733" font-size="13">Full lists, no pagination</text>
   <text x="62" y="755" font-size="13">Compact metadata → local filters</text>
   <text x="62" y="777" font-size="13">Move / ability / item pages prerendered</text>
-  <text x="62" y="809" font-size="13" fill="var(--muted)">Unfiltered paging works without JS</text>
+  <text x="62" y="809" font-size="13" fill="var(--muted)">Full unfiltered lists work without JS</text>
   <text x="361" y="706" font-size="16" font-weight="700">Pokémon details</text>
   <text x="361" y="733" font-size="13">Species + games + compact references</text>
   <text x="361" y="755" font-size="13">Shared resolver → historical panels</text>
