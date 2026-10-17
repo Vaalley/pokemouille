@@ -5,7 +5,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
-  import type { GameOption } from "../../../../../../../packages/pokemon-data/src/index.ts";
+  import type { EvolutionChainProjection, GameOption } from "../../../../../../../packages/pokemon-data/src/index.ts";
   import Abilities from "#lib/components/pokemon/Abilities.svelte";
   import Coverage from "#lib/components/pokemon/Coverage.svelte";
   import Dex from "#lib/components/pokemon/Dex.svelte";
@@ -24,8 +24,8 @@
     resolveContext,
   } from "#lib/data/context.ts";
   import { DataError, getGames } from "#lib/data/loader.ts";
-  import { loadPokemonView } from "#lib/data/pokemon.ts";
-  import type { PokemonView } from "#lib/data/pokemon.ts";
+  import { loadPokemonData, loadPokemonEvolution, resolvePokemonView } from "#lib/data/pokemon.ts";
+  import type { PokemonData, PokemonView } from "#lib/data/pokemon.ts";
   import { reasonText, t, versionGroupName, versionName } from "#lib/i18n/pokemon.ts";
   import type { PageProps } from "./$types";
 
@@ -41,6 +41,7 @@
   // game-dependent panel stays in an explicit loading state (also in prerendered HTML).
   let games = $state<GameOption[] | null>(null);
   let gamesError = $state<unknown>(null);
+  let mounted = $state(false);
   function loadGames() {
     gamesError = null;
     getGames().then(
@@ -52,7 +53,10 @@
       },
     );
   }
-  onMount(loadGames);
+  onMount(() => {
+    mounted = true;
+    loadGames();
+  });
 
   // All context lives in the URL, so Back/Forward and game/form changes re-derive it.
   const context = $derived(
@@ -66,27 +70,65 @@
       : null,
   );
 
-  let view = $state<PokemonView | null>(null);
+  let details = $state.raw<PokemonData | null>(null);
   let failure = $state<unknown>(null);
   let attempt = $state(0);
-  // Monotonic request token: only the newest context's result may be shown.
-  let token = 0;
   $effect(() => {
-    const current = context;
     const speciesId = data.speciesId;
     void attempt;
-    if (!current) return;
-    const request = ++token;
-    view = null;
+    if (!mounted) return;
+    let active = true;
+    details = null;
     failure = null;
-    loadPokemonView(speciesId, current).then(
+    loadPokemonData(speciesId).then(
       (loaded) => {
-        if (request === token) view = loaded;
+        if (active) details = loaded;
       },
       (cause: unknown) => {
-        if (request === token) failure = cause;
+        if (active) failure = cause;
       },
     );
+    return () => { active = false; };
+  });
+
+  // Resolution waits for context, but downloading the inputs does not.
+  const resolved = $derived.by((): { view: PokemonView | null; failure: unknown } => {
+    if (!details || details.record.id !== data.speciesId || !context)
+      return { view: null, failure: null };
+    try {
+      return { view: resolvePokemonView(details, context), failure: null };
+    } catch (cause) {
+      return { view: null, failure: cause };
+    }
+  });
+  const view = $derived(resolved.view);
+
+  let chain = $state.raw<EvolutionChainProjection | null>(null);
+  let evolutionLoading = $state(true);
+  let evolutionFailure = $state(false);
+  let evolutionAttempt = $state(0);
+  $effect(() => {
+    const speciesId = data.speciesId;
+    void attempt;
+    void evolutionAttempt;
+    if (!mounted) return;
+    let active = true;
+    chain = null;
+    evolutionLoading = true;
+    evolutionFailure = false;
+    loadPokemonEvolution(speciesId).then(
+      (loaded) => {
+        if (!active) return;
+        chain = loaded;
+        evolutionLoading = false;
+      },
+      () => {
+        if (!active) return;
+        evolutionFailure = true;
+        evolutionLoading = false;
+      },
+    );
+    return () => { active = false; };
   });
 
   function retry() {
@@ -125,7 +167,7 @@
   });
 
   const errorMessage = $derived.by(() => {
-    const cause = failure ?? gamesError;
+    const cause = resolved.failure ?? failure ?? gamesError;
     if (cause === null) return null;
     if (!(cause instanceof DataError)) return t(lang, "state.error.unknown");
     if (cause.kind === "network") return t(lang, "state.error.network");
@@ -321,7 +363,10 @@
     <div class="page-sections">
       <Evolution
         {lang}
-        chain={view.chain}
+        {chain}
+        loading={evolutionLoading}
+        failed={evolutionFailure}
+        onretry={() => { evolutionAttempt += 1; }}
         forms={data.evolutionForms}
         hasChain={view.record.evolutionChainId !== null}
         speciesId={data.speciesId}

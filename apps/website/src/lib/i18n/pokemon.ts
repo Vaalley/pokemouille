@@ -126,6 +126,8 @@ const en = {
   "fallback.identifier": "untranslated identifier",
 
   "evolution.heading": "Evolution",
+  "evolution.loading": "Loading evolution data…",
+  "evolution.error": "Couldn’t download the evolution data. Try again.",
   "evolution.note": "Methods are shown as recorded and aren’t checked against {game}.",
   "evolution.none": "No evolution family is recorded for this Pokémon.",
   "evolution.missing": "This Pokémon’s evolution data is missing.",
@@ -335,6 +337,8 @@ const messages = {
     "fallback.identifier": "identifiant non traduit",
 
     "evolution.heading": "Évolution",
+    "evolution.loading": "Chargement des données d’évolution…",
+    "evolution.error": "Impossible de télécharger les données d’évolution. Réessayez.",
     "evolution.note":
       "Les méthodes sont affichées telles qu’enregistrées, sans vérification pour {game}.",
     "evolution.none": "Aucune famille d’évolution n’est enregistrée pour ce Pokémon.",
@@ -541,6 +545,8 @@ const messages = {
     "fallback.identifier": "未翻訳の識別子",
 
     "evolution.heading": "進化",
+    "evolution.loading": "進化データを読み込み中…",
+    "evolution.error": "進化データをダウンロードできませんでした。再試行してください。",
     "evolution.note":
       "進化方法は記録どおりに表示しています。{game}で有効かどうかは確認していません。",
     "evolution.none": "このポケモンには記録された進化系統がありません。",

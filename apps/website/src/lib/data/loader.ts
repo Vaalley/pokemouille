@@ -7,8 +7,9 @@ import type {
   EvolutionChainProjection,
   GameOption,
   Language,
-  ReferenceData,
+  PokemonReferences,
   SearchEntry,
+  SearchReferences,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 
@@ -95,6 +96,8 @@ export function getManifest(fetchImpl: typeof fetch = fetch): Promise<DatasetMan
         typeof value.datasetRevision === "string" &&
         isObject(value.files) &&
         isObject(value.files.references) &&
+        isObject(value.files.pokemonReferences) &&
+        isObject(value.files.searchReferences) &&
         isObject(value.files.games) &&
         isObject(value.files.search) &&
         isObject(value.files.pokemon) &&
@@ -110,20 +113,44 @@ export function getManifest(fetchImpl: typeof fetch = fetch): Promise<DatasetMan
   return manifest;
 }
 
-const referencesCache = new PromiseCache<ReferenceData>(1);
+const pokemonReferencesCache = new PromiseCache<PokemonReferences>(1);
+const searchReferencesCache = new PromiseCache<SearchReferences>(1);
 const gamesCache = new PromiseCache<GameOption[]>(1);
 const searchCache = new PromiseCache<SearchEntry[]>(3);
 const speciesCache = new PromiseCache<SpeciesRecord>(24);
 const evolutionCache = new PromiseCache<EvolutionChainProjection>(24);
 
-export async function getReferences(fetchImpl: typeof fetch = fetch): Promise<ReferenceData> {
-  const { path } = (await getManifest(fetchImpl)).files.references;
-  return referencesCache.get(path, () =>
+export async function getPokemonReferences(
+  fetchImpl: typeof fetch = fetch,
+): Promise<PokemonReferences> {
+  const { path } = (await getManifest(fetchImpl)).files.pokemonReferences;
+  return pokemonReferencesCache.get(path, () =>
     loadJson(
       path,
       fetchImpl,
       (value) =>
-        isObject(value) && Array.isArray(value.versions) && Array.isArray(value.versionGroups),
+        isObject(value) &&
+        Array.isArray(value.versions) &&
+        Array.isArray(value.versionGroups) &&
+        Array.isArray(value.moves) &&
+        Array.isArray(value.items),
+    ),
+  );
+}
+
+export async function getSearchReferences(
+  fetchImpl: typeof fetch = fetch,
+): Promise<SearchReferences> {
+  const { path } = (await getManifest(fetchImpl)).files.searchReferences;
+  return searchReferencesCache.get(path, () =>
+    loadJson(
+      path,
+      fetchImpl,
+      (value) =>
+        isObject(value) &&
+        Array.isArray(value.moves) &&
+        Array.isArray(value.abilities) &&
+        Array.isArray(value.items),
     ),
   );
 }

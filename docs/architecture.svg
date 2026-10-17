@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1000" viewBox="0 0 960 1000" role="img" aria-labelledby="title desc" font-family="system-ui, sans-serif" fill="currentColor">
+  <title id="title">Pokémouille architecture</title>
+  <desc id="desc">Read top to bottom: a background pipeline collects PokéAPI data, Cloudflare serves static pages and revisioned files, and the browser resolves game-specific Pokémon information and search.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+  <text x="28" y="34" font-size="26" font-weight="700">Pokémouille — from source data to your screen</text>
+  <text x="28" y="60" font-size="14" fill="var(--muted)">Read top → bottom. Background work is separate from visitor requests.</text>
+  <text x="28" y="98" font-size="18" font-weight="700">1 · Prepare the data</text>
+  <text x="932" y="98" text-anchor="end" font-size="13" fill="var(--muted)">Weekly or manual refresh · GitHub Actions</text>
+  <g fill="var(--surface, none)" stroke="var(--border, currentColor)" stroke-width="1.5">
+    <rect x="28" y="116" width="220" height="134" rx="12"/>
+    <rect x="294" y="116" width="292" height="134" rx="12"/>
+    <rect x="632" y="116" width="300" height="134" rx="12"/>
+  </g>
+  <text x="46" y="145" font-size="17" font-weight="700">PokéAPI GraphQL</text>
+  <text x="46" y="174" font-size="14">Upstream Pokémon facts</text>
+  <text x="46" y="197" font-size="14">and localized text</text>
+  <text x="46" y="229" font-size="13" fill="var(--muted)">Not called by visitors</text>
+  <text x="312" y="145" font-size="17" font-weight="700">tools/data</text>
+  <text x="312" y="174" font-size="14">Fetch → normalize → validate</text>
+  <text x="312" y="197" font-size="14">Resumable, bounded ingestion</text>
+  <text x="312" y="229" font-size="13" fill="var(--muted)">Publishes only complete, valid input</text>
+  <text x="650" y="145" font-size="17" font-weight="700">Published snapshot</text>
+  <text x="650" y="174" font-size="14">Manifest → immutable revision files</text>
+  <text x="650" y="197" font-size="14">Species, games, evolution, indexes</text>
+  <text x="650" y="229" font-size="13" fill="var(--muted)">Full build + compact browser data</text>
+  <g fill="none" stroke="var(--accent, currentColor)" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M248 183 H288"/>
+    <path d="M586 183 H626"/>
+    <path d="M782 250 V278 H270 V330"/>
+    <path d="M782 250 V330"/>
+  </g>
+  <text x="342" y="272" font-size="13" fill="var(--muted)">Read locally during build</text>
+  <text x="796" y="295" font-size="13" fill="var(--muted)">Upload</text>
+  <text x="28" y="312" font-size="18" font-weight="700">2 · Build and deliver</text>
+  <g fill="var(--surface, none)" stroke="var(--border, currentColor)" stroke-width="1.5">
+    <rect x="28" y="336" width="286" height="168" rx="12"/>
+    <rect x="352" y="336" width="256" height="168" rx="12"/>
+    <rect x="646" y="336" width="286" height="168" rx="12"/>
+  </g>
+  <text x="46" y="366" font-size="17" font-weight="700">SvelteKit → Static Assets</text>
+  <text x="46" y="396" font-size="14">apps/website</text>
+  <text x="46" y="420" font-size="14">Prerender HTML + page data</text>
+  <text x="46" y="444" font-size="14">Bundle JavaScript and CSS</text>
+  <text x="46" y="482" font-size="13" fill="var(--muted)">Cloudflare serves matching files first</text>
+  <text x="370" y="366" font-size="17" font-weight="700">Cloudflare Worker</text>
+  <text x="370" y="396" font-size="14">Handles /data/* requests</text>
+  <text x="370" y="420" font-size="14">Reads R2 on cache misses</text>
+  <text x="370" y="444" font-size="14">Caches immutable responses</text>
+  <text x="370" y="482" font-size="13" fill="var(--muted)">Also serves retained old app chunks</text>
+  <text x="664" y="366" font-size="17" font-weight="700">Cloudflare R2</text>
+  <text x="664" y="396" font-size="14">Revisioned JSON dataset</text>
+  <text x="664" y="420" font-size="14">Mutable manifest + immutable files</text>
+  <text x="664" y="444" font-size="14">Previous revisions and app chunks</text>
+  <text x="664" y="482" font-size="13" fill="var(--muted)">Object storage, not an application DB</text>
+  <path d="M646 423 H614" fill="none" stroke="var(--accent, currentColor)" stroke-width="2" marker-end="url(#arrow)"/>
+  <g fill="none" stroke="var(--accent, currentColor)" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M170 504 V596"/>
+    <path d="M480 504 V596"/>
+  </g>
+  <text x="188" y="540" font-size="13" fill="var(--muted)">HTML, JS, CSS</text>
+  <text x="498" y="540" font-size="13" fill="var(--muted)">On-demand JSON</text>
+  <rect x="28" y="602" width="904" height="330" rx="14" fill="none" stroke="var(--accent, currentColor)" stroke-width="1.5"/>
+  <text x="46" y="632" font-size="18" font-weight="700">3 · Run in the visitor’s browser</text>
+  <text x="46" y="656" font-size="14" fill="var(--muted)">The manifest pins one dataset revision; loaders reuse downloads and cache data.</text>
+  <g fill="var(--surface, none)" stroke="var(--border, currentColor)" stroke-width="1.5">
+    <rect x="46" y="678" width="270" height="158" rx="10"/>
+    <rect x="345" y="678" width="270" height="158" rx="10"/>
+    <rect x="644" y="678" width="270" height="158" rx="10"/>
+  </g>
+  <text x="62" y="706" font-size="16" font-weight="700">Lists + resource pages</text>
+  <text x="62" y="733" font-size="13">Lists show 50 rows per page</text>
+  <text x="62" y="755" font-size="13">Compact metadata → local filters</text>
+  <text x="62" y="777" font-size="13">Move / ability / item pages prerendered</text>
+  <text x="62" y="809" font-size="13" fill="var(--muted)">Unfiltered paging works without JS</text>
+  <text x="361" y="706" font-size="16" font-weight="700">Pokémon details</text>
+  <text x="361" y="733" font-size="13">Species + games + compact references</text>
+  <text x="361" y="755" font-size="13">Shared resolver → historical panels</text>
+  <text x="361" y="777" font-size="13">Evolution loads independently</text>
+  <text x="361" y="809" font-size="13" fill="var(--muted)">Resolver: packages/pokemon-data</text>
+  <text x="660" y="706" font-size="16" font-weight="700">Global search</text>
+  <text x="660" y="733" font-size="13">UI loads on first opening</text>
+  <text x="660" y="755" font-size="13">Locale index + compact resource names</text>
+  <text x="660" y="777" font-size="13">Ranking happens locally</text>
+  <text x="660" y="809" font-size="13" fill="var(--muted)">Typing makes no network requests</text>
+  <rect x="46" y="854" width="868" height="60" rx="10" fill="var(--surface, none)" stroke="var(--border, currentColor)"/>
+  <text x="62" y="878" font-size="15" font-weight="600">Shared context: language + game + form</text>
+  <text x="62" y="900" font-size="14">Game precedence: URL → saved preference → Scarlet. Languages: English / French / Japanese.</text>
+  <text x="28" y="963" font-size="14" fill="var(--muted)">No request-time SvelteKit server. Existing tabs can keep using their pinned dataset revision.</text>
+</svg>

@@ -89,6 +89,17 @@ export interface ReferenceData {
     evolutions: number;
   };
 }
+
+/** Detail-page references retain ability prose, but not move/item detail data. */
+export interface PokemonReferences extends Omit<ReferenceData, "moves" | "items"> {
+  moves: Pick<Move, "id" | "identifier" | "names" | "typeId">[];
+  items: NamedResource[];
+}
+export interface SearchReferences {
+  moves: PokemonReferences["moves"];
+  abilities: NamedResource[];
+  items: NamedResource[];
+}
 export interface TypeSlot {
   slot: number;
   typeId: number;
@@ -339,6 +350,8 @@ export interface DatasetManifest {
   counts: { species: number; pokemon: number; forms: number; learnsets: number };
   files: {
     references: Asset;
+    pokemonReferences: Asset;
+    searchReferences: Asset;
     /** Precomputed main-series `GameOption[]` (see getMainSeriesGames). */
     games: Asset;
     search: Record<Language, Asset>;

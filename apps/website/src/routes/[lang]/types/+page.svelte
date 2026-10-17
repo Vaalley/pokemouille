@@ -4,7 +4,7 @@
   import { page } from "$app/state";
   import { resolve } from "$app/paths";
   import type { PathnameWithSearchOrHash } from "$app/types";
-  import type { GameOption, ReferenceData } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import type { GameOption } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../packages/pokemon-data/src/localization.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import MatchupGroups from "#lib/components/MatchupGroups.svelte";
@@ -12,7 +12,7 @@
   import Localized from "#lib/components/pokemon/Localized.svelte";
   import { pokemonHref } from "#lib/data/context.ts";
   import { filterTypeMembers } from "#lib/data/type-membership.ts";
-  import { getGames, getReferences } from "#lib/data/loader.ts";
+  import { getGames } from "#lib/data/loader.ts";
   import { defensiveMatchups, isIntroduced, offensiveMatchups } from "#lib/data/type-matchups.ts";
   import { readTypeSelection, typeSelectionUrl } from "#lib/data/type-selection.ts";
   import { t } from "#lib/i18n/types.ts";
@@ -20,7 +20,6 @@
 
   let { data }: PageProps = $props();
   let mounted = $state(false);
-  let references = $state<ReferenceData | null>(null);
   let games = $state<GameOption[] | null>(null);
   let failed = $state(false);
   const selectedVersion = getSelectedVersion();
@@ -30,7 +29,7 @@
   const game = $derived(games?.find((entry) => entry.version.identifier === selectedVersion()));
   const generation = $derived(game?.group.generationId);
   const matchups = $derived(generation && !selection.invalid ? defensiveMatchups(selection.ids, generation) : null);
-  const types = $derived(references?.types.filter((type) => type.id >= 1 && type.id <= 18) ?? []);
+  const types = $derived(data.types.filter((type) => type.id >= 1 && type.id <= 18));
   const membership = $derived(game && !selection.invalid && selection.ids.length
     ? filterTypeMembers(data.typeMembers, selection.ids, game.group)
     : { rows: [], missingIntroduction: 0, missingTypes: 0 });
@@ -56,7 +55,7 @@
   async function load() {
     failed = false;
     try {
-      [references, games] = await Promise.all([getReferences(), getGames()]);
+      games = await getGames();
     } catch {
       failed = true;
     }
@@ -88,7 +87,7 @@
     <div class="filter-field">
       <label for="{id}-type-{slot}">{t(data.lang, slot === 0 ? "first" : "second")}</label>
       <select id="{id}-type-{slot}" name={slot === 0 ? "type" : "type2"}
-        disabled={!mounted || !references || (slot === 1 && !selection.ids.length)}
+        disabled={!mounted || !game || (slot === 1 && !selection.ids.length)}
         value={selection.ids[slot] ?? ""} onchange={(event) => change(slot, event.currentTarget.value)}>
         <option value="">{t(data.lang, "choose")}</option>
         {#each types as type (type.id)}
@@ -107,7 +106,7 @@
 {:else if failed}
   <p role="alert">{t(data.lang, "error")}</p>
   <button type="button" onclick={() => void load()}>{t(data.lang, "retry")}</button>
-{:else if !references || !game}
+{:else if !game}
   <p role="status">{t(data.lang, "loading")}</p>
 {:else if selection.invalid}
   <p role="status">{t(data.lang, "invalid")}</p>

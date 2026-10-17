@@ -32,29 +32,45 @@
 <section aria-labelledby="types-heading">
   <h2 id="types-heading">{t(lang, "types.heading")}</h2>
   {#if types.status === "available"}
-    <!-- Hover/keyboard focus previews the combined chart; activating a badge opens the types page. -->
-    <div class="types">
-      {#each types.value as type (type.slot)}
-        <LinkPreview.Root openDelay={150} closeDelay={250}>
-          <LinkPreview.Trigger>
-            {#snippet child({ props })}
-              <TypeBadge {...props} role={undefined} aria-describedby={`${id}-hint`} typeId={type.id} name={type.name} {defendingTypes} />
-            {/snippet}
-          </LinkPreview.Trigger>
-          <LinkPreview.Portal>
-            <LinkPreview.Content class="type-matchups" side="bottom" align="start" sideOffset={8} collisionPadding={12}>
-              <h3>{typeText(lang, "defensive")}</h3>
-              {#if matchups}
-                <MatchupGroups {groups} name={typeName} heading="h4" none={typeText(lang, "none")} />
-                <p class="matchup-scope">{typeText(lang, "scope", { generation: generationId })}</p>
-              {:else}
-                <p>{typeText(lang, "unavailable")}</p>
-              {/if}
-            </LinkPreview.Content>
-          </LinkPreview.Portal>
-        </LinkPreview.Root>
-      {/each}
-    </div>
+    <!-- Both links share one hover region and one combined preview. -->
+    <LinkPreview.Root openDelay={150} closeDelay={250}>
+      <LinkPreview.Trigger>
+        {#snippet child({ props })}
+          {@const { onfocus, onblur, "aria-haspopup": _hasPopup, "aria-expanded": expanded, "aria-controls": controls, ...groupProps } = props}
+          <div
+            {...groupProps}
+            role="group"
+            aria-labelledby="types-heading"
+            class="types"
+          >
+            {#each types.value as type (type.slot)}
+              <TypeBadge
+                typeId={type.id}
+                name={type.name}
+                {defendingTypes}
+                onfocus={(event) => { if (typeof onfocus === "function") onfocus(event); }}
+                onblur={(event) => { if (typeof onblur === "function") onblur(event); }}
+                aria-describedby={`${id}-hint`}
+                aria-haspopup="dialog"
+                aria-expanded={expanded === "true"}
+                aria-controls={typeof controls === "string" ? controls : undefined}
+              />
+            {/each}
+          </div>
+        {/snippet}
+      </LinkPreview.Trigger>
+      <LinkPreview.Portal>
+        <LinkPreview.Content class="type-matchups" side="bottom" align="start" sideOffset={8} collisionPadding={12}>
+          <h3>{typeText(lang, "defensive")}</h3>
+          {#if matchups}
+            <MatchupGroups {groups} name={typeName} heading="h4" none={typeText(lang, "none")} />
+            <p class="matchup-scope">{typeText(lang, "scope", { generation: generationId })}</p>
+          {:else}
+            <p>{typeText(lang, "unavailable")}</p>
+          {/if}
+        </LinkPreview.Content>
+      </LinkPreview.Portal>
+    </LinkPreview.Root>
     <p id={`${id}-hint`} class="type-hint">{typeText(lang, "hint")}</p>
   {:else}
     <p>{reasonText(lang, types.reason)}</p>
@@ -62,7 +78,7 @@
 </section>
 
 <style>
-  .types { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .types { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; }
   .type-hint { margin-block: 0.5rem; font-size: 0.875rem; }
   :global(.type-matchups) {
     z-index: 60;

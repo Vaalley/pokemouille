@@ -9,7 +9,7 @@ export interface PokemonContext {
   language: Language;
   version: string;
   versionSource: "url" | "preference" | "default";
-  /** `?form=` as given; resolvePokemon/loadPokemonView decide whether it exists. */
+  /** `?form=` as given; resolvePokemonView decides whether it exists. */
   form: string | null;
   /** An explicit `?version=` that is not a selectable game; never used as the active version. */
   rejectedVersion: string | null;

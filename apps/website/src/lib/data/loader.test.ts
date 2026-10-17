@@ -20,6 +20,8 @@ function manifest(revision: string) {
     datasetRevision: revision,
     files: {
       references: asset("references.json"),
+      pokemonReferences: asset("pokemon-references.json"),
+      searchReferences: asset("search/references.json"),
       games: asset("games.json"),
       search: { en: asset("search/en.json") },
       pokemon: { "25": asset("pokemon/25.json"), "26": asset("pokemon/26.json") },
@@ -30,6 +32,19 @@ function manifest(revision: string) {
 
 const json = (value: unknown) => new Response(JSON.stringify(value));
 const species = (id: number) => json({ id, varieties: [] });
+
+const referenceAssets = [
+  {
+    load: "getPokemonReferences" as const,
+    path: "pokemon-references.json",
+    value: { versions: [], versionGroups: [], moves: [], items: [] },
+  },
+  {
+    load: "getSearchReferences" as const,
+    path: "search/references.json",
+    value: { moves: [], abilities: [], items: [] },
+  },
+];
 
 /** Fake static host: each route answers a request; unknown URLs are 404. */
 function host(routes: Record<string, () => Response | Promise<Response>>) {
@@ -119,10 +134,56 @@ describe("snapshot loader", () => {
     expect(count("/data/a/references.json")).toBe(0);
   });
 
-  it("rejects a manifest without a games asset", async () => {
-    const { files, ...rest } = manifest("a");
-    const { games: _, ...withoutGames } = files;
-    const { fetchImpl } = host({ [MANIFEST]: () => json({ ...rest, files: withoutGames }) });
-    await expect(loader.getManifest(fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+  it.each(["games", "pokemonReferences", "searchReferences"] as const)(
+    "rejects a manifest without a %s asset",
+    async (file) => {
+      const { files, ...rest } = manifest("a");
+      const { [file]: _, ...withoutAsset } = files;
+      const { fetchImpl } = host({ [MANIFEST]: () => json({ ...rest, files: withoutAsset }) });
+      await expect(loader.getManifest(fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+    },
+  );
+
+  describe.each(referenceAssets)("$load", ({ load, path, value }) => {
+    it("shares its compact asset between concurrent loads without fetching full references", async () => {
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      const url = `/data/a/${path}`;
+      const { fetchImpl, count } = host({
+        [MANIFEST]: () => json(manifest("a")),
+        [url]: async () => {
+          await gate;
+          return json(value);
+        },
+      });
+      const first = loader[load](fetchImpl);
+      const second = loader[load](fetchImpl);
+      await vi.waitFor(() => expect(count(url)).toBe(1));
+      release();
+      const [a, b] = await Promise.all([first, second]);
+      expect(a).toEqual(value);
+      expect(a).toBe(b);
+      expect(await loader[load](fetchImpl)).toBe(a);
+      expect(count(url)).toBe(1);
+      expect(count(MANIFEST)).toBe(1);
+      expect(count("/data/a/references.json")).toBe(0);
+    });
+
+    it("retries an invalid compact asset without replacing the pinned manifest", async () => {
+      let revision = "a";
+      let attempts = 0;
+      const url = `/data/a/${path}`;
+      const { fetchImpl, count } = host({
+        [MANIFEST]: () => json(manifest(revision)),
+        [url]: () => json(++attempts === 1 ? {} : value),
+        [`/data/b/${path}`]: () => json(value),
+      });
+      await expect(loader[load](fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+      revision = "b";
+      await expect(loader[load](fetchImpl)).resolves.toEqual(value);
+      expect(count(url)).toBe(2);
+      expect(count(`/data/b/${path}`)).toBe(0);
+      expect(count(MANIFEST)).toBe(1);
+    });
   });
 });

@@ -7,7 +7,7 @@
     EvolutionMethod,
     LocalizedText,
     NamedResource,
-    ReferenceData,
+    PokemonReferences,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { pokemonHref } from "#lib/data/context.ts";
   import { evolutionTree } from "#lib/data/evolution-tree.ts";
@@ -24,6 +24,9 @@
   let {
     lang,
     chain,
+    loading,
+    failed,
+    onretry,
     forms,
     hasChain,
     speciesId,
@@ -35,6 +38,9 @@
   }: {
     lang: Language;
     chain: EvolutionChainProjection | null;
+    loading: boolean;
+    failed: boolean;
+    onretry: () => void;
     /** Forms named by the chain's evolution conditions, keyed by form ID. */
     forms: Record<number, EvolutionForm>;
     /** Whether the species record names an evolution chain at all. */
@@ -46,7 +52,7 @@
     /** Generation of the selected game. */
     generationId: number;
     game: string;
-    references: ReferenceData;
+    references: PokemonReferences;
   } = $props();
 
   const roots = $derived(chain ? evolutionTree(chain, forms) : []);
@@ -234,7 +240,12 @@
 
 <section aria-labelledby="evolution-heading">
   <h2 id="evolution-heading">{t(lang, "evolution.heading")}</h2>
-  {#if chain}
+  {#if loading}
+    <p role="status">{t(lang, "evolution.loading")}</p>
+  {:else if failed}
+    <p role="alert">{t(lang, "evolution.error")}</p>
+    <button type="button" onclick={onretry}>{t(lang, "state.retry")}</button>
+  {:else if chain}
     <p class="note">{evolutionText(lang, "scope")}</p>
     {#if chain.applicability === "unresolved"}
       <p class="note">{t(lang, "evolution.note", { game })}</p>

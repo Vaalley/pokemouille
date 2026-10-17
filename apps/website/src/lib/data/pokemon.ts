@@ -1,32 +1,58 @@
 import { resolvePokemon } from "../../../../../packages/pokemon-data/src/index.ts";
 import type {
   EvolutionChainProjection,
-  ReferenceData,
+  PokemonReferences,
   ResolvedPokemon,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 import type { PokemonContext } from "./context.ts";
-import { DataError, getEvolutionChain, getManifest, getReferences, getSpecies } from "./loader.ts";
+import {
+  DataError,
+  getEvolutionChain,
+  getManifest,
+  getPokemonReferences,
+  getSpecies,
+} from "./loader.ts";
 
-export interface PokemonView {
-  pokemon: ResolvedPokemon;
+export interface PokemonData {
   record: SpeciesRecord;
-  references: ReferenceData;
-  chain: EvolutionChainProjection | null;
-  datasetRevision: string;
+  references: PokemonReferences;
 }
 
-export async function loadPokemonView(
+export interface PokemonView extends PokemonData {
+  pokemon: ResolvedPokemon;
+}
+
+/** Immutable inputs can load before the selected game and saved preference are known. */
+export async function loadPokemonData(
   speciesId: number,
-  context: PokemonContext,
   fetchImpl: typeof fetch = fetch,
-): Promise<PokemonView> {
-  const { language, version, form } = context;
-  const [manifest, record, references] = await Promise.all([
+): Promise<PokemonData> {
+  const [record, references] = await Promise.all([
+    getSpecies(speciesId, fetchImpl),
+    getPokemonReferences(fetchImpl),
+  ]);
+  return { record, references };
+}
+
+/** Start as soon as the species arrives, independently of references and game context. */
+export async function loadPokemonEvolution(
+  speciesId: number,
+  fetchImpl: typeof fetch = fetch,
+): Promise<EvolutionChainProjection | null> {
+  const [manifest, record] = await Promise.all([
     getManifest(fetchImpl),
     getSpecies(speciesId, fetchImpl),
-    getReferences(fetchImpl),
   ]);
+  const chainId = record.evolutionChainId;
+  return chainId !== null && manifest.files.evolution[String(chainId)]
+    ? getEvolutionChain(chainId, fetchImpl)
+    : null;
+}
+
+export function resolvePokemonView(data: PokemonData, context: PokemonContext): PokemonView {
+  const { record, references } = data;
+  const { language, version, form } = context;
   // resolvePokemon accepts variety and form identifiers; anything else is a bad URL.
   if (
     form !== null &&
@@ -35,16 +61,11 @@ export async function loadPokemonView(
         variety.identifier === form || variety.forms.some((entry) => entry.identifier === form),
     )
   )
-    throw new DataError("invalid", `Unknown form "${form}" for species ${speciesId}`);
+    throw new DataError("invalid", `Unknown form "${form}" for species ${record.id}`);
   const pokemon = resolvePokemon(
     record,
     references,
     form === null ? { language, version } : { language, version, form },
   );
-  const chainId = record.evolutionChainId;
-  const chain =
-    chainId !== null && manifest.files.evolution[String(chainId)]
-      ? await getEvolutionChain(chainId, fetchImpl)
-      : null;
-  return { pokemon, record, references, chain, datasetRevision: manifest.datasetRevision };
+  return { pokemon, record, references };
 }

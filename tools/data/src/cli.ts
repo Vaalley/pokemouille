@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import { IncompleteRefresh } from "./client.ts";
 import type { RateLedger } from "./client.ts";
 import { extractSnapshot } from "./extract.ts";
-import { publishSnapshot } from "./publish.ts";
+import { publishSnapshot, republishSnapshot } from "./publish.ts";
 import type { DatasetManifest } from "../../../packages/pokemon-data/src/index.ts";
 import { fetchSchema } from "./schema.ts";
 import { PUBLIC_ENDPOINT, readJson, withWriterLock } from "./state.ts";
@@ -18,6 +18,7 @@ Usage: node tools/data/src/cli.ts <command> [options]
 Commands:
   refresh   Resume the active refresh; validate and publish only when complete.
   publish   Validate cached complete input and publish offline (no requests).
+  republish Rebuild assets offline from the published snapshot, retaining provenance.
   status    Show durable refresh, hourly request budget and publication status.
   schema    Fetch full GraphQL introspection using the same durable budget.
   help      Show this help.
@@ -71,13 +72,29 @@ export async function main(args = process.argv.slice(2)): Promise<number> {
       console.log(HELP);
       return 0;
     }
-    if (!["refresh", "publish", "status", "schema"].includes(command) || positionals.length !== 1)
+    if (
+      !["refresh", "publish", "republish", "status", "schema"].includes(command) ||
+      positionals.length !== 1
+    )
       throw new Error(`Unknown command: ${positionals.join(" ")}; use --help`);
     if (values.fresh && command !== "refresh") throw new Error("--fresh is only valid for refresh");
+    const outDir = resolve(values["out-dir"] ?? ".data/published");
+    if (command === "republish") {
+      const manifest = await republishSnapshot(outDir);
+      console.log(
+        JSON.stringify({
+          status: "republished",
+          datasetRevision: manifest.datasetRevision,
+          newRequests: 0,
+          counts: manifest.counts,
+          manifest: join(outDir, "manifest.json"),
+        }),
+      );
+      return 0;
+    }
     const stateDir = resolve(
       values["state-dir"] ?? join(homedir(), ".cache", "pokemouille", "data"),
     );
-    const outDir = resolve(values["out-dir"] ?? ".data/published");
     if (stateDir === outDir)
       throw new Error("--state-dir and --out-dir must be different directories");
     const maxRequests = values["max-requests"] === undefined ? 60 : Number(values["max-requests"]);

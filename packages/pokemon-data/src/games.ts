@@ -53,11 +53,12 @@ const EXPANSIONS: Record<string, readonly string[]> = {
   "legends-za": ["mega-dimension"],
 };
 
-const cache = new WeakMap<ReferenceData, GameOption[]>();
+type GameReferences = Pick<ReferenceData, "versions" | "versionGroups" | "coverage">;
+const cache = new WeakMap<GameReferences, GameOption[]>();
 
 // Inputs are immutable published snapshots. Reusing the reference object avoids
 // rescanning version/group arrays on every page/context resolution.
-export function getMainSeriesGames(references: ReferenceData): GameOption[] {
+export function getMainSeriesGames(references: GameReferences): GameOption[] {
   const existing = cache.get(references);
   if (existing) return existing;
   const groups = new Map(references.versionGroups.map((group) => [group.id, group]));

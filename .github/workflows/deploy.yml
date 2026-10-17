@@ -61,6 +61,11 @@ jobs:
         if: hashFiles('apps/website/static/data/manifest.json') == ''
         run: node apps/website/scripts/r2.ts data-pull
 
+      # Rebuild derived assets from the last published source data, including older
+      # R2 snapshots without current projections. No upstream requests or state needed.
+      - name: Republish current dataset projections
+        run: node tools/data/src/cli.ts republish --out-dir apps/website/static/data
+
       - run: vp run website#build
 
       # Revisions and immutable chunks first, then the manifest, then the Worker:

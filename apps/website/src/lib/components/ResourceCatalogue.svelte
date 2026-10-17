@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { pushState } from "$app/navigation";
+  import { pushState, replaceState } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
@@ -15,6 +15,8 @@
   import type { ResourceCatalogue } from "#lib/data/resource-catalogue.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/catalogues.ts";
+  import Pagination from "./Pagination.svelte";
+  import { paginate, pageFromPath, paginationUrl } from "#lib/data/pagination.ts";
 
   let { lang, catalogue }: { lang: Language; catalogue: ResourceCatalogue } = $props();
   let mounted = $state(false);
@@ -28,9 +30,19 @@
   const prepared = $derived(prepareResources(catalogue.entries));
   const entries = $derived(filterResources(prepared, filters));
   const active = $derived(["q", "type", "category"].some((key) => params.has(key)));
+  const pagination = $derived(paginate(entries, pageFromPath(currentUrl.pathname)));
+  const navigationUrl = $derived(mounted ? new URL(currentUrl.href) : new URL(currentUrl.pathname, currentUrl.origin));
+
+  // Keep shared/translated filters on an existing result page without a loader
+  // request or an extra history entry. Filter changes explicitly reset to one.
+  $effect(() => {
+    if (mounted && pageFromPath(currentUrl.pathname) !== pagination.page) {
+      replaceState(paginationUrl(currentUrl, pagination.page), page.state);
+    }
+  });
 
   function update(changes: Partial<CatalogueFilters>) {
-    const next = catalogueFiltersUrl(currentUrl, { ...filters, ...changes });
+    const next = paginationUrl(catalogueFiltersUrl(currentUrl, { ...filters, ...changes }), 1);
     if (next.href !== currentUrl.href) pushState(next, page.state);
   }
 
@@ -111,13 +123,17 @@
   <noscript>
     <p>{t(lang, "javascript")}</p>
     <p>{t(lang, "count", { filtered: catalogue.entries.length, total: catalogue.entries.length })}</p>
-    {@render resourceList(catalogue.entries)}
+    {@render resourceList(pagination.rows)}
   </noscript>
 {:else}
   <p class="result-count" role="status" aria-live="polite" aria-atomic="true">{t(lang, "count", { filtered: entries.length, total: catalogue.entries.length })}</p>
   {#if entries.length === 0}<p>{t(lang, "empty")}</p>
-  {:else}{@render resourceList(entries)}{/if}
+  {:else}{@render resourceList(pagination.rows)}{/if}
 {/if}
+
+<Pagination current={pagination.page} pages={pagination.pages} source={navigationUrl}
+  label={t(lang, "pagination")} previous={t(lang, "previous")} next={t(lang, "next")}
+  position={t(lang, "pagePosition", { page: pagination.page, pages: pagination.pages })} />
 
 <style>
   .note p { margin-block: 0.25rem; }

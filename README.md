@@ -2,6 +2,8 @@
 
 A multilingual, game-aware Pokédex built with Vite+ and SvelteKit, live at <https://pokemouille.vaaleyou.workers.dev>. The data pipeline, localized Pokémon, move, ability and item pages, and instant global search (Ctrl/Cmd+K) are implemented.
 
+**Architecture:** [text guide](docs/architecture.md) · [SVG](docs/architecture.svg) · [PNG](docs/architecture.png). Start here when changing data ingestion, prerendering, browser-side resolution, or Cloudflare delivery.
+
 ## Product rules
 
 - **Scope:** all main-series games (remakes, Let's Go, Legends), selector grouped by generation, default **Scarlet**. Languages **en, fr, ja**, interface included. No accounts, favorites, team building or collection tracking.
@@ -48,9 +50,13 @@ Routes: `/` (language choice; redirects with JavaScript), `/{lang}/` (National P
 
 Layout is theme-free and shared through `apps/website/src/app.css`: `.page-header` (kind/number, name, one context line), `.properties` (label/value fact sheets), `.figures` (short labelled numbers), `.definitions` (stacked long text), `.filters`/`.filter-field` (Pokédex, catalogue and type filters), `.note` (smaller scope and caveat text) and `.result-count`. Pokémon pages open with previous/next links, the identity summary (game context and form picker) beside the artwork, an on-page section index, then a two-column overview (types, stats and physical data; abilities and Pokédex text) followed by full-width evolution, sprites, moves and data coverage.
 
+Pokémon pages start species data, compact detail references, and games in parallel after mount; game/form resolution still waits for URL → saved preference → Scarlet context. Evolution starts as soon as the species record arrives, independently of references and games. The overview does not wait for the chain: evolution has its own localized loading/error state and retry button, and late results from a previous species are ignored. Global search lazily loads compact resource metadata rather than full reference prose; the type-matchup page receives its small type-name list in prerendered page data and downloads only games.
+
+The header's search trigger and keyboard shortcuts are lightweight. `SearchDialogContent.svelte`, result renderers, and search-only icon mappings load on the first opening, with draft input preserved while the module arrives; closing/reopening reuses the loaded component and prepared index. Data failures retry in place. A failed JavaScript module download offers a localized page-reload action because the browser caches failed imports. Pages that otherwise need item icons still load their mapping normally.
+
 The National Pokédex list uses compact, decorative 40 × 30px box-style icons for all 1,025 species. `PokemonIcon.svelte` reads National Dex slots from one locally served [Pokémon Showdown sprite sheet](https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png?v22), so the list adds one image request rather than one per Pokémon and works without JavaScript. The vendored `static/pokemon-icons.png` has SHA-256 `81c713b8f4d94f7f577c546974e3d562d90b38c98b38b1b63b2a953b9acfca2a`; its layout is 12 columns of 40 × 30px cells. These are illustrative base-species icons, not selected-game or form-specific sprites. Pokémon imagery belongs to Nintendo / Creatures Inc. / GAME FREAK; sprite contributors and minisprite resizing are credited by [Pokémon Showdown](https://pokemonshowdown.com/credits) (including leparagon, the Smogon sprite projects, and Kalalokki). No dataset refresh is required.
 
-Homepage filters combine localized name/National Dex number, current default-variety type, and species introduction generation. Their `q`, `type`, and `generation` query parameters support shared links, refresh, reset, and Back/Forward; filtering is local with no per-keystroke requests. SvelteKit 3 shallow navigation exposes its current URL through `page.shallow.url`, so controls and results derive from that URL before falling back to `page.url`. Filters require JavaScript; without it the full unfiltered species list remains available. Types are explicitly current, not historical selected-game typing. Pokémon result links preserve the selected game and clear unrelated form selections.
+Homepage filters combine localized name/National Dex number, current default-variety type, and species introduction generation. Their `q`, `type`, and `generation` query parameters support shared links, refresh, reset, and Back/Forward; filtering is local with no per-keystroke requests. SvelteKit 3 shallow navigation exposes its current URL through `page.shallow.url`, so controls and results derive from that URL before falling back to `page.url`. Filters require JavaScript; without it every species remains reachable through unfiltered static pages. Types are explicitly current, not historical selected-game typing. Pokémon result links preserve the selected game and clear unrelated form selections.
 
 Pokémon detail pages also include a localized sprite gallery using the resolved variety's existing `media.sprites`: pixel sprites, opt-in animated sprites, and Pokémon HOME renders, with front/back, shiny, and female variants wherever the source supplies them. Tabs mount only the active source's images; images load lazily, unavailable views are omitted, and failed downloads show an explicit error. Changing Pokémon or form replaces the gallery with the newly resolved media; it never synthesizes sprite URLs or falls back to another variety. These source images are illustrative, not historical sprites for the selected game. Detail images remain hosted by PokéAPI's sprite repository; the homepage icon sheet is local.
 
@@ -74,9 +80,13 @@ Move pages list Pokémon varieties with learnsets in the selected game's **exact
 
 `apps/website/src/lib/server/catalogue.ts` derives catalogue and reverse-relationship indexes from the existing published snapshot, with four concurrent species reads, shared compact identities, and a revision-aware in-flight cache. Full species records are discarded after projection; browsers receive only catalogue metadata or the requested resource's relationships, never a 1,025-detail-file fetch. These features require no dataset schema change, refresh, or upstream API requests.
 
-Resource catalogues live at `/{lang}/move/`, `/{lang}/ability/`, and `/{lang}/item/`, with persistent header navigation. All support local localized/English/canonical-name search through `?q=`; moves also support current `?type=<typeId>&category=<damageClassId>` filters (1 status, 2 physical, 3 special). Filters combine, support reset and Back/Forward, and survive language/game changes. Detail links keep the selected game but omit catalogue filters and unrelated forms. Catalogues contain current source records, not verified selected-game availability; without JavaScript the complete unfiltered lists remain available. Only compact metadata is projected from the existing snapshot.
+Resource catalogues live at `/{lang}/move/`, `/{lang}/ability/`, and `/{lang}/item/`, with persistent header navigation. All support local localized/English/canonical-name search through `?q=`; moves also support current `?type=<typeId>&category=<damageClassId>` filters (1 status, 2 physical, 3 special). Filters combine, support reset and Back/Forward, and survive language/game changes. Detail links keep the selected game but omit catalogue filters and unrelated forms. Catalogues contain current source records, not verified selected-game availability; without JavaScript every entry remains reachable through unfiltered static pages. Only compact metadata is projected from the existing snapshot.
+
+The National Pokédex and resource catalogues render 50 entries per page, including their no-JavaScript HTML lists. Page one uses the base URL; later pages use `/{lang}/page/{page}/` or `/{lang}/{move,ability,item}/page/{page}/`. Every valid page is prerendered from the actual catalogue count; page-one duplicates, noncanonical numbers, and out-of-range numbered routes return 404. Previous/next links work without JavaScript and preserve filters and game context when hydrated. Local filtering still uses the complete compact metadata before slicing; filter changes reset to page one, Back/Forward restores page and filters, and shared filters with fewer pages replace the path with the last valid result page.
 
 Types use the reusable linked `TypeBadge.svelte` component with local [partywhale/pokemon-type-icons](https://github.com/partywhale/pokemon-type-icons) SVGs (MIT © James Watkins; license retained in `static/type-icons/LICENSE`). On Pokémon pages, clicking either type badge opens the Pokémon's full resolved type combination with `?type=<typeId>&type2=<typeId>` (or just `type` for a single-type Pokémon). Elsewhere, individual badges open `/{lang}/types/?type=<typeId>`. Links preserve the selected game through `version`. The types page has URL-backed selectors and shows combined **defensive** weaknesses, resistances, and immunities with incoming-damage multipliers. Both defending types are multiplied, including ×4, ×¼, immunity overrides, and neutral cancellation; neutral results are omitted. The chart follows the selected game's generation, and types not introduced then produce an explicit unavailable state. Invalid/nonstandard type selections do not receive an invented chart. Abilities, items, moves, battle effects, and special game rules are excluded explicitly. Query-dependent charts require JavaScript.
+
+On Pokémon details, both type badges share one hover region and one defensive-matchup preview. Moving between the badges or focusing either link keeps a single combined chart; both links still open the full type combination for the selected game.
 
 The compact chart in `apps/website/src/lib/data/type-matchups.ts` is based on PokéAPI's [current](https://github.com/PokeAPI/pokeapi/blob/master/data/v2/csv/type_efficacy.csv) and [historical](https://github.com/PokeAPI/pokeapi/blob/master/data/v2/csv/type_efficacy_past.csv) efficacy tables, including Generation I differences and Steel's pre-Generation VI resistances. Dark/Steel start in Generation II and Fairy in Generation VI. Nonstandard types have no invented matchup chart. No dataset refresh or runtime API request is needed.
 
@@ -129,17 +139,29 @@ vp run data:publish
 
 Missing cached pages exit incomplete; invalid or truncated data never replaces a working manifest. A writer lock with stale-lock recovery prevents concurrent updates to the same state/output directories. Use the same output directory for one deployment channel.
 
+To regenerate derived assets from an existing published dataset without ingestion state or upstream requests:
+
+```sh
+node tools/data/src/cli.ts republish --out-dir apps/website/static/data
+```
+
+Run this once before using a dataset published before the compact browser projections existed. It verifies the full reference/species assets against manifest hashes and sizes, validates the snapshot, preserves source provenance and previous revisions, and atomically publishes the new manifest. Repeating it on unchanged input produces the same revision. Normal deployment runs this step automatically after downloading the published dataset.
+
 ## Published files
 
 `manifest.json` points to immutable content-versioned assets under `revisions/{datasetRevision}/`:
 
 - `references.json`: game mappings, localized labels, complete move detail records, ability/item effects and descriptions, source counts, and coverage.
+- `pokemon-references.json`: detail-page references, retaining full abilities and historical mappings but only names/identities/type IDs for moves and names/identities for items.
+- `search/references.json`: move, ability, and item names/aliases/identities plus move type IDs, without effects or descriptions.
 - `games.json`: the precomputed main-series game list (selector options and coverage), so `getGames()` no longer downloads `references.json`.
 - `pokemon/{speciesId}.json`: one complete locale-independent species/variety bundle.
 - `search/{en,fr,ja}.json`: compact names, aliases, and stable species/variety/form identities.
 - `evolution/{chainId}.json`: chain membership and incoming source methods, with unresolved game applicability explicitly preserved.
 
 Every manifest entry includes a relative path, SHA-256, and byte count. Publish assets first and atomically switch the manifest only after validation. Keep previous revisions available for active visitors; a failed refresh leaves the last-good manifest unchanged. Do not garbage-collect older revisions without an explicit retention policy.
+
+Each emitted asset is canonically serialized once; that same text is hashed, measured, and atomically written, keeping immutable identities unchanged without duplicate serialization.
 
 Caching contract: revalidate the root manifest, all prerendered HTML, and `_app/version.json` (`no-cache`/`must-revalidate` plus an `ETag`). Serve `data/revisions/*` and `_app/immutable/*` with `Cache-Control: public, max-age=31536000, immutable`, and keep the previous deploy's `_app/immutable/*` files, as with data revisions, so open tabs keep working after a redeploy. With these headers, a repeat visit costs 304s for the manifest and HTML plus only the species files not yet seen. `vp preview` sends neither header, so it cannot demonstrate repeat-visit caching; use `vp run cf:dev`. The browser pins one manifest revision per page session.
 
@@ -161,7 +183,7 @@ The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the 
 
 Add `--local` to use Wrangler's local bucket instead of R2. Local Workers preview: `vp run website#build`, `node apps/website/scripts/r2.ts sync --local`, `vp run cf:dev`.
 
-**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker. The weekly schedule (and manual runs with `refresh`) first restores `.data/state`, starts a `--fresh` refresh (or resumes an incomplete one), and saves state even when the refresh stops early; an incomplete refresh deploys the last-good dataset and warns.
+**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, republishes derived assets offline, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker. The weekly schedule (and manual runs with `refresh`) first restores `.data/state`, starts a `--fresh` refresh (or resumes an incomplete one), and saves state even when the refresh stops early; an incomplete refresh deploys the last-good dataset and warns.
 
 One-time setup:
 

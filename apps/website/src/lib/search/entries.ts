@@ -1,9 +1,9 @@
 import type {
   Language,
   LocalizedText,
-  Move,
   NamedResource,
   SearchEntry,
+  SearchReferences,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 import { localize } from "../../../../../packages/pokemon-data/src/localization.ts";
 
@@ -28,11 +28,7 @@ const ALIAS_LANGUAGES: Record<Language, ReadonlySet<number>> = {
 
 export function buildSearchEntries(
   pokemon: readonly SearchEntry[],
-  references: {
-    moves: readonly Pick<Move, "id" | "identifier" | "names" | "typeId">[];
-    abilities: readonly NamedResource[];
-    items: readonly NamedResource[];
-  },
+  references: SearchReferences,
   lang: Language,
 ): GlobalSearchEntry[] {
   const entries: GlobalSearchEntry[] = pokemon.map((entry) => ({

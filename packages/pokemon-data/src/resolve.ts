@@ -10,7 +10,7 @@ import type {
   NamedResource,
   PokemonForm,
   PokemonVariety,
-  ReferenceData,
+  PokemonReferences,
   ResolvedPokemon,
   SpeciesRecord,
   VersionGroup,
@@ -36,7 +36,7 @@ interface ReferenceIndex {
   groups: Map<number, VersionGroup>;
   games: Map<string, GameOption>;
 }
-function makeReferenceIndex(refs: ReferenceData): ReferenceIndex {
+function makeReferenceIndex(refs: PokemonReferences): ReferenceIndex {
   return {
     types: resourceIndex(refs.types),
     stats: resourceIndex(refs.stats),
@@ -48,8 +48,8 @@ function makeReferenceIndex(refs: ReferenceData): ReferenceIndex {
     games: new Map(getMainSeriesGames(refs).map((game) => [game.version.identifier, game])),
   };
 }
-const referenceCache = new WeakMap<ReferenceData, ReferenceIndex>();
-function referenceIndex(refs: ReferenceData) {
+const referenceCache = new WeakMap<PokemonReferences, ReferenceIndex>();
+function referenceIndex(refs: PokemonReferences) {
   let index = referenceCache.get(refs);
   if (!index) {
     index = makeReferenceIndex(refs);
@@ -207,7 +207,7 @@ export function pokemonTypesAtGeneration(
  */
 export function resolvePokemon(
   record: SpeciesRecord,
-  references: ReferenceData,
+  references: PokemonReferences,
   context: { language: Language; version: string; form?: string },
 ): ResolvedPokemon {
   assertLanguage(context.language);

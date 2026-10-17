@@ -51,6 +51,7 @@ interface SnapshotIndex {
   moves: Map<number, MoveRelation[]>;
   abilities: Map<number, AbilityRelation[]>;
   typeMembers: Record<Language, TypeMember[]>;
+  types: ReferenceData["types"];
 }
 
 /** One current default-variety typing per species, never a historical game typing. */
@@ -216,6 +217,7 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
     };
   };
   const index: SnapshotIndex = {
+    types,
     catalogue: { en: catalogue("en"), fr: catalogue("fr"), ja: catalogue("ja") },
     resources: { en: resources("en"), fr: resources("fr"), ja: resources("ja") },
     learnMethods: { en: methods("en"), fr: methods("fr"), ja: methods("ja") },
@@ -323,6 +325,11 @@ export async function getResourceCatalogue(
 /** Compact historical typing and form chronology, shared by all static locale pages. */
 export async function getTypeMembers(lang: Language): Promise<TypeMember[]> {
   return (await getSnapshot()).typeMembers[lang];
+}
+
+/** Type names only; keeps the full server references out of browser page loads. */
+export async function getTypes(): Promise<ReferenceData["types"]> {
+  return (await getSnapshot()).types;
 }
 
 /** Only the requested resource's projected relationships cross the page boundary. */
