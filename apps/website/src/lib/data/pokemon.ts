@@ -1,18 +1,11 @@
 import { resolvePokemon } from "../../../../../packages/pokemon-data/src/index.ts";
 import type {
-  EvolutionChainProjection,
   PokemonReferences,
   ResolvedPokemon,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 import type { PokemonContext } from "./context.ts";
-import {
-  DataError,
-  getEvolutionChain,
-  getManifest,
-  getPokemonReferences,
-  getSpecies,
-} from "./loader.ts";
+import { DataError, getPokemonReferences, getSpecies } from "./loader.ts";
 
 export interface PokemonData {
   record: SpeciesRecord;
@@ -33,21 +26,6 @@ export async function loadPokemonData(
     getPokemonReferences(fetchImpl),
   ]);
   return { record, references };
-}
-
-/** Start as soon as the species arrives, independently of references and game context. */
-export async function loadPokemonEvolution(
-  speciesId: number,
-  fetchImpl: typeof fetch = fetch,
-): Promise<EvolutionChainProjection | null> {
-  const [manifest, record] = await Promise.all([
-    getManifest(fetchImpl),
-    getSpecies(speciesId, fetchImpl),
-  ]);
-  const chainId = record.evolutionChainId;
-  return chainId !== null && manifest.files.evolution[String(chainId)]
-    ? getEvolutionChain(chainId, fetchImpl)
-    : null;
 }
 
 export function resolvePokemonView(data: PokemonData, context: PokemonContext): PokemonView {

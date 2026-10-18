@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { error } from "@sveltejs/kit";
 import { localize } from "../../../../../../../packages/pokemon-data/src/localization.ts";
+import { datasetFiles } from "../../../../../../../packages/pokemon-data/src/index.ts";
 import type {
   DatasetManifest,
   EvolutionChainProjection,
@@ -96,7 +97,7 @@ export const entries: EntryGenerator = () => {
 };
 
 // Only game- and form-independent identity: a static page cannot know the visitor's game.
-export const load: PageServerLoad = ({ params }) => {
+export const load: PageServerLoad = ({ params, locals }) => {
   if (!isLanguage(params.lang)) error(404, "Unknown language");
   const index = languageIndex(params.lang);
   const speciesId = Number(params.id);
@@ -106,8 +107,16 @@ export const load: PageServerLoad = ({ params }) => {
   const identity = index.ordered[position]!;
   const summary = speciesSummary(speciesId, asset.path);
   const genus = localize(summary.genera, params.lang, "");
+  const chainId = summary.evolutionChainId;
+  // hooks.server.ts turns these into preload hints for the document's first data requests.
+  locals.dataPreloads = [
+    datasetFiles.species(speciesId),
+    datasetFiles.pokemonReferences,
+    ...(chainId === null ? [] : [datasetFiles.evolution(chainId)]),
+  ];
   return {
     speciesId,
+    evolutionChainId: chainId,
     name: identity.name,
     genus: genus.sourceLanguageId === null ? null : genus,
     generationId: identity.generationId,
@@ -115,7 +124,6 @@ export const load: PageServerLoad = ({ params }) => {
     isMythical: summary.isMythical,
     previous: index.ordered[position - 1] ?? null,
     next: index.ordered[position + 1] ?? null,
-    evolutionForms:
-      summary.evolutionChainId === null ? {} : chainForms(summary.evolutionChainId)[params.lang],
+    evolutionForms: chainId === null ? {} : chainForms(chainId)[params.lang],
   };
 };

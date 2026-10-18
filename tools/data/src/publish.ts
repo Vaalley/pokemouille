@@ -14,7 +14,9 @@ import type {
 } from "../../../packages/pokemon-data/src/index.ts";
 import {
   buildSearchIndex,
+  datasetFiles,
   getMainSeriesGames,
+  revisionPath,
   validateSnapshot,
 } from "../../../packages/pokemon-data/src/index.ts";
 import {
@@ -35,7 +37,7 @@ export async function republishSnapshot(outDir: string): Promise<DatasetManifest
     if (!manifest) throw new Error("No published manifest to republish");
     if (manifest.schemaVersion !== OUTPUT_VERSION)
       throw new Error(`Unsupported published schema version: ${manifest.schemaVersion}`);
-    const revisionPrefix = `revisions/${manifest.datasetRevision}/`;
+    const revisionPrefix = revisionPath(manifest.datasetRevision, "");
     async function readAsset<T>(asset: Asset): Promise<T> {
       if (
         !asset.path.startsWith(revisionPrefix) ||
@@ -94,7 +96,7 @@ async function publishRevision(
     assets[path] = { sha256: digest(text), bytes: Buffer.byteLength(text, "utf8") };
   }
   try {
-    await emit("references.json", input.references);
+    await emit(datasetFiles.references, input.references);
     const pokemonReferences: PokemonReferences = {
       ...input.references,
       moves: input.references.moves.map(
@@ -126,17 +128,17 @@ async function publishRevision(
       })),
       items: pokemonReferences.items,
     };
-    await emit("pokemon-references.json", pokemonReferences);
-    await emit("search/references.json", searchReferences);
+    await emit(datasetFiles.pokemonReferences, pokemonReferences);
+    await emit(datasetFiles.searchReferences, searchReferences);
     // Precomputed so the game selector does not need the full references file.
-    await emit("games.json", getMainSeriesGames(input.references));
+    await emit(datasetFiles.games, getMainSeriesGames(input.references));
     for (const language of ["en", "fr", "ja"] as const)
-      await emit(`search/${language}.json`, buildSearchIndex(input, language));
+      await emit(datasetFiles.search(language), buildSearchIndex(input, language));
     // Stable source ordering is not part of semantic identity.
     const evolutionChains = new Map<number, EvolutionChainProjection>();
     const orderedSpecies = [...input.species].sort((a, b) => a.id - b.id);
     for (const record of orderedSpecies) {
-      await emit(`pokemon/${record.id}.json`, record);
+      await emit(datasetFiles.species(record.id), record);
       if (record.evolutionChainId === null) continue;
       let chain = evolutionChains.get(record.evolutionChainId);
       if (!chain) {
@@ -153,12 +155,12 @@ async function publishRevision(
       });
     }
     for (const chain of evolutionChains.values())
-      await emit(`evolution/${chain.chainId}.json`, chain);
+      await emit(datasetFiles.evolution(chain.chainId), chain);
     const datasetRevision = digest(canonicalJson({ schemaVersion: OUTPUT_VERSION, files: assets }));
-    const revisionPath = join(outDir, "revisions", datasetRevision);
+    const revisionDir = join(outDir, "revisions", datasetRevision);
     await mkdir(join(outDir, "revisions"), { recursive: true });
     try {
-      await rename(staging, revisionPath);
+      await rename(staging, revisionDir);
     } catch (error) {
       if (
         !isFileError(error, "EEXIST") &&
@@ -168,15 +170,15 @@ async function publishRevision(
         throw error;
       // Windows also reports EPERM when a scanner/indexer holds a staged file and the
       // target does not exist yet; install by copying instead of assuming it exists.
-      const exists = await access(revisionPath).then(
+      const exists = await access(revisionDir).then(
         () => true,
         () => false,
       );
       if (!exists)
-        await cp(staging, revisionPath, { recursive: true, errorOnExist: true, force: false });
+        await cp(staging, revisionDir, { recursive: true, errorOnExist: true, force: false });
       // Existing or copied revision: verify; never overwrite immutable data.
       for (const [path, expected] of Object.entries(assets)) {
-        const contents = await readFile(join(revisionPath, path));
+        const contents = await readFile(join(revisionDir, path));
         if (
           contents.length !== expected.bytes ||
           digest(contents.toString("utf8")) !== expected.sha256
@@ -187,7 +189,7 @@ async function publishRevision(
     function asset(path: string): Asset {
       const metadata = assets[path];
       if (!metadata) throw new Error(`Missing generated asset ${path}`);
-      return { path: `revisions/${datasetRevision}/${path}`, ...metadata };
+      return { path: revisionPath(datasetRevision, path), ...metadata };
     }
     const manifest: DatasetManifest = {
       schemaVersion: OUTPUT_VERSION,
@@ -210,22 +212,25 @@ async function publishRevision(
         ),
       },
       files: {
-        references: asset("references.json"),
-        pokemonReferences: asset("pokemon-references.json"),
-        searchReferences: asset("search/references.json"),
-        games: asset("games.json"),
+        references: asset(datasetFiles.references),
+        pokemonReferences: asset(datasetFiles.pokemonReferences),
+        searchReferences: asset(datasetFiles.searchReferences),
+        games: asset(datasetFiles.games),
         search: {
-          en: asset("search/en.json"),
-          fr: asset("search/fr.json"),
-          ja: asset("search/ja.json"),
+          en: asset(datasetFiles.search("en")),
+          fr: asset(datasetFiles.search("fr")),
+          ja: asset(datasetFiles.search("ja")),
         },
         pokemon: Object.fromEntries(
-          input.species.map((record) => [String(record.id), asset(`pokemon/${record.id}.json`)]),
+          input.species.map((record) => [
+            String(record.id),
+            asset(datasetFiles.species(record.id)),
+          ]),
         ),
         evolution: Object.fromEntries(
           [...evolutionChains.keys()].map((chainId) => [
             String(chainId),
-            asset(`evolution/${chainId}.json`),
+            asset(datasetFiles.evolution(chainId)),
           ]),
         ),
       },

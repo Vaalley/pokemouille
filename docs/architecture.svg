@@ -65,7 +65,7 @@
   <text x="498" y="540" font-size="13" fill="var(--muted)">On-demand JSON</text>
   <rect x="28" y="602" width="904" height="330" rx="14" fill="none" stroke="var(--accent, currentColor)" stroke-width="1.5"/>
   <text x="46" y="632" font-size="18" font-weight="700">3 · Run in the visitor’s browser</text>
-  <text x="46" y="656" font-size="14" fill="var(--muted)">The manifest pins one dataset revision; loaders reuse downloads and cache data.</text>
+  <text x="46" y="656" font-size="14" fill="var(--muted)">The build pins one dataset revision; pages preload data and loaders reuse downloads.</text>
   <g fill="var(--surface, none)" stroke="var(--border, currentColor)" stroke-width="1.5">
     <rect x="46" y="678" width="270" height="158" rx="10"/>
     <rect x="345" y="678" width="270" height="158" rx="10"/>

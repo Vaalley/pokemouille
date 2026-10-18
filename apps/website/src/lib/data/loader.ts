@@ -1,9 +1,7 @@
-import { browser } from "$app/env";
 import { asset } from "$app/paths";
 import type { AssetPath } from "$app/types";
+import { datasetFiles } from "../../../../../packages/pokemon-data/src/index.ts";
 import type {
-  Asset,
-  DatasetManifest,
   EvolutionChainProjection,
   GameOption,
   Language,
@@ -12,6 +10,7 @@ import type {
   SearchReferences,
   SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
+import { datasetPath } from "./dataset.ts";
 
 export class DataError extends Error {
   readonly kind: "not-found" | "network" | "invalid";
@@ -23,7 +22,7 @@ export class DataError extends Error {
 }
 
 /**
- * Promise cache keyed by manifest-relative path: concurrent requests share one fetch,
+ * Promise cache keyed by revision-relative file: concurrent requests share one fetch,
  * the least recently used entry is dropped beyond `limit`, and rejected loads are
  * evicted so a retry fetches again.
  */
@@ -98,16 +97,14 @@ function hasEncounters(value: unknown): boolean {
 }
 
 async function loadJson<T>(
-  path: string,
+  file: string,
   fetchImpl: typeof fetch,
   isValid: (value: unknown) => boolean,
-  init?: RequestInit,
 ): Promise<T> {
-  // Paths come from the runtime manifest, not the build-time static file list.
-  const url = asset(`data/${path}` as AssetPath);
+  const url = asset(datasetPath(file) as AssetPath);
   let response: Response;
   try {
-    response = await fetchImpl(url, init);
+    response = await fetchImpl(url);
   } catch (cause) {
     throw new DataError("network", `Could not fetch ${url}`, { cause });
   }
@@ -123,38 +120,6 @@ async function loadJson<T>(
   return value as T;
 }
 
-// The first manifest that loads successfully pins the dataset revision for the whole
-// session, so every later asset comes from one consistent snapshot.
-let manifest: Promise<DatasetManifest> | undefined;
-
-export function getManifest(fetchImpl: typeof fetch = fetch): Promise<DatasetManifest> {
-  if (!manifest) {
-    const attempt = loadJson<DatasetManifest>(
-      "manifest.json",
-      fetchImpl,
-      (value) =>
-        isObject(value) &&
-        value.schemaVersion === 2 &&
-        typeof value.datasetRevision === "string" &&
-        isObject(value.files) &&
-        isObject(value.files.references) &&
-        isObject(value.files.pokemonReferences) &&
-        isObject(value.files.searchReferences) &&
-        isObject(value.files.games) &&
-        isObject(value.files.search) &&
-        isObject(value.files.pokemon) &&
-        isObject(value.files.evolution),
-      // The root manifest is mutable; revalidate it instead of trusting the HTTP cache.
-      browser ? { cache: "no-cache" } : undefined,
-    );
-    manifest = attempt;
-    attempt.catch(() => {
-      if (manifest === attempt) manifest = undefined;
-    });
-  }
-  return manifest;
-}
-
 const pokemonReferencesCache = new PromiseCache<PokemonReferences>(1);
 const searchReferencesCache = new PromiseCache<SearchReferences>(1);
 const gamesCache = new PromiseCache<GameOption[]>(1);
@@ -165,10 +130,10 @@ const evolutionCache = new PromiseCache<EvolutionChainProjection>(24);
 export async function getPokemonReferences(
   fetchImpl: typeof fetch = fetch,
 ): Promise<PokemonReferences> {
-  const { path } = (await getManifest(fetchImpl)).files.pokemonReferences;
-  return pokemonReferencesCache.get(path, () =>
+  const file = datasetFiles.pokemonReferences;
+  return pokemonReferencesCache.get(file, () =>
     loadJson(
-      path,
+      file,
       fetchImpl,
       (value) =>
         isObject(value) &&
@@ -198,10 +163,10 @@ export async function getPokemonReferences(
 export async function getSearchReferences(
   fetchImpl: typeof fetch = fetch,
 ): Promise<SearchReferences> {
-  const { path } = (await getManifest(fetchImpl)).files.searchReferences;
-  return searchReferencesCache.get(path, () =>
+  const file = datasetFiles.searchReferences;
+  return searchReferencesCache.get(file, () =>
     loadJson(
-      path,
+      file,
       fetchImpl,
       (value) =>
         isObject(value) &&
@@ -212,21 +177,20 @@ export async function getSearchReferences(
   );
 }
 
-/** Main-series games of the pinned revision, without loading the full references. */
+/** Main-series games, without loading the full references. */
 export async function getGames(fetchImpl: typeof fetch = fetch): Promise<GameOption[]> {
-  const { path } = (await getManifest(fetchImpl)).files.games;
-  return gamesCache.get(path, () => loadJson(path, fetchImpl, Array.isArray));
+  const file = datasetFiles.games;
+  return gamesCache.get(file, () => loadJson(file, fetchImpl, Array.isArray));
 }
 
 export async function getSpecies(
   speciesId: number,
   fetchImpl: typeof fetch = fetch,
 ): Promise<SpeciesRecord> {
-  const entry: Asset | undefined = (await getManifest(fetchImpl)).files.pokemon[String(speciesId)];
-  if (!entry) throw new DataError("not-found", `Species ${speciesId} is not in the dataset`);
-  return speciesCache.get(entry.path, () =>
+  const file = datasetFiles.species(speciesId);
+  return speciesCache.get(file, () =>
     loadJson(
-      entry.path,
+      file,
       fetchImpl,
       (value) =>
         isObject(value) &&
@@ -241,11 +205,10 @@ export async function getEvolutionChain(
   chainId: number,
   fetchImpl: typeof fetch = fetch,
 ): Promise<EvolutionChainProjection> {
-  const entry: Asset | undefined = (await getManifest(fetchImpl)).files.evolution[String(chainId)];
-  if (!entry) throw new DataError("not-found", `Evolution chain ${chainId} is not in the dataset`);
-  return evolutionCache.get(entry.path, () =>
+  const file = datasetFiles.evolution(chainId);
+  return evolutionCache.get(file, () =>
     loadJson(
-      entry.path,
+      file,
       fetchImpl,
       (value) => isObject(value) && value.chainId === chainId && Array.isArray(value.nodes),
     ),
@@ -256,7 +219,6 @@ export async function getSearchIndex(
   lang: Language,
   fetchImpl: typeof fetch = fetch,
 ): Promise<SearchEntry[]> {
-  const entry: Asset | undefined = (await getManifest(fetchImpl)).files.search[lang];
-  if (!entry) throw new DataError("not-found", `No search index for ${lang}`);
-  return searchCache.get(entry.path, () => loadJson(entry.path, fetchImpl, Array.isArray));
+  const file = datasetFiles.search(lang);
+  return searchCache.get(file, () => loadJson(file, fetchImpl, Array.isArray));
 }

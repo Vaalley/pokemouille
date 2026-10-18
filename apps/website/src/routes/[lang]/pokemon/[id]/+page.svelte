@@ -24,8 +24,8 @@
     readPreference,
     resolveContext,
   } from "#lib/data/context.ts";
-  import { DataError, getGames } from "#lib/data/loader.ts";
-  import { loadPokemonData, loadPokemonEvolution, resolvePokemonView } from "#lib/data/pokemon.ts";
+  import { DataError, getEvolutionChain, getGames } from "#lib/data/loader.ts";
+  import { loadPokemonData, resolvePokemonView } from "#lib/data/pokemon.ts";
   import type { PokemonData, PokemonView } from "#lib/data/pokemon.ts";
   import { reasonText, t, versionGroupName, versionName } from "#lib/i18n/pokemon.ts";
   import type { PageProps } from "./$types";
@@ -109,7 +109,7 @@
   let evolutionFailure = $state(false);
   let evolutionAttempt = $state(0);
   $effect(() => {
-    const speciesId = data.speciesId;
+    const chainId = data.evolutionChainId;
     void attempt;
     void evolutionAttempt;
     if (!mounted) return;
@@ -117,7 +117,7 @@
     chain = null;
     evolutionLoading = true;
     evolutionFailure = false;
-    loadPokemonEvolution(speciesId).then(
+    (chainId === null ? Promise.resolve(null) : getEvolutionChain(chainId)).then(
       (loaded) => {
         if (!active) return;
         chain = loaded;

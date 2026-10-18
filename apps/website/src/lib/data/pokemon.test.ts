@@ -1,15 +1,21 @@
-import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { fixture } from "../../../../../packages/pokemon-data/tests/fixtures.ts";
+import type * as LoaderModule from "./loader.ts";
 import type * as PokemonModule from "./pokemon.ts";
 
-vi.mock("$app/env", () => ({ browser: false }));
 vi.mock("$app/paths", () => ({ asset: (path: string) => `/${path}` }));
 
+let loader: typeof LoaderModule;
 let pokemon: typeof PokemonModule;
 beforeEach(async () => {
-  // Re-import after resetModules so each test gets fresh revision and promise caches.
+  vi.stubEnv("DATASET_REVISION", "revision");
+  // Re-import after resetModules so each test gets fresh promise caches.
   vi.resetModules();
+  loader = await import("./loader.ts");
   pokemon = await import("./pokemon.ts");
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 const json = (value: unknown) => new Response(JSON.stringify(value));
@@ -40,24 +46,10 @@ function pokemonReferences(references = fixture().references) {
 
 function snapshotHost(overrides: Record<string, () => Response | Promise<Response>> = {}) {
   const input = fixture();
-  const asset = (path: string) => ({ path: `revision/${path}`, sha256: "", bytes: 0 });
   const routes: Record<string, () => Response | Promise<Response>> = {
-    "/data/manifest.json": () =>
-      json({
-        schemaVersion: 2,
-        datasetRevision: "revision",
-        files: {
-          references: asset("references.json"),
-          pokemonReferences: asset("pokemon-references.json"),
-          searchReferences: asset("search/references.json"),
-          games: asset("games.json"),
-          search: {},
-          pokemon: { "25": asset("pokemon/25.json") },
-          evolution: { "10": asset("evolution/10.json") },
-        },
-      }),
-    "/data/revision/pokemon/25.json": () => json(input.species[0]),
-    "/data/revision/pokemon-references.json": () => json(pokemonReferences(input.references)),
+    "/data/revisions/revision/pokemon/25.json": () => json(input.species[0]),
+    "/data/revisions/revision/pokemon-references.json": () =>
+      json(pokemonReferences(input.references)),
     ...overrides,
   };
   return (async (request: RequestInfo | URL) => {
@@ -83,7 +75,7 @@ describe("Pokémon section readiness", () => {
     let attempts = 0;
     const chain = { chainId: 10, applicability: "unresolved", nodes: [] };
     const fetchImpl = snapshotHost({
-      "/data/revision/evolution/10.json": async () => {
+      "/data/revisions/revision/evolution/10.json": async () => {
         if (++attempts === 1) {
           await gate.promise;
           return new Response(null, { status: 503 });
@@ -91,7 +83,7 @@ describe("Pokémon section readiness", () => {
         return json(chain);
       },
     });
-    const evolution = pokemon.loadPokemonEvolution(25, fetchImpl);
+    const evolution = loader.getEvolutionChain(10, fetchImpl);
     const rejected = expect(evolution).rejects.toMatchObject({ kind: "network" });
     const data = await pokemon.loadPokemonData(25, fetchImpl);
     const red = pokemon.resolvePokemonView(data, context("red")).pokemon;
@@ -106,7 +98,7 @@ describe("Pokémon section readiness", () => {
     });
     gate.resolve();
     await rejected;
-    await expect(pokemon.loadPokemonEvolution(25, fetchImpl)).resolves.toEqual(chain);
+    await expect(loader.getEvolutionChain(10, fetchImpl)).resolves.toEqual(chain);
     expect(pokemon.resolvePokemonView(data, context("red")).pokemon.learnset).toEqual(red.learnset);
   });
 
@@ -115,14 +107,14 @@ describe("Pokémon section readiness", () => {
     const input = fixture();
     const chain = { chainId: 10, applicability: "unresolved", nodes: [] };
     const fetchImpl = snapshotHost({
-      "/data/revision/pokemon-references.json": async () => {
+      "/data/revisions/revision/pokemon-references.json": async () => {
         await gate.promise;
         return json(pokemonReferences(input.references));
       },
-      "/data/revision/evolution/10.json": () => json(chain),
+      "/data/revisions/revision/evolution/10.json": () => json(chain),
     });
     const data = pokemon.loadPokemonData(25, fetchImpl);
-    await expect(pokemon.loadPokemonEvolution(25, fetchImpl)).resolves.toEqual(chain);
+    await expect(loader.getEvolutionChain(10, fetchImpl)).resolves.toEqual(chain);
     gate.resolve();
     const loaded = await data;
     expect(() =>
