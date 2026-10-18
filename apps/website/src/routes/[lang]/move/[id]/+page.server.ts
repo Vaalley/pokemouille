@@ -9,6 +9,7 @@ import type {
 import { LANGUAGES, isLanguage } from "#lib/i18n/core.ts";
 import { versionGroupName } from "#lib/i18n/pokemon.ts";
 import { getRelatedPokemon } from "#lib/server/catalogue.ts";
+import { projectMachines } from "#lib/data/machines.ts";
 import type { EntryGenerator, PageServerLoad } from "./$types";
 
 export const prerender = true;
@@ -54,6 +55,14 @@ export const load: PageServerLoad = async ({ params }) => {
   return {
     id: move.id,
     related: await getRelatedPokemon("move", move.id, lang),
+    machines: projectMachines(refs, lang, { kind: "move", id: move.id }),
+    move: {
+      target: move.target,
+      attributes: move.attributes,
+      statChanges: move.statChanges,
+      meta: move.meta,
+    },
+    stats: refs.stats,
     name,
     generationId: move.generationId,
     typeId: move.typeId,

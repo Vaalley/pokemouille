@@ -7,6 +7,33 @@ export type Incremental<T> =
 export type CensusBeforeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CensusBeforeQuery = {
+  machines: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveAttributes: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveStatChanges: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveMeta: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounters: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditions: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterLocations: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterAreas: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterSlots: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterMethods: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditionKinds: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterConditionValues: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterLocationNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterAreaNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterMethodNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditionNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterConditionValueNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
   species: { aggregate: { count: number; max: { id: number | null } | null } | null };
   pokemon: { aggregate: { count: number; max: { id: number | null } | null } | null };
   forms: { aggregate: { count: number; max: { id: number | null } | null } | null };
@@ -56,6 +83,33 @@ export type CensusBeforeQuery = {
 export type CensusAfterQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CensusAfterQuery = {
+  machines: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveAttributes: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveStatChanges: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveMeta: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounters: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditions: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterLocations: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterAreas: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterSlots: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterMethods: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditionKinds: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterConditionValues: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterLocationNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterAreaNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterMethodNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditionNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterConditionValueNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
   species: { aggregate: { count: number; max: { id: number | null } | null } | null };
   pokemon: { aggregate: { count: number; max: { id: number | null } | null } | null };
   forms: { aggregate: { count: number; max: { id: number | null } | null } | null };
@@ -103,6 +157,33 @@ export type CensusAfterQuery = {
 };
 
 export type SourceCensusFragment = {
+  machines: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveAttributes: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveStatChanges: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  moveMeta: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounters: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditions: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterLocations: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterAreas: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterSlots: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterMethods: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditionKinds: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterConditionValues: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterLocationNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterAreaNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterMethodNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  encounterConditionNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
+  encounterConditionValueNames: {
+    aggregate: { count: number; max: { id: number | null } | null } | null;
+  };
   species: { aggregate: { count: number; max: { id: number | null } | null } | null };
   pokemon: { aggregate: { count: number; max: { id: number | null } | null } | null };
   forms: { aggregate: { count: number; max: { id: number | null } | null } | null };
@@ -149,6 +230,57 @@ export type SourceCensusFragment = {
   versionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
 };
 
+export type EncounterReferencesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type EncounterReferencesQuery = {
+  locations: Array<{
+    id: number;
+    identifier: string;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  locationsCount: { aggregate: { count: number } | null };
+  areas: Array<{
+    id: number;
+    identifier: string;
+    locationId: number | null;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  areasCount: { aggregate: { count: number } | null };
+  slots: Array<{
+    id: number;
+    slot: number | null;
+    rarity: number;
+    versionGroupId: number | null;
+    methodId: number | null;
+  }>;
+  slotsCount: { aggregate: { count: number } | null };
+  methods: Array<{
+    id: number;
+    identifier: string;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  methodsCount: { aggregate: { count: number } | null };
+  conditions: Array<{
+    id: number;
+    identifier: string;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  conditionsCount: { aggregate: { count: number } | null };
+  conditionValues: Array<{
+    id: number;
+    identifier: string;
+    conditionId: number | null;
+    isDefault: boolean;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  conditionValuesCount: { aggregate: { count: number } | null };
+};
+
 export type ReferencesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ReferencesQuery = {
@@ -164,6 +296,7 @@ export type ReferencesQuery = {
       id: number;
       identifier: string;
       versionGroupId: number | null;
+      encountersCount: { aggregate: { count: number } | null };
       names: Array<{ name: string; languageId: number | null }>;
       namesCount: { aggregate: { count: number } | null };
       flavorTextsCount: { aggregate: { count: number } | null };
@@ -216,6 +349,50 @@ export type ReferencesQuery = {
     damageClassId: number | null;
     effectChance: number | null;
     effectId: number | null;
+    target: {
+      id: number;
+      identifier: string;
+      names: Array<{ name: string; languageId: number | null }>;
+      namesCount: { aggregate: { count: number } | null };
+    } | null;
+    attributes: Array<{
+      id: number;
+      attribute: {
+        id: number;
+        identifier: string;
+        names: Array<{ name: string; languageId: number | null }>;
+        namesCount: { aggregate: { count: number } | null };
+      } | null;
+    }>;
+    attributesCount: { aggregate: { count: number } | null };
+    statChanges: Array<{ id: number; change: number; statId: number | null }>;
+    statChangesCount: { aggregate: { count: number } | null };
+    meta: Array<{
+      id: number;
+      drain: number | null;
+      healing: number | null;
+      minHits: number | null;
+      maxHits: number | null;
+      minTurns: number | null;
+      maxTurns: number | null;
+      critRate: number | null;
+      ailmentChance: number | null;
+      flinchChance: number | null;
+      statChance: number | null;
+      ailment: {
+        id: number;
+        identifier: string;
+        names: Array<{ name: string; languageId: number | null }>;
+        namesCount: { aggregate: { count: number } | null };
+      } | null;
+      category: {
+        id: number;
+        identifier: string;
+        descriptions: Array<{ description: string; languageId: number | null }>;
+        descriptionsCount: { aggregate: { count: number } | null };
+      } | null;
+    }>;
+    metaCount: { aggregate: { count: number } | null };
     names: Array<{ name: string; languageId: number | null }>;
     namesCount: { aggregate: { count: number } | null };
     flavorTexts: Array<{ languageId: number | null; versionGroupId: number | null; text: string }>;
@@ -228,6 +405,14 @@ export type ReferencesQuery = {
     effectsCount: { aggregate: { count: number } | null };
   }>;
   moveEffectsCount: { aggregate: { count: number } | null };
+  machines: Array<{
+    id: number;
+    versionGroupId: number | null;
+    number: number;
+    itemId: number | null;
+    moveId: number | null;
+  }>;
+  machinesCount: { aggregate: { count: number } | null };
   learnMethods: Array<{
     id: number;
     identifier: string;
@@ -378,6 +563,17 @@ export type SpeciesPageQuery = {
         learnMethodId: number | null;
       }>;
       learnsetsCount: { aggregate: { count: number } | null };
+      encounters: Array<{
+        id: number;
+        versionId: number | null;
+        minLevel: number;
+        maxLevel: number;
+        areaId: number | null;
+        slotId: number | null;
+        conditions: Array<{ id: number; encounterId: number | null; valueId: number | null }>;
+        conditionsCount: { aggregate: { count: number } | null };
+      }>;
+      encountersCount: { aggregate: { count: number } | null };
       sprites: Array<{ sprites: unknown }>;
       spritesCount: { aggregate: { count: number } | null };
     }>;

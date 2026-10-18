@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vite-plus/test";
-import type { ReferencesQuery } from "../src/generated/operations.ts";
-import { gameText, mapReferences } from "../src/mapping.ts";
-import { validateBoundedRelationships } from "../src/operations.ts";
+import type {
+  EncounterReferencesQuery,
+  ReferencesQuery,
+  SpeciesPageQuery,
+} from "../src/generated/operations.ts";
+import {
+  gameText,
+  mapEncounterReferences,
+  mapReferences,
+  mapSpecies,
+  validateEncounterReferenceCensus,
+} from "../src/mapping.ts";
+import { loadOperations, validateBoundedRelationships } from "../src/operations.ts";
+import { fixture } from "../../../packages/pokemon-data/tests/fixtures.ts";
+import { validateSnapshot } from "../../../packages/pokemon-data/src/index.ts";
 
 const census = { species: 0, pokemon: 0, forms: 0, learnsets: 0, evolutions: 0 };
 
@@ -18,6 +30,8 @@ function moveReferences(): ReferencesQuery {
     statsCount: { aggregate: { count: 0 } },
     abilities: [],
     abilitiesCount: { aggregate: { count: 0 } },
+    machines: [],
+    machinesCount: { aggregate: { count: 0 } },
     moves: [
       {
         id: 85,
@@ -31,6 +45,13 @@ function moveReferences(): ReferencesQuery {
         priority: 0,
         effectChance: 10,
         effectId: 7,
+        target: null,
+        attributes: [],
+        attributesCount: { aggregate: { count: 0 } },
+        statChanges: [],
+        statChangesCount: { aggregate: { count: 0 } },
+        meta: [],
+        metaCount: { aggregate: { count: 0 } },
         names: [{ languageId: 5, name: "Tonnerre" }],
         namesCount: { aggregate: { count: 1 } },
         flavorTexts: [{ languageId: 5, versionGroupId: 25, text: "Une attaque électrique." }],
@@ -158,9 +179,104 @@ describe("move reference mapping", () => {
       pp: 15,
       priority: 0,
       effectChance: 10,
+      target: null,
+      attributes: [],
+      statChanges: [],
+      meta: null,
+      sourceCounts: { attributes: 0, statChanges: 0, meta: 0 },
       flavorTexts: raw.moves[0]!.flavorTexts,
       effects: raw.moveEffects[0]!.effects,
     });
+  });
+
+  it("preserves structured metadata, signed recoil, zero chances and source machine numbering", () => {
+    const raw = moveReferences();
+    const move = raw.moves[0]!;
+    move.target = {
+      id: 10,
+      identifier: "selected-pokemon",
+      names: [],
+      namesCount: { aggregate: { count: 0 } },
+    };
+    move.attributes = [
+      {
+        id: 1,
+        attribute: {
+          id: 1,
+          identifier: "contact",
+          names: [{ languageId: 5, name: "Contact" }],
+          namesCount: { aggregate: { count: 1 } },
+        },
+      },
+    ];
+    move.attributesCount.aggregate!.count = 1;
+    move.statChanges = [{ id: 1, statId: 2, change: -1 }];
+    move.statChangesCount.aggregate!.count = 1;
+    move.meta = [
+      {
+        id: 85,
+        minHits: null,
+        maxHits: null,
+        minTurns: 2,
+        maxTurns: 3,
+        drain: -25,
+        healing: 0,
+        critRate: 1,
+        ailmentChance: 0,
+        flinchChance: null,
+        statChance: 100,
+        ailment: { id: 0, identifier: "none", names: [], namesCount: { aggregate: { count: 0 } } },
+        category: {
+          id: 0,
+          identifier: "damage",
+          descriptions: [{ languageId: 9, description: "Inflicts damage." }],
+          descriptionsCount: { aggregate: { count: 1 } },
+        },
+      },
+    ];
+    move.metaCount.aggregate!.count = 1;
+    raw.machines = [{ id: 1, number: 1001, versionGroupId: 20, itemId: 1131, moveId: 85 }];
+    raw.machinesCount.aggregate!.count = 1;
+    validateBoundedRelationships(raw);
+    const mapped = mapReferences(raw, census);
+    expect(mapped.machines).toEqual(raw.machines);
+    expect(mapped.moves[0]).toMatchObject({
+      target: { id: 10, identifier: "selected-pokemon", names: [] },
+      attributes: [{ id: 1, identifier: "contact", names: [{ languageId: 5, name: "Contact" }] }],
+      statChanges: [{ statId: 2, change: -1 }],
+      meta: {
+        drain: -25,
+        healing: 0,
+        ailmentChance: 0,
+        flinchChance: null,
+        minTurns: 2,
+        maxTurns: 3,
+      },
+      sourceCounts: { attributes: 1, statChanges: 1, meta: 1 },
+    });
+    raw.machines[0]!.moveId = null;
+    expect(() => mapReferences(raw, census)).toThrow("machine.moveId");
+  });
+
+  it("rejects ambiguous metadata instead of choosing an arbitrary record", () => {
+    const raw = moveReferences();
+    const meta = {
+      id: 1,
+      minHits: null,
+      maxHits: null,
+      minTurns: null,
+      maxTurns: null,
+      drain: null,
+      healing: null,
+      critRate: null,
+      ailmentChance: null,
+      flinchChance: null,
+      statChance: null,
+      ailment: null,
+      category: null,
+    };
+    raw.moves[0]!.meta = [meta, { ...meta, id: 2 }];
+    expect(() => mapReferences(raw, census)).toThrow("ambiguous metadata");
   });
 
   it("preserves genuinely absent stats and descriptions without fabricated defaults", () => {
@@ -321,5 +437,419 @@ describe("game text normalization", () => {
     expect(references.abilities[0]!.flavorTexts[0]!.text).toBe(
       "Attire les capacités de type Électrik.",
     );
+  });
+});
+
+describe("species-scoped encounter mapping", () => {
+  function sourceLookups(): EncounterReferencesQuery {
+    return {
+      locations: [
+        {
+          id: 1,
+          identifier: "viridian-forest",
+          names: [{ languageId: 5, name: "Forêt de Jade" }],
+          namesCount: { aggregate: { count: 1 } },
+        },
+      ],
+      locationsCount: { aggregate: { count: 1 } },
+      areas: [
+        {
+          id: 1,
+          identifier: "",
+          locationId: 1,
+          names: [],
+          namesCount: { aggregate: { count: 0 } },
+        },
+      ],
+      areasCount: { aggregate: { count: 1 } },
+      slots: [{ id: 1, versionGroupId: 1, methodId: 1, slot: null, rarity: 5 }],
+      slotsCount: { aggregate: { count: 1 } },
+      methods: [
+        {
+          id: 1,
+          identifier: "walk",
+          names: [{ languageId: 9, name: "Walking" }],
+          namesCount: { aggregate: { count: 1 } },
+        },
+      ],
+      methodsCount: { aggregate: { count: 1 } },
+      conditions: [
+        { id: 1, identifier: "time", names: [], namesCount: { aggregate: { count: 0 } } },
+      ],
+      conditionsCount: { aggregate: { count: 1 } },
+      conditionValues: [
+        {
+          id: 1,
+          identifier: "time-morning",
+          conditionId: 1,
+          isDefault: false,
+          names: [{ languageId: 1, name: "朝" }],
+          namesCount: { aggregate: { count: 1 } },
+        },
+      ],
+      conditionValuesCount: { aggregate: { count: 1 } },
+    };
+  }
+
+  function sourceSpecies(): SpeciesPageQuery["species"][number] {
+    const record = fixture().species[0]!;
+    const variety = record.varieties[0]!;
+    return {
+      id: record.id,
+      identifier: record.identifier,
+      generationId: record.generationId,
+      evolvesFromSpeciesId: null,
+      evolutionChainId: record.evolutionChainId,
+      genderRate: record.genderRate,
+      captureRate: record.captureRate,
+      baseHappiness: record.baseHappiness,
+      isBaby: false,
+      isLegendary: false,
+      isMythical: false,
+      hatch_counter: 10,
+      growth_rate_id: 2,
+      pokemon_color_id: 10,
+      pokemon_shape_id: 8,
+      pokemon_habitat_id: 2,
+      order: 26,
+      forms_switchable: false,
+      has_gender_differences: true,
+      names: [
+        { languageId: 9, name: "Pikachu", genus: "Mouse Pokémon" },
+        { languageId: 5, name: "Pikachu", genus: "Souris" },
+        { languageId: 1, name: "ピカチュウ", genus: "ねずみポケモン" },
+      ],
+      namesCount: { aggregate: { count: record.names.length } },
+      flavorTexts: record.flavorTexts,
+      flavorTextsCount: { aggregate: { count: record.flavorTexts.length } },
+      evolutions: [],
+      evolutionsCount: { aggregate: { count: 0 } },
+      varieties: [
+        {
+          id: variety.id,
+          identifier: variety.identifier,
+          isDefault: variety.isDefault,
+          height: variety.height,
+          weight: variety.weight,
+          baseExperience: variety.baseExperience,
+          order: variety.order,
+          speciesId: record.id,
+          types: variety.types,
+          typesCount: { aggregate: { count: variety.types.length } },
+          typeHistory: [],
+          typeHistoryCount: { aggregate: { count: 0 } },
+          stats: variety.stats,
+          statsCount: { aggregate: { count: variety.stats.length } },
+          statHistory: variety.statHistory,
+          statHistoryCount: { aggregate: { count: variety.statHistory.length } },
+          abilities: variety.abilities,
+          abilitiesCount: { aggregate: { count: variety.abilities.length } },
+          abilityHistory: variety.abilityHistory,
+          abilityHistoryCount: { aggregate: { count: variety.abilityHistory.length } },
+          forms: variety.forms.map((form) => ({
+            id: form.id,
+            identifier: form.identifier,
+            formIdentifier: form.formIdentifier,
+            versionGroupId: form.versionGroupId,
+            isDefault: form.isDefault,
+            isBattleOnly: form.isBattleOnly,
+            isMega: form.isMega,
+            order: form.order,
+            formOrder: form.formOrder,
+            pokemonId: variety.id,
+            names: [],
+            namesCount: { aggregate: { count: 0 } },
+          })),
+          formsCount: { aggregate: { count: variety.forms.length } },
+          learnsets: variety.learnsets.map((row, index) => ({ id: index + 1, ...row })),
+          learnsetsCount: { aggregate: { count: variety.learnsets.length } },
+          sprites: [],
+          spritesCount: { aggregate: { count: 0 } },
+          encounters: [
+            {
+              id: 1,
+              versionId: 1,
+              minLevel: 3,
+              maxLevel: 5,
+              areaId: 1,
+              slotId: 1,
+              conditions: [{ id: 1, encounterId: 1, valueId: 1 }],
+              conditionsCount: { aggregate: { count: 1 } },
+            },
+          ],
+          encountersCount: { aggregate: { count: 1 } },
+        },
+      ],
+      varietiesCount: { aggregate: { count: 1 } },
+    };
+  }
+
+  it("retains exact version, levels, slot rarity, localized places/methods and condition defaults", () => {
+    const raw = sourceSpecies();
+    validateBoundedRelationships({ species: [raw] });
+    const lookups = sourceLookups();
+    validateBoundedRelationships(lookups);
+    expect(mapSpecies(raw, mapEncounterReferences(lookups)).varieties[0]!.encounters).toEqual([
+      {
+        id: 1,
+        versionId: 1,
+        minLevel: 3,
+        maxLevel: 5,
+        location: {
+          id: 1,
+          identifier: "viridian-forest",
+          names: [{ languageId: 5, name: "Forêt de Jade" }],
+        },
+        area: { id: 1, identifier: "", names: [] },
+        method: { id: 1, identifier: "walk", names: [{ languageId: 9, name: "Walking" }] },
+        slot: { id: 1, versionGroupId: 1, slot: null, rarity: 5 },
+        conditions: [
+          {
+            id: 1,
+            identifier: "time-morning",
+            names: [{ languageId: 1, name: "朝" }],
+            isDefault: false,
+            condition: { id: 1, identifier: "time", names: [] },
+          },
+        ],
+        sourceCounts: { conditions: 1 },
+      },
+    ]);
+    expect(
+      mapSpecies(raw, mapEncounterReferences(lookups)).varieties[0]!.sourceCounts.encounters,
+    ).toBe(1);
+  });
+
+  it("does not invent missing encounter relationships or turn a counted empty export into availability", () => {
+    const raw = sourceSpecies();
+    const lookups = mapEncounterReferences(sourceLookups());
+    raw.varieties[0]!.encounters[0]!.areaId = null;
+    expect(() => mapSpecies(raw, lookups)).toThrow("encounter.areaId");
+    raw.varieties[0]!.encounters = [];
+    raw.varieties[0]!.encountersCount.aggregate!.count = 0;
+    validateBoundedRelationships({ species: [raw] });
+    expect(mapSpecies(raw, lookups).varieties[0]!.encounters).toEqual([]);
+  });
+
+  it("retains actual same-language area aliases and blank labels without relaxing other resource identities", () => {
+    const lookups = sourceLookups();
+    lookups.areas[0] = {
+      id: 754,
+      identifier: "terminus-cave-1f",
+      locationId: 1,
+      names: [
+        { languageId: 5, name: "Grotte Coda (zone inconnue 343)" },
+        { languageId: 9, name: "Terminus Cave (unknown area 343)" },
+        { languageId: 9, name: "Terminus Cave (1F)" },
+        { languageId: 1, name: "" },
+        { languageId: 9, name: "Terminus Cave (1F)" },
+      ],
+      namesCount: { aggregate: { count: 5 } },
+    };
+    const raw = sourceSpecies();
+    raw.varieties[0]!.encounters[0]!.areaId = 754;
+    validateBoundedRelationships(lookups);
+    const mapped = mapSpecies(raw, mapEncounterReferences(lookups));
+    expect(mapped.varieties[0]!.encounters[0]!.area.names).toEqual(
+      lookups.areas[0]!.names.slice(0, 4),
+    );
+    // Raw source row counts remain untouched even though identical aliases collapse.
+    expect(lookups.areas[0]!.names).toHaveLength(5);
+    const snapshot = fixture();
+    snapshot.species = [mapped];
+    snapshot.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 1;
+    validateSnapshot(snapshot);
+    mapped.varieties[0]!.encounters[0]!.area.names.push({
+      languageId: 9,
+      name: "Terminus Cave (1F)",
+    });
+    expect(() => validateSnapshot(snapshot)).toThrow("duplicate localized alias");
+    mapped.varieties[0]!.encounters[0]!.area.names.pop();
+    snapshot.references.types[0]!.names.push(
+      { languageId: 11, name: "Alternative one" },
+      { languageId: 11, name: "Alternative two" },
+    );
+    expect(() => validateSnapshot(snapshot)).toThrow("duplicate language identity");
+  });
+
+  it("joins shared lookups across encounters without mutating or multiplying source names", () => {
+    const raw = sourceSpecies();
+    const variety = raw.varieties[0]!;
+    variety.encounters.push({
+      ...variety.encounters[0]!,
+      id: 2,
+      conditions: [{ id: 2, encounterId: 2, valueId: 1 }],
+    });
+    variety.encountersCount.aggregate!.count = 2;
+    const source = sourceLookups();
+    const original = structuredClone(source);
+    const lookups = mapEncounterReferences(source);
+    const mapped = mapSpecies(raw, lookups).varieties[0]!.encounters;
+    expect(mapped).toHaveLength(2);
+    expect(mapped[0]!.location).toBe(mapped[1]!.location);
+    expect(mapped[0]!.method).toBe(mapped[1]!.method);
+    expect(mapped[0]!.conditions[0]).toBe(mapped[1]!.conditions[0]);
+    expect(source).toEqual(original);
+  });
+
+  it.each(["locations", "areas", "slots", "methods", "conditions", "conditionValues"] as const)(
+    "rejects duplicate %s lookup identities even if independent row counts match",
+    (table) => {
+      const raw = sourceLookups();
+      Reflect.set(raw, table, [...raw[table], raw[table][0]!]);
+      raw[`${table}Count`].aggregate!.count = 2;
+      validateBoundedRelationships(raw);
+      expect(() => mapEncounterReferences(raw)).toThrow(`Duplicate encounter lookup id: ${table}`);
+    },
+  );
+
+  it("rejects unresolved lookup FKs, including unused resource rows", () => {
+    const areas = sourceLookups();
+    areas.areas.push({ ...areas.areas[0]!, id: 2, locationId: 999999 });
+    areas.areasCount.aggregate!.count = 2;
+    expect(() => mapEncounterReferences(areas)).toThrow("encounter.location 999999");
+    const methods = sourceLookups();
+    methods.slots[0]!.methodId = null;
+    expect(() => mapEncounterReferences(methods)).toThrow("encounter.slot.methodId");
+    const conditions = sourceLookups();
+    conditions.conditionValues[0]!.conditionId = 999999;
+    expect(() => mapEncounterReferences(conditions)).toThrow("encounter.condition 999999");
+  });
+
+  it("rejects absent, invalid or unknown species encounter foreign keys", () => {
+    const lookups = mapEncounterReferences(sourceLookups());
+    const raw = sourceSpecies();
+    const encounter = raw.varieties[0]!.encounters[0]!;
+    encounter.areaId = 999999;
+    expect(() => mapSpecies(raw, lookups)).toThrow("encounter.area 999999");
+    encounter.areaId = 1;
+    encounter.slotId = null;
+    expect(() => mapSpecies(raw, lookups)).toThrow("encounter.slotId");
+    encounter.slotId = 999999;
+    expect(() => mapSpecies(raw, lookups)).toThrow("encounter.slot 999999");
+    encounter.slotId = 1;
+    encounter.conditions[0]!.valueId = 999999;
+    expect(() => mapSpecies(raw, lookups)).toThrow("encounter.conditionValue 999999");
+    encounter.conditions[0]!.valueId = null;
+    expect(() => mapSpecies(raw, lookups)).toThrow("encounter.conditionMap.valueId");
+  });
+
+  it("rejects condition maps attached to the wrong encounter or duplicated condition values", () => {
+    const lookups = mapEncounterReferences(sourceLookups());
+    const raw = sourceSpecies();
+    const encounter = raw.varieties[0]!.encounters[0]!;
+    encounter.conditions[0]!.encounterId = 999999;
+    expect(() => mapSpecies(raw, lookups)).toThrow("inconsistent condition mapping relationship");
+    encounter.conditions[0]!.encounterId = 1;
+    encounter.conditions.push({ id: 2, encounterId: 1, valueId: 1 });
+    encounter.conditionsCount.aggregate!.count = 2;
+    validateBoundedRelationships({ species: [raw] });
+    expect(() => mapSpecies(raw, lookups)).toThrow("Duplicate source encounter condition mapping");
+  });
+
+  it("compares all lookup and localized-name totals against the independent source census", () => {
+    const raw = sourceLookups();
+    const count = (value: number) => ({ aggregate: { count: value, max: { id: value || null } } });
+    const sourceCensus = {
+      encounterLocations: count(1),
+      encounterAreas: count(1),
+      encounterSlots: count(1),
+      encounterMethods: count(1),
+      encounterConditionKinds: count(1),
+      encounterConditionValues: count(1),
+      encounterLocationNames: count(1),
+      encounterAreaNames: count(0),
+      encounterMethodNames: count(1),
+      encounterConditionNames: count(0),
+      encounterConditionValueNames: count(1),
+    };
+    validateEncounterReferenceCensus(raw, sourceCensus);
+    for (const [key, value] of Object.entries(sourceCensus)) {
+      value.aggregate.count++;
+      expect(() => validateEncounterReferenceCensus(raw, sourceCensus)).toThrow(
+        key.endsWith("Names") ? "localized encounter names" : "Encounter reference census mismatch",
+      );
+      value.aggregate.count--;
+    }
+  });
+
+  it("keeps species query encounter rows scalar-only and validates them using the shared lookup context", async () => {
+    const operations = await loadOperations();
+    const lookups = sourceLookups();
+    operations.encounterReferences.validate(lookups, {});
+    const speciesOperation = operations.species(mapEncounterReferences(lookups));
+    for (const join of [
+      "locationarea {",
+      "encounterslot {",
+      "locationnames",
+      "locationareanames",
+      "encountermethodnames",
+      "encounterconditionnames",
+      "encounterconditionvaluenames",
+    ]) {
+      expect(speciesOperation.document).not.toContain(join);
+    }
+    expect(speciesOperation.document).toContain("areaId: location_area_id");
+    expect(speciesOperation.document).toContain("slotId: encounter_slot_id");
+    expect(speciesOperation.document).toContain("valueId: encounter_condition_value_id");
+    const raw = sourceSpecies();
+    speciesOperation.validate({ species: [raw] }, { after: 0, limit: 1 });
+    raw.varieties[0]!.encounters[0]!.areaId = 999999;
+    expect(() => speciesOperation.validate({ species: [raw] }, { after: 0, limit: 1 })).toThrow(
+      "encounter.area",
+    );
+  });
+
+  it("preserves the observed Yellow Power Plant slot's red-blue provenance without changing its exact version", () => {
+    const raw = sourceSpecies();
+    raw.varieties[0]!.encounters = [
+      {
+        id: 62320,
+        versionId: 3,
+        areaId: 330,
+        slotId: 561,
+        minLevel: 40,
+        maxLevel: 40,
+        conditions: [],
+        conditionsCount: { aggregate: { count: 0 } },
+      },
+    ];
+    const source = sourceLookups();
+    source.locations = [
+      {
+        id: 158,
+        identifier: "kanto-power-plant",
+        names: [{ languageId: 9, name: "Kanto Power Plant" }],
+        namesCount: { aggregate: { count: 1 } },
+      },
+    ];
+    source.areas = [
+      {
+        id: 330,
+        locationId: 158,
+        identifier: "kanto-power-plant-area",
+        names: [{ languageId: 9, name: "Power Plant" }],
+        namesCount: { aggregate: { count: 1 } },
+      },
+    ];
+    source.slots = [{ id: 561, versionGroupId: 1, methodId: 20, rarity: 100, slot: null }];
+    source.methods = [
+      {
+        id: 20,
+        identifier: "static",
+        names: [{ languageId: 9, name: "Static encounter" }],
+        namesCount: { aggregate: { count: 1 } },
+      },
+    ];
+    const mapped = mapSpecies(raw, mapEncounterReferences(source));
+    const snapshot = fixture();
+    snapshot.species = [mapped];
+    snapshot.references.encounterCoverage.find((row) => row.versionId === 3)!.rows = 1;
+    validateSnapshot(snapshot);
+    expect(mapped.varieties[0]!.encounters[0]).toMatchObject({
+      id: 62320,
+      versionId: 3,
+      slot: { id: 561, versionGroupId: 1, rarity: 100 },
+    });
   });
 });

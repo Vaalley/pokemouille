@@ -11,6 +11,10 @@ import type {
 import { LANGUAGES, isLanguage } from "#lib/i18n/core.ts";
 import type { Language } from "#lib/i18n/core.ts";
 import { localizeVersion } from "#lib/i18n/pokemon.ts";
+import { getItemEvolutions } from "#lib/server/item-evolutions.ts";
+import { getRelatedPokemon } from "#lib/server/catalogue.ts";
+import { projectMachines } from "#lib/data/machines.ts";
+import type { RelatedPokemonData } from "#lib/data/catalogue.ts";
 import type { EntryGenerator, PageServerLoad } from "./$types";
 
 export const prerender = true;
@@ -39,7 +43,7 @@ function localizeText(rows: Name[], lang: Language): LocalizedText | null {
 export const entries: EntryGenerator = () =>
   LANGUAGES.flatMap((lang) => getReferences().items.map((item) => ({ lang, id: String(item.id) })));
 
-export const load: PageServerLoad = ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
   if (!isLanguage(params.lang)) error(404, "Unknown language");
   const lang = params.lang;
   const id = Number(params.id);
@@ -78,6 +82,16 @@ export const load: PageServerLoad = ({ params }) => {
       a.versionGroupId - b.versionGroupId,
   );
 
+  const machineMoves = new Set(
+    refs.machines.filter((row) => row.itemId === item.id).map((row) => row.moveId),
+  );
+  const machineRelations = new Map<number, RelatedPokemonData>();
+  await Promise.all(
+    [...machineMoves].map(async (moveId) => {
+      machineRelations.set(moveId, await getRelatedPokemon("move", moveId, lang));
+    }),
+  );
+
   return {
     itemId: item.id,
     identifier: item.identifier,
@@ -91,5 +105,7 @@ export const load: PageServerLoad = ({ params }) => {
       lang,
     ),
     descriptions,
+    evolutions: await getItemEvolutions(item.id, lang),
+    machines: projectMachines(refs, lang, { kind: "item", id: item.id }, machineRelations),
   };
 };

@@ -22,6 +22,11 @@ query References {
       id
       identifier: name
       versionGroupId: version_group_id
+      encountersCount: encounters_aggregate {
+        aggregate {
+          count
+        }
+      }
       names: versionnames(
         where: { language_id: { _in: [1, 5, 9, 11] } }
         order_by: { language_id: asc }
@@ -189,6 +194,112 @@ query References {
     priority
     effectChance: move_effect_chance
     effectId: move_effect_id
+    target: movetarget {
+      id
+      identifier: name
+      names: movetargetnames(
+        where: { language_id: { _in: [1, 5, 9, 11] } }
+        order_by: { language_id: asc }
+        limit: 8
+      ) {
+        languageId: language_id
+        name
+      }
+      namesCount: movetargetnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+        aggregate {
+          count
+        }
+      }
+    }
+    attributes: moveattributemaps(order_by: { id: asc }, limit: 128) {
+      id
+      attribute: moveattribute {
+        id
+        identifier: name
+        names: moveattributenames(
+          where: { language_id: { _in: [1, 5, 9, 11] } }
+          order_by: { language_id: asc }
+          limit: 8
+        ) {
+          languageId: language_id
+          name
+        }
+        namesCount: moveattributenames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+          aggregate {
+            count
+          }
+        }
+      }
+    }
+    attributesCount: moveattributemaps_aggregate {
+      aggregate {
+        count
+      }
+    }
+    statChanges: movemetastatchanges(order_by: { id: asc }, limit: 128) {
+      id
+      statId: stat_id
+      change
+    }
+    statChangesCount: movemetastatchanges_aggregate {
+      aggregate {
+        count
+      }
+    }
+    meta: movemeta(order_by: { id: asc }, limit: 2) {
+      id
+      minHits: min_hits
+      maxHits: max_hits
+      minTurns: min_turns
+      maxTurns: max_turns
+      drain
+      healing
+      critRate: crit_rate
+      ailmentChance: ailment_chance
+      flinchChance: flinch_chance
+      statChance: stat_chance
+      ailment: movemetaailment {
+        id
+        identifier: name
+        names: movemetaailmentnames(
+          where: { language_id: { _in: [1, 5, 9, 11] } }
+          order_by: { language_id: asc }
+          limit: 8
+        ) {
+          languageId: language_id
+          name
+        }
+        namesCount: movemetaailmentnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+          aggregate {
+            count
+          }
+        }
+      }
+      category: movemetacategory {
+        id
+        identifier: name
+        descriptions: movemetacategorydescriptions(
+          where: { language_id: { _in: [1, 5, 9, 11] } }
+          order_by: { language_id: asc }
+          limit: 8
+        ) {
+          languageId: language_id
+          description
+        }
+        descriptionsCount: movemetacategorydescriptions_aggregate(
+          where: { language_id: { _in: [1, 5, 9, 11] } }
+        ) {
+          aggregate {
+            count
+          }
+        }
+      }
+    }
+    metaCount: movemeta_aggregate {
+      aggregate {
+        count
+      }
+    }
     names: movenames(
       where: { language_id: { _in: [1, 5, 9, 11] } }
       order_by: { language_id: asc }
@@ -240,6 +351,18 @@ query References {
     }
   }
   moveEffectsCount: moveeffect_aggregate {
+    aggregate {
+      count
+    }
+  }
+  machines: machine(order_by: { id: asc }, limit: 10000) {
+    id
+    versionGroupId: version_group_id
+    number: machine_number
+    itemId: item_id
+    moveId: move_id
+  }
+  machinesCount: machine_aggregate {
     aggregate {
       count
     }

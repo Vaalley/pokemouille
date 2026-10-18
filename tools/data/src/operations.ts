@@ -7,12 +7,15 @@ import type {
   CensusAfterQueryVariables,
   CensusBeforeQuery,
   CensusBeforeQueryVariables,
+  EncounterReferencesQuery,
+  EncounterReferencesQueryVariables,
   ReferencesQuery,
   ReferencesQueryVariables,
   SpeciesPageQuery,
   SpeciesPageQueryVariables,
 } from "./generated/operations.ts";
-import { mapReferences, mapSpecies, validateCensus } from "./mapping.ts";
+import { mapEncounterReferences, mapReferences, mapSpecies, validateCensus } from "./mapping.ts";
+import type { EncounterLookups } from "./mapping.ts";
 
 // Every bounded relationship has an independent unbounded aggregate. A server-side
 // row cap must cause rejection, never a deceptively successful partial snapshot.
@@ -42,17 +45,20 @@ export function validateBoundedRelationships(value: unknown, path = "$"): void {
       child.forEach((item, index) =>
         validateBoundedRelationships(item, `${path}.${key}[${index}]`),
       );
-    }
+    } else if (key !== "sprites" && child !== null && typeof child === "object")
+      validateBoundedRelationships(child, `${path}.${key}`);
   }
 }
 
 export async function loadOperations() {
-  const [schemaRevisionText, censusText, referencesText, speciesText] = await Promise.all([
-    readFile(new URL("../graphql/schema-revision.json", import.meta.url), "utf8"),
-    readFile(new URL("../graphql/census.graphql", import.meta.url), "utf8"),
-    readFile(new URL("../graphql/references.graphql", import.meta.url), "utf8"),
-    readFile(new URL("../graphql/species.graphql", import.meta.url), "utf8"),
-  ]);
+  const [schemaRevisionText, censusText, referencesText, encounterReferencesText, speciesText] =
+    await Promise.all([
+      readFile(new URL("../graphql/schema-revision.json", import.meta.url), "utf8"),
+      readFile(new URL("../graphql/census.graphql", import.meta.url), "utf8"),
+      readFile(new URL("../graphql/references.graphql", import.meta.url), "utf8"),
+      readFile(new URL("../graphql/encounter-references.graphql", import.meta.url), "utf8"),
+      readFile(new URL("../graphql/species.graphql", import.meta.url), "utf8"),
+    ]);
   const metadata: unknown = JSON.parse(schemaRevisionText);
   if (
     metadata === null ||
@@ -66,6 +72,7 @@ export async function loadOperations() {
   const schemaRevision = metadata.sha256;
   const census = print(parse(censusText));
   const references = print(parse(referencesText));
+  const encounterReferences = print(parse(encounterReferencesText));
   const species = print(parse(speciesText));
   const before: Operation<CensusBeforeQuery, CensusBeforeQueryVariables> = {
     name: "CensusBefore",
@@ -90,6 +97,7 @@ export async function loadOperations() {
         !Array.isArray(data.abilities) ||
         !Array.isArray(data.moves) ||
         !Array.isArray(data.moveEffects) ||
+        !Array.isArray(data.machines) ||
         !Array.isArray(data.items) ||
         !Array.isArray(data.learnMethods) ||
         !Array.isArray(data.evolutionTriggers)
@@ -99,7 +107,21 @@ export async function loadOperations() {
       mapReferences(data, { species: 0, pokemon: 0, forms: 0, learnsets: 0, evolutions: 0 });
     },
   };
-  const speciesOperation: Operation<SpeciesPageQuery, SpeciesPageQueryVariables> = {
+  const encounterReferenceOperation: Operation<
+    EncounterReferencesQuery,
+    EncounterReferencesQueryVariables
+  > = {
+    name: "EncounterReferences",
+    document: encounterReferences,
+    validate(data) {
+      validateBoundedRelationships(data);
+      mapEncounterReferences(data);
+    },
+  };
+  // The same shared lookup context validates fresh and cached pages before acceptance.
+  const speciesOperation = (
+    encounters: EncounterLookups,
+  ): Operation<SpeciesPageQuery, SpeciesPageQueryVariables> => ({
     name: "SpeciesPage",
     document: species,
     validate(data, variables) {
@@ -112,15 +134,18 @@ export async function loadOperations() {
       )
         throw new Error("Truncated or invalid bounded species page");
       validateBoundedRelationships(data);
-      data.species.forEach(mapSpecies);
+      data.species.forEach((record) => mapSpecies(record, encounters));
     },
-  };
+  });
   return {
     schemaRevision,
-    operationRevision: digest(`${schemaRevision}\n${census}\n${references}\n${species}`),
+    operationRevision: digest(
+      `${schemaRevision}\n${census}\n${references}\n${encounterReferences}\n${species}`,
+    ),
     before,
     after,
     references: referenceOperation,
+    encounterReferences: encounterReferenceOperation,
     species: speciesOperation,
   };
 }

@@ -224,4 +224,121 @@ describe("snapshot integrity", () => {
         .status,
     ).toBe("missing");
   });
+  it("requires counted structured move fields while preserving missing metadata and signed HP costs", () => {
+    const snapshot = fixture();
+    const move = snapshot.references.moves[0]!;
+    move.meta = {
+      ailment: { id: -1, identifier: "unknown", names: [] },
+      category: { id: 0, identifier: "damage", descriptions: [] },
+      minHits: null,
+      maxHits: null,
+      minTurns: null,
+      maxTurns: null,
+      drain: -25,
+      healing: 0,
+      critRate: 0,
+      ailmentChance: null,
+      flinchChance: 0,
+      statChance: 0,
+    };
+    move.sourceCounts.meta = 1;
+    move.statChanges = [{ statId: 2, change: -1 }];
+    move.sourceCounts.statChanges = 1;
+    validateSnapshot(snapshot);
+    // Actual upstream semantics: Struggle uses -25 and Clangorous Soul uses -33 healing.
+    move.meta.drain = 0;
+    for (const healing of [-25, -33, 0, 50, null]) {
+      move.meta.healing = healing;
+      validateSnapshot(snapshot);
+    }
+    move.meta.healing = -101;
+    expect(() => validateSnapshot(snapshot)).toThrow("move.meta.healing");
+    move.meta.healing = -25.5;
+    expect(() => validateSnapshot(snapshot)).toThrow("move.meta.healing");
+    move.meta.healing = -25;
+    move.statChanges = [];
+    expect(() => validateSnapshot(snapshot)).toThrow("statChanges");
+    move.sourceCounts.statChanges = 0;
+    move.meta = null;
+    expect(() => validateSnapshot(snapshot)).toThrow("move.meta");
+    move.sourceCounts.meta = 0;
+    validateSnapshot(snapshot);
+    Reflect.deleteProperty(move, "attributes");
+    expect(() => validateSnapshot(snapshot)).toThrow("attributes");
+  });
+
+  it("validates machine item/move/game relationships without deriving a label from the number", () => {
+    const snapshot = fixture();
+    snapshot.references.items = [
+      { id: 1131, identifier: "tr01", names: [], effects: [], flavorTexts: [] },
+    ];
+    snapshot.references.sourceCounts.items = 1;
+    snapshot.references.machines = [
+      { id: 1, versionGroupId: 25, number: 1001, itemId: 1131, moveId: 85 },
+    ];
+    snapshot.references.sourceCounts.machines = 1;
+    validateSnapshot(snapshot);
+    snapshot.references.machines[0]!.itemId = 999999;
+    expect(() => validateSnapshot(snapshot)).toThrow("machine.itemId");
+  });
+
+  it("validates exact-version encounter coverage, slot scopes and independent condition counts", () => {
+    const snapshot = fixture();
+    const variety = snapshot.species[0]!.varieties[0]!;
+    variety.encounters = [
+      {
+        id: 1,
+        versionId: 1,
+        minLevel: 3,
+        maxLevel: 5,
+        location: {
+          id: 1,
+          identifier: "viridian-forest",
+          names: [{ languageId: 5, name: "Forêt de Jade" }],
+        },
+        area: { id: 1, identifier: "", names: [] },
+        method: { id: 1, identifier: "walk", names: [] },
+        slot: { id: 1, versionGroupId: 1, slot: null, rarity: 5 },
+        conditions: [
+          {
+            id: 1,
+            identifier: "time-morning",
+            names: [],
+            isDefault: false,
+            condition: { id: 1, identifier: "time", names: [] },
+          },
+        ],
+        sourceCounts: { conditions: 1 },
+      },
+    ];
+    variety.sourceCounts.encounters = 1;
+    snapshot.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 1;
+    validateSnapshot(snapshot);
+    const encounter = variety.encounters[0]!;
+    encounter.area.names = [
+      { languageId: 9, name: "Terminus Cave (unknown area 343)" },
+      { languageId: 9, name: "Terminus Cave (1F)" },
+      { languageId: 1, name: "" },
+    ];
+    validateSnapshot(snapshot);
+    encounter.area.names.push({ languageId: 9, name: "Terminus Cave (1F)" });
+    expect(() => validateSnapshot(snapshot)).toThrow("duplicate localized alias");
+    encounter.area.names.pop();
+    encounter.slot.versionGroupId = 999999;
+    expect(() => validateSnapshot(snapshot)).toThrow("encounter.slot.versionGroupId");
+    encounter.slot.versionGroupId = 1;
+    encounter.conditions = [];
+    expect(() => validateSnapshot(snapshot)).toThrow("conditions");
+    encounter.sourceCounts.conditions = 0;
+    encounter.minLevel = 6;
+    expect(() => validateSnapshot(snapshot)).toThrow("inverted level");
+    encounter.minLevel = 3;
+    snapshot.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 0;
+    expect(() => validateSnapshot(snapshot)).toThrow("encounter row count");
+    snapshot.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 1;
+    variety.encounters = [];
+    expect(() => validateSnapshot(snapshot)).toThrow("encounters");
+    variety.sourceCounts.encounters = 0;
+    expect(() => validateSnapshot(snapshot)).toThrow("encounter row count");
+  });
 });

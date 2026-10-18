@@ -1,0 +1,127 @@
+import { createTranslator } from "./core.ts";
+import type { Language } from "./core.ts";
+
+const en = {
+  heading: "Battle properties",
+  scope:
+    "Current source mechanics, not historical rules for the selected game. Conditions and exceptions are described in the move’s effect text.",
+  target: "Target",
+  flags: "Source flags",
+  noFlags: "No flags recorded. Missing flags do not establish that an interaction is impossible.",
+  stats: "Stat-stage changes",
+  noStats: "No stat-stage changes recorded.",
+  stat: "Stat #{id}",
+  stage: "{value} stages",
+  stageOne: "{value} stage",
+  metadata: "Effect metadata",
+  missingMetadata: "No effect metadata recorded for this move.",
+  missing: "Not recorded",
+  category: "Effect category",
+  ailment: "Ailment",
+  hits: "Hits",
+  turns: "Effect duration (turns)",
+  minimum: "At least {value}; maximum not recorded",
+  maximum: "Up to {value}; minimum not recorded",
+  healing: "Healing",
+  hpCost: "HP cost",
+  healingValue: "{value}% of maximum HP",
+  drain: "Drain / recoil",
+  drainValue: "{value}% of damage dealt (drain)",
+  recoilValue: "{value}% of damage dealt (recoil)",
+  zeroDrain: "0% of damage dealt (source value)",
+  critRate: "Critical-hit stage modifier",
+  ailmentChance: "Ailment chance",
+  flinchChance: "Flinch chance",
+  statChance: "Stat-change chance",
+  zeroChance: "0% (conditional or unspecified in source)",
+  chanceNote:
+    "A source chance of 0% can mean a conditional or unspecified chance, not necessarily no effect or a guaranteed effect. Critical-hit modifiers are stages, not probabilities.",
+  raw: "All recorded metadata values",
+  rawNote:
+    "The summary omits most zero values and unrecorded ranges. This list preserves zero separately from missing values; see the effect text for their meaning.",
+};
+const fr = {
+  heading: "Propriétés en combat",
+  scope:
+    "Mécaniques actuelles de la source, et non règles historiques du jeu sélectionné. Les conditions et exceptions figurent dans le texte de l’effet.",
+  target: "Cible",
+  flags: "Indicateurs de la source",
+  noFlags:
+    "Aucun indicateur renseigné. Un indicateur absent ne prouve pas qu’une interaction est impossible.",
+  stats: "Modifications de niveaux de statistiques",
+  noStats: "Aucune modification de niveau de statistique renseignée.",
+  stat: "Statistique nº {id}",
+  stage: "{value} niveaux",
+  stageOne: "{value} niveau",
+  metadata: "Métadonnées de l’effet",
+  missingMetadata: "Aucune métadonnée d’effet renseignée pour cette capacité.",
+  missing: "Non renseigné",
+  category: "Catégorie d’effet",
+  ailment: "Altération d’état",
+  hits: "Nombre de coups",
+  turns: "Durée de l’effet (tours)",
+  minimum: "Au moins {value} ; maximum non renseigné",
+  maximum: "Jusqu’à {value} ; minimum non renseigné",
+  healing: "Soins",
+  hpCost: "Coût en PV",
+  healingValue: "{value} % des PV maximaux",
+  drain: "Absorption / recul",
+  drainValue: "{value} % des dégâts infligés (absorption)",
+  recoilValue: "{value} % des dégâts infligés (recul)",
+  zeroDrain: "0 % des dégâts infligés (valeur source)",
+  critRate: "Modificateur du niveau de coups critiques",
+  ailmentChance: "Probabilité d’altération d’état",
+  flinchChance: "Probabilité d’apeurement",
+  statChance: "Probabilité de modification de statistique",
+  zeroChance: "0 % (conditionnel ou non précisé dans la source)",
+  chanceNote:
+    "Une probabilité source de 0 % peut être conditionnelle ou non précisée, sans forcément indiquer un effet impossible ou garanti. Les modificateurs de coups critiques sont des niveaux, pas des probabilités.",
+  raw: "Toutes les valeurs des métadonnées",
+  rawNote:
+    "Le résumé omet la plupart des valeurs égales à zéro et les plages non renseignées. Cette liste distingue zéro des données manquantes ; consulter le texte de l’effet pour leur signification.",
+} satisfies Record<keyof typeof en, string>;
+const ja = {
+  heading: "バトルでの特性",
+  scope:
+    "現在の出典データの仕様であり、選択したゲームの過去の仕様ではありません。条件や例外はわざの効果説明を確認してください。",
+  target: "対象",
+  flags: "出典のフラグ",
+  noFlags:
+    "フラグの記録はありません。記録がないことは、その相互作用が起こらないことを意味しません。",
+  stats: "能力ランクの変化",
+  noStats: "能力ランク変化の記録はありません。",
+  stat: "能力 #{id}",
+  stage: "{value} 段階",
+  stageOne: "{value} 段階",
+  metadata: "効果のメタデータ",
+  missingMetadata: "このわざの効果メタデータは記録されていません。",
+  missing: "データなし",
+  category: "効果の分類",
+  ailment: "状態異常",
+  hits: "攻撃回数",
+  turns: "効果の継続ターン数",
+  minimum: "最低 {value}（最大値の記録なし）",
+  maximum: "最大 {value}（最小値の記録なし）",
+  healing: "回復",
+  hpCost: "消費HP",
+  healingValue: "最大HPの {value}%",
+  drain: "吸収 / 反動",
+  drainValue: "与えたダメージの {value}%（吸収）",
+  recoilValue: "与えたダメージの {value}%（反動）",
+  zeroDrain: "与えたダメージの 0%（出典の値）",
+  critRate: "急所ランクの補正",
+  ailmentChance: "状態異常の発生率",
+  flinchChance: "ひるみの発生率",
+  statChance: "能力変化の発生率",
+  zeroChance: "0%（出典では条件付き、または未指定）",
+  chanceNote:
+    "出典の発生率が0%の場合、条件付きまたは未指定の可能性があり、効果が起こらないことや必ず起こることを意味しません。急所補正は確率ではなくランクです。",
+  raw: "記録されたすべてのメタデータ値",
+  rawNote:
+    "概要では通常のゼロ値や未記録の範囲を省略しています。この一覧はゼロと未記録を区別します。意味は効果説明を確認してください。",
+} satisfies Record<keyof typeof en, string>;
+
+export const t = createTranslator({ en, fr, ja } satisfies Record<
+  Language,
+  Record<keyof typeof en, string>
+>);

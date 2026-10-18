@@ -201,6 +201,16 @@ const en = {
   "moves.level": "Level",
   "moves.move": "Move",
   "moves.mastery": "Mastery level",
+  "moves.category": "Damage category",
+  "moves.status": "Status",
+  "moves.physical": "Physical",
+  "moves.special": "Special",
+  "moves.power": "Power",
+  "moves.accuracy": "Accuracy",
+  "moves.pp": "PP",
+  "moves.priority": "Priority",
+  "moves.currentValues":
+    "Type, damage category, power, accuracy, PP and priority are current values. Historical move values aren’t exported and may differ in the selected game. — means no fixed value is recorded (not applicable, variable, or missing), not zero.",
 
   "coverage.heading": "Data coverage",
   "coverage.context":
@@ -432,6 +442,16 @@ const messages = {
     "moves.level": "Niveau",
     "moves.move": "Capacité",
     "moves.mastery": "Niveau de maîtrise",
+    "moves.category": "Catégorie de dégâts",
+    "moves.status": "Statut",
+    "moves.physical": "Physique",
+    "moves.special": "Spéciale",
+    "moves.power": "Puissance",
+    "moves.accuracy": "Précision",
+    "moves.pp": "PP",
+    "moves.priority": "Priorité",
+    "moves.currentValues":
+      "Le type, la catégorie, la puissance, la précision, les PP et la priorité sont les valeurs actuelles. Les valeurs historiques ne sont pas exportées et peuvent différer dans le jeu sélectionné. — indique l’absence de valeur fixe enregistrée (sans objet, variable ou manquante), pas zéro.",
 
     "coverage.heading": "Couverture des données",
     "coverage.context":
@@ -659,6 +679,16 @@ const messages = {
     "moves.level": "レベル",
     "moves.move": "わざ",
     "moves.mastery": "極めるレベル",
+    "moves.category": "わざの分類",
+    "moves.status": "変化",
+    "moves.physical": "物理",
+    "moves.special": "特殊",
+    "moves.power": "威力",
+    "moves.accuracy": "命中率",
+    "moves.pp": "PP",
+    "moves.priority": "優先度",
+    "moves.currentValues":
+      "タイプ・分類・威力・命中率・PP・優先度は現在の値です。過去の値は収録されておらず、選択したゲームとは異なる場合があります。—は固定値の記録がないこと（対象外・変動・データ欠落）を表し、0ではありません。",
 
     "coverage.heading": "データの網羅状況",
     "coverage.context": "わざはバージョングループ単位、図鑑説明はゲーム単位で照合しています。",

@@ -35,12 +35,14 @@
     generationId,
     game,
     references,
+    embedded = false,
+    methodsOpen = false,
   }: {
     lang: Language;
-    chain: EvolutionChainProjection | null;
+    chain: Pick<EvolutionChainProjection, "nodes" | "applicability"> | null;
     loading: boolean;
     failed: boolean;
-    onretry: () => void;
+    onretry?: () => void;
     /** Forms named by the chain's evolution conditions, keyed by form ID. */
     forms: Record<number, EvolutionForm>;
     /** Whether the species record names an evolution chain at all. */
@@ -52,8 +54,14 @@
     /** Generation of the selected game. */
     generationId: number;
     game: string;
-    references: PokemonReferences;
+    references: Pick<PokemonReferences, "evolutionTriggers" | "versionGroups" | "versions" | "items" | "types"> & {
+      moves: Pick<PokemonReferences["moves"][number], "id" | "identifier" | "names" | "typeId">[];
+    };
+    /** Item pages embed the same chain/condition renderer beneath their own section heading. */
+    embedded?: boolean;
+    methodsOpen?: boolean;
   } = $props();
+  const id = $props.id();
 
   const roots = $derived(chain ? evolutionTree(chain, forms) : []);
   // A variety with its own card is "this page" there; every other form of the species
@@ -143,7 +151,7 @@
 </script>
 
 {#snippet methodList(methods: EvolutionMethod[])}
-  <details class="methods">
+  <details class="methods" open={methodsOpen}>
     <summary>{t(lang, "evolution.methods")}</summary>
     {#each methods as method, index (method.id)}
       {@const trigger = references.evolutionTriggers.find((row) => row.id === method.triggerId)}
@@ -238,13 +246,17 @@
   </ul>
 {/snippet}
 
-<section aria-labelledby="evolution-heading">
-  <h2 id="evolution-heading">{t(lang, "evolution.heading")}</h2>
+<section aria-labelledby={`${id}-heading`}>
+  {#if embedded}
+    <h3 id={`${id}-heading`}>{t(lang, "evolution.heading")}</h3>
+  {:else}
+    <h2 id={`${id}-heading`}>{t(lang, "evolution.heading")}</h2>
+  {/if}
   {#if loading}
     <p role="status">{t(lang, "evolution.loading")}</p>
   {:else if failed}
     <p role="alert">{t(lang, "evolution.error")}</p>
-    <button type="button" onclick={onretry}>{t(lang, "state.retry")}</button>
+    {#if onretry}<button type="button" onclick={onretry}>{t(lang, "state.retry")}</button>{/if}
   {:else if chain}
     <p class="note">{evolutionText(lang, "scope")}</p>
     {#if chain.applicability === "unresolved"}

@@ -1,0 +1,130 @@
+# Shared encounter resources are fetched once, never joined/localized per encounter row.
+query EncounterReferences {
+  locations: location(order_by: { id: asc }, limit: 4096) {
+    id
+    identifier: name
+    names: locationnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: locationnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  locationsCount: location_aggregate {
+    aggregate {
+      count
+    }
+  }
+  areas: locationarea(order_by: { id: asc }, limit: 4096) {
+    id
+    identifier: name
+    locationId: location_id
+    names: locationareanames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: locationareanames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  areasCount: locationarea_aggregate {
+    aggregate {
+      count
+    }
+  }
+  slots: encounterslot(order_by: { id: asc }, limit: 4096) {
+    id
+    versionGroupId: version_group_id
+    methodId: encounter_method_id
+    slot
+    rarity
+  }
+  slotsCount: encounterslot_aggregate {
+    aggregate {
+      count
+    }
+  }
+  methods: encountermethod(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: encountermethodnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: encountermethodnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  methodsCount: encountermethod_aggregate {
+    aggregate {
+      count
+    }
+  }
+  conditions: encountercondition(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: encounterconditionnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: encounterconditionnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  conditionsCount: encountercondition_aggregate {
+    aggregate {
+      count
+    }
+  }
+  conditionValues: encounterconditionvalue(order_by: { id: asc }, limit: 1024) {
+    id
+    identifier: name
+    conditionId: encounter_condition_id
+    isDefault: is_default
+    names: encounterconditionvaluenames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: encounterconditionvaluenames_aggregate(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+  conditionValuesCount: encounterconditionvalue_aggregate {
+    aggregate {
+      count
+    }
+  }
+}

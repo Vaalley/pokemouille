@@ -26,21 +26,25 @@ function flag(value: unknown, path: string): void {
 function nullableInteger(value: unknown, path: string, minimum = 1): void {
   if (value !== null) integer(value, path, minimum);
 }
-function names(value: unknown, path: string): void {
+function names(value: unknown, path: string, allowAliases = false): void {
   const seen = new Set<unknown>();
   for (const [index, entry] of array(value, path).entries()) {
     const row = object(entry, `${path}[${index}]`);
     integer(row.languageId, `${path}.languageId`, 1);
     text(row.name, `${path}.name`, true);
-    if (seen.has(row.languageId)) fail(path, "duplicate language identity");
-    seen.add(row.languageId);
+    const identity = allowAliases
+      ? `${String(row.languageId)}:${String(row.name)}`
+      : row.languageId;
+    if (seen.has(identity))
+      fail(path, allowAliases ? "duplicate localized alias" : "duplicate language identity");
+    seen.add(identity);
   }
 }
-function resource(value: unknown, path: string): Record<string, unknown> {
+function resource(value: unknown, path: string, allowNameAliases = false): Record<string, unknown> {
   const row = object(value, path);
   integer(row.id, `${path}.id`, 1);
   text(row.identifier, `${path}.identifier`);
-  names(row.names, `${path}.names`);
+  names(row.names, `${path}.names`, allowNameAliases);
   return row;
 }
 function counted(row: Record<string, unknown>, keys: readonly string[], path: string): void {
@@ -100,6 +104,7 @@ function variety(value: unknown, path: string): void {
       "abilityHistory",
       "forms",
       "learnsets",
+      "encounters",
     ],
     path,
   );
@@ -137,6 +142,33 @@ function variety(value: unknown, path: string): void {
     integer(move.level, `${path}.learnsets.level`);
     nullableInteger(move.order, `${path}.learnsets.order`, 0);
     nullableInteger(move.mastery, `${path}.learnsets.mastery`, 0);
+  }
+  for (const entry of array(row.encounters, `${path}.encounters`)) {
+    const encounter = object(entry, `${path}.encounters`);
+    integer(encounter.id, "encounter.id", 1);
+    integer(encounter.versionId, "encounter.versionId", 1);
+    resource(encounter.location, "encounter.location", true);
+    const area = object(encounter.area, "encounter.area");
+    integer(area.id, "encounter.area.id", 1);
+    text(area.identifier, "encounter.area.identifier", true);
+    names(area.names, "encounter.area.names", true);
+    resource(encounter.method, "encounter.method", true);
+    integer(encounter.minLevel, "encounter.minLevel", 1);
+    integer(encounter.maxLevel, "encounter.maxLevel", 1);
+    if (Number(encounter.minLevel) > Number(encounter.maxLevel))
+      fail("encounter", "inverted level range");
+    const slot = object(encounter.slot, "encounter.slot");
+    integer(slot.id, "encounter.slot.id", 1);
+    integer(slot.versionGroupId, "encounter.slot.versionGroupId", 1);
+    nullableInteger(slot.slot, "encounter.slot.slot", 0);
+    integer(slot.rarity, "encounter.slot.rarity");
+    if (Number(slot.rarity) > 100) fail("encounter.slot.rarity", "expected percentage <= 100");
+    counted(encounter, ["conditions"], "encounter");
+    for (const entry of array(encounter.conditions, "encounter.conditions")) {
+      const condition = resource(entry, "encounter.conditionValue", true);
+      flag(condition.isDefault, "encounter.conditionValue.isDefault");
+      resource(condition.condition, "encounter.condition", true);
+    }
   }
   const media = object(row.media, `${path}.media`);
   if (!Object.hasOwn(media, "sprites")) fail(path, "missing source sprite metadata");
@@ -192,6 +224,7 @@ const REFERENCE_COLLECTIONS = [
   "abilities",
   "moves",
   "learnMethods",
+  "machines",
   "items",
   "evolutionTriggers",
 ] as const;
@@ -258,6 +291,17 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
       text(effect.shortEffect, "item.effect.shortEffect", true);
     }
   }
+  for (const entry of array(refs.machines, "references.machines")) {
+    const row = object(entry, "machine");
+    for (const key of ["id", "versionGroupId", "itemId", "moveId"])
+      integer(row[key], `machine.${key}`, 1);
+    integer(row.number, "machine.number");
+  }
+  for (const entry of array(refs.encounterCoverage, "references.encounterCoverage")) {
+    const row = object(entry, "encounterCoverage");
+    integer(row.versionId, "encounterCoverage.versionId", 1);
+    integer(row.rows, "encounterCoverage.rows");
+  }
   for (const entry of array(refs.moves, "references.moves")) {
     const row = resource(entry, "move");
     for (const key of ["generationId", "typeId", "damageClassId"])
@@ -265,6 +309,50 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
     for (const key of ["power", "accuracy", "pp", "effectChance"])
       nullableInteger(row[key], `move.${key}`, 0);
     integer(row.priority, "move.priority", -7);
+    if (row.target !== null) resource(row.target, "move.target");
+    counted(row, ["attributes", "statChanges"], "move");
+    const counts = object(row.sourceCounts, "move.sourceCounts");
+    integer(counts.meta, "move.sourceCounts.meta");
+    if (counts.meta !== (row.meta === null ? 0 : 1))
+      fail("move.meta", "truncated or ambiguous metadata");
+    for (const entry of array(row.attributes, "move.attributes")) resource(entry, "move.attribute");
+    for (const entry of array(row.statChanges, "move.statChanges")) {
+      const change = object(entry, "move.statChange");
+      integer(change.statId, "move.statChange.statId", 1);
+      integer(change.change, "move.statChange.change", -6);
+    }
+    if (row.meta !== null) {
+      const meta = object(row.meta, "move.meta");
+      for (const key of [
+        "minHits",
+        "maxHits",
+        "minTurns",
+        "maxTurns",
+        "critRate",
+        "ailmentChance",
+        "flinchChance",
+        "statChance",
+      ])
+        nullableInteger(meta[key], `move.meta.${key}`, 0);
+      nullableInteger(meta.drain, "move.meta.drain", -100);
+      nullableInteger(meta.healing, "move.meta.healing", -100);
+      if (meta.ailment !== null) {
+        const ailment = object(meta.ailment, "move.meta.ailment");
+        integer(ailment.id, "move.meta.ailment.id", -1);
+        text(ailment.identifier, "move.meta.ailment.identifier");
+        names(ailment.names, "move.meta.ailment.names");
+      }
+      if (meta.category !== null) {
+        const category = object(meta.category, "move.meta.category");
+        integer(category.id, "move.meta.category.id", 0);
+        text(category.identifier, "move.meta.category.identifier");
+        for (const entry of array(category.descriptions, "move.meta.category.descriptions")) {
+          const description = object(entry, "move.meta.category.description");
+          integer(description.languageId, "move.meta.category.description.languageId", 1);
+          text(description.description, "move.meta.category.description", true);
+        }
+      }
+    }
     for (const entry of array(row.flavorTexts, "move.flavorTexts")) {
       const flavor = object(entry, "move.flavorText");
       integer(flavor.languageId, "move.flavorText.languageId", 1);
@@ -326,6 +414,13 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
   const methods = identities(refs.learnMethods, "learnMethods");
   const items = identities(refs.items, "items");
   const triggers = identities(refs.evolutionTriggers, "evolutionTriggers");
+  unique(refs.machines, (row) => row.id, "machines");
+  unique(refs.machines, (row) => `${row.versionGroupId}/${row.number}`, "machine.number");
+  for (const row of refs.machines) {
+    relationship(groups, row.versionGroupId, "machine.versionGroupId");
+    relationship(moves, row.moveId, "machine.moveId");
+    relationship(items, row.itemId, "machine.itemId");
+  }
   const speciesIds = identities(input.species, "species");
   const varieties = input.species.flatMap((record) => record.varieties);
   const pokemon = identities(varieties, "pokemon");
@@ -359,6 +454,9 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
   for (const move of refs.moves) {
     relationship(generations, move.generationId, "move.generationId");
     relationship(types, move.typeId, "move.typeId");
+    unique(move.attributes, (row) => row.id, "move.attributes");
+    unique(move.statChanges, (row) => row.statId, "move.statChanges");
+    for (const row of move.statChanges) relationship(stats, row.statId, "move.statChange.statId");
     unique(
       move.flavorTexts,
       (row) => `${row.languageId}/${row.versionGroupId}`,
@@ -381,6 +479,12 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
   const versionGroups = new Map(refs.versions.map((row) => [row.id, row.versionGroupId]));
   const learnsetCounts = new Map<number, number>();
   const flavorCounts = new Map<number, number>();
+  const encounterCounts = new Map<number, number>();
+  unique(
+    varieties.flatMap((row) => row.encounters),
+    (row) => row.id,
+    "encounters",
+  );
   for (const record of input.species) {
     relationship(generations, record.generationId, "species.generationId");
     relationship(speciesIds, record.evolvesFromSpeciesId, "species.evolvesFromSpeciesId");
@@ -404,6 +508,17 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
       flavorCounts.set(groupId, (flavorCounts.get(groupId) ?? 0) + 1);
     }
     for (const row of record.varieties) {
+      for (const encounter of row.encounters) {
+        relationship(versions, encounter.versionId, "encounter.versionId");
+        relationship(groups, encounter.slot.versionGroupId, "encounter.slot.versionGroupId");
+        // Upstream reuses some slots across groups (e.g. Yellow's Power Plant
+        // static encounters use a red-blue slot). The encounter's version is authoritative.
+        unique(encounter.conditions, (condition) => condition.id, "encounter.conditions");
+        encounterCounts.set(
+          encounter.versionId,
+          (encounterCounts.get(encounter.versionId) ?? 0) + 1,
+        );
+      }
       unique(row.stats, (stat) => stat.statId, "pokemon.stats");
       unique(
         row.statHistory,
@@ -492,6 +607,14 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
       id = parentBySpecies.get(id) ?? null;
     }
     for (const visited of active) completed.add(visited);
+  }
+  unique(refs.encounterCoverage, (row) => row.versionId, "encounterCoverage");
+  if (refs.encounterCoverage.length !== refs.versions.length)
+    fail("encounterCoverage", "expected one coverage record for every exact version");
+  for (const coverage of refs.encounterCoverage) {
+    relationship(versions, coverage.versionId, "encounterCoverage.versionId");
+    if (coverage.rows !== (encounterCounts.get(coverage.versionId) ?? 0))
+      fail("encounterCoverage", "encounter row count disagrees with exported data");
   }
   unique(refs.coverage, (row) => row.versionGroupId, "coverage");
   if (refs.coverage.length !== refs.versionGroups.length)

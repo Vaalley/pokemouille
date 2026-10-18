@@ -1,5 +1,7 @@
 <script lang="ts">
   import ItemIcon from "#lib/components/ItemIcon.svelte";
+  import ItemEvolutions from "#lib/components/ItemEvolutions.svelte";
+  import Machines from "#lib/components/Machines.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
   import { t } from "#lib/i18n/item.ts";
   import type { PageProps } from "./$types";
@@ -77,6 +79,8 @@
       <p>{t(lang, "flavor.empty")}</p>
     {/if}
   </section>
+  <Machines {lang} kind="item" data={data.machines} />
+  <ItemEvolutions {lang} data={data.evolutions} />
 </article>
 
 <style>

@@ -4,6 +4,8 @@
   import RelatedPokemon from "#lib/components/RelatedPokemon.svelte";
   import MoveIcon from "#lib/components/MoveIcon.svelte";
   import TypeBadge from "#lib/components/TypeBadge.svelte";
+  import Machines from "#lib/components/Machines.svelte";
+  import MoveProperties from "#lib/components/MoveProperties.svelte";
   import { t } from "#lib/i18n/move.ts";
   import type { PageProps } from "./$types";
 
@@ -41,6 +43,7 @@
     <div><dt>{t(lang, "effectChance")}</dt><dd>{data.effectChance === null ? t(lang, "variable") : `${data.effectChance}%`}</dd></div>
   </dl>
   <p class="note">{t(lang, "scope")}</p>
+  <MoveProperties {lang} move={data.move} stats={data.stats} />
 
   <section aria-labelledby="effect-heading">
     <h2 id="effect-heading">{t(lang, "effect")}</h2>
@@ -65,6 +68,7 @@
       <p>{t(lang, "noDescriptions")}</p>
     {/if}
   </section>
+  <Machines {lang} kind="move" data={data.machines} />
   <RelatedPokemon {lang} kind="move" data={data.related} />
   <p><a href={resolve(`${lang}/`)}>{t(lang, "back")}</a></p>
 </article>

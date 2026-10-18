@@ -9,6 +9,7 @@
   import Abilities from "#lib/components/pokemon/Abilities.svelte";
   import Coverage from "#lib/components/pokemon/Coverage.svelte";
   import Dex from "#lib/components/pokemon/Dex.svelte";
+  import Encounters from "#lib/components/pokemon/Encounters.svelte";
   import Evolution from "#lib/components/pokemon/Evolution.svelte";
   import Facts from "#lib/components/pokemon/Facts.svelte";
   import FormSelector from "#lib/components/pokemon/FormSelector.svelte";
@@ -364,6 +365,7 @@
         <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} versions={view.references.versions} versionGroups={view.references.versionGroups} />
       {/key}
       <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
+      <Encounters {lang} varieties={view.record.varieties} {pokemon} version={context.version} references={view.references} game={gameName} />
       <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
     </div>
   {/if}

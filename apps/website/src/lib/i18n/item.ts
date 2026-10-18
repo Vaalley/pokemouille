@@ -19,6 +19,13 @@ const en = {
   "flavor.empty": "Our data has no in-game descriptions for this item.",
   "flavor.games": "Games",
   "flavor.text": "Description",
+  "evolution.heading": "Used in evolutions",
+  "evolution.scope":
+    "These source records require using or holding this item, together with every other listed requirement. Recorded games are provenance, not proof of applicability to the selected game; unscoped and default records are not universal rules. Pokémon links keep your selected game. Missing records do not prove that an evolution is impossible.",
+  "evolution.empty": "No evolution requiring this item is recorded in our data.",
+  "evolution.loading": "Loading the selected game…",
+  "evolution.error": "Couldn’t resolve the selected game. Try reloading the page.",
+  "evolution.context": "Game context for Pokémon links:",
 } as const satisfies Record<string, string>;
 
 type MessageKey = keyof typeof en;
@@ -44,6 +51,13 @@ const messages = {
     "flavor.empty": "Nos données ne contiennent aucune description en jeu pour cet objet.",
     "flavor.games": "Jeux",
     "flavor.text": "Description",
+    "evolution.heading": "Utilisé pour des évolutions",
+    "evolution.scope":
+      "Ces données exigent d’utiliser ou de faire tenir cet objet, avec toutes les autres conditions indiquées. Les jeux enregistrés indiquent la provenance, pas la validité dans le jeu sélectionné ; les données sans jeu précis ou par défaut ne sont pas des règles universelles. Les liens Pokémon conservent le jeu sélectionné. L’absence de données ne prouve pas qu’une évolution est impossible.",
+    "evolution.empty": "Nos données ne mentionnent aucune évolution nécessitant cet objet.",
+    "evolution.loading": "Chargement du jeu sélectionné…",
+    "evolution.error": "Impossible de déterminer le jeu sélectionné. Rechargez la page.",
+    "evolution.context": "Jeu conservé dans les liens Pokémon :",
   },
   ja: {
     "meta.title": "{name} | 道具 | Pokémouille",
@@ -63,6 +77,13 @@ const messages = {
     "flavor.empty": "データには、この道具のゲーム内説明がありません。",
     "flavor.games": "ゲーム",
     "flavor.text": "説明",
+    "evolution.heading": "進化に使う道具",
+    "evolution.scope":
+      "この道具を使う・持たせる条件を含む記録です。記載された他の条件もすべて必要です。記録対象のゲームは出典を示し、選択中のゲームで有効だと保証するものではありません。ゲームの指定がない記録や既定の記録も、全ゲーム共通のルールではありません。ポケモンへのリンクには選択中のゲームを引き継ぎます。記録がないことは、進化できないことの証明ではありません。",
+    "evolution.empty": "この道具が必要な進化はデータに記録されていません。",
+    "evolution.loading": "選択中のゲームを読み込み中…",
+    "evolution.error": "選択中のゲームを確認できませんでした。ページを再読み込みしてください。",
+    "evolution.context": "ポケモンへのリンクで引き継ぐゲーム：",
   },
 } satisfies Record<Language, Record<MessageKey, string>>;
 

@@ -12,7 +12,7 @@
   import Localized from "./pokemon/Localized.svelte";
   import TypeBadge from "./TypeBadge.svelte";
   import { catalogueFiltersUrl, filterResources, prepareResources, readCatalogueFilters, type CatalogueFilters } from "#lib/data/catalogue-filters.ts";
-  import type { ResourceCatalogue } from "#lib/data/resource-catalogue.ts";
+  import { MOVE_SORTS, readMoveSort, sortMoves, type MoveSort, type ResourceCatalogue } from "#lib/data/resource-catalogue.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/catalogues.ts";
 
@@ -26,11 +26,18 @@
   const params = $derived(mounted ? new URL(currentUrl.href).searchParams : new URLSearchParams());
   const filters = $derived(readCatalogueFilters(params, catalogue));
   const prepared = $derived(prepareResources(catalogue.entries));
-  const entries = $derived(filterResources(prepared, filters));
-  const active = $derived(["q", "type", "category"].some((key) => params.has(key)));
+  const sort = $derived(catalogue.kind === "move" ? readMoveSort(params) : "name");
+  const filtered = $derived(filterResources(prepared, filters));
+  const entries = $derived(catalogue.kind === "move" ? sortMoves(filtered, sort, lang) : filtered);
+  const defaultEntries = $derived(catalogue.kind === "move" ? sortMoves(catalogue.entries, "name", lang) : catalogue.entries);
+  const active = $derived(["q", "type", "category", ...(catalogue.kind === "move" ? ["sort"] : [])].some((key) => params.has(key)));
 
-  function update(changes: Partial<CatalogueFilters>) {
+  function update(changes: Partial<CatalogueFilters>, nextSort: MoveSort = sort) {
     const next = catalogueFiltersUrl(currentUrl, { ...filters, ...changes });
+    if (catalogue.kind === "move") {
+      next.searchParams.delete("sort");
+      if (nextSort !== "name") next.searchParams.set("sort", nextSort);
+    }
     if (next.href !== currentUrl.href) pushState(next, page.state);
   }
 
@@ -74,8 +81,17 @@
         {/each}
       </select>
     </div>
+    <div class="filter-field">
+      <label for="{id}-sort">{t(lang, "sort")}</label>
+      <select id="{id}-sort" name="sort" value={sort} disabled={!mounted}
+        onchange={(event) => update({}, readMoveSort(new URLSearchParams({ sort: event.currentTarget.value })))}>
+        {#each MOVE_SORTS as value (value)}
+          <option value={value}>{t(lang, value === "name" ? "sortName" : value === "power" ? "sortPower" : value === "accuracy" ? "sortAccuracy" : "sortPp")}</option>
+        {/each}
+      </select>
+    </div>
   {/if}
-  <button type="button" disabled={!mounted || !active} onclick={() => update({ q: "", type: null, category: null })}>{t(lang, "reset")}</button>
+  <button type="button" disabled={!mounted || !active} onclick={() => update({ q: "", type: null, category: null }, "name")}>{t(lang, "reset")}</button>
 </form>
 <div class="note" id="{id}-scope">
   <p>{t(lang, "scope")}</p>
@@ -83,27 +99,52 @@
 </div>
 
 {#snippet resourceList(rows: typeof entries)}
-  <ul class="resource-list" aria-label={t(lang, catalogue.kind)}>
-    {#each rows as entry (entry.id)}
-      {@const version = selectedVersion()}
-      {@const href = `${lang}/${catalogue.kind}/${entry.id}/${version ? `?version=${encodeURIComponent(version)}` : ""}`}
-      <li>
-        <a href={resolve(href as PathnameWithSearchOrHash)}>
-          {#if catalogue.kind === "move"}<MoveIcon typeId={entry.typeId} />
-          {:else if catalogue.kind === "ability"}<AbilityIcon />
-          {:else}<ItemIcon identifier={entry.identifier} />{/if}
-          <Localized text={entry.name} />
-        </a>
-        {#if catalogue.kind === "move"}
-          {@const type = catalogue.types.find((row) => row.id === entry.typeId)}
-          <span class="metadata">
-            {#if type}<TypeBadge typeId={type.id} name={type.name} /> · {/if}
-            <span class="damage-class"><DamageClassIcon damageClassId={entry.damageClassId} /> {categoryName(entry.damageClassId ?? 0)}</span>
-          </span>
-        {/if}
-      </li>
-    {/each}
-  </ul>
+  {#if catalogue.kind === "move"}
+    <div class="table-scroll" role="region" aria-label={t(lang, "move")} tabindex="0">
+      <table class="move-list">
+        <caption class="visually-hidden">{t(lang, "move")}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{t(lang, "name")}</th>
+            <th scope="col">{t(lang, "type")}</th>
+            <th scope="col">{t(lang, "category")}</th>
+            <th scope="col" class="numeric">{t(lang, "power")}</th>
+            <th scope="col" class="numeric">{t(lang, "accuracy")}</th>
+            <th scope="col" class="numeric">{t(lang, "pp")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each rows as entry (entry.id)}
+            {@const version = selectedVersion()}
+            {@const href = `${lang}/move/${entry.id}/${version ? `?version=${encodeURIComponent(version)}` : ""}`}
+            {@const type = catalogue.types.find((row) => row.id === entry.typeId)}
+            <tr>
+              <th scope="row"><a href={resolve(href as PathnameWithSearchOrHash)}><MoveIcon typeId={entry.typeId} /><Localized text={entry.name} /></a></th>
+              <td>{#if type}<TypeBadge typeId={type.id} name={type.name} />{:else}—{/if}</td>
+              <td><span class="damage-class"><DamageClassIcon damageClassId={entry.damageClassId} /> {categoryName(entry.damageClassId ?? 0)}</span></td>
+              <td class="numeric">{entry.power ? entry.power : "—"}</td>
+              <td class="numeric">{entry.accuracy == null ? "—" : `${entry.accuracy}%`}</td>
+              <td class="numeric">{entry.pp ?? "—"}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {:else}
+    <ul class="resource-list" aria-label={t(lang, catalogue.kind)}>
+      {#each rows as entry (entry.id)}
+        {@const version = selectedVersion()}
+        {@const href = `${lang}/${catalogue.kind}/${entry.id}/${version ? `?version=${encodeURIComponent(version)}` : ""}`}
+        <li>
+          <a href={resolve(href as PathnameWithSearchOrHash)}>
+            {#if catalogue.kind === "ability"}<AbilityIcon />
+            {:else}<ItemIcon identifier={entry.identifier} />{/if}
+            <Localized text={entry.name} />
+          </a>
+        </li>
+      {/each}
+    </ul>
+  {/if}
 {/snippet}
 
 {#if !mounted}
@@ -111,7 +152,7 @@
   <noscript>
     <p>{t(lang, "javascript")}</p>
     <p>{t(lang, "count", { filtered: catalogue.entries.length, total: catalogue.entries.length })}</p>
-    {@render resourceList(catalogue.entries)}
+    {@render resourceList(defaultEntries)}
   </noscript>
 {:else}
   <p class="result-count" role="status" aria-live="polite" aria-atomic="true">{t(lang, "count", { filtered: entries.length, total: catalogue.entries.length })}</p>
@@ -124,6 +165,11 @@
   .resource-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0.25rem 1rem; }
   .resource-list li { min-width: 0; }
   .resource-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
-  .metadata { display: block; margin-inline-start: 2.375rem; font-size: 0.85rem; }
-  .damage-class { display: inline-flex; align-items: center; gap: 0.35rem; vertical-align: middle; }
+  .table-scroll { max-width: 100%; overflow-x: auto; }
+  .move-list { width: 100%; }
+  .move-list th, .move-list td { vertical-align: middle; }
+  .move-list th[scope="row"] { min-width: 10rem; font-weight: normal; }
+  .move-list a { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
+  .numeric { white-space: nowrap; }
+  .damage-class { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; vertical-align: middle; }
 </style>

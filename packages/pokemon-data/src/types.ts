@@ -47,6 +47,33 @@ export interface Item extends NamedResource {
   flavorTexts: { languageId: number; versionGroupId: number; text: string }[];
   effects: { languageId: number; effect: string; shortEffect: string }[];
 }
+export interface Machine {
+  id: number;
+  versionGroupId: number;
+  number: number;
+  itemId: number;
+  moveId: number;
+}
+export interface MoveMeta {
+  ailment: NamedResource | null;
+  category: {
+    id: number;
+    identifier: string;
+    descriptions: { languageId: number; description: string }[];
+  } | null;
+  minHits: number | null;
+  maxHits: number | null;
+  minTurns: number | null;
+  maxTurns: number | null;
+  /** Signed source percentage: positive drain, negative recoil. */
+  drain: number | null;
+  /** Signed percentage of the user's maximum HP: positive recovery, negative HP cost. */
+  healing: number | null;
+  critRate: number | null;
+  ailmentChance: number | null;
+  flinchChance: number | null;
+  statChance: number | null;
+}
 export interface Move extends NamedResource {
   generationId: number;
   typeId: number;
@@ -56,6 +83,12 @@ export interface Move extends NamedResource {
   pp: number | null;
   priority: number;
   effectChance: number | null;
+  /** Current source mechanics, not verified historical game rules. */
+  target: NamedResource | null;
+  attributes: NamedResource[];
+  statChanges: { statId: number; change: number }[];
+  meta: MoveMeta | null;
+  sourceCounts: { attributes: number; statChanges: number; meta: number };
   flavorTexts: { languageId: number; versionGroupId: number; text: string }[];
   effects: { languageId: number; effect: string; shortEffect: string }[];
 }
@@ -72,6 +105,9 @@ export interface ReferenceData {
   stats: NamedResource[];
   abilities: Ability[];
   moves: Move[];
+  machines: Machine[];
+  /** Global source row presence per exact version; not availability evidence. */
+  encounterCoverage: { versionId: number; rows: number }[];
   learnMethods: NamedResource[];
   items: Item[];
   evolutionTriggers: NamedResource[];
@@ -85,6 +121,7 @@ export interface ReferenceData {
     | "stats"
     | "abilities"
     | "moves"
+    | "machines"
     | "learnMethods"
     | "items"
     | "evolutionTriggers",
@@ -101,11 +138,22 @@ export interface ReferenceData {
 
 /** Detail-page references retain ability prose, but not move/item detail data. */
 export interface PokemonReferences extends Omit<ReferenceData, "moves" | "items"> {
-  moves: Pick<Move, "id" | "identifier" | "names" | "typeId">[];
+  moves: Pick<
+    Move,
+    | "id"
+    | "identifier"
+    | "names"
+    | "typeId"
+    | "damageClassId"
+    | "power"
+    | "accuracy"
+    | "pp"
+    | "priority"
+  >[];
   items: NamedResource[];
 }
 export interface SearchReferences {
-  moves: PokemonReferences["moves"];
+  moves: Pick<Move, "id" | "identifier" | "names" | "typeId">[];
   abilities: NamedResource[];
   items: NamedResource[];
 }
@@ -144,6 +192,20 @@ export interface PokemonForm {
   order: number;
   formOrder: number;
 }
+/** Localized encounter resources may retain multiple distinct names per language. */
+export interface Encounter {
+  id: number;
+  versionId: number;
+  location: NamedResource;
+  area: NamedResource;
+  method: NamedResource;
+  minLevel: number;
+  maxLevel: number;
+  /** Source slot provenance; its group may differ from the exact encounter version's group. */
+  slot: { id: number; versionGroupId: number; slot: number | null; rarity: number };
+  conditions: (NamedResource & { condition: NamedResource; isDefault: boolean })[];
+  sourceCounts: { conditions: number };
+}
 export interface PokemonVariety {
   id: number;
   identifier: string;
@@ -160,6 +222,8 @@ export interface PokemonVariety {
   abilityHistory: (AbilitySlot & { generationId: number })[];
   forms: PokemonForm[];
   learnsets: LearnsetRow[];
+  /** Exact-version source rows; absence does not prove unavailability. */
+  encounters: Encounter[];
   media: { sprites: unknown; artwork: string | null };
   sourceCounts: Record<
     | "types"
@@ -169,7 +233,8 @@ export interface PokemonVariety {
     | "abilities"
     | "abilityHistory"
     | "forms"
-    | "learnsets",
+    | "learnsets"
+    | "encounters",
     number
   >;
 }

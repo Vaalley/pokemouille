@@ -97,16 +97,28 @@ async function publishRevision(
     await emit("references.json", input.references);
     const pokemonReferences: PokemonReferences = {
       ...input.references,
+      moves: input.references.moves.map(
+        ({ id, identifier, names, typeId, damageClassId, power, accuracy, pp, priority }) => ({
+          id,
+          identifier,
+          names,
+          typeId,
+          damageClassId,
+          power,
+          accuracy,
+          pp,
+          priority,
+        }),
+      ),
+      items: input.references.items.map(({ id, identifier, names }) => ({ id, identifier, names })),
+    };
+    const searchReferences: SearchReferences = {
       moves: input.references.moves.map(({ id, identifier, names, typeId }) => ({
         id,
         identifier,
         names,
         typeId,
       })),
-      items: input.references.items.map(({ id, identifier, names }) => ({ id, identifier, names })),
-    };
-    const searchReferences: SearchReferences = {
-      moves: pokemonReferences.moves,
       abilities: input.references.abilities.map(({ id, identifier, names }) => ({
         id,
         identifier,

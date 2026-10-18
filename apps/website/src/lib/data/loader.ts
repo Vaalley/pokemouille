@@ -55,6 +55,47 @@ class PromiseCache<T> {
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+const isInteger = (value: unknown): value is number =>
+  typeof value === "number" && Number.isSafeInteger(value);
+const isNullableInteger = (value: unknown): boolean => value === null || isInteger(value);
+
+function hasMoveListStats(value: unknown): boolean {
+  return (
+    isObject(value) &&
+    isInteger(value.damageClassId) &&
+    isNullableInteger(value.power) &&
+    isNullableInteger(value.accuracy) &&
+    isNullableInteger(value.pp) &&
+    isInteger(value.priority)
+  );
+}
+
+function hasEncounters(value: unknown): boolean {
+  if (
+    !isObject(value) ||
+    !Array.isArray(value.encounters) ||
+    !isObject(value.sourceCounts) ||
+    value.sourceCounts.encounters !== value.encounters.length
+  )
+    return false;
+  return value.encounters.every(
+    (row) =>
+      isObject(row) &&
+      isInteger(row.id) &&
+      isInteger(row.versionId) &&
+      isObject(row.location) &&
+      isObject(row.area) &&
+      isObject(row.method) &&
+      isInteger(row.minLevel) &&
+      isInteger(row.maxLevel) &&
+      isObject(row.slot) &&
+      isInteger(row.slot.rarity) &&
+      isInteger(row.slot.versionGroupId) &&
+      Array.isArray(row.conditions) &&
+      isObject(row.sourceCounts) &&
+      row.sourceCounts.conditions === row.conditions.length,
+  );
+}
 
 async function loadJson<T>(
   path: string,
@@ -93,6 +134,7 @@ export function getManifest(fetchImpl: typeof fetch = fetch): Promise<DatasetMan
       fetchImpl,
       (value) =>
         isObject(value) &&
+        value.schemaVersion === 2 &&
         typeof value.datasetRevision === "string" &&
         isObject(value.files) &&
         isObject(value.files.references) &&
@@ -133,7 +175,22 @@ export async function getPokemonReferences(
         Array.isArray(value.versions) &&
         Array.isArray(value.versionGroups) &&
         Array.isArray(value.moves) &&
-        Array.isArray(value.items),
+        value.moves.every(hasMoveListStats) &&
+        Array.isArray(value.items) &&
+        Array.isArray(value.machines) &&
+        value.machines.every(
+          (row) =>
+            isObject(row) &&
+            isInteger(row.id) &&
+            isInteger(row.number) &&
+            isInteger(row.versionGroupId) &&
+            isInteger(row.itemId) &&
+            isInteger(row.moveId),
+        ) &&
+        Array.isArray(value.encounterCoverage) &&
+        value.encounterCoverage.every(
+          (row) => isObject(row) && isInteger(row.versionId) && isInteger(row.rows),
+        ),
     ),
   );
 }
@@ -171,7 +228,11 @@ export async function getSpecies(
     loadJson(
       entry.path,
       fetchImpl,
-      (value) => isObject(value) && value.id === speciesId && Array.isArray(value.varieties),
+      (value) =>
+        isObject(value) &&
+        value.id === speciesId &&
+        Array.isArray(value.varieties) &&
+        value.varieties.every(hasEncounters),
     ),
   );
 }

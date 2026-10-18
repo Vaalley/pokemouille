@@ -6,6 +6,148 @@ query CensusAfter {
 }
 
 fragment SourceCensus on query_root {
+  machines: machine_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  moveAttributes: moveattributemap_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  moveStatChanges: movemetastatchange_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  moveMeta: movemeta_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounters: encounter_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterConditions: encounterconditionvaluemap_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterLocations: location_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterAreas: locationarea_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterSlots: encounterslot_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterMethods: encountermethod_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterConditionKinds: encountercondition_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterConditionValues: encounterconditionvalue_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterLocationNames: locationname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterAreaNames: locationareaname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterMethodNames: encountermethodname_aggregate(
+    where: { language_id: { _in: [1, 5, 9, 11] } }
+  ) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterConditionNames: encounterconditionname_aggregate(
+    where: { language_id: { _in: [1, 5, 9, 11] } }
+  ) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  encounterConditionValueNames: encounterconditionvaluename_aggregate(
+    where: { language_id: { _in: [1, 5, 9, 11] } }
+  ) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
   species: pokemonspecies_aggregate {
     aggregate {
       count

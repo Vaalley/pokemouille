@@ -92,6 +92,50 @@ describe("bounded upstream response validation", () => {
     );
   });
 
+  it.each([
+    "machines",
+    "attributes",
+    "statChanges",
+    "meta",
+    "encounters",
+    "locations",
+    "areas",
+    "slots",
+    "methods",
+    "conditions",
+    "conditionValues",
+  ])("rejects truncated %s rows even when the result is empty", (relationship) => {
+    const response = {
+      [relationship]: [],
+      [`${relationship}Count`]: { aggregate: { count: 1 } },
+    };
+    expect(() => validateBoundedRelationships(response)).toThrow("truncated relationship");
+  });
+
+  it.each(["locations", "areas", "methods", "conditions", "conditionValues"])(
+    "rejects truncated shared %s names independently of the complete lookup table",
+    (table) => {
+      const response = {
+        [table]: [{ id: 1, names: [], namesCount: { aggregate: { count: 1 } } }],
+        [`${table}Count`]: { aggregate: { count: 1 } },
+      };
+      expect(() => validateBoundedRelationships(response)).toThrow(`$.${table}[0].names`);
+    },
+  );
+
+  it("validates localized arrays behind object relationships without interpreting sprite JSON as rows", () => {
+    const response = {
+      target: { names: [], namesCount: { aggregate: { count: 1 } } },
+    };
+    expect(() => validateBoundedRelationships(response)).toThrow("$.target.names");
+    expect(() =>
+      validateBoundedRelationships({
+        sprites: [{ sprites: { other: { frames: [1, 2] } } }],
+        spritesCount: { aggregate: { count: 1 } },
+      }),
+    ).not.toThrow();
+  });
+
   it("accepts complete bounded relationships, including truthful zero-row histories", () => {
     const response = {
       species: [

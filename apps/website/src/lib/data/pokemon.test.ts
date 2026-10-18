@@ -14,12 +14,37 @@ beforeEach(async () => {
 
 const json = (value: unknown) => new Response(JSON.stringify(value));
 
+function pokemonReferences(references = fixture().references) {
+  return {
+    ...references,
+    moves: references.moves.map(
+      ({ id, identifier, names, typeId, damageClassId, power, accuracy, pp, priority }) => ({
+        id,
+        identifier,
+        names,
+        typeId,
+        damageClassId,
+        power,
+        accuracy,
+        pp,
+        priority,
+      }),
+    ),
+    items: references.items.map(({ id, identifier, names }) => ({
+      id,
+      identifier,
+      names,
+    })),
+  };
+}
+
 function snapshotHost(overrides: Record<string, () => Response | Promise<Response>> = {}) {
   const input = fixture();
   const asset = (path: string) => ({ path: `revision/${path}`, sha256: "", bytes: 0 });
   const routes: Record<string, () => Response | Promise<Response>> = {
     "/data/manifest.json": () =>
       json({
+        schemaVersion: 2,
         datasetRevision: "revision",
         files: {
           references: asset("references.json"),
@@ -32,21 +57,7 @@ function snapshotHost(overrides: Record<string, () => Response | Promise<Respons
         },
       }),
     "/data/revision/pokemon/25.json": () => json(input.species[0]),
-    "/data/revision/pokemon-references.json": () =>
-      json({
-        ...input.references,
-        moves: input.references.moves.map(({ id, identifier, names, typeId }) => ({
-          id,
-          identifier,
-          names,
-          typeId,
-        })),
-        items: input.references.items.map(({ id, identifier, names }) => ({
-          id,
-          identifier,
-          names,
-        })),
-      }),
+    "/data/revision/pokemon-references.json": () => json(pokemonReferences(input.references)),
     ...overrides,
   };
   return (async (request: RequestInfo | URL) => {
@@ -106,7 +117,7 @@ describe("Pokémon section readiness", () => {
     const fetchImpl = snapshotHost({
       "/data/revision/pokemon-references.json": async () => {
         await gate.promise;
-        return json(input.references);
+        return json(pokemonReferences(input.references));
       },
       "/data/revision/evolution/10.json": () => json(chain),
     });

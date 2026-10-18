@@ -13,6 +13,15 @@ const en = {
   allTypes: "All types",
   category: "Damage category",
   allCategories: "All categories",
+  name: "Move",
+  power: "Power",
+  accuracy: "Accuracy",
+  pp: "PP",
+  sort: "Sort by",
+  sortName: "Name (A–Z)",
+  sortPower: "Power (highest first)",
+  sortAccuracy: "Accuracy (highest first)",
+  sortPp: "PP (highest first)",
   status: "Status",
   physical: "Physical",
   special: "Special",
@@ -20,7 +29,7 @@ const en = {
   scope:
     "This list has every entry in our data, not only the ones in the selected game. Names with no translation appear in English. Links to details keep the selected game.",
   moveScope:
-    "Type and damage category are today’s values and may not match the selected game. Disc icons show the type only; they don’t mean a TM exists.",
+    "Type, damage category, power, accuracy and PP are current values; historical values aren’t exported and may differ in the selected game. — means no fixed value is recorded (not applicable, variable, or missing), not zero; these values sort last. Disc icons show the type only, not that a TM exists.",
   abilityScope:
     "Abilities don’t have their own icons in the games, so every ability uses the Ability Capsule icon.",
   itemScope: "Items without artwork show a dashed placeholder.",
@@ -43,6 +52,15 @@ const fr = {
   allTypes: "Tous les types",
   category: "Catégorie de dégâts",
   allCategories: "Toutes les catégories",
+  name: "Capacité",
+  power: "Puissance",
+  accuracy: "Précision",
+  pp: "PP",
+  sort: "Trier par",
+  sortName: "Nom (A–Z)",
+  sortPower: "Puissance décroissante",
+  sortAccuracy: "Précision décroissante",
+  sortPp: "PP décroissants",
   status: "Statut",
   physical: "Physique",
   special: "Spéciale",
@@ -50,7 +68,7 @@ const fr = {
   scope:
     "Cette liste contient toutes les entrées de nos données, pas seulement celles du jeu sélectionné. Les noms sans traduction s’affichent en anglais. Les liens vers les fiches conservent le jeu sélectionné.",
   moveScope:
-    "Le type et la catégorie de dégâts sont les valeurs actuelles et peuvent différer dans le jeu sélectionné. Les disques indiquent seulement le type ; ils ne signifient pas qu’une CT existe.",
+    "Le type, la catégorie, la puissance, la précision et les PP sont les valeurs actuelles ; les valeurs historiques ne sont pas exportées et peuvent différer dans le jeu sélectionné. — indique l’absence de valeur fixe enregistrée (sans objet, variable ou manquante), pas zéro ; ces valeurs sont triées en dernier. Les disques indiquent le type, pas l’existence d’une CT.",
   abilityScope:
     "Les talents n’ont pas d’icône propre dans les jeux : ils utilisent tous l’icône de la Pilule Talent.",
   itemScope: "Un repère en pointillés remplace l’icône des objets sans illustration.",
@@ -73,6 +91,15 @@ const ja = {
   allTypes: "すべてのタイプ",
   category: "わざの分類",
   allCategories: "すべての分類",
+  name: "わざ",
+  power: "威力",
+  accuracy: "命中率",
+  pp: "PP",
+  sort: "並び順",
+  sortName: "名前順",
+  sortPower: "威力が高い順",
+  sortAccuracy: "命中率が高い順",
+  sortPp: "PPが多い順",
   status: "変化",
   physical: "物理",
   special: "特殊",
@@ -80,7 +107,7 @@ const ja = {
   scope:
     "この一覧にはデータ内の全項目が含まれ、選択したゲームのものに限りません。翻訳がない名前は英語で表示されます。詳細へのリンクでは選択したゲームが引き継がれます。",
   moveScope:
-    "タイプと分類は現在の値で、選択したゲームとは異なる場合があります。ディスクのアイコンはタイプを表すだけで、わざマシンがあることを示すものではありません。",
+    "タイプ・分類・威力・命中率・PPは現在の値です。過去の値は収録されておらず、選択したゲームとは異なる場合があります。—は固定値の記録がないこと（対象外・変動・データ欠落）を表し、0ではありません。並べ替えでは末尾になります。ディスクのアイコンはタイプを表すだけで、わざマシンの存在を示しません。",
   abilityScope:
     "ゲーム内でとくせいごとのアイコンはないため、すべてとくせいカプセルのアイコンを使っています。",
   itemScope: "画像がないどうぐには点線のマークを表示します。",

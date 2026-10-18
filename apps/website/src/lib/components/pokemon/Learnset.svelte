@@ -11,6 +11,7 @@
   import { reasonText, t } from "#lib/i18n/pokemon.ts";
   import Localized from "./Localized.svelte";
   import MoveIcon from "../MoveIcon.svelte";
+  import DamageClassIcon from "../DamageClassIcon.svelte";
 
   type Move = Extract<ResolvedPokemon["learnset"], { status: "available" }>["value"][number];
 
@@ -24,14 +25,17 @@
     learnset: ResolvedPokemon["learnset"];
     /** Localized names of the selected version group's games. */
     games: string;
-    referenceMoves: ReadonlyArray<Pick<ReferenceData["moves"][number], "id" | "typeId">>;
+    referenceMoves: ReadonlyArray<Pick<ReferenceData["moves"][number],
+      "id" | "typeId" | "damageClassId" | "power" | "accuracy" | "pp" | "priority">>;
   } = $props();
 
-  const moveTypes = $derived.by(() => {
-    const types = new Map<number, number | null>();
-    for (const move of referenceMoves) types.set(move.id, move.typeId);
-    return types;
-  });
+  const moveMetadata = $derived(new Map(referenceMoves.map((move) => [move.id, move])));
+
+  function categoryName(category: number | undefined) {
+    return category === 1 ? t(lang, "moves.status") :
+      category === 2 ? t(lang, "moves.physical") :
+      category === 3 ? t(lang, "moves.special") : t(lang, "value.notRecorded");
+  }
 
   // Learn method 1 is "level-up": the only method whose rows are ordered by level.
   const LEVEL_UP = 1;
@@ -52,6 +56,7 @@
           method: group.method,
           levelUp,
           hasMastery: group.moves.some((move) => move.mastery !== null),
+          hasPriority: group.moves.some((move) => (moveMetadata.get(move.moveId)?.priority ?? 0) !== 0),
           moves: group.moves.toSorted((a, b) =>
             levelUp
               ? a.level - b.level ||
@@ -75,6 +80,7 @@
   <h2 id="moves-heading">{t(lang, "moves.heading")}</h2>
   {#if learnset.status === "available"}
     <p class="note">{t(lang, "moves.context", { games })}</p>
+    <p class="note">{t(lang, "moves.currentValues")}</p>
     {#if groups.length > 0}
       <Tabs.Root value={activeTab} onValueChange={(v) => (selectedTab = v)}>
         <Tabs.List>
@@ -86,29 +92,48 @@
         </Tabs.List>
         {#each groups as group (group.methodId)}
           <Tabs.Content value={String(group.methodId)}>
+            <div class="table-scroll" role="region" aria-label={group.method.text} tabindex="0">
             <table>
               <caption class="visually-hidden"><Localized text={group.method} /></caption>
               <thead>
                 <tr>
                   {#if group.levelUp}<th scope="col" class="numeric">{t(lang, "moves.level")}</th>{/if}
                   <th scope="col">{t(lang, "moves.move")}</th>
+                  <th scope="col">{t(lang, "moves.category")}</th>
+                  <th scope="col" class="numeric">{t(lang, "moves.power")}</th>
+                  <th scope="col" class="numeric">{t(lang, "moves.accuracy")}</th>
+                  <th scope="col" class="numeric">{t(lang, "moves.pp")}</th>
+                  {#if group.hasPriority}<th scope="col" class="numeric">{t(lang, "moves.priority")}</th>{/if}
                   {#if group.hasMastery}<th scope="col" class="numeric">{t(lang, "moves.mastery")}</th>{/if}
                 </tr>
               </thead>
               <tbody>
                 {#each group.moves as move, index (index)}
+                  {@const metadata = moveMetadata.get(move.moveId)}
                   <tr>
                     {#if group.levelUp}<td class="numeric">{move.level}</td>{/if}
                     <th scope="row">
                       <a
                         href={`${resolve(`${lang}/move/${move.moveId}/`)}${page.url.searchParams.has("version") ? `?version=${encodeURIComponent(page.url.searchParams.get("version")!)}` : ""}`}
-                      ><MoveIcon typeId={moveTypes.get(move.moveId)} /><Localized text={move.name} /></a>
+                      ><MoveIcon typeId={metadata?.typeId} /><Localized text={move.name} /></a>
                     </th>
+                    <td>
+                      <span class="damage-class" title={categoryName(metadata?.damageClassId)}>
+                        <DamageClassIcon damageClassId={metadata?.damageClassId} />
+                        <span class="visually-hidden">{categoryName(metadata?.damageClassId)}</span>
+                        {#if !metadata || ![1, 2, 3].includes(metadata.damageClassId)}—{/if}
+                      </span>
+                    </td>
+                    <td class="numeric">{metadata?.power ? metadata.power : "—"}</td>
+                    <td class="numeric">{metadata?.accuracy == null ? "—" : `${metadata.accuracy}%`}</td>
+                    <td class="numeric">{metadata?.pp ?? "—"}</td>
+                    {#if group.hasPriority}<td class="numeric">{metadata?.priority == null ? "—" : metadata.priority > 0 ? `+${metadata.priority}` : metadata.priority}</td>{/if}
                     {#if group.hasMastery}<td class="numeric">{move.mastery ?? ""}</td>{/if}
                   </tr>
                 {/each}
               </tbody>
             </table>
+            </div>
           </Tabs.Content>
         {/each}
       </Tabs.Root>
@@ -119,8 +144,11 @@
 </section>
 
 <style>
-  table { width: min(100%, 32rem); }
+  .table-scroll { max-width: 100%; overflow-x: auto; }
+  table { width: 100%; }
   th, td { vertical-align: middle; }
-  th[scope="row"] { width: 100%; font-weight: normal; }
+  th[scope="row"] { min-width: 10rem; font-weight: normal; }
   th a { display: inline-flex; align-items: center; gap: 0.375rem; }
+  .numeric { white-space: nowrap; }
+  .damage-class { display: inline-flex; align-items: center; }
 </style>

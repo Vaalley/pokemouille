@@ -89,6 +89,11 @@ export function fixture(): SnapshotInput {
         pp: 30,
         priority: 1,
         effectChance: null,
+        target: null,
+        attributes: [],
+        statChanges: [],
+        meta: null,
+        sourceCounts: { attributes: 0, statChanges: 0, meta: 0 },
         flavorTexts: [{ languageId: 9, versionGroupId: 25, text: "Strikes first." }],
         effects: [
           { languageId: 9, effect: "Inflicts regular damage.", shortEffect: "Strikes first." },
@@ -106,10 +111,17 @@ export function fixture(): SnapshotInput {
         pp: 15,
         priority: 0,
         effectChance: 10,
+        target: null,
+        attributes: [],
+        statChanges: [],
+        meta: null,
+        sourceCounts: { attributes: 0, statChanges: 0, meta: 0 },
         flavorTexts: [],
         effects: [],
       },
     ],
+    machines: [],
+    encounterCoverage: [],
     learnMethods: [{ id: 1, identifier: "level-up", names: [] }],
     items: [],
     evolutionTriggers: [{ id: 1, identifier: "level-up", names: [] }],
@@ -122,6 +134,7 @@ export function fixture(): SnapshotInput {
       stats: 7,
       abilities: 4,
       moves: 2,
+      machines: 0,
       learnMethods: 1,
       items: 0,
       evolutionTriggers: 1,
@@ -227,6 +240,7 @@ export function fixture(): SnapshotInput {
             mastery: null,
           },
         ],
+        encounters: [],
         media: { sprites: {}, artwork: null },
         sourceCounts: {
           types: 1,
@@ -237,6 +251,7 @@ export function fixture(): SnapshotInput {
           abilityHistory: 1,
           forms: 1,
           learnsets: 3,
+          encounters: 0,
         },
       },
     ],
@@ -247,6 +262,10 @@ export function fixture(): SnapshotInput {
     versionGroupId: group.id,
     learnsetRows: group.id === 1 ? 1 : group.id === 2 ? 2 : 0,
     speciesFlavorTextRows: group.id === 1 || group.id === 2 ? 1 : 0,
+  }));
+  references.encounterCoverage = references.versions.map((version) => ({
+    versionId: version.id,
+    rows: 0,
   }));
   return { references, species: [record] };
 }

@@ -1,5 +1,6 @@
 import type {
   Ability,
+  Encounter,
   Item,
   Name,
   Move,
@@ -10,6 +11,7 @@ import type {
   TypeSlot,
 } from "../../../packages/pokemon-data/src/index.ts";
 import type {
+  EncounterReferencesQuery,
   ReferencesQuery,
   SourceCensusFragment,
   SpeciesPageQuery,
@@ -98,6 +100,23 @@ export function validateCensus(data: SourceCensusFragment): void {
     "itemNames",
     "evolutionTriggerNames",
     "versionNames",
+    "machines",
+    "moveAttributes",
+    "moveStatChanges",
+    "moveMeta",
+    "encounters",
+    "encounterConditions",
+    "encounterLocations",
+    "encounterAreas",
+    "encounterSlots",
+    "encounterMethods",
+    "encounterConditionKinds",
+    "encounterConditionValues",
+    "encounterLocationNames",
+    "encounterAreaNames",
+    "encounterMethodNames",
+    "encounterConditionNames",
+    "encounterConditionValueNames",
   ];
   for (const key of keys) {
     const count = sourceCount(data[key]);
@@ -131,6 +150,190 @@ function namedResource(row: {
   names: { languageId: number | null; name: string | null }[];
 }): NamedResource {
   return { id: row.id, identifier: row.identifier, names: names(row.names) };
+}
+
+export interface EncounterLookups {
+  areas: ReadonlyMap<number, { area: NamedResource; location: NamedResource }>;
+  slots: ReadonlyMap<number, { slot: Encounter["slot"]; method: NamedResource }>;
+  conditionValues: ReadonlyMap<number, Encounter["conditions"][number]>;
+}
+
+function sourceId(value: number | null | undefined, field: string): number {
+  const id = required(value, field);
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`Invalid source id: ${field}`);
+  return id;
+}
+
+function indexEncounterTable<T extends { id: number }>(
+  rows: T[],
+  count: { aggregate: { count: number } | null },
+  field: string,
+): Map<number, T> {
+  if (!Array.isArray(rows) || rows.length !== sourceCount(count))
+    throw new Error(`Incomplete encounter lookup: ${field}`);
+  const index = new Map<number, T>();
+  for (const row of rows) {
+    sourceId(row.id, `${field}.id`);
+    if (index.has(row.id)) throw new Error(`Duplicate encounter lookup id: ${field}.${row.id}`);
+    index.set(row.id, row);
+  }
+  return index;
+}
+
+function encounterResource(
+  row: {
+    id: number;
+    identifier: string;
+    names: { languageId: number | null; name: string | null }[];
+    namesCount: { aggregate: { count: number } | null };
+  },
+  field: string,
+  allowEmptyIdentifier = false,
+): NamedResource {
+  if (
+    typeof row.identifier !== "string" ||
+    (!allowEmptyIdentifier && row.identifier.length === 0) ||
+    !Array.isArray(row.names) ||
+    row.names.length !== sourceCount(row.namesCount)
+  )
+    throw new Error(`Invalid encounter resource: ${field}`);
+  const seen = new Set<string>();
+  const localized: Name[] = [];
+  for (const name of row.names) {
+    const languageId = sourceId(name.languageId, `${field}.name.languageId`);
+    if (![1, 5, 9, 11].includes(languageId) || typeof name.name !== "string")
+      throw new Error(`Invalid localized encounter name: ${field}`);
+    // Some source areas have several different labels in the same language.
+    // Preserve every alias (including blank labels); only exact duplicates collapse.
+    const key = `${languageId}:${name.name}`;
+    if (!seen.has(key)) localized.push({ languageId, name: name.name });
+    seen.add(key);
+  }
+  return { id: row.id, identifier: row.identifier, names: localized };
+}
+
+/** Resolve shared resources once; species pages contain only their foreign keys. */
+export function mapEncounterReferences(raw: EncounterReferencesQuery): EncounterLookups {
+  const locations = indexEncounterTable(raw.locations, raw.locationsCount, "locations");
+  const areas = indexEncounterTable(raw.areas, raw.areasCount, "areas");
+  const slots = indexEncounterTable(raw.slots, raw.slotsCount, "slots");
+  const methods = indexEncounterTable(raw.methods, raw.methodsCount, "methods");
+  const conditions = indexEncounterTable(raw.conditions, raw.conditionsCount, "conditions");
+  const values = indexEncounterTable(
+    raw.conditionValues,
+    raw.conditionValuesCount,
+    "conditionValues",
+  );
+  const namedLocations = new Map(
+    [...locations].map(([id, row]) => [id, encounterResource(row, `locations.${id}`)]),
+  );
+  const namedMethods = new Map(
+    [...methods].map(([id, row]) => [id, encounterResource(row, `methods.${id}`)]),
+  );
+  const namedConditions = new Map(
+    [...conditions].map(([id, row]) => [id, encounterResource(row, `conditions.${id}`)]),
+  );
+  return {
+    areas: new Map(
+      [...areas].map(([id, row]) => [
+        id,
+        {
+          area: encounterResource(row, `areas.${id}`, true),
+          location: required(
+            namedLocations.get(sourceId(row.locationId, "encounter.area.locationId")),
+            `encounter.location ${row.locationId}`,
+          ),
+        },
+      ]),
+    ),
+    slots: new Map(
+      [...slots].map(([id, row]) => {
+        if (
+          (row.slot !== null && (!Number.isSafeInteger(row.slot) || row.slot < 0)) ||
+          !Number.isSafeInteger(row.rarity) ||
+          row.rarity < 0 ||
+          row.rarity > 100
+        )
+          throw new Error(`Invalid encounter slot: ${id}`);
+        return [
+          id,
+          {
+            slot: {
+              id,
+              versionGroupId: sourceId(row.versionGroupId, "encounter.slot.versionGroupId"),
+              slot: row.slot,
+              rarity: row.rarity,
+            },
+            method: required(
+              namedMethods.get(sourceId(row.methodId, "encounter.slot.methodId")),
+              `encounter.method ${row.methodId}`,
+            ),
+          },
+        ];
+      }),
+    ),
+    conditionValues: new Map(
+      [...values].map(([id, row]) => {
+        if (typeof row.isDefault !== "boolean")
+          throw new Error(`Invalid encounter condition default: ${id}`);
+        return [
+          id,
+          {
+            ...encounterResource(row, `conditionValues.${id}`),
+            isDefault: row.isDefault,
+            condition: required(
+              namedConditions.get(
+                sourceId(row.conditionId, "encounter.conditionValue.conditionId"),
+              ),
+              `encounter.condition ${row.conditionId}`,
+            ),
+          },
+        ];
+      }),
+    ),
+  };
+}
+
+export function validateEncounterReferenceCensus(
+  raw: EncounterReferencesQuery,
+  census: Pick<
+    SourceCensusFragment,
+    | "encounterLocations"
+    | "encounterAreas"
+    | "encounterSlots"
+    | "encounterMethods"
+    | "encounterConditionKinds"
+    | "encounterConditionValues"
+    | "encounterLocationNames"
+    | "encounterAreaNames"
+    | "encounterMethodNames"
+    | "encounterConditionNames"
+    | "encounterConditionValueNames"
+  >,
+): void {
+  for (const [table, censusKey] of [
+    ["locations", "encounterLocations"],
+    ["areas", "encounterAreas"],
+    ["slots", "encounterSlots"],
+    ["methods", "encounterMethods"],
+    ["conditions", "encounterConditionKinds"],
+    ["conditionValues", "encounterConditionValues"],
+  ] as const) {
+    if (raw[table].length !== sourceCount(census[censusKey]))
+      throw new Error(`Encounter reference census mismatch: ${table}`);
+  }
+  for (const [table, censusKey] of [
+    ["locations", "encounterLocationNames"],
+    ["areas", "encounterAreaNames"],
+    ["methods", "encounterMethodNames"],
+    ["conditions", "encounterConditionNames"],
+    ["conditionValues", "encounterConditionValueNames"],
+  ] as const) {
+    if (
+      raw[table].reduce((sum, row) => sum + row.names.length, 0) !== sourceCount(census[censusKey])
+    )
+      throw new Error(`Incomplete localized encounter names: ${table}`);
+  }
 }
 
 export function mapReferences(
@@ -214,6 +417,49 @@ export function mapReferences(
     pp: row.pp,
     priority: required(row.priority, "move.priority"),
     effectChance: row.effectChance,
+    target: row.target === null ? null : namedResource(row.target),
+    attributes: row.attributes.map((entry) =>
+      namedResource(required(entry.attribute, "move.attribute")),
+    ),
+    statChanges: row.statChanges.map((entry) => ({
+      statId: required(entry.statId, "move.statChange.statId"),
+      change: required(entry.change, "move.statChange.change"),
+    })),
+    meta: (() => {
+      if (row.meta.length > 1) throw new Error(`Move ${row.id} has ambiguous metadata`);
+      const meta = row.meta[0];
+      return meta
+        ? {
+            ailment: meta.ailment === null ? null : namedResource(meta.ailment),
+            category:
+              meta.category === null
+                ? null
+                : {
+                    id: meta.category.id,
+                    identifier: meta.category.identifier,
+                    descriptions: meta.category.descriptions.map((text) => ({
+                      languageId: required(text.languageId, "move.category.languageId"),
+                      description: text.description,
+                    })),
+                  },
+            minHits: meta.minHits,
+            maxHits: meta.maxHits,
+            minTurns: meta.minTurns,
+            maxTurns: meta.maxTurns,
+            drain: meta.drain,
+            healing: meta.healing,
+            critRate: meta.critRate,
+            ailmentChance: meta.ailmentChance,
+            flinchChance: meta.flinchChance,
+            statChance: meta.statChance,
+          }
+        : null;
+    })(),
+    sourceCounts: {
+      attributes: sourceCount(row.attributesCount),
+      statChanges: sourceCount(row.statChangesCount),
+      meta: sourceCount(row.metaCount),
+    },
     flavorTexts: row.flavorTexts.map((text) => ({
       languageId: required(text.languageId, "move.flavor.languageId"),
       versionGroupId: required(text.versionGroupId, "move.flavor.versionGroupId"),
@@ -245,6 +491,19 @@ export function mapReferences(
     stats: raw.stats.map(namedResource),
     abilities,
     moves,
+    machines: raw.machines.map((row) => ({
+      id: row.id,
+      versionGroupId: required(row.versionGroupId, "machine.versionGroupId"),
+      number: row.number,
+      itemId: required(row.itemId, "machine.itemId"),
+      moveId: required(row.moveId, "machine.moveId"),
+    })),
+    encounterCoverage: raw.versionGroups.flatMap((group) =>
+      group.versions.map((version) => ({
+        versionId: version.id,
+        rows: sourceCount(version.encountersCount),
+      })),
+    ),
     learnMethods: raw.learnMethods.map(namedResource),
     items,
     evolutionTriggers: raw.evolutionTriggers.map(namedResource),
@@ -264,6 +523,7 @@ export function mapReferences(
       stats: sourceCount(raw.statsCount),
       abilities: sourceCount(raw.abilitiesCount),
       moves: sourceCount(raw.movesCount),
+      machines: sourceCount(raw.machinesCount),
       learnMethods: sourceCount(raw.learnMethodsCount),
       items: sourceCount(raw.itemsCount),
       evolutionTriggers: sourceCount(raw.evolutionTriggersCount),
@@ -274,7 +534,11 @@ export function mapReferences(
 
 type RawSpecies = SpeciesPageQuery["species"][number];
 type RawVariety = RawSpecies["varieties"][number];
-function mapVariety(raw: RawVariety, speciesId: number): PokemonVariety {
+function mapVariety(
+  raw: RawVariety,
+  speciesId: number,
+  encounters: EncounterLookups,
+): PokemonVariety {
   if (raw.speciesId !== speciesId)
     throw new Error(`Pokemon ${raw.id} has inconsistent species relationship`);
   const grouped = new Map<number, TypeSlot[]>();
@@ -372,6 +636,44 @@ function mapVariety(raw: RawVariety, speciesId: number): PokemonVariety {
       mastery: row.mastery ?? null,
       order: row.order ?? null,
     })),
+    encounters: raw.encounters.map((row) => {
+      sourceId(row.id, "encounter.id");
+      const area = required(
+        encounters.areas.get(sourceId(row.areaId, "encounter.areaId")),
+        `encounter.area ${row.areaId}`,
+      );
+      const slot = required(
+        encounters.slots.get(sourceId(row.slotId, "encounter.slotId")),
+        `encounter.slot ${row.slotId}`,
+      );
+      const conditionIds = new Set<number>();
+      const valueIds = new Set<number>();
+      return {
+        id: row.id,
+        versionId: sourceId(row.versionId, "encounter.versionId"),
+        location: area.location,
+        area: area.area,
+        method: slot.method,
+        minLevel: row.minLevel,
+        maxLevel: row.maxLevel,
+        slot: slot.slot,
+        conditions: row.conditions.map((entry) => {
+          const id = sourceId(entry.id, "encounter.conditionMap.id");
+          const valueId = sourceId(entry.valueId, "encounter.conditionMap.valueId");
+          if (entry.encounterId !== row.id)
+            throw new Error(`Encounter ${row.id} has inconsistent condition mapping relationship`);
+          if (conditionIds.has(id) || valueIds.has(valueId))
+            throw new Error(`Duplicate source encounter condition mapping: ${row.id}`);
+          conditionIds.add(id);
+          valueIds.add(valueId);
+          return required(
+            encounters.conditionValues.get(valueId),
+            `encounter.conditionValue ${valueId}`,
+          );
+        }),
+        sourceCounts: { conditions: sourceCount(row.conditionsCount) },
+      };
+    }),
     media: { sprites, artwork },
     sourceCounts: {
       types: sourceCount(raw.typesCount),
@@ -382,11 +684,12 @@ function mapVariety(raw: RawVariety, speciesId: number): PokemonVariety {
       abilityHistory: sourceCount(raw.abilityHistoryCount),
       forms: sourceCount(raw.formsCount),
       learnsets: sourceCount(raw.learnsetsCount),
+      encounters: sourceCount(raw.encountersCount),
     },
   };
 }
 
-export function mapSpecies(raw: RawSpecies): SpeciesRecord {
+export function mapSpecies(raw: RawSpecies, encounters: EncounterLookups): SpeciesRecord {
   return {
     id: raw.id,
     identifier: raw.identifier,
@@ -421,7 +724,7 @@ export function mapSpecies(raw: RawSpecies): SpeciesRecord {
       forms_switchable: raw.forms_switchable,
       has_gender_differences: raw.has_gender_differences,
     },
-    varieties: raw.varieties.map((row) => mapVariety(row, raw.id)),
+    varieties: raw.varieties.map((row) => mapVariety(row, raw.id, encounters)),
     evolutions: raw.evolutions.map((row) => {
       const { id, evolvedSpeciesId, versionGroupId, isDefault, triggerId, ...conditions } = row;
       return {

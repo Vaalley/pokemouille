@@ -17,6 +17,7 @@ const MANIFEST = "/data/manifest.json";
 function manifest(revision: string) {
   const asset = (path: string) => ({ path: `${revision}/${path}`, sha256: "", bytes: 0 });
   return {
+    schemaVersion: 2,
     datasetRevision: revision,
     files: {
       references: asset("references.json"),
@@ -37,7 +38,14 @@ const referenceAssets = [
   {
     load: "getPokemonReferences" as const,
     path: "pokemon-references.json",
-    value: { versions: [], versionGroups: [], moves: [], items: [] },
+    value: {
+      versions: [],
+      versionGroups: [],
+      moves: [],
+      items: [],
+      machines: [],
+      encounterCoverage: [],
+    },
   },
   {
     load: "getSearchReferences" as const,
@@ -132,6 +140,65 @@ describe("snapshot loader", () => {
     await loader.getGames(fetchImpl);
     expect(count("/data/a/games.json")).toBe(1);
     expect(count("/data/a/references.json")).toBe(0);
+  });
+
+  it("rejects an old snapshot contract rather than fabricating complete new fields", async () => {
+    const { fetchImpl } = host({
+      [MANIFEST]: () => json({ ...manifest("a"), schemaVersion: 1 }),
+    });
+    await expect(loader.getManifest(fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+  });
+
+  it("retains nullable move stats and exact machine mappings without loading full references", async () => {
+    const value = {
+      versions: [],
+      versionGroups: [],
+      items: [],
+      encounterCoverage: [],
+      moves: [{ id: 85, damageClassId: 3, power: null, accuracy: null, pp: null, priority: -1 }],
+      machines: [{ id: 1, number: 1001, versionGroupId: 20, itemId: 1131, moveId: 85 }],
+    };
+    const { fetchImpl, count } = host({
+      [MANIFEST]: () => json(manifest("a")),
+      "/data/a/pokemon-references.json": () => json(value),
+    });
+    await expect(loader.getPokemonReferences(fetchImpl)).resolves.toEqual(value);
+    expect(count("/data/a/references.json")).toBe(0);
+  });
+
+  it("rejects compact references missing machine coverage or move battle columns", async () => {
+    const value = {
+      versions: [],
+      versionGroups: [],
+      items: [],
+      encounterCoverage: [],
+      machines: [],
+      moves: [{ id: 85, power: null, accuracy: null, pp: null, priority: 0 }],
+    };
+    const { fetchImpl } = host({
+      [MANIFEST]: () => json(manifest("a")),
+      "/data/a/pokemon-references.json": () => json(value),
+    });
+    await expect(loader.getPokemonReferences(fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+  });
+
+  it("rejects truncated species encounters and retains a truthful counted empty collection", async () => {
+    let complete = false;
+    const { fetchImpl, count } = host({
+      [MANIFEST]: () => json(manifest("a")),
+      "/data/a/pokemon/25.json": () =>
+        json({
+          id: 25,
+          varieties: [{ id: 25, encounters: [], sourceCounts: { encounters: complete ? 0 : 1 } }],
+        }),
+    });
+    await expect(loader.getSpecies(25, fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+    complete = true;
+    await expect(loader.getSpecies(25, fetchImpl)).resolves.toMatchObject({
+      varieties: [{ encounters: [], sourceCounts: { encounters: 0 } }],
+    });
+    expect(count("/data/a/pokemon/25.json")).toBe(2);
+    expect(count("/data/a/pokemon/26.json")).toBe(0);
   });
 
   it.each(["games", "pokemonReferences", "searchReferences"] as const)(

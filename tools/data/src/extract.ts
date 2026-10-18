@@ -11,7 +11,13 @@ import { canonicalJson, openRun, readJson, saveRun } from "./state.ts";
 import type { RefreshRun } from "./state.ts";
 import { join } from "node:path";
 import { loadOperations } from "./operations.ts";
-import { mapReferences, mapSpecies, sourceCount } from "./mapping.ts";
+import {
+  mapEncounterReferences,
+  mapReferences,
+  mapSpecies,
+  sourceCount,
+  validateEncounterReferenceCensus,
+} from "./mapping.ts";
 
 interface ExtractOptions {
   stateDir: string;
@@ -45,6 +51,7 @@ function accumulate(totals: Record<string, number>, page: Page): void {
         "abilityHistory",
         "forms",
         "learnsets",
+        "encounters",
         "sprites",
       ] as const)
         totals[key] = (totals[key] ?? 0) + variety[key].length;
@@ -55,6 +62,9 @@ function accumulate(totals: Record<string, number>, page: Page): void {
         if (learnsetIds.has(row.id)) throw new Error(`Duplicate source learnset id ${row.id}`);
         learnsetIds.add(row.id);
       }
+      totals.encounterConditions =
+        (totals.encounterConditions ?? 0) +
+        variety.encounters.reduce((sum, encounter) => sum + encounter.conditions.length, 0);
     }
   }
 }
@@ -80,6 +90,8 @@ function validateExtractedCounts(
     "abilityHistory",
     "sprites",
     "formNames",
+    "encounters",
+    "encounterConditions",
   ] as const) {
     if ((totals[key] ?? 0) !== sourceCount(census[key]))
       throw new Error(
@@ -94,6 +106,7 @@ function validateExtractedCounts(
     stats: "referenceStats",
     abilities: "referenceAbilities",
     moves: "moves",
+    machines: "machines",
     learnMethods: "learnMethods",
     items: "items",
     evolutionTriggers: "evolutionTriggers",
@@ -127,6 +140,10 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
   });
   const before = await client.request(operations.before, {});
   const referenceResponse = await client.request(operations.references, {});
+  const encounterResponse = await client.request(operations.encounterReferences, {});
+  validateEncounterReferenceCensus(encounterResponse.data, before.data);
+  const encounters = mapEncounterReferences(encounterResponse.data);
+  const speciesOperation = operations.species(encounters);
   const census: ReferenceData["census"] = {
     species: sourceCount(before.data.species),
     pokemon: sourceCount(before.data.pokemon),
@@ -157,6 +174,17 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
       sourceCount(before.data.moveEffectTexts)
   )
     throw new Error("Incomplete move text relationships");
+  for (const [key, relation] of [
+    ["moveAttributes", "attributes"],
+    ["moveStatChanges", "statChanges"],
+    ["moveMeta", "meta"],
+  ] as const) {
+    if (
+      referenceResponse.data.moves.reduce((sum, move) => sum + move[relation].length, 0) !==
+      sourceCount(before.data[key])
+    )
+      throw new Error(`Incomplete structured move relationship: ${key}`);
+  }
   if (
     referenceResponse.data.items.reduce((total, row) => total + row.flavorTexts.length, 0) !==
       sourceCount(before.data.itemFlavorTexts) ||
@@ -192,19 +220,23 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
   const totals: Record<string, number> = {};
   let cursor = 0;
   let pageIndex = 0;
-  const retrievalTimes = [before.retrievedAt, referenceResponse.retrievedAt];
+  const retrievalTimes = [
+    before.retrievedAt,
+    referenceResponse.retrievedAt,
+    encounterResponse.retrievedAt,
+  ];
   while (species.length < census.species) {
     if (run.speciesPages[pageIndex] !== undefined && run.speciesPages[pageIndex] !== cursor)
       throw new Error("Invalid durable species cursor sequence");
     const expected = Math.min(25, census.species - species.length);
-    const response = await client.request(operations.species, { after: cursor, limit: expected });
+    const response = await client.request(speciesOperation, { after: cursor, limit: expected });
     const page = response.data.species;
     const previous = cursor;
     for (const record of page) {
       if (!Number.isSafeInteger(record.id) || record.id <= cursor)
         throw new Error("Non-increasing species pagination cursor");
       cursor = record.id;
-      species.push(mapSpecies(record));
+      species.push(mapSpecies(record, encounters));
     }
     accumulate(totals, page);
     retrievalTimes.push(response.retrievedAt);

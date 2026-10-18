@@ -47,6 +47,7 @@ function variety(overrides: Partial<PokemonVariety> = {}): PokemonVariety {
     abilityHistory: [],
     forms: [form()],
     learnsets: [],
+    encounters: [],
     media: { sprites: null, artwork: null },
     sourceCounts: {
       types: 1,
@@ -57,6 +58,7 @@ function variety(overrides: Partial<PokemonVariety> = {}): PokemonVariety {
       abilityHistory: 0,
       forms: 1,
       learnsets: 0,
+      encounters: 0,
     },
     ...overrides,
   };

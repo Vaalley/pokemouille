@@ -211,6 +211,29 @@ query SpeciesPage($after: Int!, $limit: Int!) {
           count
         }
       }
+      encounters: encounters(order_by: { id: asc }, limit: 10000) {
+        id
+        versionId: version_id
+        minLevel: min_level
+        maxLevel: max_level
+        areaId: location_area_id
+        slotId: encounter_slot_id
+        conditions: encounterconditionvaluemaps(order_by: { id: asc }, limit: 128) {
+          id
+          encounterId: encounter_id
+          valueId: encounter_condition_value_id
+        }
+        conditionsCount: encounterconditionvaluemaps_aggregate {
+          aggregate {
+            count
+          }
+        }
+      }
+      encountersCount: encounters_aggregate {
+        aggregate {
+          count
+        }
+      }
       sprites: pokemonsprites(order_by: { id: asc }, limit: 2) {
         sprites
       }

@@ -32,7 +32,7 @@ export interface EvolutionTreeNode extends Omit<ChainNode, "methods"> {
  * variety hangs off its card (Galarian Mr. Mime → Mr. Rime); others off the species card.
  */
 export function evolutionTree(
-  chain: EvolutionChainProjection,
+  chain: Pick<EvolutionChainProjection, "nodes">,
   forms: Readonly<Record<number, EvolutionForm>>,
 ): EvolutionTreeNode[] {
   const cards = new Map<number, EvolutionTreeNode[]>();

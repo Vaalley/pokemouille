@@ -3,7 +3,7 @@ import { mkdir, open, readFile, rename, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import lockfile from "proper-lockfile";
 
-export const OUTPUT_VERSION = 1;
+export const OUTPUT_VERSION = 2;
 export const CACHE_VERSION = 1;
 export const QUERY_VERSION = 1;
 export const PUBLIC_ENDPOINT = "https://graphql.pokeapi.co/v1beta2";

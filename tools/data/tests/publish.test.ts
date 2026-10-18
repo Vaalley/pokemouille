@@ -177,6 +177,60 @@ describe("last-good static publication", () => {
     }
   });
 
+  it("publishes source machine mappings and move stats in compact references, encounters only per species", async () => {
+    const outDir = await outputDirectory();
+    const input = fixture();
+    input.references.items = [
+      { id: 1131, identifier: "tr01", names: [], effects: [], flavorTexts: [] },
+    ];
+    input.references.sourceCounts.items = 1;
+    input.references.machines = [
+      { id: 1, versionGroupId: 25, number: 1001, itemId: 1131, moveId: 85 },
+    ];
+    input.references.sourceCounts.machines = 1;
+    const variety = input.species[0]!.varieties[0]!;
+    variety.encounters = [
+      {
+        id: 1,
+        versionId: 1,
+        minLevel: 3,
+        maxLevel: 5,
+        location: { id: 1, identifier: "viridian-forest", names: [] },
+        area: { id: 1, identifier: "", names: [] },
+        method: { id: 1, identifier: "walk", names: [] },
+        slot: { id: 1, versionGroupId: 1, slot: 1, rarity: 5 },
+        conditions: [],
+        sourceCounts: { conditions: 0 },
+      },
+    ];
+    variety.sourceCounts.encounters = 1;
+    input.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 1;
+    const manifest = await publishSnapshot(outDir, input, provenance);
+    expect(manifest.schemaVersion).toBe(2);
+    const compact: PokemonReferences = JSON.parse(
+      await readFile(join(outDir, manifest.files.pokemonReferences.path), "utf8"),
+    );
+    expect(compact.machines).toEqual(input.references.machines);
+    expect(compact.moves[0]).toMatchObject({
+      damageClassId: 2,
+      power: 40,
+      accuracy: 100,
+      pp: 30,
+      priority: 1,
+    });
+    expect(compact.encounterCoverage).toEqual(input.references.encounterCoverage);
+    expect(compact).not.toHaveProperty("encounters");
+    expect(compact.moves[0]).not.toHaveProperty("meta");
+    const record = JSON.parse(
+      await readFile(join(outDir, manifest.files.pokemon["25"]!.path), "utf8"),
+    );
+    expect(record.varieties[0].encounters).toEqual(variety.encounters);
+    const before = await readFile(join(outDir, "manifest.json"), "utf8");
+    Reflect.deleteProperty(input.references.moves[0]!, "meta");
+    await expect(publishSnapshot(outDir, input, provenance)).rejects.toThrow("move.meta");
+    expect(await readFile(join(outDir, "manifest.json"), "utf8")).toBe(before);
+  });
+
   it("migrates a published legacy snapshot offline, preserves provenance and retains the old revision", async () => {
     const outDir = await outputDirectory();
     const legacy = await publishLegacySnapshot(outDir);
@@ -232,7 +286,7 @@ describe("last-good static publication", () => {
     let before = await readFile(join(outDir, "manifest.json"), "utf8");
     await expect(republishSnapshot(outDir)).rejects.toThrow("Unsupported published schema version");
     expect(await readFile(join(outDir, "manifest.json"), "utf8")).toBe(before);
-    legacy.schemaVersion = 1;
+    legacy.schemaVersion = 2;
     legacy.files.references.path = "revisions/other/references.json";
     await writeJson(join(outDir, "manifest.json"), legacy);
     before = await readFile(join(outDir, "manifest.json"), "utf8");
