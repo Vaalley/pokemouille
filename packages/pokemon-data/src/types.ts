@@ -97,6 +97,12 @@ export interface Coverage {
   learnsetRows: number;
   speciesFlavorTextRows: number;
 }
+/** Upstream regional/national dex; `versionGroupIds` lists the games that use it. */
+export interface Pokedex extends NamedResource {
+  isMainSeries: boolean;
+  regionId: number | null;
+  versionGroupIds: number[];
+}
 export interface ReferenceData {
   generations: Generation[];
   versionGroups: VersionGroup[];
@@ -111,6 +117,9 @@ export interface ReferenceData {
   learnMethods: NamedResource[];
   items: Item[];
   evolutionTriggers: NamedResource[];
+  eggGroups: NamedResource[];
+  pokedexes: Pokedex[];
+  regions: NamedResource[];
   coverage: Coverage[];
   // Exact upstream counts, taken independently from the exported row arrays.
   sourceCounts: Record<
@@ -124,7 +133,10 @@ export interface ReferenceData {
     | "machines"
     | "learnMethods"
     | "items"
-    | "evolutionTriggers",
+    | "evolutionTriggers"
+    | "eggGroups"
+    | "pokedexes"
+    | "regions",
     number
   >;
   census: {
@@ -192,11 +204,15 @@ export interface PokemonForm {
   order: number;
   formOrder: number;
 }
+/** Source location; `regionId` null when the source assigns no region. */
+export interface EncounterLocation extends NamedResource {
+  regionId: number | null;
+}
 /** Localized encounter resources may retain multiple distinct names per language. */
 export interface Encounter {
   id: number;
   versionId: number;
-  location: NamedResource;
+  location: EncounterLocation;
   area: NamedResource;
   method: NamedResource;
   minLevel: number;
@@ -225,6 +241,8 @@ export interface PokemonVariety {
   /** Exact-version source rows; absence does not prove unavailability. */
   encounters: Encounter[];
   media: { sprites: unknown; artwork: string | null };
+  /** Current source cry audio URLs; null when the source has none. */
+  cries: { latest: string | null; legacy: string | null };
   sourceCounts: Record<
     | "types"
     | "typeHistory"
@@ -266,9 +284,22 @@ export interface SpeciesRecord {
   isMythical: boolean;
   // Additional source scalars retain their upstream column names and nulls.
   sourceFacts: Record<string, SourceFactValue>;
+  /** Current source egg groups in source order; not game-specific. */
+  eggGroupIds: number[];
+  /** Every source dex entry; resolve regional entries via `Pokedex.versionGroupIds`. */
+  pokedexNumbers: { pokedexId: number; number: number }[];
   varieties: PokemonVariety[];
   evolutions: EvolutionMethod[];
-  sourceCounts: Record<"names" | "genera" | "flavorTexts" | "varieties" | "evolutions", number>;
+  sourceCounts: Record<
+    | "names"
+    | "genera"
+    | "flavorTexts"
+    | "varieties"
+    | "evolutions"
+    | "eggGroupIds"
+    | "pokedexNumbers",
+    number
+  >;
 }
 export interface SnapshotInput {
   references: ReferenceData;
@@ -372,6 +403,15 @@ export interface ResolvedPokemon {
     sourceFacts: SpeciesRecord["sourceFacts"];
   }>;
   media: PokemonVariety["media"];
+  /** Current cry URLs of the resolved variety; not game-specific. */
+  cries: PokemonVariety["cries"] & { scope: "current-not-game-specific" };
+  /** Current species egg groups; not historical/game-specific. */
+  eggGroups: Field<{
+    scope: "current-not-game-specific";
+    groups: { id: number; name: LocalizedText }[];
+  }>;
+  /** Dex numbers in pokedexes used by the selected version group (national dex excluded). */
+  regionalDexNumbers: Field<{ pokedexId: number; name: LocalizedText; number: number }[]>;
   forms: {
     id: number;
     pokemonId: number;

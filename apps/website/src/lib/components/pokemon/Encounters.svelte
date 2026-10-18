@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
+  import type { PathnameWithSearchOrHash } from "$app/types";
   import type { NamedResource, PokemonReferences, PokemonVariety, ResolvedPokemon } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../packages/pokemon-data/src/localization.ts";
   import { resolveEncounters } from "#lib/data/encounters.ts";
@@ -43,7 +45,11 @@
     <div class="encounter-groups">
       {#each locations.groups as group (`${group.location.id}:${group.area.id}:${group.method.id}`)}
         <div class="encounter-group">
-          <h3><Localized text={name(group.location)} /></h3>
+          <h3>
+            <a href={resolve(`${lang}/location/${group.location.id}/?version=${encodeURIComponent(version)}` as PathnameWithSearchOrHash)}>
+              <Localized text={name(group.location)} />
+            </a>
+          </h3>
           <p class="area-method"><Localized text={name(group.area)} /> · <Localized text={name(group.method)} /></p>
           <div class="table-scroll" role="region" aria-label={t(lang, "table", { method: name(group.method).text })} tabindex="0">
             <table>

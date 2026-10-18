@@ -43,18 +43,18 @@
   </g>
   <text x="46" y="366" font-size="17" font-weight="700">SvelteKit → Static Assets</text>
   <text x="46" y="396" font-size="14">apps/website</text>
-  <text x="46" y="420" font-size="14">Prerender HTML + page data</text>
+  <text x="46" y="420" font-size="14">Prerender pages + derived JSON</text>
   <text x="46" y="444" font-size="14">Bundle JavaScript and CSS</text>
   <text x="46" y="482" font-size="13" fill="var(--muted)">Cloudflare serves matching files first</text>
   <text x="370" y="366" font-size="17" font-weight="700">Cloudflare Worker</text>
-  <text x="370" y="396" font-size="14">Handles /data/* requests</text>
+  <text x="370" y="396" font-size="14">Handles data + derived JSON</text>
   <text x="370" y="420" font-size="14">Reads R2 on cache misses</text>
   <text x="370" y="444" font-size="14">Caches immutable responses</text>
-  <text x="370" y="482" font-size="13" fill="var(--muted)">Also serves retained old app chunks</text>
+  <text x="370" y="482" font-size="13" fill="var(--muted)">Retains old chunks + derived JSON</text>
   <text x="664" y="366" font-size="17" font-weight="700">Cloudflare R2</text>
-  <text x="664" y="396" font-size="14">Revisioned JSON dataset</text>
+  <text x="664" y="396" font-size="14">Dataset + learner/breeding JSON</text>
   <text x="664" y="420" font-size="14">Mutable manifest + immutable files</text>
-  <text x="664" y="444" font-size="14">Previous revisions and app chunks</text>
+  <text x="664" y="444" font-size="14">Old revisions, chunks, derived JSON</text>
   <text x="664" y="482" font-size="13" fill="var(--muted)">Object storage, not an application DB</text>
   <path d="M646 423 H614" fill="none" stroke="var(--accent, currentColor)" stroke-width="2" marker-end="url(#arrow)"/>
   <g fill="none" stroke="var(--accent, currentColor)" stroke-width="2" marker-end="url(#arrow)">

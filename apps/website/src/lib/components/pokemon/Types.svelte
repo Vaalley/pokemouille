@@ -90,7 +90,7 @@
     border-radius: 0.75rem;
     background: Canvas;
     color: CanvasText;
-    box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.15);
+    box-shadow: var(--popover-shadow);
   }
   :global(.type-matchups h3) { margin: 0; }
   :global(.type-matchups h4) { margin-block: 0.75rem 0.375rem; }

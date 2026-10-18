@@ -45,7 +45,7 @@ export function validateBoundedRelationships(value: unknown, path = "$"): void {
       child.forEach((item, index) =>
         validateBoundedRelationships(item, `${path}.${key}[${index}]`),
       );
-    } else if (key !== "sprites" && child !== null && typeof child === "object")
+    } else if (key !== "sprites" && key !== "cries" && child !== null && typeof child === "object")
       validateBoundedRelationships(child, `${path}.${key}`);
   }
 }
@@ -89,20 +89,34 @@ export async function loadOperations() {
     document: references,
     validate(data) {
       validateBoundedRelationships(data);
-      if (
-        !Array.isArray(data.generations) ||
-        !Array.isArray(data.versionGroups) ||
-        !Array.isArray(data.types) ||
-        !Array.isArray(data.stats) ||
-        !Array.isArray(data.abilities) ||
-        !Array.isArray(data.moves) ||
-        !Array.isArray(data.moveEffects) ||
-        !Array.isArray(data.machines) ||
-        !Array.isArray(data.items) ||
-        !Array.isArray(data.learnMethods) ||
-        !Array.isArray(data.evolutionTriggers)
-      )
-        throw new Error("Missing reference resource arrays");
+      const requiredArrays = [
+        "generations",
+        "versionGroups",
+        "types",
+        "stats",
+        "abilities",
+        "moves",
+        "moveEffects",
+        "machines",
+        "items",
+        "learnMethods",
+        "evolutionTriggers",
+        "eggGroups",
+        "pokedexes",
+        "regions",
+      ] as const;
+      const missing = requiredArrays.filter((key) => !Array.isArray(data[key]));
+      if (missing.length > 0) {
+        const returnedFields = Object.entries(data)
+          .map(([key, value]) => {
+            const type = Array.isArray(value) ? "array" : value === null ? "null" : typeof value;
+            return `${key}:${type}`;
+          })
+          .join(", ");
+        throw new Error(
+          `Missing reference resource arrays: ${missing.join(", ")}; returned fields: ${returnedFields}`,
+        );
+      }
       // Mapping checks required source scalars; the final census is supplied later.
       mapReferences(data, { species: 0, pokemon: 0, forms: 0, learnsets: 0, evolutions: 0 });
     },

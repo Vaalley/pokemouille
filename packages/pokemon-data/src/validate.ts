@@ -147,7 +147,8 @@ function variety(value: unknown, path: string): void {
     const encounter = object(entry, `${path}.encounters`);
     integer(encounter.id, "encounter.id", 1);
     integer(encounter.versionId, "encounter.versionId", 1);
-    resource(encounter.location, "encounter.location", true);
+    const location = resource(encounter.location, "encounter.location", true);
+    nullableInteger(location.regionId, "encounter.location.regionId");
     const area = object(encounter.area, "encounter.area");
     integer(area.id, "encounter.area.id", 1);
     text(area.identifier, "encounter.area.identifier", true);
@@ -173,6 +174,11 @@ function variety(value: unknown, path: string): void {
   const media = object(row.media, `${path}.media`);
   if (!Object.hasOwn(media, "sprites")) fail(path, "missing source sprite metadata");
   if (media.artwork !== null) text(media.artwork, `${path}.media.artwork`);
+  const cries = object(row.cries, `${path}.cries`);
+  for (const key of ["latest", "legacy"]) {
+    if (!Object.hasOwn(cries, key)) fail(`${path}.cries`, `missing ${key} cry`);
+    if (cries[key] !== null) text(cries[key], `${path}.cries.${key}`);
+  }
 }
 function scalarFacts(value: unknown, path: string): void {
   for (const [key, fact] of Object.entries(object(value, path))) {
@@ -196,7 +202,19 @@ function species(value: unknown, path: string): void {
   for (const key of ["isBaby", "isLegendary", "isMythical"]) flag(row[key], `${path}.${key}`);
   scalarFacts(row.sourceFacts, `${path}.sourceFacts`);
   names(row.genera, `${path}.genera`);
-  counted(row, ["names", "genera", "flavorTexts", "varieties", "evolutions"], path);
+  counted(
+    row,
+    ["names", "genera", "flavorTexts", "varieties", "evolutions", "eggGroupIds", "pokedexNumbers"],
+    path,
+  );
+  for (const id of array(row.eggGroupIds, `${path}.eggGroupIds`))
+    integer(id, `${path}.eggGroupIds`, 1);
+  for (const entry of array(row.pokedexNumbers, `${path}.pokedexNumbers`)) {
+    const dex = object(entry, `${path}.pokedexNumbers`);
+    integer(dex.pokedexId, `${path}.pokedexNumbers.pokedexId`, 1);
+    // Some regional dexes start at 0 (Victini in the Unova dex).
+    integer(dex.number, `${path}.pokedexNumbers.number`);
+  }
   for (const entry of array(row.flavorTexts, `${path}.flavorTexts`)) {
     const flavor = object(entry, `${path}.flavorTexts`);
     integer(flavor.languageId, `${path}.flavorTexts.languageId`, 1);
@@ -227,6 +245,9 @@ const REFERENCE_COLLECTIONS = [
   "machines",
   "items",
   "evolutionTriggers",
+  "eggGroups",
+  "pokedexes",
+  "regions",
 ] as const;
 
 function validateShape(input: unknown): asserts input is SnapshotInput {
@@ -249,8 +270,15 @@ function validateShape(input: unknown): asserts input is SnapshotInput {
     const row = resource(entry, "version");
     integer(row.versionGroupId, "version.versionGroupId", 1);
   }
-  for (const key of ["types", "stats", "learnMethods", "evolutionTriggers"])
+  for (const key of ["types", "stats", "learnMethods", "evolutionTriggers", "eggGroups", "regions"])
     for (const row of array(refs[key], `references.${key}`)) resource(row, `references.${key}`);
+  for (const entry of array(refs.pokedexes, "references.pokedexes")) {
+    const row = resource(entry, "pokedex");
+    flag(row.isMainSeries, "pokedex.isMainSeries");
+    nullableInteger(row.regionId, "pokedex.regionId");
+    for (const id of array(row.versionGroupIds, "pokedex.versionGroupIds"))
+      integer(id, "pokedex.versionGroupIds", 1);
+  }
   for (const entry of array(refs.abilities, "references.abilities")) {
     const row = resource(entry, "ability");
     integer(row.generationId, "ability.generationId", 1);
@@ -414,6 +442,14 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
   const methods = identities(refs.learnMethods, "learnMethods");
   const items = identities(refs.items, "items");
   const triggers = identities(refs.evolutionTriggers, "evolutionTriggers");
+  const eggGroups = identities(refs.eggGroups, "eggGroups");
+  const pokedexes = identities(refs.pokedexes, "pokedexes");
+  const regions = identities(refs.regions, "regions");
+  for (const pokedex of refs.pokedexes) {
+    relationship(regions, pokedex.regionId, "pokedex.regionId");
+    unique(pokedex.versionGroupIds, (id) => id, "pokedex.versionGroupIds");
+    for (const id of pokedex.versionGroupIds) relationship(groups, id, "pokedex.versionGroupId");
+  }
   unique(refs.machines, (row) => row.id, "machines");
   unique(refs.machines, (row) => `${row.versionGroupId}/${row.number}`, "machine.number");
   for (const row of refs.machines) {
@@ -488,6 +524,11 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
   for (const record of input.species) {
     relationship(generations, record.generationId, "species.generationId");
     relationship(speciesIds, record.evolvesFromSpeciesId, "species.evolvesFromSpeciesId");
+    unique(record.eggGroupIds, (id) => id, "species.eggGroupIds");
+    for (const id of record.eggGroupIds) relationship(eggGroups, id, "species.eggGroupId");
+    unique(record.pokedexNumbers, (row) => row.pokedexId, "species.pokedexNumbers");
+    for (const row of record.pokedexNumbers)
+      relationship(pokedexes, row.pokedexId, "species.pokedexNumber.pokedexId");
     if (record.evolvesFromSpeciesId === record.id) fail("species", "self evolution relationship");
     if (record.varieties.filter((row) => row.isDefault).length !== 1)
       fail("species.varieties", "expected exactly one default Pokémon variety");
@@ -510,6 +551,7 @@ export function validateSnapshot(input: unknown): asserts input is SnapshotInput
     for (const row of record.varieties) {
       for (const encounter of row.encounters) {
         relationship(versions, encounter.versionId, "encounter.versionId");
+        relationship(regions, encounter.location.regionId, "encounter.location.regionId");
         relationship(groups, encounter.slot.versionGroupId, "encounter.slot.versionGroupId");
         // Upstream reuses some slots across groups (e.g. Yellow's Power Plant
         // static encounters use a red-blue slot). The encounter's version is authoritative.

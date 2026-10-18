@@ -13,7 +13,14 @@ function datasetRevision(): string | undefined {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
     throw error;
   }
-  const { datasetRevision: revision } = JSON.parse(source) as { datasetRevision?: unknown };
+  const { datasetRevision: revision, schemaVersion } = JSON.parse(source) as {
+    datasetRevision?: unknown;
+    schemaVersion?: unknown;
+  };
+  if (schemaVersion !== 3)
+    throw new Error(
+      "static/data/manifest.json requires schema version 3; generate a fresh dataset",
+    );
   if (typeof revision !== "string")
     throw new Error("static/data/manifest.json has no datasetRevision");
   return revision;

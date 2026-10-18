@@ -1,9 +1,32 @@
 /* Shared layout, typography, link styling, and functional Bits UI data-* rules. */
 
+/* Themes: "auto" (no data-theme) follows the OS; src/app.html sets data-theme="light"|"dark"
+   from the saved preference before first paint. Every colour below derives from the used
+   colour scheme (system colours, light-dark()), so components only reference variables. */
 :root {
-  /* Neutral rule colour derived from the text colour, so it follows any future theme. */
+  color-scheme: light dark;
+  /* Neutral rule colour derived from the text colour, so it follows the theme. */
   --border: color-mix(in srgb, currentColor 22%, transparent);
   --measure: 75ch;
+  --page-background: Canvas;
+  --page-text: CanvasText;
+  --link: light-dark(#245b83, #8cc4ee);
+  --link-visited: light-dark(#6b527f, #cdb4e0);
+  /* Rarity badges: Legendary gold and Mythical violet, readable on either background. */
+  --legendary: light-dark(#795000, #f2c55c);
+  --legendary-background: light-dark(#fff4d6, color-mix(in srgb, #f2c55c 14%, Canvas));
+  --mythical: light-dark(#7041a0, #d2b6f2);
+  --mythical-background: light-dark(#f2eaff, color-mix(in srgb, #d2b6f2 14%, Canvas));
+  --overlay: light-dark(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.6));
+  --popover-shadow: 0 0.25rem 1rem light-dark(rgb(0 0 0 / 0.15), rgb(0 0 0 / 0.5));
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 *,
@@ -19,13 +42,15 @@ html {
 
 body {
   margin: 0;
+  background: var(--page-background);
+  color: var(--page-text);
   font-family: system-ui, sans-serif;
   line-height: 1.5;
 }
 
 /* Keep links recognisable without the browser's bright blue, tight underlines. */
 a:any-link {
-  color: #245b83;
+  color: var(--link);
   text-decoration-line: underline;
   text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
   text-decoration-thickness: 0.06em;
@@ -34,7 +59,7 @@ a:any-link {
 }
 
 a:visited {
-  color: #6b527f;
+  color: var(--link-visited);
 }
 
 a:any-link:is(:hover, :focus-visible) {
@@ -497,7 +522,7 @@ button:disabled {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgb(0 0 0 / 0.25);
+  background: var(--overlay);
 }
 
 [data-dialog-content] {

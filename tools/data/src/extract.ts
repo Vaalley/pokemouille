@@ -39,6 +39,8 @@ function accumulate(totals: Record<string, number>, page: Page): void {
     totals.species = (totals.species ?? 0) + 1;
     totals.names = (totals.names ?? 0) + record.names.length;
     totals.flavorTexts = (totals.flavorTexts ?? 0) + record.flavorTexts.length;
+    totals.speciesEggGroups = (totals.speciesEggGroups ?? 0) + record.eggGroups.length;
+    totals.speciesDexNumbers = (totals.speciesDexNumbers ?? 0) + record.pokedexNumbers.length;
     totals.evolutions = (totals.evolutions ?? 0) + record.evolutions.length;
     for (const variety of record.varieties) {
       totals.pokemon = (totals.pokemon ?? 0) + 1;
@@ -53,6 +55,7 @@ function accumulate(totals: Record<string, number>, page: Page): void {
         "learnsets",
         "encounters",
         "sprites",
+        "cries",
       ] as const)
         totals[key] = (totals[key] ?? 0) + variety[key].length;
       for (const form of variety.forms)
@@ -92,6 +95,9 @@ function validateExtractedCounts(
     "formNames",
     "encounters",
     "encounterConditions",
+    "speciesEggGroups",
+    "speciesDexNumbers",
+    "cries",
   ] as const) {
     if ((totals[key] ?? 0) !== sourceCount(census[key]))
       throw new Error(
@@ -110,6 +116,9 @@ function validateExtractedCounts(
     learnMethods: "learnMethods",
     items: "items",
     evolutionTriggers: "evolutionTriggers",
+    eggGroups: "eggGroups",
+    pokedexes: "pokedexes",
+    regions: "regions",
   } as const;
   for (const [key, censusKey] of Object.entries(referenceKeys)) {
     if (
@@ -152,6 +161,10 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
     evolutions: sourceCount(before.data.evolutions),
   };
   const references = mapReferences(referenceResponse.data, census);
+  const regionIds = new Set(references.regions.map((region) => region.id));
+  for (const location of encounterResponse.data.locations)
+    if (location.regionId !== null && !regionIds.has(location.regionId))
+      throw new Error(`Unknown encounter location region: ${location.id}/${location.regionId}`);
   if (
     referenceResponse.data.abilities.reduce((total, row) => total + row.flavorTexts.length, 0) !==
       sourceCount(before.data.abilityFlavorTexts) ||
@@ -200,6 +213,9 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
     learnMethods: "learnMethodNames",
     items: "itemNames",
     evolutionTriggers: "evolutionTriggerNames",
+    eggGroups: "eggGroupNames",
+    pokedexes: "pokedexNames",
+    regions: "regionNames",
   } as const;
   for (const [resource, censusKey] of Object.entries(nameTables)) {
     const rows = referenceResponse.data[resource as keyof typeof nameTables];
@@ -216,6 +232,11 @@ export async function extractSnapshot(options: ExtractOptions): Promise<Extracte
     ) !== sourceCount(before.data.versionNames)
   )
     throw new Error("Incomplete localized version names");
+  if (
+    referenceResponse.data.pokedexes.reduce((sum, row) => sum + row.versionGroups.length, 0) !==
+    sourceCount(before.data.pokedexVersionGroups)
+  )
+    throw new Error("Incomplete pokedex version group relationships");
   const species: SpeciesRecord[] = [];
   const totals: Record<string, number> = {};
   let cursor = 0;

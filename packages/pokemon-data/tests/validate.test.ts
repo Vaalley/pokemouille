@@ -295,6 +295,7 @@ describe("snapshot integrity", () => {
           id: 1,
           identifier: "viridian-forest",
           names: [{ languageId: 5, name: "Forêt de Jade" }],
+          regionId: 1,
         },
         area: { id: 1, identifier: "", names: [] },
         method: { id: 1, identifier: "walk", names: [] },
@@ -314,6 +315,9 @@ describe("snapshot integrity", () => {
     variety.sourceCounts.encounters = 1;
     snapshot.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 1;
     validateSnapshot(snapshot);
+    variety.encounters[0]!.location.regionId = 999;
+    expect(() => validateSnapshot(snapshot)).toThrow("encounter.location.regionId");
+    variety.encounters[0]!.location.regionId = null;
     const encounter = variety.encounters[0]!;
     encounter.area.names = [
       { languageId: 9, name: "Terminus Cave (unknown area 343)" },
@@ -340,5 +344,84 @@ describe("snapshot integrity", () => {
     expect(() => validateSnapshot(snapshot)).toThrow("encounters");
     variety.sourceCounts.encounters = 0;
     expect(() => validateSnapshot(snapshot)).toThrow("encounter row count");
+  });
+
+  it("validates egg group, pokedex, region and cry relationships against references", () => {
+    const snapshot = fixture();
+    validateSnapshot(snapshot);
+    const record = snapshot.species[0]!;
+
+    record.eggGroupIds.push(99);
+    record.sourceCounts.eggGroupIds = 3;
+    expect(() => validateSnapshot(snapshot)).toThrow("species.eggGroupId");
+    record.eggGroupIds = [5, 5];
+    record.sourceCounts.eggGroupIds = 2;
+    expect(() => validateSnapshot(snapshot)).toThrow("species.eggGroupIds");
+    record.eggGroupIds = [5];
+    expect(() => validateSnapshot(snapshot)).toThrow("truncated or inconsistent eggGroupIds");
+    record.sourceCounts.eggGroupIds = 1;
+
+    record.pokedexNumbers.push({ pokedexId: 404, number: 1 });
+    record.sourceCounts.pokedexNumbers = 4;
+    expect(() => validateSnapshot(snapshot)).toThrow("species.pokedexNumber.pokedexId");
+    record.pokedexNumbers[3] = { pokedexId: 31, number: 0 };
+    expect(() => validateSnapshot(snapshot)).toThrow("species.pokedexNumbers");
+    record.pokedexNumbers.pop();
+    record.sourceCounts.pokedexNumbers = 3;
+    validateSnapshot(snapshot);
+
+    const pokedex = snapshot.references.pokedexes[1]!;
+    pokedex.regionId = 404;
+    expect(() => validateSnapshot(snapshot)).toThrow("pokedex.regionId");
+    pokedex.regionId = null;
+    pokedex.versionGroupIds = [1, 999];
+    expect(() => validateSnapshot(snapshot)).toThrow("pokedex.versionGroupId");
+    pokedex.versionGroupIds = [1, 1];
+    expect(() => validateSnapshot(snapshot)).toThrow("pokedex.versionGroupIds");
+    pokedex.versionGroupIds = [1];
+
+    snapshot.references.regions.pop();
+    expect(() => validateSnapshot(snapshot)).toThrow("regions");
+    snapshot.references.sourceCounts.regions = 1;
+    expect(() => validateSnapshot(snapshot)).toThrow("pokedex.regionId");
+    snapshot.references.regions.push({ id: 10, identifier: "paldea", names: [] });
+    snapshot.references.sourceCounts.regions = 2;
+
+    const variety = record.varieties[0]!;
+    variety.cries = { latest: null, legacy: null };
+    validateSnapshot(snapshot);
+    Reflect.deleteProperty(variety.cries, "legacy");
+    expect(() => validateSnapshot(snapshot)).toThrow("missing legacy cry");
+  });
+
+  it.each(["eggGroups", "pokedexes", "regions"] as const)(
+    "rejects independently truncated and duplicate %s references",
+    (collection) => {
+      const snapshot = fixture();
+      snapshot.references[collection].pop();
+      expect(() => validateSnapshot(snapshot)).toThrow(collection);
+      const duplicate = fixture();
+      const rows = duplicate.references[collection];
+      Reflect.set(duplicate.references, collection, [...rows, rows[0]!]);
+      duplicate.references.sourceCounts[collection]++;
+      expect(() => validateSnapshot(duplicate)).toThrow("duplicate identity");
+    },
+  );
+
+  it("accepts zero regional dex numbers but rejects malformed numbers and cry URLs", () => {
+    const snapshot = fixture();
+    const dexNumber = snapshot.species[0]!.pokedexNumbers[0]!;
+    dexNumber.number = 0;
+    validateSnapshot(snapshot);
+    dexNumber.number = -1;
+    expect(() => validateSnapshot(snapshot)).toThrow("pokedexNumbers.number");
+    dexNumber.number = 0;
+    const cries = snapshot.species[0]!.varieties[0]!.cries;
+    Reflect.set(cries, "latest", 123);
+    expect(() => validateSnapshot(snapshot)).toThrow("cries.latest");
+    cries.latest = "";
+    expect(() => validateSnapshot(snapshot)).toThrow("cries.latest");
+    cries.latest = null;
+    validateSnapshot(snapshot);
   });
 });

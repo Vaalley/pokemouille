@@ -125,6 +125,58 @@ export function fixture(): SnapshotInput {
     learnMethods: [{ id: 1, identifier: "level-up", names: [] }],
     items: [],
     evolutionTriggers: [{ id: 1, identifier: "level-up", names: [] }],
+    eggGroups: [
+      {
+        id: 5,
+        identifier: "ground",
+        names: [
+          { languageId: 9, name: "Field" },
+          { languageId: 5, name: "Terrestre" },
+        ],
+      },
+      { id: 6, identifier: "fairy", names: [{ languageId: 9, name: "Fairy" }] },
+    ],
+    pokedexes: [
+      {
+        id: 1,
+        identifier: "national",
+        names: [{ languageId: 9, name: "National" }],
+        isMainSeries: true,
+        regionId: null,
+        versionGroupIds: [1, 2, 25],
+      },
+      {
+        id: 2,
+        identifier: "kanto",
+        names: [{ languageId: 9, name: "Kanto" }],
+        isMainSeries: true,
+        regionId: 1,
+        versionGroupIds: [1, 2],
+      },
+      {
+        id: 31,
+        identifier: "paldea",
+        names: [
+          { languageId: 9, name: "Paldea" },
+          { languageId: 5, name: "Paldea (FR)" },
+        ],
+        isMainSeries: true,
+        regionId: 10,
+        versionGroupIds: [25],
+      },
+      {
+        id: 32,
+        identifier: "kitakami",
+        names: [{ languageId: 9, name: "Kitakami" }],
+        isMainSeries: true,
+        regionId: 10,
+        versionGroupIds: [26],
+      },
+    ],
+    regions: [
+      { id: 1, identifier: "kanto", names: [{ languageId: 9, name: "Kanto" }] },
+      { id: 10, identifier: "paldea", names: [{ languageId: 9, name: "Paldea" }] },
+    ],
     coverage: [],
     sourceCounts: {
       generations: 9,
@@ -138,6 +190,9 @@ export function fixture(): SnapshotInput {
       learnMethods: 1,
       items: 0,
       evolutionTriggers: 1,
+      eggGroups: 2,
+      pokedexes: 4,
+      regions: 2,
     },
     census: { species: 1, pokemon: 1, forms: 1, learnsets: 3, evolutions: 0 },
   };
@@ -163,6 +218,12 @@ export function fixture(): SnapshotInput {
     isBaby: false,
     isLegendary: false,
     isMythical: false,
+    eggGroupIds: [5, 6],
+    pokedexNumbers: [
+      { pokedexId: 1, number: 25 },
+      { pokedexId: 2, number: 25 },
+      { pokedexId: 31, number: 74 },
+    ],
     sourceFacts: {
       hatch_counter: 10,
       growth_rate_id: 2,
@@ -242,6 +303,10 @@ export function fixture(): SnapshotInput {
         ],
         encounters: [],
         media: { sprites: {}, artwork: null },
+        cries: {
+          latest: "https://example.test/cries/latest/25.ogg",
+          legacy: "https://example.test/cries/legacy/25.ogg",
+        },
         sourceCounts: {
           types: 1,
           typeHistory: 0,
@@ -256,7 +321,15 @@ export function fixture(): SnapshotInput {
       },
     ],
     evolutions: [],
-    sourceCounts: { names: 3, genera: 0, flavorTexts: 2, varieties: 1, evolutions: 0 },
+    sourceCounts: {
+      names: 3,
+      genera: 0,
+      flavorTexts: 2,
+      varieties: 1,
+      evolutions: 0,
+      eggGroupIds: 2,
+      pokedexNumbers: 3,
+    },
   };
   references.coverage = references.versionGroups.map((group) => ({
     versionGroupId: group.id,

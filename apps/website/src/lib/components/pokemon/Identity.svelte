@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import type { LocalizedText } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import type { LocalizedText, ResolvedPokemon } from "../../../../../../packages/pokemon-data/src/index.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/pokemon.ts";
   import Localized from "./Localized.svelte";
+  import Cries from "./Cries.svelte";
   import { getSelectedSprite } from "../SpriteSelector.svelte";
   import { resolveMainSprite, spriteStyleName } from "#lib/data/sprite-preference.ts";
   import type { GameOption } from "../../../../../../packages/pokemon-data/src/index.ts";
@@ -20,6 +21,8 @@
     artwork,
     sprites,
     games,
+    pokemon,
+    identityKey,
     children,
   }: {
     lang: Language;
@@ -35,6 +38,9 @@
     artwork: string | null | undefined;
     sprites: unknown;
     games: readonly GameOption[];
+    pokemon: ResolvedPokemon | null;
+    /** Current species/form URL identity, including while its data is loading. */
+    identityKey: string;
     /** Page-level controls shown under the facts (game context, form picker). */
     children?: Snippet;
   } = $props();
@@ -77,25 +83,32 @@
     {@render children?.()}
   </div>
   {#if artwork !== undefined}
-    <figure>
-      {#if imageUrl}
-        <img
-          src={imageUrl}
-          alt={t(lang, "sprites.alt", { name: (formName ?? name).text, view: fallback ? t(lang, "sprites.official") : spriteStyleName(style, lang, games) })}
-          width="240"
-          height="240"
-          class:pixelated={image.pixelated && !fallback}
-          onerror={() => { if (imageUrl) failedUrls = [...failedUrls, imageUrl]; }}
-        />
-        <figcaption class="note" aria-live="polite">
-          {fallback
-            ? t(lang, "sprites.preferenceFallback", { style: spriteStyleName(style, lang, games) })
-            : style.id === "official" ? t(lang, "identity.artworkNote") : spriteStyleName(style, lang, games)}
-        </figcaption>
-      {:else}
-        <figcaption class="note">{t(lang, "sprites.mainMissing")}</figcaption>
-      {/if}
-    </figure>
+    <div class="media">
+      <figure>
+        {#if imageUrl}
+          <img
+            src={imageUrl}
+            alt={t(lang, "sprites.alt", { name: (formName ?? name).text, view: fallback ? t(lang, "sprites.official") : spriteStyleName(style, lang, games) })}
+            width="240"
+            height="240"
+            class:pixelated={image.pixelated && !fallback}
+            onerror={() => { if (imageUrl) failedUrls = [...failedUrls, imageUrl]; }}
+          />
+          <figcaption class="note" aria-live="polite">
+            {fallback
+              ? t(lang, "sprites.preferenceFallback", { style: spriteStyleName(style, lang, games) })
+              : style.id === "official" ? t(lang, "identity.artworkNote") : spriteStyleName(style, lang, games)}
+          </figcaption>
+        {:else}
+          <figcaption class="note">{t(lang, "sprites.mainMissing")}</figcaption>
+        {/if}
+      </figure>
+      {#key `${identityKey}:${pokemon?.pokemonId}:${pokemon?.formId}`}
+        {#if pokemon && pokemon.speciesId === speciesId}
+          <Cries {lang} cries={pokemon.cries} />
+        {/if}
+      {/key}
+    </div>
   {/if}
 </header>
 
@@ -127,8 +140,8 @@
     padding: 0.3rem 0.625rem;
     border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
     border-radius: 999px;
-    background: #fff4d6;
-    color: #795000;
+    background: var(--legendary-background);
+    color: var(--legendary);
     font-size: 0.75rem;
     font-weight: 650;
     line-height: 1.25;
@@ -136,16 +149,20 @@
   }
 
   .rarity-badge.mythical {
-    background: #f2eaff;
-    color: #7041a0;
+    background: var(--mythical-background);
+    color: var(--mythical);
   }
 
   .rarity-badge svg {
     flex-shrink: 0;
   }
 
-  figure {
+  .media {
     grid-column: 2;
+    min-width: 0;
+  }
+
+  figure {
     margin: 0;
     text-align: center;
   }
@@ -159,9 +176,9 @@
       grid-template-columns: minmax(0, 1fr);
     }
 
-    figure {
+    .media {
       grid-column: 1;
-      max-width: 12rem;
+      max-width: 15rem;
       margin-inline: auto;
     }
   }

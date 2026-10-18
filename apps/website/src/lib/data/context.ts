@@ -76,11 +76,13 @@ export function pickRootLanguage(
   return DEFAULT_LANGUAGE;
 }
 
-export type PreferenceKey = "version" | "language" | "sprite";
+export type PreferenceKey = "version" | "language" | "sprite" | "theme";
+// `theme` is also read by the pre-paint inline script in src/app.html; keep the key in sync.
 const STORAGE_KEYS: Record<PreferenceKey, string> = {
   version: "pokemouille.version",
   language: "pokemouille.language",
   sprite: "pokemouille.sprite",
+  theme: "pokemouille.theme",
 };
 
 // Storage is absent during SSR/prerender and may throw when blocked by the browser;

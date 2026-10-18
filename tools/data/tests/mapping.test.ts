@@ -79,8 +79,29 @@ function moveReferences(): ReferencesQuery {
     itemsCount: { aggregate: { count: 0 } },
     evolutionTriggers: [],
     evolutionTriggersCount: { aggregate: { count: 0 } },
+    eggGroups: [],
+    eggGroupsCount: { aggregate: { count: 0 } },
+    pokedexes: [],
+    pokedexesCount: { aggregate: { count: 0 } },
+    regions: [],
+    regionsCount: { aggregate: { count: 0 } },
   };
 }
+
+describe("reference operation diagnostics", () => {
+  it("identifies stale response aliases without including source prose", async () => {
+    const operations = await loadOperations();
+    const raw = moveReferences();
+    for (const key of ["eggGroups", "pokedexes", "regions"]) {
+      Reflect.deleteProperty(raw, key);
+      Reflect.deleteProperty(raw, `${key}Count`);
+    }
+    expect(() => operations.references.validate(raw, {})).toThrow(
+      /Missing reference resource arrays: eggGroups, pokedexes, regions; returned fields: .*moves:array/,
+    );
+    expect(() => operations.references.validate(raw, {})).not.toThrow("Une attaque électrique.");
+  });
+});
 
 describe("ability reference mapping", () => {
   function abilityReferences(): ReferencesQuery {
@@ -397,6 +418,104 @@ describe("item reference mapping", () => {
   });
 });
 
+describe("egg group, pokedex and region reference mapping", () => {
+  function dexReferences(): ReferencesQuery {
+    const raw = moveReferences();
+    raw.eggGroups = [
+      {
+        id: 5,
+        identifier: "ground",
+        names: [
+          { languageId: 9, name: "Field" },
+          { languageId: 5, name: "Terrestre" },
+        ],
+        namesCount: { aggregate: { count: 2 } },
+      },
+    ];
+    raw.eggGroupsCount = { aggregate: { count: 1 } };
+    raw.pokedexes = [
+      {
+        id: 31,
+        identifier: "paldea",
+        isMainSeries: true,
+        regionId: 10,
+        names: [{ languageId: 1, name: "パルデア" }],
+        namesCount: { aggregate: { count: 1 } },
+        versionGroups: [{ versionGroupId: 25 }],
+        versionGroupsCount: { aggregate: { count: 1 } },
+      },
+      {
+        id: 1,
+        identifier: "national",
+        isMainSeries: true,
+        regionId: null,
+        names: [],
+        namesCount: { aggregate: { count: 0 } },
+        versionGroups: [],
+        versionGroupsCount: { aggregate: { count: 0 } },
+      },
+    ];
+    raw.pokedexesCount = { aggregate: { count: 2 } };
+    raw.regions = [
+      {
+        id: 10,
+        identifier: "paldea",
+        names: [{ languageId: 9, name: "Paldea" }],
+        namesCount: { aggregate: { count: 1 } },
+      },
+    ];
+    raw.regionsCount = { aggregate: { count: 1 } };
+    return raw;
+  }
+
+  it("maps localized named rows, nullable regions and pokedex version groups with source counts", () => {
+    const raw = dexReferences();
+    validateBoundedRelationships(raw);
+    const mapped = mapReferences(raw, census);
+    expect(mapped.eggGroups).toEqual([
+      {
+        id: 5,
+        identifier: "ground",
+        names: [
+          { languageId: 9, name: "Field" },
+          { languageId: 5, name: "Terrestre" },
+        ],
+      },
+    ]);
+    expect(mapped.pokedexes).toEqual([
+      {
+        id: 31,
+        identifier: "paldea",
+        names: [{ languageId: 1, name: "パルデア" }],
+        isMainSeries: true,
+        regionId: 10,
+        versionGroupIds: [25],
+      },
+      {
+        id: 1,
+        identifier: "national",
+        names: [],
+        isMainSeries: true,
+        regionId: null,
+        versionGroupIds: [],
+      },
+    ]);
+    expect(mapped.regions).toEqual([
+      { id: 10, identifier: "paldea", names: [{ languageId: 9, name: "Paldea" }] },
+    ]);
+    expect(mapped.sourceCounts).toMatchObject({ eggGroups: 1, pokedexes: 2, regions: 1 });
+  });
+
+  it("rejects truncated pokedex version groups and missing version-group relationships", () => {
+    const truncated = dexReferences();
+    truncated.pokedexes[0]!.versionGroupsCount.aggregate!.count = 2;
+    expect(() => validateBoundedRelationships(truncated)).toThrow("truncated relationship");
+    const missing = dexReferences();
+    missing.pokedexes[0]!.versionGroups[0]!.versionGroupId = null;
+    expect(() => mapReferences(missing, census)).toThrow("pokedex.versionGroupId");
+  });
+});
+
 describe("game text normalization", () => {
   it("joins cartridge text-box wrapping into prose", () => {
     expect(
@@ -449,6 +568,7 @@ describe("species-scoped encounter mapping", () => {
           identifier: "viridian-forest",
           names: [{ languageId: 5, name: "Forêt de Jade" }],
           namesCount: { aggregate: { count: 1 } },
+          regionId: 1,
         },
       ],
       locationsCount: { aggregate: { count: 1 } },
@@ -522,6 +642,10 @@ describe("species-scoped encounter mapping", () => {
       namesCount: { aggregate: { count: record.names.length } },
       flavorTexts: record.flavorTexts,
       flavorTextsCount: { aggregate: { count: record.flavorTexts.length } },
+      eggGroups: record.eggGroupIds.map((eggGroupId) => ({ eggGroupId })),
+      eggGroupsCount: { aggregate: { count: record.eggGroupIds.length } },
+      pokedexNumbers: record.pokedexNumbers,
+      pokedexNumbersCount: { aggregate: { count: record.pokedexNumbers.length } },
       evolutions: [],
       evolutionsCount: { aggregate: { count: 0 } },
       varieties: [
@@ -565,6 +689,8 @@ describe("species-scoped encounter mapping", () => {
           learnsetsCount: { aggregate: { count: variety.learnsets.length } },
           sprites: [],
           spritesCount: { aggregate: { count: 0 } },
+          cries: [{ cries: variety.cries }],
+          criesCount: { aggregate: { count: 1 } },
           encounters: [
             {
               id: 1,
@@ -599,6 +725,7 @@ describe("species-scoped encounter mapping", () => {
           id: 1,
           identifier: "viridian-forest",
           names: [{ languageId: 5, name: "Forêt de Jade" }],
+          regionId: 1,
         },
         area: { id: 1, identifier: "", names: [] },
         method: { id: 1, identifier: "walk", names: [{ languageId: 9, name: "Walking" }] },
@@ -618,6 +745,65 @@ describe("species-scoped encounter mapping", () => {
     expect(
       mapSpecies(raw, mapEncounterReferences(lookups)).varieties[0]!.sourceCounts.encounters,
     ).toBe(1);
+  });
+
+  it("maps species egg groups and dex numbers in source order with independent counts", () => {
+    const raw = sourceSpecies();
+    raw.eggGroups = [{ eggGroupId: 6 }, { eggGroupId: 5 }];
+    raw.pokedexNumbers = [
+      { pokedexId: 1, number: 494 },
+      { pokedexId: 9, number: 0 },
+    ];
+    raw.pokedexNumbersCount.aggregate!.count = 2;
+    validateBoundedRelationships({ species: [raw] });
+    const mapped = mapSpecies(raw, mapEncounterReferences(sourceLookups()));
+    expect(mapped.eggGroupIds).toEqual([6, 5]);
+    expect(mapped.pokedexNumbers).toEqual([
+      { pokedexId: 1, number: 494 },
+      { pokedexId: 9, number: 0 },
+    ]);
+    expect(mapped.sourceCounts).toMatchObject({ eggGroupIds: 2, pokedexNumbers: 2 });
+    raw.pokedexNumbersCount.aggregate!.count = 3;
+    expect(() => validateBoundedRelationships({ species: [raw] })).toThrow("pokedexNumbers");
+    raw.eggGroups[0]!.eggGroupId = null;
+    expect(() => mapSpecies(raw, mapEncounterReferences(sourceLookups()))).toThrow(
+      "species.eggGroupId",
+    );
+  });
+
+  it("maps current cry URLs and keeps absent or malformed cries explicitly null", () => {
+    const raw = sourceSpecies();
+    const lookups = mapEncounterReferences(sourceLookups());
+    const variety = raw.varieties[0]!;
+    expect(mapSpecies(raw, lookups).varieties[0]!.cries).toEqual({
+      latest: "https://example.test/cries/latest/25.ogg",
+      legacy: "https://example.test/cries/legacy/25.ogg",
+    });
+    variety.cries = [{ cries: { latest: "https://example.test/latest.ogg", legacy: null } }];
+    expect(mapSpecies(raw, lookups).varieties[0]!.cries).toEqual({
+      latest: "https://example.test/latest.ogg",
+      legacy: null,
+    });
+    variety.cries = [];
+    variety.criesCount.aggregate!.count = 0;
+    validateBoundedRelationships({ species: [raw] });
+    expect(mapSpecies(raw, lookups).varieties[0]!.cries).toEqual({ latest: null, legacy: null });
+    variety.cries = [{ cries: { latest: 7 } }, { cries: {} }];
+    variety.criesCount.aggregate!.count = 2;
+    expect(() => mapSpecies(raw, lookups)).toThrow("ambiguous cry records");
+    variety.cries = [{ cries: { latest: 7 } }];
+    expect(mapSpecies(raw, lookups).varieties[0]!.cries).toEqual({ latest: null, legacy: null });
+  });
+
+  it("maps location regions as nullable validated foreign keys", () => {
+    const lookups = sourceLookups();
+    lookups.locations[0]!.regionId = null;
+    const raw = sourceSpecies();
+    expect(
+      mapSpecies(raw, mapEncounterReferences(lookups)).varieties[0]!.encounters[0]!.location,
+    ).toMatchObject({ id: 1, regionId: null });
+    lookups.locations[0]!.regionId = 0;
+    expect(() => mapEncounterReferences(lookups)).toThrow("location.regionId");
   });
 
   it("does not invent missing encounter relationships or turn a counted empty export into availability", () => {
@@ -821,6 +1007,7 @@ describe("species-scoped encounter mapping", () => {
         identifier: "kanto-power-plant",
         names: [{ languageId: 9, name: "Kanto Power Plant" }],
         namesCount: { aggregate: { count: 1 } },
+        regionId: 1,
       },
     ];
     source.areas = [

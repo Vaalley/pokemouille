@@ -302,7 +302,7 @@
     top: -1rem;
     bottom: -1rem;
     left: -1rem;
-    border-left: 2px solid var(--border, #8888);
+    border-left: 2px solid var(--border);
   }
   .branch > .branches > .branch:last-child::before {
     bottom: auto;
@@ -314,11 +314,11 @@
     top: 1.5rem;
     left: -1rem;
     width: 1rem;
-    border-top: 2px solid var(--border, #8888);
+    border-top: 2px solid var(--border);
   }
   .card {
     min-width: 0;
-    border: 1px solid var(--border, #8888);
+    border: 1px solid var(--border);
     border-radius: 0.75rem;
     padding: 1rem;
     overflow-wrap: anywhere;
@@ -354,7 +354,7 @@
     display: inline-block;
     margin: 0.25rem 0 0 0.25rem;
     padding: 0.15rem 0.4rem;
-    border: 1px solid var(--border, #8888);
+    border: 1px solid var(--border);
     border-radius: 0.3rem;
     font-size: 0.8rem;
   }

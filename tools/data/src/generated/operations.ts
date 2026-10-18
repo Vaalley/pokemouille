@@ -78,6 +78,16 @@ export type CensusBeforeQuery = {
   itemNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   evolutionTriggerNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   versionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  eggGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  eggGroupNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  speciesEggGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexes: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexVersionGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  speciesDexNumbers: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  cries: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  regions: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  regionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
 };
 
 export type CensusAfterQueryVariables = Exact<{ [key: string]: never }>;
@@ -154,6 +164,16 @@ export type CensusAfterQuery = {
   itemNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   evolutionTriggerNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   versionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  eggGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  eggGroupNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  speciesEggGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexes: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexVersionGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  speciesDexNumbers: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  cries: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  regions: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  regionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
 };
 
 export type SourceCensusFragment = {
@@ -228,6 +248,16 @@ export type SourceCensusFragment = {
   itemNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   evolutionTriggerNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
   versionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  eggGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  eggGroupNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  speciesEggGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexes: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  pokedexVersionGroups: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  speciesDexNumbers: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  cries: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  regions: { aggregate: { count: number; max: { id: number | null } | null } | null };
+  regionNames: { aggregate: { count: number; max: { id: number | null } | null } | null };
 };
 
 export type EncounterReferencesQueryVariables = Exact<{ [key: string]: never }>;
@@ -236,6 +266,7 @@ export type EncounterReferencesQuery = {
   locations: Array<{
     id: number;
     identifier: string;
+    regionId: number | null;
     names: Array<{ name: string; languageId: number | null }>;
     namesCount: { aggregate: { count: number } | null };
   }>;
@@ -438,6 +469,31 @@ export type ReferencesQuery = {
     namesCount: { aggregate: { count: number } | null };
   }>;
   evolutionTriggersCount: { aggregate: { count: number } | null };
+  eggGroups: Array<{
+    id: number;
+    identifier: string;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  eggGroupsCount: { aggregate: { count: number } | null };
+  pokedexes: Array<{
+    id: number;
+    identifier: string;
+    isMainSeries: boolean;
+    regionId: number | null;
+    versionGroups: Array<{ versionGroupId: number | null }>;
+    versionGroupsCount: { aggregate: { count: number } | null };
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  pokedexesCount: { aggregate: { count: number } | null };
+  regions: Array<{
+    id: number;
+    identifier: string;
+    names: Array<{ name: string; languageId: number | null }>;
+    namesCount: { aggregate: { count: number } | null };
+  }>;
+  regionsCount: { aggregate: { count: number } | null };
 };
 
 export type SpeciesPageQueryVariables = Exact<{
@@ -470,6 +526,10 @@ export type SpeciesPageQuery = {
     namesCount: { aggregate: { count: number } | null };
     flavorTexts: Array<{ languageId: number | null; versionId: number | null; text: string }>;
     flavorTextsCount: { aggregate: { count: number } | null };
+    eggGroups: Array<{ eggGroupId: number | null }>;
+    eggGroupsCount: { aggregate: { count: number } | null };
+    pokedexNumbers: Array<{ pokedexId: number | null; number: number }>;
+    pokedexNumbersCount: { aggregate: { count: number } | null };
     evolutions: Array<{
       id: number;
       condition_expression: string;
@@ -576,6 +636,8 @@ export type SpeciesPageQuery = {
       encountersCount: { aggregate: { count: number } | null };
       sprites: Array<{ sprites: unknown }>;
       spritesCount: { aggregate: { count: number } | null };
+      cries: Array<{ cries: unknown }>;
+      criesCount: { aggregate: { count: number } | null };
     }>;
     varietiesCount: { aggregate: { count: number } | null };
   }>;

@@ -1,20 +1,14 @@
-import { createHash } from "node:crypto";
-import { readFile, stat } from "node:fs/promises";
-import { join } from "node:path";
 import type {
   DatasetManifest,
   EvolutionChainProjection,
   Language,
   PokemonReferences,
   ReferenceData,
-  SpeciesRecord,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 import { pokemonName } from "../../../../../packages/pokemon-data/src/resolve.ts";
 import type { EvolutionForm } from "../data/evolution-tree.ts";
+import { createSnapshotCache, forEachSpecies, readDataJson } from "./snapshot.ts";
 
-const DATA_DIR = join(process.cwd(), "static", "data");
-const MANIFEST_PATH = join(DATA_DIR, "manifest.json");
-const READ_CONCURRENCY = 4;
 const LANGUAGES: readonly Language[] = ["en", "fr", "ja"];
 
 type EvolutionReferences = Pick<
@@ -79,13 +73,9 @@ export function selectItemEvolutions(
   };
 }
 
-async function readJson<T>(path: string): Promise<T> {
-  return JSON.parse(await readFile(join(DATA_DIR, path), "utf8")) as T;
-}
-
 /** One bounded species pass per immutable dataset revision, shared across all item routes/locales. */
 async function buildSnapshot(manifest: DatasetManifest): Promise<Snapshot> {
-  const refs = await readJson<ReferenceData>(manifest.files.references.path);
+  const refs = await readDataJson<ReferenceData>(manifest.files.references.path);
   const references: EvolutionReferences = {
     evolutionTriggers: refs.evolutionTriggers,
     versionGroups: refs.versionGroups,
@@ -100,49 +90,41 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<Snapshot> {
     types: refs.types,
   };
   const chains = new Map<string, IndexedChain>();
-  const assets = Object.values(manifest.files.pokemon);
-  let next = 0;
-  async function worker(): Promise<void> {
-    while (next < assets.length) {
-      const record = await readJson<SpeciesRecord>(assets[next++]!.path);
-      // A missing chain ID must not merge unrelated species into an invented chain.
-      const key =
-        record.evolutionChainId === null
-          ? `species:${record.id}`
-          : `chain:${record.evolutionChainId}`;
-      let entry = chains.get(key);
-      if (!entry) {
-        entry = {
-          key,
-          chain: { chainId: record.evolutionChainId, applicability: "unresolved", nodes: [] },
-          forms: { en: {}, fr: {}, ja: {} },
-        };
-        chains.set(key, entry);
-      }
-      entry.chain.nodes.push({
-        speciesId: record.id,
-        identifier: record.identifier,
-        names: record.names,
-        generationId: record.generationId,
-        evolvesFromSpeciesId: record.evolvesFromSpeciesId,
-        methods: record.evolutions,
-      });
-      // Keep identities only, never retain full records or their learnsets in the index.
-      for (const variety of record.varieties)
-        for (const form of variety.forms)
-          for (const lang of LANGUAGES)
-            entry.forms[lang][form.id] = {
-              speciesId: record.id,
-              identifier: form.identifier,
-              separate: !variety.isDefault,
-              versionGroupId: form.versionGroupId,
-              name: pokemonName(record, variety, form, lang),
-            };
+  await forEachSpecies(manifest, (record) => {
+    // A missing chain ID must not merge unrelated species into an invented chain.
+    const key =
+      record.evolutionChainId === null
+        ? `species:${record.id}`
+        : `chain:${record.evolutionChainId}`;
+    let entry = chains.get(key);
+    if (!entry) {
+      entry = {
+        key,
+        chain: { chainId: record.evolutionChainId, applicability: "unresolved", nodes: [] },
+        forms: { en: {}, fr: {}, ja: {} },
+      };
+      chains.set(key, entry);
     }
-  }
-  await Promise.all(
-    Array.from({ length: Math.min(READ_CONCURRENCY, assets.length) }, () => worker()),
-  );
+    entry.chain.nodes.push({
+      speciesId: record.id,
+      identifier: record.identifier,
+      names: record.names,
+      generationId: record.generationId,
+      evolvesFromSpeciesId: record.evolvesFromSpeciesId,
+      methods: record.evolutions,
+    });
+    // Keep identities only, never retain full records or their learnsets in the index.
+    for (const variety of record.varieties)
+      for (const form of variety.forms)
+        for (const lang of LANGUAGES)
+          entry.forms[lang][form.id] = {
+            speciesId: record.id,
+            identifier: form.identifier,
+            separate: !variety.isDefault,
+            versionGroupId: form.versionGroupId,
+            name: pokemonName(record, variety, form, lang),
+          };
+  });
   const items = new Map<number, IndexedChain[]>();
   for (const entry of chains.values()) {
     entry.chain.nodes.sort((a, b) => a.speciesId - b.speciesId);
@@ -182,44 +164,7 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<Snapshot> {
   return { items, references };
 }
 
-interface CachedSnapshot {
-  manifestStamp: string;
-  revisionKey: string;
-  promise: Promise<Snapshot>;
-}
-let cachedSnapshot: CachedSnapshot | undefined;
-let checkingSnapshot: Promise<Snapshot> | undefined;
-
-async function currentSnapshot(): Promise<Snapshot> {
-  const info = await stat(MANIFEST_PATH, { bigint: true });
-  const manifestStamp = `${info.mtimeNs}:${info.ctimeNs}:${info.size}:${info.ino}`;
-  if (cachedSnapshot?.manifestStamp === manifestStamp) return cachedSnapshot.promise;
-  const source = await readFile(MANIFEST_PATH, "utf8");
-  const manifest = JSON.parse(source) as DatasetManifest;
-  const revisionKey = `${manifest.datasetRevision}:${createHash("sha256").update(source).digest("hex")}`;
-  if (cachedSnapshot?.revisionKey === revisionKey) {
-    cachedSnapshot.manifestStamp = manifestStamp;
-    return cachedSnapshot.promise;
-  }
-  const promise = buildSnapshot(manifest);
-  cachedSnapshot = { manifestStamp, revisionKey, promise };
-  void promise.catch(() => {
-    if (cachedSnapshot?.promise === promise) cachedSnapshot = undefined;
-  });
-  return promise;
-}
-
-function getSnapshot(): Promise<Snapshot> {
-  if (!checkingSnapshot) {
-    const attempt = currentSnapshot();
-    checkingSnapshot = attempt;
-    const clear = () => {
-      if (checkingSnapshot === attempt) checkingSnapshot = undefined;
-    };
-    void attempt.then(clear, clear);
-  }
-  return checkingSnapshot;
-}
+const getSnapshot = createSnapshotCache(buildSnapshot);
 
 /** Only this item's matching methods and the reference names they use reach the browser. */
 export async function getItemEvolutions(

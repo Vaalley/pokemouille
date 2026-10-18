@@ -4,17 +4,49 @@ import type {
   LocalizedText,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 
+/** HP, Attack, Defense, Sp. Atk, Sp. Def, Speed, then their sum. */
+export type CatalogueStats = [
+  hp: number,
+  attack: number,
+  defense: number,
+  specialAttack: number,
+  specialDefense: number,
+  speed: number,
+  total: number,
+];
+
+export const SPECIES_CLASSES = ["legendary", "mythical", "baby", "ordinary"] as const;
+export type SpeciesClass = (typeof SPECIES_CLASSES)[number];
+
+/**
+ * Compact National Pokédex row. Types, stats and abilities are the default
+ * variety's current values, never those of a selected or historical game.
+ */
 export interface CatalogueSpecies {
   id: number;
   name: string;
   generationId: number;
   typeIds: number[];
+  /** Null when the source lacks any of the six base stats. */
+  stats: CatalogueStats | null;
+  abilityIds: number[];
+  hiddenAbilityIds: number[];
+  classification: SpeciesClass;
+  /** Exact source membership: [Pokédex ID, number], including number zero. */
+  dexNumbers: [pokedexId: number, dexNumber: number][];
 }
 
 export interface Catalogue {
   species: CatalogueSpecies[];
   types: { id: number; name: LocalizedText }[];
   generations: number[];
+  /** Only abilities some species currently has, in localized name order. */
+  abilities: { id: number; name: LocalizedText }[];
+  /** Source names of the six base stats, in `CatalogueStats` order. */
+  statNames: LocalizedText[];
+  pokedexes: { id: number; name: LocalizedText; versionGroupIds: number[] }[];
+  /** Version identifiers map to exact groups, never introduction or encounter proxies. */
+  versions: [identifier: string, versionGroupId: number][];
 }
 
 export interface RelatedPokemon {

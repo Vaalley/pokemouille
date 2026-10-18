@@ -133,7 +133,11 @@ export class GraphqlClient {
     // Persist the reservation before touching the network: crashes and errors consume budget too.
     await writeJson(ledgerPath, ledger);
     this.requests++;
-    const response = await (this.options.fetch ?? globalThis.fetch)(this.options.endpoint, {
+    // The upstream proxy can reuse a response for different large POST bodies.
+    // Include the complete request identity in the URL, not just in our local cache.
+    const requestUrl = new URL(this.options.endpoint);
+    requestUrl.searchParams.set("queryHash", key);
+    const response = await (this.options.fetch ?? globalThis.fetch)(requestUrl, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({ query: operation.document, operationName: operation.name, variables }),

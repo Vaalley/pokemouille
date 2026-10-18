@@ -85,7 +85,7 @@
     border-radius: 0.75rem;
     background: Canvas;
     color: CanvasText;
-    box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.15);
+    box-shadow: var(--popover-shadow);
     font-size: 1rem;
     font-weight: normal;
   }

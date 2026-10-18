@@ -11,6 +11,7 @@ import type {
   PokemonForm,
   PokemonVariety,
   PokemonReferences,
+  Pokedex,
   ResolvedPokemon,
   SpeciesRecord,
   VersionGroup,
@@ -33,6 +34,9 @@ interface ReferenceIndex {
   moves: Map<number, NamedResource>;
   learnMethods: Map<number, NamedResource>;
   triggers: Map<number, NamedResource>;
+  eggGroups: Map<number, NamedResource>;
+  /** Non-national pokedexes keyed by the version groups that use them. */
+  dexesByGroup: Map<number, Map<number, Pokedex>>;
   groups: Map<number, VersionGroup>;
   games: Map<string, GameOption>;
 }
@@ -44,9 +48,25 @@ function makeReferenceIndex(refs: PokemonReferences): ReferenceIndex {
     moves: resourceIndex(refs.moves),
     learnMethods: resourceIndex(refs.learnMethods),
     triggers: resourceIndex(refs.evolutionTriggers),
+    eggGroups: resourceIndex(refs.eggGroups),
+    dexesByGroup: pokedexesByGroup(refs.pokedexes),
     groups: resourceIndex(refs.versionGroups),
     games: new Map(getMainSeriesGames(refs).map((game) => [game.version.identifier, game])),
   };
+}
+// Pokédex 1 is the National Dex; its number is the species ID, not a game-specific fact.
+const NATIONAL_POKEDEX_ID = 1;
+function pokedexesByGroup(pokedexes: readonly Pokedex[]): Map<number, Map<number, Pokedex>> {
+  const byGroup = new Map<number, Map<number, Pokedex>>();
+  for (const pokedex of pokedexes) {
+    if (pokedex.id === NATIONAL_POKEDEX_ID) continue;
+    for (const groupId of pokedex.versionGroupIds) {
+      let dexes = byGroup.get(groupId);
+      if (!dexes) byGroup.set(groupId, (dexes = new Map()));
+      dexes.set(pokedex.id, pokedex);
+    }
+  }
+  return byGroup;
 }
 const referenceCache = new WeakMap<PokemonReferences, ReferenceIndex>();
 function referenceIndex(refs: PokemonReferences) {
@@ -244,6 +264,8 @@ export function resolvePokemon(
   let abilities: ResolvedPokemon["abilities"] = blocked();
   let learnset: ResolvedPokemon["learnset"] = blocked();
   let flavorText: ResolvedPokemon["flavorText"] = blocked();
+  let eggGroups: ResolvedPokemon["eggGroups"] = blocked();
+  let regionalDexNumbers: ResolvedPokemon["regionalDexNumbers"] = blocked();
   if (eligible) {
     const typeRows = pokemonTypesAtGeneration(variety, generationId);
     types = typeRows.length
@@ -340,6 +362,37 @@ export function resolvePokemon(
       record.flavorTexts.filter((text) => text.versionId === game.version.id),
       language,
     );
+    eggGroups = record.eggGroupIds.length
+      ? available({
+          scope: "current-not-game-specific" as const,
+          groups: record.eggGroupIds.map((id) => ({
+            id,
+            name: named(refs.eggGroups.get(id), language, id),
+          })),
+        })
+      : missing("No egg group facts for this species");
+    const dexes = refs.dexesByGroup.get(game.group.id);
+    const entries = dexes
+      ? record.pokedexNumbers.flatMap((row) => {
+          const pokedex = dexes.get(row.pokedexId);
+          return pokedex
+            ? [
+                {
+                  pokedexId: pokedex.id,
+                  name: named(pokedex, language, pokedex.id),
+                  number: row.number,
+                },
+              ]
+            : [];
+        })
+      : [];
+    regionalDexNumbers = entries.length
+      ? available(entries)
+      : missing(
+          dexes
+            ? "The source lists this species in no regional Pokédex of the selected game"
+            : "The source maps no regional Pokédex to the selected game",
+        );
   }
 
   return {
@@ -390,6 +443,9 @@ export function resolvePokemon(
         })
       : blocked(),
     media: variety.media,
+    cries: { ...variety.cries, scope: "current-not-game-specific" },
+    eggGroups,
+    regionalDexNumbers,
     forms: index.forms.map((entry) => ({
       id: entry.form!.id,
       pokemonId: entry.variety.id,

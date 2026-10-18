@@ -461,4 +461,83 @@ query References {
       count
     }
   }
+  eggGroups: egggroup(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: egggroupnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: egggroupnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  eggGroupsCount: egggroup_aggregate {
+    aggregate {
+      count
+    }
+  }
+  pokedexes: pokedex(order_by: { id: asc }, limit: 256) {
+    id
+    identifier: name
+    isMainSeries: is_main_series
+    regionId: region_id
+    versionGroups: pokedexversiongroups(
+      order_by: [{ version_group_id: asc }, { id: asc }]
+      limit: 64
+    ) {
+      versionGroupId: version_group_id
+    }
+    versionGroupsCount: pokedexversiongroups_aggregate {
+      aggregate {
+        count
+      }
+    }
+    names: pokedexnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: pokedexnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  pokedexesCount: pokedex_aggregate {
+    aggregate {
+      count
+    }
+  }
+  regions: region(order_by: { id: asc }, limit: 128) {
+    id
+    identifier: name
+    names: regionnames(
+      where: { language_id: { _in: [1, 5, 9, 11] } }
+      order_by: { language_id: asc }
+      limit: 8
+    ) {
+      languageId: language_id
+      name
+    }
+    namesCount: regionnames_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+  regionsCount: region_aggregate {
+    aggregate {
+      count
+    }
+  }
 }

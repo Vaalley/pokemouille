@@ -3,6 +3,7 @@ query EncounterReferences {
   locations: location(order_by: { id: asc }, limit: 4096) {
     id
     identifier: name
+    regionId: region_id
     names: locationnames(
       where: { language_id: { _in: [1, 5, 9, 11] } }
       order_by: { language_id: asc }

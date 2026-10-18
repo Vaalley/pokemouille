@@ -83,6 +83,7 @@ function hasEncounters(value: unknown): boolean {
       isInteger(row.id) &&
       isInteger(row.versionId) &&
       isObject(row.location) &&
+      isNullableInteger(row.location.regionId) &&
       isObject(row.area) &&
       isObject(row.method) &&
       isInteger(row.minLevel) &&
@@ -142,6 +143,18 @@ export async function getPokemonReferences(
         Array.isArray(value.moves) &&
         value.moves.every(hasMoveListStats) &&
         Array.isArray(value.items) &&
+        Array.isArray(value.eggGroups) &&
+        Array.isArray(value.regions) &&
+        Array.isArray(value.pokedexes) &&
+        value.pokedexes.every(
+          (row) =>
+            isObject(row) &&
+            isInteger(row.id) &&
+            typeof row.isMainSeries === "boolean" &&
+            isNullableInteger(row.regionId) &&
+            Array.isArray(row.versionGroupIds) &&
+            row.versionGroupIds.every(isInteger),
+        ) &&
         Array.isArray(value.machines) &&
         value.machines.every(
           (row) =>
@@ -195,8 +208,24 @@ export async function getSpecies(
       (value) =>
         isObject(value) &&
         value.id === speciesId &&
+        Array.isArray(value.eggGroupIds) &&
+        value.eggGroupIds.every(isInteger) &&
+        Array.isArray(value.pokedexNumbers) &&
+        value.pokedexNumbers.every(
+          (row) => isObject(row) && isInteger(row.pokedexId) && isInteger(row.number),
+        ) &&
+        isObject(value.sourceCounts) &&
+        value.sourceCounts.eggGroupIds === value.eggGroupIds.length &&
+        value.sourceCounts.pokedexNumbers === value.pokedexNumbers.length &&
         Array.isArray(value.varieties) &&
-        value.varieties.every(hasEncounters),
+        value.varieties.every(
+          (row) =>
+            hasEncounters(row) &&
+            isObject(row) &&
+            isObject(row.cries) &&
+            (row.cries.latest === null || typeof row.cries.latest === "string") &&
+            (row.cries.legacy === null || typeof row.cries.legacy === "string"),
+        ),
     ),
   );
 }

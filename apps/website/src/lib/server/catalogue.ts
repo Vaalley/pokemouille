@@ -1,6 +1,3 @@
-import { createHash } from "node:crypto";
-import { readFile, stat } from "node:fs/promises";
-import { join } from "node:path";
 import type {
   DatasetManifest,
   Language,
@@ -16,17 +13,16 @@ import {
   projectMoveMembership,
   type Catalogue,
   type CatalogueSpecies,
+  type CatalogueStats,
   type RelatedPokemon,
   type RelatedPokemonData,
+  type SpeciesClass,
 } from "../data/catalogue.ts";
 import type { ResourceCatalogue, ResourceEntry, ResourceKind } from "../data/resource-catalogue.ts";
 import { compareTypeMembers, type TypeMember } from "../data/type-membership.ts";
+import { createSnapshotCache, forEachSpecies, readDataJson } from "./snapshot.ts";
 
 const LANGUAGES: readonly Language[] = ["en", "fr", "ja"];
-// Like the prerender route loaders, the server runs with apps/website as cwd.
-const DATA_DIR = join(process.cwd(), "static", "data");
-const MANIFEST_PATH = join(DATA_DIR, "manifest.json");
-const READ_CONCURRENCY = 4;
 
 type RelatedIdentity = Omit<
   RelatedPokemon,
@@ -54,16 +50,58 @@ interface SnapshotIndex {
   types: ReferenceData["types"];
 }
 
-/** One current default-variety typing per species, never a historical game typing. */
+// Source stat IDs for HP, Attack, Defense, Sp. Atk, Sp. Def and Speed.
+const BASE_STAT_IDS = [1, 2, 3, 4, 5, 6] as const;
+
+/** Missing or ambiguous source stats stay unknown rather than becoming a misleading zero. */
+function projectStats(variety: PokemonVariety): CatalogueStats | null {
+  const stats = BASE_STAT_IDS.flatMap((statId) =>
+    variety.stats.filter((row) => row.statId === statId).map((row) => row.baseStat),
+  );
+  if (stats.length !== BASE_STAT_IDS.length) return null;
+  const [hp = 0, attack = 0, defense = 0, spAtk = 0, spDef = 0, speed = 0] = stats;
+  return [hp, attack, defense, spAtk, spDef, speed, hp + attack + defense + spAtk + spDef + speed];
+}
+
+/** Source flags are exclusive in practice; mythical is the most specific if not. */
+function projectClass(record: SpeciesRecord): SpeciesClass {
+  if (record.isMythical) return "mythical";
+  if (record.isLegendary) return "legendary";
+  if (record.isBaby) return "baby";
+  return "ordinary";
+}
+
+/** Current default-variety typing, stats and abilities; never a historical game's values. */
 export function projectCatalogueSpecies(record: SpeciesRecord): Record<Language, CatalogueSpecies> {
   const variety = record.varieties.find((entry) => entry.isDefault);
   if (!variety) throw new Error(`Species ${record.id} has no default variety`);
   const typeIds = [...new Set(variety.types.map((row) => row.typeId))];
+  const abilities = (hidden: boolean) => [
+    ...new Set(
+      variety.abilities
+        .filter((row) => row.isHidden === hidden)
+        .toSorted((a, b) => a.slot - b.slot)
+        .flatMap((row) => (row.abilityId === null ? [] : [row.abilityId])),
+    ),
+  ];
+  const stats = projectStats(variety);
+  const abilityIds = abilities(false);
+  const hiddenAbilityIds = abilities(true);
+  const classification = projectClass(record);
+  const dexNumbers: CatalogueSpecies["dexNumbers"] = record.pokedexNumbers.map((row) => [
+    row.pokedexId,
+    row.number,
+  ]);
   const row = (language: Language): CatalogueSpecies => ({
     id: record.id,
     name: localize(record.names, language, record.identifier).text,
     generationId: record.generationId,
     typeIds,
+    stats,
+    abilityIds,
+    hiddenAbilityIds,
+    classification,
+    dexNumbers,
   });
   return { en: row("en"), fr: row("fr"), ja: row("ja") };
 }
@@ -140,10 +178,6 @@ export function projectTypeMembers(
   return projected;
 }
 
-async function readJson<T>(path: string): Promise<T> {
-  return JSON.parse(await readFile(join(DATA_DIR, path), "utf8")) as T;
-}
-
 function byIdentity(a: { identity: RelatedIdentity }, b: { identity: RelatedIdentity }): number {
   return a.identity.speciesId - b.identity.speciesId || a.identity.pokemonId - b.identity.pokemonId;
 }
@@ -160,15 +194,23 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
   // Do not retain the full reference payload (move text/effects are irrelevant here).
   const {
     types,
+    stats,
     generations: sourceGenerations,
     learnMethods,
     moves: sourceMoves,
     abilities: sourceAbilities,
     items: sourceItems,
     versionGroups,
-  } = await readJson<ReferenceData>(manifest.files.references.path);
+    pokedexes,
+    versions,
+  } = await readDataJson<ReferenceData>(manifest.files.references.path);
   const generations = sourceGenerations.map((row) => row.id).sort((a, b) => a - b);
   const groupOrders = new Map(versionGroups.map((group) => [group.id, group.order]));
+  const statRows = BASE_STAT_IDS.map((id) => {
+    const row = stats.find((stat) => stat.id === id);
+    if (!row) throw new Error(`References lack base stat ${id}`);
+    return row;
+  });
   const catalogue = (language: Language): Catalogue => ({
     species: [],
     types: types.map((row) => ({
@@ -176,6 +218,14 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
       name: localize(row.names, language, row.identifier),
     })),
     generations,
+    abilities: [],
+    statNames: statRows.map((row) => localize(row.names, language, row.identifier)),
+    pokedexes: pokedexes.map((row) => ({
+      id: row.id,
+      name: localize(row.names, language, row.identifier),
+      versionGroupIds: [...new Set(row.versionGroupIds)],
+    })),
+    versions: versions.map((row) => [row.identifier, row.versionGroupId]),
   });
   const methods = (language: Language): RelatedPokemonData["learnMethods"] =>
     learnMethods.map((row) => ({
@@ -228,90 +278,51 @@ async function buildSnapshot(manifest: DatasetManifest): Promise<SnapshotIndex> 
     abilities: new Map(),
     typeMembers: { en: [], fr: [], ja: [] },
   };
-  const assets = Object.values(manifest.files.pokemon);
-  let next = 0;
-  async function worker(): Promise<void> {
-    while (next < assets.length) {
-      const asset = assets[next++]!;
-      const record = await readJson<SpeciesRecord>(asset.path);
-      const species = projectCatalogueSpecies(record);
-      const typeMembers = projectTypeMembers(record, groupOrders);
-      for (const language of LANGUAGES) index.typeMembers[language].push(...typeMembers[language]);
-      for (const language of LANGUAGES) index.catalogue[language].species.push(species[language]);
-      const speciesGenerations = generations.filter((id) => id >= record.generationId);
-      for (const variety of record.varieties) {
-        const identity = projectRelatedIdentity(record, variety);
-        for (const [moveId, learnsets] of projectMoveMembership(variety.learnsets)) {
-          const relation = { identity, learnsets };
-          const rows = index.moves.get(moveId);
-          if (rows) rows.push(relation);
-          else index.moves.set(moveId, [relation]);
-        }
-        for (const [abilityId, membership] of projectAbilityMembership(
-          variety.abilities,
-          variety.abilityHistory,
-          speciesGenerations,
-        )) {
-          const relation = { identity, ...membership };
-          const rows = index.abilities.get(abilityId);
-          if (rows) rows.push(relation);
-          else index.abilities.set(abilityId, [relation]);
-        }
+  await forEachSpecies(manifest, (record) => {
+    const species = projectCatalogueSpecies(record);
+    const typeMembers = projectTypeMembers(record, groupOrders);
+    for (const language of LANGUAGES) index.typeMembers[language].push(...typeMembers[language]);
+    for (const language of LANGUAGES) index.catalogue[language].species.push(species[language]);
+    const speciesGenerations = generations.filter((id) => id >= record.generationId);
+    for (const variety of record.varieties) {
+      const identity = projectRelatedIdentity(record, variety);
+      for (const [moveId, learnsets] of projectMoveMembership(variety.learnsets)) {
+        const relation = { identity, learnsets };
+        const rows = index.moves.get(moveId);
+        if (rows) rows.push(relation);
+        else index.moves.set(moveId, [relation]);
+      }
+      for (const [abilityId, membership] of projectAbilityMembership(
+        variety.abilities,
+        variety.abilityHistory,
+        speciesGenerations,
+      )) {
+        const relation = { identity, ...membership };
+        const rows = index.abilities.get(abilityId);
+        if (rows) rows.push(relation);
+        else index.abilities.set(abilityId, [relation]);
       }
     }
-  }
-  await Promise.all(
-    Array.from({ length: Math.min(READ_CONCURRENCY, assets.length) }, () => worker()),
+  });
+  // Only abilities a species currently has: any other choice would always be empty.
+  const currentAbilityIds = new Set(
+    index.catalogue.en.species.flatMap((row) => [...row.abilityIds, ...row.hiddenAbilityIds]),
   );
-  for (const language of LANGUAGES) index.catalogue[language].species.sort((a, b) => a.id - b.id);
+  for (const language of LANGUAGES) {
+    const collator = new Intl.Collator(language);
+    index.catalogue[language].species.sort((a, b) => a.id - b.id);
+    index.catalogue[language].abilities = sourceAbilities
+      .filter((row) => currentAbilityIds.has(row.id))
+      .map((row) => ({ id: row.id, name: localize(row.names, language, row.identifier) }))
+      .sort((a, b) => collator.compare(a.name.text, b.name.text) || a.id - b.id);
+  }
   for (const language of LANGUAGES) index.typeMembers[language].sort(compareTypeMembers);
   for (const rows of index.moves.values()) rows.sort(byIdentity);
   for (const rows of index.abilities.values()) rows.sort(byIdentity);
   return index;
 }
 
-interface CachedSnapshot {
-  manifestStamp: string;
-  revisionKey: string;
-  promise: Promise<SnapshotIndex>;
-}
-let cachedSnapshot: CachedSnapshot | undefined;
-let checkingSnapshot: Promise<SnapshotIndex> | undefined;
-
-async function currentSnapshot(): Promise<SnapshotIndex> {
-  // Stat the mutable manifest on each new request batch, including in dev. Immutable
-  // revision assets never need polling; a replaced/edited manifest invalidates them.
-  const info = await stat(MANIFEST_PATH, { bigint: true });
-  const manifestStamp = `${info.mtimeNs}:${info.ctimeNs}:${info.size}:${info.ino}`;
-  if (cachedSnapshot?.manifestStamp === manifestStamp) return cachedSnapshot.promise;
-  const source = await readFile(MANIFEST_PATH, "utf8");
-  const manifest = JSON.parse(source) as DatasetManifest;
-  const revisionKey = `${manifest.datasetRevision}:${createHash("sha256").update(source).digest("hex")}`;
-  if (cachedSnapshot?.revisionKey === revisionKey) {
-    cachedSnapshot.manifestStamp = manifestStamp;
-    return cachedSnapshot.promise;
-  }
-  const promise = buildSnapshot(manifest);
-  // Retain only the current revision. Existing in-flight consumers can finish on
-  // their old immutable snapshot, which becomes collectable after those requests.
-  cachedSnapshot = { manifestStamp, revisionKey, promise };
-  void promise.catch(() => {
-    if (cachedSnapshot?.promise === promise) cachedSnapshot = undefined;
-  });
-  return promise;
-}
-
-function getSnapshot(): Promise<SnapshotIndex> {
-  if (!checkingSnapshot) {
-    const attempt = currentSnapshot();
-    checkingSnapshot = attempt;
-    const clear = () => {
-      if (checkingSnapshot === attempt) checkingSnapshot = undefined;
-    };
-    void attempt.then(clear, clear);
-  }
-  return checkingSnapshot;
-}
+const getSnapshot = createSnapshotCache(buildSnapshot);
 
 export async function getCatalogue(lang: Language): Promise<Catalogue> {
   return (await getSnapshot()).catalogue[lang];

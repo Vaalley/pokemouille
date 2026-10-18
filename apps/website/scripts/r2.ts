@@ -1,5 +1,5 @@
 // R2 transfers for the Cloudflare deployment (run from anywhere):
-//   node apps/website/scripts/r2.ts sync [--local]        upload dataset + _app/immutable, manifest last
+//   node apps/website/scripts/r2.ts sync [--local]        upload dataset + retained app/derived assets, manifest last
 //   node apps/website/scripts/r2.ts data-pull [--local]   download the published snapshot to static/data
 //   node apps/website/scripts/r2.ts state-pull [--local]  restore .data/state from R2
 //   node apps/website/scripts/r2.ts state-push [--local]  save .data/state to R2
@@ -10,18 +10,22 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, extname, join, relative, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname, extname, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { getPlatformProxy } from "wrangler";
+import { DERIVED_DATA_PREFIXES, isDerivedDataKey } from "../derived-assets.ts";
 
 const WEBSITE = fileURLToPath(new URL("..", import.meta.url));
 const ROOT = join(WEBSITE, "..", "..");
 const CONFIG = join(WEBSITE, "wrangler.jsonc");
 const DATA_DIR = join(WEBSITE, "static", "data");
 const IMMUTABLE_DIR = join(WEBSITE, "build", "_app", "immutable");
+const DERIVED_DIRS = Object.fromEntries(
+  DERIVED_DATA_PREFIXES.map((prefix) => [prefix, join(WEBSITE, "build", prefix)]),
+) as Record<(typeof DERIVED_DATA_PREFIXES)[number], string>;
 const STATE_DIR = join(ROOT, ".data", "state");
-// Never served: the Worker only exposes data/manifest.json, data/revisions/* and _app/immutable/*.
+// Never served: the Worker only exposes the dataset, _app/immutable/* and pinned derived data.
 const STATE_KEY = "state/state.tar.gz";
 const CONCURRENCY = 16;
 
@@ -95,24 +99,39 @@ async function uploadImmutable(store: Store, files: { key: string; path: string 
   await pool(files, async ({ key, path }) => {
     const body = await readFile(path);
     const existing = await store.size(key);
-    if (existing === body.byteLength) return;
-    if (existing !== null)
-      throw new Error(`Immutable object ${key} differs in size; refusing to overwrite`);
+    if (existing !== null) {
+      if (existing === body.byteLength) {
+        const previous = await store.get(key);
+        if (previous && body.equals(previous)) return;
+      }
+      throw new Error(`Immutable object ${key} differs in content; refusing to overwrite`);
+    }
     await store.put(key, body, CONTENT_TYPES[extname(key)] ?? "application/octet-stream");
     uploaded++;
   });
   return uploaded;
 }
 
-async function sync(store: Store) {
-  const manifest = await readFile(join(DATA_DIR, "manifest.json"));
+export async function sync(
+  store: Store,
+  directories = { data: DATA_DIR, immutable: IMMUTABLE_DIR, ...DERIVED_DIRS },
+) {
+  const manifest = await readFile(join(directories.data, "manifest.json"));
   const files = [];
   for (const [dir, prefix] of [
-    [join(DATA_DIR, "revisions"), "data/revisions/"],
-    [IMMUTABLE_DIR, "_app/immutable/"],
+    [join(directories.data, "revisions"), "data/revisions/"],
+    [directories.immutable, "_app/immutable/"],
+    ...DERIVED_DATA_PREFIXES.map((prefix) => [directories[prefix], `${prefix}/`] as const),
   ] as const) {
-    for (const path of await listFiles(dir))
-      files.push({ key: prefix + relative(dir, path).split(sep).join("/"), path });
+    for (const path of await listFiles(dir)) {
+      const key = prefix + relative(dir, path).split(sep).join("/");
+      if (
+        DERIVED_DATA_PREFIXES.some((derived) => prefix === `${derived}/`) &&
+        !isDerivedDataKey(key)
+      )
+        throw new Error(`Invalid immutable derived asset ${key}`);
+      files.push({ key, path });
+    }
   }
   const uploaded = await uploadImmutable(store, files);
   // Publish the mutable pointer only after every file it references exists.
@@ -181,26 +200,32 @@ async function statePush(store: Store) {
   }
 }
 
-const { positionals, values } = parseArgs({
-  allowPositionals: true,
-  options: { local: { type: "boolean", default: false } },
-});
-const commands = {
-  sync,
-  "data-pull": dataPull,
-  "state-pull": statePull,
-  "state-push": statePush,
-};
-const command = commands[positionals[0] as keyof typeof commands];
-if (!command) {
-  console.error(
-    `Usage: node apps/website/scripts/r2.ts <${Object.keys(commands).join("|")}> [--local]`,
-  );
-  process.exit(1);
+async function main() {
+  const { positionals, values } = parseArgs({
+    allowPositionals: true,
+    options: { local: { type: "boolean", default: false } },
+  });
+  const commands = {
+    sync,
+    "data-pull": dataPull,
+    "state-pull": statePull,
+    "state-push": statePush,
+  };
+  const command = commands[positionals[0] as keyof typeof commands];
+  if (!command) {
+    console.error(
+      `Usage: node apps/website/scripts/r2.ts <${Object.keys(commands).join("|")}> [--local]`,
+    );
+    process.exitCode = 1;
+    return;
+  }
+  const store = await openStore(values.local);
+  try {
+    await command(store);
+  } finally {
+    await store.close();
+  }
 }
-const store = await openStore(values.local);
-try {
-  await command(store);
-} finally {
-  await store.close();
-}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href)
+  await main();

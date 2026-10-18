@@ -195,7 +195,7 @@ describe("last-good static publication", () => {
         versionId: 1,
         minLevel: 3,
         maxLevel: 5,
-        location: { id: 1, identifier: "viridian-forest", names: [] },
+        location: { id: 1, identifier: "viridian-forest", names: [], regionId: 1 },
         area: { id: 1, identifier: "", names: [] },
         method: { id: 1, identifier: "walk", names: [] },
         slot: { id: 1, versionGroupId: 1, slot: 1, rarity: 5 },
@@ -206,7 +206,7 @@ describe("last-good static publication", () => {
     variety.sourceCounts.encounters = 1;
     input.references.encounterCoverage.find((row) => row.versionId === 1)!.rows = 1;
     const manifest = await publishSnapshot(outDir, input, provenance);
-    expect(manifest.schemaVersion).toBe(2);
+    expect(manifest.schemaVersion).toBe(3);
     const compact: PokemonReferences = JSON.parse(
       await readFile(join(outDir, manifest.files.pokemonReferences.path), "utf8"),
     );
@@ -219,12 +219,30 @@ describe("last-good static publication", () => {
       priority: 1,
     });
     expect(compact.encounterCoverage).toEqual(input.references.encounterCoverage);
+    expect(compact.eggGroups).toEqual(input.references.eggGroups);
+    expect(compact.pokedexes).toEqual(input.references.pokedexes);
+    expect(compact.regions).toEqual(input.references.regions);
+    const full = JSON.parse(await readFile(join(outDir, manifest.files.references.path), "utf8"));
+    expect(full.pokedexes[2]).toEqual({
+      id: 31,
+      identifier: "paldea",
+      names: [
+        { languageId: 9, name: "Paldea" },
+        { languageId: 5, name: "Paldea (FR)" },
+      ],
+      isMainSeries: true,
+      regionId: 10,
+      versionGroupIds: [25],
+    });
     expect(compact).not.toHaveProperty("encounters");
     expect(compact.moves[0]).not.toHaveProperty("meta");
     const record = JSON.parse(
       await readFile(join(outDir, manifest.files.pokemon["25"]!.path), "utf8"),
     );
     expect(record.varieties[0].encounters).toEqual(variety.encounters);
+    expect(record.varieties[0].cries).toEqual(variety.cries);
+    expect(record.eggGroupIds).toEqual([5, 6]);
+    expect(record.pokedexNumbers).toEqual(input.species[0]!.pokedexNumbers);
     const before = await readFile(join(outDir, "manifest.json"), "utf8");
     Reflect.deleteProperty(input.references.moves[0]!, "meta");
     await expect(publishSnapshot(outDir, input, provenance)).rejects.toThrow("move.meta");
@@ -281,12 +299,13 @@ describe("last-good static publication", () => {
   it("rejects unsupported source schemas and unpinned source assets without replacing the manifest", async () => {
     const outDir = await outputDirectory();
     const legacy = await publishLegacySnapshot(outDir);
-    legacy.schemaVersion = 999;
+    // Schema-2 publications lack egg groups, dex numbers, cries and regions.
+    legacy.schemaVersion = 2;
     await writeJson(join(outDir, "manifest.json"), legacy);
     let before = await readFile(join(outDir, "manifest.json"), "utf8");
     await expect(republishSnapshot(outDir)).rejects.toThrow("Unsupported published schema version");
     expect(await readFile(join(outDir, "manifest.json"), "utf8")).toBe(before);
-    legacy.schemaVersion = 2;
+    legacy.schemaVersion = 3;
     legacy.files.references.path = "revisions/other/references.json";
     await writeJson(join(outDir, "manifest.json"), legacy);
     before = await readFile(join(outDir, "manifest.json"), "utf8");

@@ -104,6 +104,12 @@ describe("bounded upstream response validation", () => {
     "methods",
     "conditions",
     "conditionValues",
+    "eggGroups",
+    "pokedexNumbers",
+    "cries",
+    "pokedexes",
+    "versionGroups",
+    "regions",
   ])("rejects truncated %s rows even when the result is empty", (relationship) => {
     const response = {
       [relationship]: [],
@@ -112,16 +118,22 @@ describe("bounded upstream response validation", () => {
     expect(() => validateBoundedRelationships(response)).toThrow("truncated relationship");
   });
 
-  it.each(["locations", "areas", "methods", "conditions", "conditionValues"])(
-    "rejects truncated shared %s names independently of the complete lookup table",
-    (table) => {
-      const response = {
-        [table]: [{ id: 1, names: [], namesCount: { aggregate: { count: 1 } } }],
-        [`${table}Count`]: { aggregate: { count: 1 } },
-      };
-      expect(() => validateBoundedRelationships(response)).toThrow(`$.${table}[0].names`);
-    },
-  );
+  it.each([
+    "locations",
+    "areas",
+    "methods",
+    "conditions",
+    "conditionValues",
+    "eggGroups",
+    "pokedexes",
+    "regions",
+  ])("rejects truncated shared %s names independently of the complete lookup table", (table) => {
+    const response = {
+      [table]: [{ id: 1, names: [], namesCount: { aggregate: { count: 1 } } }],
+      [`${table}Count`]: { aggregate: { count: 1 } },
+    };
+    expect(() => validateBoundedRelationships(response)).toThrow(`$.${table}[0].names`);
+  });
 
   it("validates localized arrays behind object relationships without interpreting sprite JSON as rows", () => {
     const response = {
@@ -132,6 +144,12 @@ describe("bounded upstream response validation", () => {
       validateBoundedRelationships({
         sprites: [{ sprites: { other: { frames: [1, 2] } } }],
         spritesCount: { aggregate: { count: 1 } },
+      }),
+    ).not.toThrow();
+    expect(() =>
+      validateBoundedRelationships({
+        cries: [{ cries: { latest: "a.ogg", legacy: null, extra: [1] } }],
+        criesCount: { aggregate: { count: 1 } },
       }),
     ).not.toThrow();
   });

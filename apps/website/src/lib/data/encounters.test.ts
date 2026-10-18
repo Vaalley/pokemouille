@@ -10,7 +10,7 @@ function encounter(id: number, versionId = 1): Encounter {
   return {
     id,
     versionId,
-    location: resource(1, "route-1"),
+    location: { ...resource(1, "route-1"), regionId: 1 },
     area: resource(1, "route-1-area"),
     method: resource(1, "walk"),
     minLevel: 2,

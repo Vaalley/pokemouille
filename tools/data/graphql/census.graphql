@@ -488,4 +488,84 @@ fragment SourceCensus on query_root {
       }
     }
   }
+  eggGroups: egggroup_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  eggGroupNames: egggroupname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  speciesEggGroups: pokemonegggroup_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  pokedexes: pokedex_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  pokedexNames: pokedexname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  pokedexVersionGroups: pokedexversiongroup_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  speciesDexNumbers: pokemondexnumber_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  cries: pokemoncries_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  regions: region_aggregate {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
+  regionNames: regionname_aggregate(where: { language_id: { _in: [1, 5, 9, 11] } }) {
+    aggregate {
+      count
+      max {
+        id
+      }
+    }
+  }
 }

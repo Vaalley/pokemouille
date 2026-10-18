@@ -133,6 +133,96 @@ describe("historical Pokémon resolution", () => {
     });
   });
 
+  it("resolves current egg groups, cries and only the selected game's regional dex numbers", () => {
+    const { record, references } = setup();
+    const red = resolvePokemon(record, references, { language: "fr", version: "red" });
+    expect(red.eggGroups).toEqual({
+      status: "available",
+      value: {
+        scope: "current-not-game-specific",
+        groups: [
+          { id: 5, name: expect.objectContaining({ text: "Terrestre", fallback: false }) },
+          { id: 6, name: expect.objectContaining({ text: "Fairy", fallback: true }) },
+        ],
+      },
+    });
+    expect(red.cries).toEqual({
+      scope: "current-not-game-specific",
+      latest: "https://example.test/cries/latest/25.ogg",
+      legacy: "https://example.test/cries/legacy/25.ogg",
+    });
+    // The national dex (id 1) is excluded even though it lists Red's version group.
+    expect(red.regionalDexNumbers).toEqual({
+      status: "available",
+      value: [{ pokedexId: 2, name: expect.objectContaining({ text: "Kanto" }), number: 25 }],
+    });
+    // Kitakami belongs to the Teal Mask's version group, not Scarlet's.
+    record.pokedexNumbers.push({ pokedexId: 32, number: 196 });
+    const scarlet = resolvePokemon(record, references, { language: "fr", version: "scarlet" });
+    expect(scarlet.regionalDexNumbers).toEqual({
+      status: "available",
+      value: [
+        { pokedexId: 31, name: expect.objectContaining({ text: "Paldea (FR)" }), number: 74 },
+      ],
+    });
+    expect(
+      resolvePokemon(record, references, { language: "en", version: "x" }).regionalDexNumbers,
+    ).toEqual({
+      status: "missing",
+      reason: "The source maps no regional Pokédex to the selected game",
+    });
+  });
+
+  it("withholds egg groups and regional dex numbers when the selection is not introduced", () => {
+    const { record, references, variety } = setup();
+    record.eggGroupIds = [];
+    expect(
+      resolvePokemon(record, references, { language: "en", version: "red" }).eggGroups,
+    ).toEqual({ status: "missing", reason: "No egg group facts for this species" });
+    variety.forms[0]!.versionGroupId = 25;
+    const red = resolvePokemon(record, references, { language: "en", version: "red" });
+    expect(red.status).toBe("not-introduced");
+    expect(red.regionalDexNumbers).toMatchObject({ status: "missing" });
+    expect(red.eggGroups).toMatchObject({ status: "missing" });
+    variety.cries = { latest: null, legacy: null };
+    expect(resolvePokemon(record, references, { language: "en", version: "red" }).cries).toEqual({
+      scope: "current-not-game-specific",
+      latest: null,
+      legacy: null,
+    });
+  });
+
+  it("keeps every selected-group regional number and resolves cries from the selected variety", () => {
+    const { record, references, variety } = setup();
+    references.pokedexes.find((dex) => dex.id === 32)!.versionGroupIds = [25];
+    record.pokedexNumbers.push({ pokedexId: 32, number: 0 });
+    const alternate = structuredClone(variety);
+    alternate.id = 10025;
+    alternate.identifier = "pikachu-alternate";
+    alternate.isDefault = false;
+    alternate.forms[0]!.id = 10025;
+    alternate.forms[0]!.identifier = "pikachu-alternate";
+    alternate.cries = { latest: "https://example.test/alternate.ogg", legacy: null };
+    record.varieties.push(alternate);
+    const resolved = resolvePokemon(record, references, {
+      language: "ja",
+      version: "scarlet",
+      form: "pikachu-alternate",
+    });
+    expect(resolved.regionalDexNumbers).toMatchObject({
+      status: "available",
+      value: [
+        { pokedexId: 31, number: 74, name: { text: "Paldea", fallback: true } },
+        { pokedexId: 32, number: 0, name: { text: "Kitakami", fallback: true } },
+      ],
+    });
+    expect(resolved.cries).toEqual({
+      scope: "current-not-game-specific",
+      latest: "https://example.test/alternate.ogg",
+      legacy: null,
+    });
+  });
+
   it("retains Japanese kana fallback and labels detailed ability effects as current", () => {
     const { record, references } = setup();
     references.abilities[0]!.flavorTexts = [{ versionGroupId: 15, languageId: 11, text: "日本語" }];

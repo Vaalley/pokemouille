@@ -15,7 +15,9 @@
   import { getGames } from "#lib/data/loader.ts";
   import { defensiveMatchups, isIntroduced, offensiveMatchups } from "#lib/data/type-matchups.ts";
   import { readTypeSelection, typeSelectionUrl } from "#lib/data/type-selection.ts";
+  import { typeCoverageHref } from "#lib/data/type-coverage.ts";
   import { t } from "#lib/i18n/types.ts";
+  import { t as coverageText } from "#lib/i18n/type-coverage.ts";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -82,6 +84,7 @@
 <svelte:head><title>{t(data.lang, "heading")} | Pokémouille</title></svelte:head>
 <h1>{t(data.lang, "heading")}</h1>
 <p>{t(data.lang, "intro")}</p>
+<p><a href={resolve(typeCoverageHref(data.lang, selection.invalid ? [] : selection.ids, selectedVersion()) as PathnameWithSearchOrHash)}>{coverageText(data.lang, "link")}</a></p>
 <form class="filters" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
   {#each [0, 1] as slot}
     <div class="filter-field">

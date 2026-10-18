@@ -1,6 +1,7 @@
 import type {
   Ability,
   Encounter,
+  EncounterLocation,
   Item,
   Name,
   Move,
@@ -117,6 +118,16 @@ export function validateCensus(data: SourceCensusFragment): void {
     "encounterMethodNames",
     "encounterConditionNames",
     "encounterConditionValueNames",
+    "eggGroups",
+    "eggGroupNames",
+    "speciesEggGroups",
+    "pokedexes",
+    "pokedexNames",
+    "pokedexVersionGroups",
+    "speciesDexNumbers",
+    "cries",
+    "regions",
+    "regionNames",
   ];
   for (const key of keys) {
     const count = sourceCount(data[key]);
@@ -153,7 +164,7 @@ function namedResource(row: {
 }
 
 export interface EncounterLookups {
-  areas: ReadonlyMap<number, { area: NamedResource; location: NamedResource }>;
+  areas: ReadonlyMap<number, { area: NamedResource; location: EncounterLocation }>;
   slots: ReadonlyMap<number, { slot: Encounter["slot"]; method: NamedResource }>;
   conditionValues: ReadonlyMap<number, Encounter["conditions"][number]>;
 }
@@ -224,8 +235,14 @@ export function mapEncounterReferences(raw: EncounterReferencesQuery): Encounter
     raw.conditionValuesCount,
     "conditionValues",
   );
-  const namedLocations = new Map(
-    [...locations].map(([id, row]) => [id, encounterResource(row, `locations.${id}`)]),
+  const namedLocations = new Map<number, EncounterLocation>(
+    [...locations].map(([id, row]) => [
+      id,
+      {
+        ...encounterResource(row, `locations.${id}`),
+        regionId: row.regionId === null ? null : sourceId(row.regionId, "location.regionId"),
+      },
+    ]),
   );
   const namedMethods = new Map(
     [...methods].map(([id, row]) => [id, encounterResource(row, `methods.${id}`)]),
@@ -507,6 +524,16 @@ export function mapReferences(
     learnMethods: raw.learnMethods.map(namedResource),
     items,
     evolutionTriggers: raw.evolutionTriggers.map(namedResource),
+    eggGroups: raw.eggGroups.map(namedResource),
+    pokedexes: raw.pokedexes.map((row) => ({
+      ...namedResource(row),
+      isMainSeries: row.isMainSeries,
+      regionId: row.regionId === null ? null : sourceId(row.regionId, "pokedex.regionId"),
+      versionGroupIds: row.versionGroups.map((entry) =>
+        sourceId(entry.versionGroupId, "pokedex.versionGroupId"),
+      ),
+    })),
+    regions: raw.regions.map(namedResource),
     coverage: raw.versionGroups.map((group) => ({
       versionGroupId: group.id,
       learnsetRows: sourceCount(group.learnsetsCount),
@@ -527,6 +554,9 @@ export function mapReferences(
       learnMethods: sourceCount(raw.learnMethodsCount),
       items: sourceCount(raw.itemsCount),
       evolutionTriggers: sourceCount(raw.evolutionTriggersCount),
+      eggGroups: sourceCount(raw.eggGroupsCount),
+      pokedexes: sourceCount(raw.pokedexesCount),
+      regions: sourceCount(raw.regionsCount),
     },
     census,
   };
@@ -534,6 +564,17 @@ export function mapReferences(
 
 type RawSpecies = SpeciesPageQuery["species"][number];
 type RawVariety = RawSpecies["varieties"][number];
+/** Current source cry URLs; a missing record or non-text entry is null, never guessed. */
+function cryUrls(raw: Pick<RawVariety, "id" | "cries">): PokemonVariety["cries"] {
+  if (raw.cries.length > 1) throw new Error(`Pokemon ${raw.id} has ambiguous cry records`);
+  const cries: unknown = raw.cries[0]?.cries ?? null;
+  const url = (key: "latest" | "legacy") => {
+    if (cries === null || typeof cries !== "object" || !(key in cries)) return null;
+    const value: unknown = (cries as Record<string, unknown>)[key];
+    return typeof value === "string" && value.length > 0 ? value : null;
+  };
+  return { latest: url("latest"), legacy: url("legacy") };
+}
 function mapVariety(
   raw: RawVariety,
   speciesId: number,
@@ -675,6 +716,7 @@ function mapVariety(
       };
     }),
     media: { sprites, artwork },
+    cries: cryUrls(raw),
     sourceCounts: {
       types: sourceCount(raw.typesCount),
       typeHistory: grouped.size,
@@ -714,6 +756,11 @@ export function mapSpecies(raw: RawSpecies, encounters: EncounterLookups): Speci
     isBaby: raw.isBaby,
     isLegendary: raw.isLegendary,
     isMythical: raw.isMythical,
+    eggGroupIds: raw.eggGroups.map((row) => sourceId(row.eggGroupId, "species.eggGroupId")),
+    pokedexNumbers: raw.pokedexNumbers.map((row) => ({
+      pokedexId: sourceId(row.pokedexId, "species.pokedexId"),
+      number: row.number,
+    })),
     sourceFacts: {
       hatch_counter: raw.hatch_counter,
       growth_rate_id: raw.growth_rate_id,
@@ -742,6 +789,8 @@ export function mapSpecies(raw: RawSpecies, encounters: EncounterLookups): Speci
       flavorTexts: sourceCount(raw.flavorTextsCount),
       varieties: sourceCount(raw.varietiesCount),
       evolutions: sourceCount(raw.evolutionsCount),
+      eggGroupIds: sourceCount(raw.eggGroupsCount),
+      pokedexNumbers: sourceCount(raw.pokedexNumbersCount),
     },
   };
 }

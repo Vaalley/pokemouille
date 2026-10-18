@@ -49,6 +49,23 @@ query SpeciesPage($after: Int!, $limit: Int!) {
         count
       }
     }
+    eggGroups: pokemonegggroups(order_by: { id: asc }, limit: 8) {
+      eggGroupId: egg_group_id
+    }
+    eggGroupsCount: pokemonegggroups_aggregate {
+      aggregate {
+        count
+      }
+    }
+    pokedexNumbers: pokemondexnumbers(order_by: [{ pokedex_id: asc }, { id: asc }], limit: 64) {
+      pokedexId: pokedex_id
+      number: pokedex_number
+    }
+    pokedexNumbersCount: pokemondexnumbers_aggregate {
+      aggregate {
+        count
+      }
+    }
     evolutions: pokemonevolutions(order_by: { id: asc }, limit: 128) {
       id
       evolvedSpeciesId: evolved_species_id
@@ -238,6 +255,14 @@ query SpeciesPage($after: Int!, $limit: Int!) {
         sprites
       }
       spritesCount: pokemonsprites_aggregate {
+        aggregate {
+          count
+        }
+      }
+      cries: pokemoncries(order_by: { id: asc }, limit: 2) {
+        cries
+      }
+      criesCount: pokemoncries_aggregate {
         aggregate {
           count
         }

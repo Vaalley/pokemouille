@@ -9,6 +9,7 @@
   import LanguageSwitcher from "#lib/components/LanguageSwitcher.svelte";
   import SearchDialog from "#lib/components/SearchDialog.svelte";
   import SpriteSelector, { setSelectedSprite } from "#lib/components/SpriteSelector.svelte";
+  import ThemeSelector from "#lib/components/ThemeSelector.svelte";
   import { spriteStyle } from "#lib/data/sprite-preference.ts";
   import { readPreference, resolveContext, writePreference } from "#lib/data/context.ts";
   import { getGames } from "#lib/data/loader.ts";
@@ -37,6 +38,9 @@
     { key: "abilities", path: "ability/", detail: "ability/" },
     { key: "items", path: "item/", detail: "item/" },
     { key: "types", path: "types/", detail: "types/" },
+    { key: "compare", path: "compare/", detail: "compare/" },
+    { key: "moveset", path: "moveset/", detail: "moveset/" },
+    { key: "locations", path: "location/", detail: "location/" },
   ] as const;
 
   function current(section: (typeof sections)[number]) {
@@ -69,14 +73,27 @@
 
   setSelectedVersion(() => version);
 
+  // Pages whose content depends on the game keep explicit game choices shareable.
+  const versionedRoutes: ReadonlySet<string> = new Set([
+    "/[lang]",
+    "/[lang]/egg-group",
+    "/[lang]/egg-group/[id]",
+    "/[lang]/types",
+    "/[lang]/types/coverage",
+    "/[lang]/compare",
+    "/[lang]/moveset",
+    "/[lang]/location",
+    "/[lang]/location/[id]",
+  ]);
+
   function selectVersion(next: string) {
     writePreference("version", next);
     savedVersion = next;
-    // Context-sensitive pages keep explicit game choices shareable. Start from the
-    // shallow URL so catalogue filters and selected types survive game changes.
+    // Start from the shallow URL so catalogue filters and selected types survive game changes.
+    const routeId = page.route.id ?? "";
     if (
-      page.route.id?.startsWith("/[lang]/pokemon/") ||
-      page.route.id === "/[lang]/types" ||
+      routeId.startsWith("/[lang]/pokemon/") ||
+      versionedRoutes.has(routeId) ||
       currentUrl.searchParams.has("version")
     ) {
       const url = new URL(currentUrl.href);
@@ -115,6 +132,7 @@
       error={gamesFailed}
     />
     <SpriteSelector lang={data.lang} {games} value={selectedSprite} ready={spriteReady && !!games} onchange={selectSprite} />
+    <ThemeSelector lang={data.lang} />
   </div>
 </header>
 

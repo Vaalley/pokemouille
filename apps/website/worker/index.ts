@@ -1,22 +1,34 @@
 // Static assets are matched before this Worker runs, so it only sees unmatched paths.
 // The dataset is excluded from deployed assets (static/.assetsignore) and served from R2;
-// R2 also retains earlier `_app/immutable` chunks so tabs opened before a deploy keep working.
+// R2 also retains earlier `_app/immutable` chunks and revision-pinned derived files so tabs
+// opened before a deploy keep working.
+import { isDerivedDataKey } from "../derived-assets.ts";
 
 interface Env {
-  ASSETS: Fetcher;
-  DATA: R2Bucket;
+  ASSETS: Pick<Fetcher, "fetch">;
+  DATA: Pick<R2Bucket, "get">;
 }
 
 const IMMUTABLE = "public, max-age=31536000, immutable";
 
 export default {
-  async fetch(request, env, ctx): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: Pick<ExecutionContext, "waitUntil">,
+  ): Promise<Response> {
     const url = new URL(request.url);
-    const key = decodeURIComponent(url.pathname.slice(1));
+    let key: string;
+    try {
+      key = decodeURIComponent(url.pathname.slice(1));
+    } catch {
+      return new Response("Not found", { status: 404 });
+    }
     const fromR2 =
       key === "data/manifest.json" ||
       key.startsWith("data/revisions/") ||
-      key.startsWith("_app/immutable/");
+      key.startsWith("_app/immutable/") ||
+      isDerivedDataKey(key);
     if ((request.method !== "GET" && request.method !== "HEAD") || !fromR2) {
       return env.ASSETS.fetch(request);
     }

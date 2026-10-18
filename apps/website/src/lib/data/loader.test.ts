@@ -16,7 +16,14 @@ afterEach(() => {
 });
 
 const json = (value: unknown) => new Response(JSON.stringify(value));
-const species = (id: number) => json({ id, varieties: [] });
+const speciesData = (id: number) => ({
+  id,
+  eggGroupIds: [],
+  pokedexNumbers: [],
+  sourceCounts: { eggGroupIds: 0, pokedexNumbers: 0 },
+  varieties: [],
+});
+const species = (id: number) => json(speciesData(id));
 
 const referenceAssets = [
   {
@@ -27,6 +34,9 @@ const referenceAssets = [
       versionGroups: [],
       moves: [],
       items: [],
+      eggGroups: [],
+      pokedexes: [],
+      regions: [],
       machines: [],
       encounterCoverage: [],
     },
@@ -116,6 +126,9 @@ describe("snapshot loader", () => {
       versions: [],
       versionGroups: [],
       items: [],
+      eggGroups: [],
+      pokedexes: [],
+      regions: [],
       encounterCoverage: [],
       moves: [{ id: 85, damageClassId: 3, power: null, accuracy: null, pp: null, priority: -1 }],
       machines: [{ id: 1, number: 1001, versionGroupId: 20, itemId: 1131, moveId: 85 }],
@@ -132,6 +145,9 @@ describe("snapshot loader", () => {
       versions: [],
       versionGroups: [],
       items: [],
+      eggGroups: [],
+      pokedexes: [],
+      regions: [],
       encounterCoverage: [],
       machines: [],
       moves: [{ id: 85, power: null, accuracy: null, pp: null, priority: 0 }],
@@ -145,8 +161,15 @@ describe("snapshot loader", () => {
     const { fetchImpl, count } = host({
       "/data/revisions/a/pokemon/25.json": () =>
         json({
-          id: 25,
-          varieties: [{ id: 25, encounters: [], sourceCounts: { encounters: complete ? 0 : 1 } }],
+          ...speciesData(25),
+          varieties: [
+            {
+              id: 25,
+              cries: { latest: null, legacy: null },
+              encounters: [],
+              sourceCounts: { encounters: complete ? 0 : 1 },
+            },
+          ],
         }),
     });
     await expect(loader.getSpecies(25, fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
@@ -155,6 +178,65 @@ describe("snapshot loader", () => {
       varieties: [{ encounters: [], sourceCounts: { encounters: 0 } }],
     });
     expect(count("/data/revisions/a/pokemon/25.json")).toBe(2);
+  });
+
+  it.each(["eggGroups", "pokedexes", "regions"])(
+    "rejects schema-2 compact references missing %s",
+    async (field) => {
+      const value = { ...referenceAssets[0]!.value };
+      Reflect.deleteProperty(value, field);
+      const { fetchImpl } = host({
+        "/data/revisions/a/pokemon-references.json": () => json(value),
+      });
+      await expect(loader.getPokemonReferences(fetchImpl)).rejects.toMatchObject({
+        kind: "invalid",
+      });
+    },
+  );
+
+  it.each(["eggGroupIds", "pokedexNumbers"])(
+    "rejects missing or independently truncated species %s",
+    async (field) => {
+      const value = speciesData(25);
+      Reflect.deleteProperty(value, field);
+      const { fetchImpl } = host({ "/data/revisions/a/pokemon/25.json": () => json(value) });
+      await expect(loader.getSpecies(25, fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+      Reflect.set(value, field, []);
+      Reflect.set(value.sourceCounts, field, 1);
+      await expect(loader.getSpecies(25, fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+      Reflect.set(value.sourceCounts, field, 0);
+      await expect(loader.getSpecies(25, fetchImpl)).resolves.toMatchObject({ id: 25 });
+    },
+  );
+
+  it("requires both nullable cry URLs and nullable encounter region identity", async () => {
+    const variety = {
+      cries: { latest: null, legacy: null },
+      encounters: [
+        {
+          id: 1,
+          versionId: 1,
+          location: { regionId: 1 },
+          area: {},
+          method: {},
+          minLevel: 2,
+          maxLevel: 5,
+          slot: { rarity: 5, versionGroupId: 1 },
+          conditions: [],
+          sourceCounts: { conditions: 0 },
+        },
+      ],
+      sourceCounts: { encounters: 1 },
+    };
+    const value = { ...speciesData(25), varieties: [variety] };
+    const { fetchImpl } = host({ "/data/revisions/a/pokemon/25.json": () => json(value) });
+    Reflect.deleteProperty(variety.cries, "legacy");
+    await expect(loader.getSpecies(25, fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+    Reflect.set(variety.cries, "legacy", null);
+    Reflect.deleteProperty(variety.encounters[0]!.location, "regionId");
+    await expect(loader.getSpecies(25, fetchImpl)).rejects.toMatchObject({ kind: "invalid" });
+    Reflect.set(variety.encounters[0]!.location, "regionId", null);
+    await expect(loader.getSpecies(25, fetchImpl)).resolves.toEqual(value);
   });
 
   describe.each(referenceAssets)("$load", ({ load, path, value }) => {

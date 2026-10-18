@@ -7,17 +7,20 @@
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { EvolutionChainProjection, GameOption } from "../../../../../../../packages/pokemon-data/src/index.ts";
   import Abilities from "#lib/components/pokemon/Abilities.svelte";
+  import Breeding from "#lib/components/pokemon/Breeding.svelte";
   import Coverage from "#lib/components/pokemon/Coverage.svelte";
   import Dex from "#lib/components/pokemon/Dex.svelte";
   import Encounters from "#lib/components/pokemon/Encounters.svelte";
   import Evolution from "#lib/components/pokemon/Evolution.svelte";
   import Facts from "#lib/components/pokemon/Facts.svelte";
   import FormSelector from "#lib/components/pokemon/FormSelector.svelte";
+  import History from "#lib/components/pokemon/History.svelte";
   import Identity from "#lib/components/pokemon/Identity.svelte";
   import Learnset from "#lib/components/pokemon/Learnset.svelte";
   import Sprites from "#lib/components/pokemon/Sprites.svelte";
   import Stats from "#lib/components/pokemon/Stats.svelte";
   import Types from "#lib/components/pokemon/Types.svelte";
+  import { compareKey } from "#lib/data/compare.ts";
   import {
     DEFAULT_VERSION,
     pokemonHref,
@@ -28,6 +31,7 @@
   import { loadPokemonData, resolvePokemonView } from "#lib/data/pokemon.ts";
   import type { PokemonData, PokemonView } from "#lib/data/pokemon.ts";
   import { reasonText, t, versionGroupName, versionName } from "#lib/i18n/pokemon.ts";
+  import { t as historyT } from "#lib/i18n/pokemon-history.ts";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -138,6 +142,9 @@
   }
 
   const pokemon = $derived(view?.pokemon ?? null);
+  const identityKey = $derived(
+    `${(page.shallow?.url ?? page.url).pathname}:${mounted ? (page.shallow?.url ?? page.url).searchParams.get("form") ?? "" : ""}`,
+  );
   const game = $derived(
     context ? games?.find((option) => option.version.identifier === context.version) : undefined,
   );
@@ -154,6 +161,17 @@
   );
   const selectedForm = $derived(pokemon?.forms.find((form) => form.id === pokemon.formId) ?? null);
   const isDefaultForm = $derived(!selectedForm || selectedForm.identifier === defaultForm);
+  const compareHref = $derived(
+    context && pokemon
+      ? href(`/${lang}/compare/?${new URLSearchParams({
+          p: compareKey({
+            speciesId: data.speciesId,
+            form: selectedForm && isDefaultForm ? null : selectedForm?.identifier ?? context.form ?? null,
+          }),
+          version: context.version,
+        })}`)
+      : null,
+  );
 
   // Not introduced / unknown: offer the game that introduced the shown form, else Scarlet.
   const alternative = $derived.by(() => {
@@ -242,6 +260,8 @@
 
   <Identity
     {lang}
+    {pokemon}
+    {identityKey}
     speciesId={data.speciesId}
     name={data.name}
     genus={data.genus}
@@ -270,6 +290,7 @@
     {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
       <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
     {/if}
+    {#if compareHref}<p><a href={compareHref}>{historyT(lang, "compare.link")}</a></p>{/if}
   </Identity>
 
   <div aria-live="polite">
@@ -299,7 +320,7 @@
     {/if}
   </div>
 
-  {#if view && pokemon && context}
+  {#if view && pokemon && context && game}
     {#if pokemon.status !== "available"}
       <ul class="inline-list">
         {#if alternative}
@@ -352,18 +373,20 @@
     <div class="overview">
       <div class="column">
         <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
-        <Stats {lang} stats={pokemon.stats} game={gameName} />
-        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} />
+        <Stats {lang} stats={pokemon.stats} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
+        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} regionalDexNumbers={pokemon.regionalDexNumbers} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
       </div>
       <div class="column">
         <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
-        <Dex {lang} flavorText={pokemon.flavorText} game={gameName} />
+        <Dex {lang} flavorText={pokemon.flavorText} game={gameName} flavorTexts={view.record.flavorTexts} references={view.references} versionId={pokemon.context.versionId} formShared={!isDefaultForm} />
       </div>
     </div>
+    <Breeding {lang} record={view.record} {pokemon} references={view.references} group={game.group} version={context.version} />
     <div class="page-sections">
       {#key pokemon.pokemonId}
         <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} versions={view.references.versions} versionGroups={view.references.versionGroups} />
       {/key}
+      <History {lang} record={view.record} references={view.references} form={context.form ?? undefined} />
       <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
       <Encounters {lang} varieties={view.record.varieties} {pokemon} version={context.version} references={view.references} game={gameName} />
       <Coverage {lang} coverage={pokemon.coverage} games={groupName} />

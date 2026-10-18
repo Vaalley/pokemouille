@@ -56,6 +56,42 @@ describe("durable GraphQL ingestion", () => {
     expect(calls).toBe(2);
   });
 
+  it("separates upstream proxy cache identities by full request and keeps identical URLs stable", async () => {
+    const stateDir = await directory();
+    const urls: URL[] = [];
+    const options = {
+      stateDir,
+      refreshId: "run",
+      endpoint: "http://localhost/graphql?channel=test",
+      schemaRevision: "schema",
+      maxRequests: 3,
+      fetch: async (input: string | URL | Request, init?: RequestInit) => {
+        urls.push(new URL(input instanceof Request ? input.url : String(input)));
+        expect(typeof init?.body).toBe("string");
+        return Response.json({ data: { rows: [4, 9] } });
+      },
+    };
+    const client = new GraphqlClient(options);
+    await client.request(operation, { page: 0 });
+    await client.request(operation, { page: 1 });
+    await client.request(
+      { ...operation, document: "query Rows($page:Int!){rows(page:$page) extra}" },
+      { page: 0 },
+    );
+    // A fresh run must still use the same upstream URL for the exact same request.
+    await new GraphqlClient({ ...options, refreshId: "next-run", maxRequests: 1 }).request(
+      operation,
+      { page: 0 },
+    );
+    expect(urls).toHaveLength(4);
+    for (const url of urls) {
+      expect(url.searchParams.get("channel")).toBe("test");
+      expect(url.searchParams.get("queryHash")).toMatch(/^[a-f0-9]{64}$/);
+    }
+    expect(new Set(urls.slice(0, 3).map(String)).size).toBe(3);
+    expect(String(urls[3])).toBe(String(urls[0]));
+  });
+
   it("persists the rolling-hour cap across client invocations", async () => {
     const stateDir = await directory();
     let calls = 0;

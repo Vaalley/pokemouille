@@ -49,6 +49,7 @@ function variety(overrides: Partial<PokemonVariety> = {}): PokemonVariety {
     learnsets: [],
     encounters: [],
     media: { sprites: null, artwork: null },
+    cries: { latest: null, legacy: null },
     sourceCounts: {
       types: 1,
       typeHistory: 1,
@@ -84,6 +85,8 @@ function species(varieties: PokemonVariety[] = [variety()]): SpeciesRecord {
     isBaby: false,
     isLegendary: false,
     isMythical: false,
+    eggGroupIds: [],
+    pokedexNumbers: [],
     sourceFacts: {},
     varieties,
     evolutions: [],
@@ -93,6 +96,8 @@ function species(varieties: PokemonVariety[] = [variety()]): SpeciesRecord {
       flavorTexts: 0,
       varieties: varieties.length,
       evolutions: 0,
+      eggGroupIds: 0,
+      pokedexNumbers: 0,
     },
   };
 }
@@ -114,15 +119,82 @@ describe("projectCatalogueSpecies", () => {
       name: "Sample Mouse",
       generationId: 2,
       typeIds: [18, 3],
+      stats: null,
+      abilityIds: [],
+      hiddenAbilityIds: [],
+      classification: "ordinary",
+      dexNumbers: [],
     });
     expect(projected.fr.name).toBe("Souris Exemple");
     expect(projected.ja.name).toBe("サンプル");
+  });
+
+  it("projects current default-variety stats, abilities and classification, not history", () => {
+    const current = [35, 55, 40, 50, 50, 90].map((baseStat, index) => ({
+      statId: index + 1,
+      baseStat,
+      effort: 0,
+    }));
+    const record = {
+      ...species([
+        variety({
+          id: 10025,
+          isDefault: false,
+          abilities: [{ slot: 1, abilityId: 99, isHidden: false }],
+        }),
+        variety({
+          // Source order is not slot order; history must never leak into current values.
+          stats: current.toReversed(),
+          statHistory: [{ statId: 1, baseStat: 1, effort: 0, generationId: 5 }],
+          abilities: [
+            { slot: 3, abilityId: 31, isHidden: true },
+            { slot: 2, abilityId: null, isHidden: false },
+            { slot: 1, abilityId: 9, isHidden: false },
+          ],
+          abilityHistory: [{ slot: 1, abilityId: 77, isHidden: false, generationId: 5 }],
+        }),
+      ]),
+      isLegendary: true,
+    };
+    expect(projectCatalogueSpecies(record).en).toMatchObject({
+      stats: [35, 55, 40, 50, 50, 90, 320],
+      abilityIds: [9],
+      hiddenAbilityIds: [31],
+      classification: "legendary",
+    });
+    const baby = projectCatalogueSpecies({ ...record, isLegendary: false, isBaby: true });
+    expect(baby.en.classification).toBe("baby");
+  });
+
+  it("keeps stats unknown when any of the six is missing instead of inventing zero", () => {
+    const stats = [1, 2, 3, 4, 5].map((statId) => ({ statId, baseStat: 50, effort: 0 }));
+    expect(projectCatalogueSpecies(species([variety({ stats })])).en.stats).toBeNull();
   });
 
   it("does not silently substitute an alternative for a missing default variety", () => {
     expect(() => projectCatalogueSpecies(species([variety({ isDefault: false })]))).toThrow(
       "Species 25 has no default variety",
     );
+  });
+
+  it("projects compact regional and DLC numbers including zero without introduction filtering", () => {
+    const record = species();
+    record.pokedexNumbers = [
+      { pokedexId: 1, number: 25 },
+      { pokedexId: 31, number: 74 },
+      { pokedexId: 32, number: 0 },
+      { pokedexId: 33, number: 21 },
+    ];
+    const projected = projectCatalogueSpecies(record);
+    expect(projected.en.dexNumbers).toEqual([
+      [1, 25],
+      [31, 74],
+      [32, 0],
+      [33, 21],
+    ]);
+    expect(projected.fr.dexNumbers).toEqual(projected.en.dexNumbers);
+    expect(projected.ja.dexNumbers).toEqual(projected.en.dexNumbers);
+    expect(record.pokedexNumbers[2]).toEqual({ pokedexId: 32, number: 0 });
   });
 });
 
