@@ -117,7 +117,7 @@
 
   /**
    * Detail-page link keeping the current game: the header's resolved game, else the URL's
-   * `?version=` while games load, else a context-free link the detail page resolves itself.
+   * `?version=` while games load, else let the detail page resolve the game. Always keep the form.
    */
   function hrefFor(entry: GlobalSearchEntry): string {
     const target = version ?? page.url.searchParams.get("version");
@@ -131,7 +131,6 @@
       if (target) params.set("version", target);
       return path + (params.size ? `?${params}` : "");
     }
-    if (!target) return resolve(`${lang}/pokemon/${entry.speciesId}/`);
     const path = pokemonHref(lang, entry.speciesId, {
       version: target,
       form: entry.isDefault ? null : entry.identifier,

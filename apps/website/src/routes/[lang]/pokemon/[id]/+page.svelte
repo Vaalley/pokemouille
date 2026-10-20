@@ -247,9 +247,10 @@
           <li class={key === "identity.next" ? "next" : "previous"}>
             <a
               rel={key === "identity.next" ? "next" : "prev"}
-              href={context
-                ? href(pokemonHref(lang, entry.speciesId, { version: context.version, form: null }))
-                : resolve(`${lang}/pokemon/${entry.speciesId}/`)}
+              href={href(pokemonHref(lang, entry.speciesId, {
+                version: context?.version ?? (mounted ? page.url.searchParams.get("version") : null),
+                form: null,
+              }))}
               >{t(lang, key, { number: entry.speciesId, name: entry.name.text })}</a
             >
           </li>

@@ -45,11 +45,12 @@ export function resolveContext({
 export function pokemonHref(
   language: Language,
   speciesId: number,
-  { version, form }: { version: string; form?: string | null },
+  { version, form }: { version: string | null; form?: string | null },
 ): string {
-  const query = new URLSearchParams({ version });
+  const query = new URLSearchParams();
+  if (version) query.set("version", version);
   if (form) query.set("form", form);
-  return `/${language}/pokemon/${speciesId}/?${query}`;
+  return `/${language}/pokemon/${speciesId}/${query.size ? `?${query}` : ""}`;
 }
 
 /** Same page in another language: first path segment replaced, query and hash preserved. */

@@ -87,6 +87,17 @@ describe("pokemonHref", () => {
       "/en/pokemon/6/?version=x&form=charizard-mega-x",
     );
   });
+
+  it("preserves the selected form when the destination must resolve the game", () => {
+    const href = pokemonHref("fr", 479, { version: null, form: "rotom-wash" });
+    expect(href).toBe("/fr/pokemon/479/?form=rotom-wash");
+    expect(context(new URL(href, "https://example.test").search)).toMatchObject({
+      version: "scarlet",
+      versionSource: "default",
+      form: "rotom-wash",
+    });
+    expect(pokemonHref("fr", 479, { version: null, form: null })).toBe("/fr/pokemon/479/");
+  });
 });
 
 describe("swapLanguageHref", () => {
