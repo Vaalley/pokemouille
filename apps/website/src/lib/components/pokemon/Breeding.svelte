@@ -84,6 +84,7 @@
         {#if failed}<p role="alert">{t(lang, "error")} <button type="button" onclick={() => attempt++}>{t(lang, "retry")}</button></p>
         {:else if !projection}<p role="status">{t(lang, "loading")}</p>
         {:else}
+          <div class="breeding-rows" role="region" aria-labelledby="breeding-heading" tabindex="0">
           {#each rows as row (row.id)}
             <section class="egg-move">
               <h3><a href={href(`/${lang}/move/${row.id}/?${new URLSearchParams({ version })}`)}>{row.name.text}</a></h3>
@@ -99,6 +100,7 @@
               {#if row.candidates.missingChronology}<p class="note">{t(lang, "gap", { count: row.candidates.missingChronology })}</p>{/if}
             </section>
           {/each}
+          </div>
         {/if}
       </details>
     {/if}
@@ -106,7 +108,9 @@
 </section>
 
 <style>
+  .breeding-rows { max-height: min(36rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding-inline: 0.5rem; margin-block-start: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
   .candidate-list { display: flex; flex-wrap: wrap; gap: 0.35rem 1.5rem; padding-inline-start: 1.25rem; }
-  .egg-move { border-block-start: 1px solid var(--border); margin-block-start: 1rem; padding-block-start: 0.5rem; }
-  summary { cursor: pointer; }
+  .egg-move { border-block-start: var(--border-width) solid var(--border); margin-block-start: 1rem; padding-block-start: 0.5rem; }
+  .egg-move:first-child { border-block-start: 0; margin-block-start: 0; }
+  summary { min-height: 2.75rem; padding-block: 0.5rem; cursor: pointer; }
 </style>

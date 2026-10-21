@@ -19,6 +19,7 @@ const en = {
   "flavor.empty": "Our data has no in-game descriptions for this item.",
   "flavor.games": "Games",
   "flavor.text": "Description",
+  "flavor.count": "Game groups: {count}",
   "evolution.heading": "Used in evolutions",
   "evolution.scope":
     "These source records require using or holding this item, together with every other listed requirement. Recorded games are provenance, not proof of applicability to the selected game; unscoped and default records are not universal rules. Pokémon links keep your selected game. Missing records do not prove that an evolution is impossible.",
@@ -51,6 +52,7 @@ const messages = {
     "flavor.empty": "Nos données ne contiennent aucune description en jeu pour cet objet.",
     "flavor.games": "Jeux",
     "flavor.text": "Description",
+    "flavor.count": "Groupes de jeux : {count}",
     "evolution.heading": "Utilisé pour des évolutions",
     "evolution.scope":
       "Ces données exigent d’utiliser ou de faire tenir cet objet, avec toutes les autres conditions indiquées. Les jeux enregistrés indiquent la provenance, pas la validité dans le jeu sélectionné ; les données sans jeu précis ou par défaut ne sont pas des règles universelles. Les liens Pokémon conservent le jeu sélectionné. L’absence de données ne prouve pas qu’une évolution est impossible.",
@@ -77,6 +79,7 @@ const messages = {
     "flavor.empty": "データには、この道具のゲーム内説明がありません。",
     "flavor.games": "ゲーム",
     "flavor.text": "説明",
+    "flavor.count": "ゲームグループ数：{count}",
     "evolution.heading": "進化に使う道具",
     "evolution.scope":
       "この道具を使う・持たせる条件を含む記録です。記載された他の条件もすべて必要です。記録対象のゲームは出典を示し、選択中のゲームで有効だと保証するものではありません。ゲームの指定がない記録や既定の記録も、全ゲーム共通のルールではありません。ポケモンへのリンクには選択中のゲームを引き継ぎます。記録がないことは、進化できないことの証明ではありません。",

@@ -23,7 +23,24 @@ export const handle: Handle = ({ event, resolve }) => {
             `<link rel="preload" as="fetch" crossorigin href="${asset(datasetPath(file) as AssetPath)}">`,
         )
         .join("");
-      return page.replace("</head>", `${links}</head>`);
+      // Static HTML cannot know local storage or query-selected forms. Discover the default
+      // image during head parsing only when it matches the visitor's initial selection.
+      const artwork = event.locals.artworkPreload;
+      const imagePreload = artwork
+        ? `<script>(function () {
+          if (new URLSearchParams(location.search).get("form")) return;
+          var sprite;
+          try { sprite = localStorage.getItem("pokemouille.sprite"); } catch {}
+          if (sprite && sprite !== "official") return;
+          var link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "image";
+          link.fetchPriority = "high";
+          link.href = ${JSON.stringify(artwork).replaceAll("<", "\\u003c")};
+          document.head.appendChild(link);
+        })();</script>`
+        : "";
+      return page.replace("</head>", `${links}${imagePreload}</head>`);
     },
   });
 };

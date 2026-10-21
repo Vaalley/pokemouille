@@ -10,6 +10,8 @@ const en = {
     "Abilities come from the selected game’s generation and aren’t checked game by game. They don’t confirm that a Pokémon can be obtained or how it behaves in battle, especially in games like Let's Go and Pokémon Legends. Forms introduced after the selected game are left out.",
   game: "Selected game:",
   count: "{count} matching Pokémon varieties",
+  scrollHint:
+    "All matching varieties are listed. Scroll within the list to browse them; use the arrow keys when the list has focus.",
   loading: "Loading the selected game and related Pokémon…",
   error:
     "Couldn’t load the game data, so related Pokémon can’t be shown. Reload the page to try again.",
@@ -39,6 +41,8 @@ const fr = {
     "Les talents viennent de la génération du jeu sélectionné et ne sont pas vérifiés jeu par jeu. Ils ne confirment ni qu’un Pokémon peut être obtenu, ni son comportement en combat, notamment dans les jeux Let's Go et Légendes Pokémon. Les formes apparues après le jeu sélectionné ne sont pas incluses.",
   game: "Jeu sélectionné :",
   count: "{count} variétés de Pokémon correspondantes",
+  scrollHint:
+    "Toutes les variétés correspondantes sont listées. Faites défiler la liste pour les parcourir ; utilisez les flèches lorsque la liste a le focus.",
   loading: "Chargement du jeu sélectionné et des Pokémon associés…",
   error:
     "Impossible de charger les données des jeux : les Pokémon associés ne peuvent pas être affichés. Rechargez la page pour réessayer.",
@@ -68,6 +72,8 @@ const ja = {
     "とくせいは選択したゲームの世代のデータで、ゲームごとには確認していません。入手できるかどうかや戦闘での動きを保証するものではありません。特に『Let's Go』や『Pokémon LEGENDS』などでは注意してください。選択したゲームより後に登場したフォルムは含みません。",
   game: "選択したゲーム：",
   count: "該当するポケモン：{count}種類",
+  scrollHint:
+    "該当するすべての種類を表示しています。リスト内をスクロールして確認できます。リストにフォーカスを合わせると、矢印キーでも移動できます。",
   loading: "選択したゲームと関連するポケモンを読み込み中…",
   error:
     "ゲームデータを読み込めなかったため、関連するポケモンを表示できません。ページを再読み込みしてください。",

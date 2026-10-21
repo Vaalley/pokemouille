@@ -92,11 +92,12 @@
 
 <style>
   .cries {
-    display: grid;
-    gap: 0.5rem;
-    margin-block-start: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
     padding-block-start: 0.75rem;
-    border-block-start: 1px solid var(--border);
+    border-block-start: var(--border-width) solid var(--border);
     min-width: 0;
   }
 
@@ -108,22 +109,40 @@
     font-size: 1rem;
   }
 
+  .actions {
+    flex-basis: 100%;
+  }
+
+  .cries > .note {
+    flex: 1 1 20rem;
+    margin: 0;
+  }
+
   label {
-    display: grid;
-    gap: 0.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    min-width: 0;
   }
 
   label, .source {
     font-size: 0.875rem;
   }
 
-  select, audio {
-    width: 100%;
+  select {
+    max-width: 100%;
+    min-height: 2.75rem;
+  }
+
+  audio {
+    width: min(100%, 20rem);
     min-width: 0;
   }
 
   button {
-    justify-self: start;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
   }
 
   .actions {

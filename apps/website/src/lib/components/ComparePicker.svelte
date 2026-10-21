@@ -201,7 +201,8 @@
     padding: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    border: 1px solid var(--border);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
     list-style: none;
   }
 

@@ -163,12 +163,12 @@
   .area { min-width: 0; }
   h3 { margin-block: 0 0.25rem; }
   h4 { margin-block: 0.75rem 0.5rem; }
-  .table-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--border, color-mix(in srgb, currentColor 20%, transparent)); border-radius: 0.5rem; }
+  .table-scroll { max-width: 100%; overflow-x: auto; border: var(--border-width) solid var(--border, color-mix(in srgb, currentColor 20%, transparent)); }
   .table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
   table { width: 100%; min-width: 44rem; border-collapse: collapse; text-align: start; }
   th, td { padding: 0.625rem 0.75rem; vertical-align: top; }
-  thead th { border-block-end: 1px solid color-mix(in srgb, currentColor 20%, transparent); }
-  tbody tr + tr { border-block-start: 1px solid color-mix(in srgb, currentColor 15%, transparent); }
+  thead th { border-block-end: var(--border-width) solid color-mix(in srgb, currentColor 20%, transparent); }
+  tbody tr + tr { border-block-start: var(--border-width) solid color-mix(in srgb, currentColor 15%, transparent); }
   th[scope="row"] { font-weight: normal; min-width: 11rem; }
   th[scope="row"] a { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
   .numeric { white-space: nowrap; font-variant-numeric: tabular-nums; }

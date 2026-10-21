@@ -194,5 +194,9 @@
   /* Several lists stack here: a shared label width keeps their values aligned. */
   dl {
     grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 32rem) {
+    dl { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 0.375rem 0.75rem; }
   }
 </style>

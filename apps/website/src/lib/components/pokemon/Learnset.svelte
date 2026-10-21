@@ -82,17 +82,26 @@
     <p class="note">{t(lang, "moves.context", { games })}</p>
     <p class="note">{t(lang, "moves.currentValues")}</p>
     {#if groups.length > 0}
+      <div class="learnset-tabs">
       <Tabs.Root value={activeTab} onValueChange={(v) => (selectedTab = v)}>
         <Tabs.List>
           {#each groups as group (group.methodId)}
-            <Tabs.Trigger value={String(group.methodId)}>
-              <Localized text={group.method} />
+            <Tabs.Trigger class="method-tab" value={String(group.methodId)}>
+              <span class="method-name"><Localized text={group.method} /></span>
+              <span class="method-count">
+                <span aria-hidden="true">{group.moves.length}</span>
+                <span class="visually-hidden">{t(lang, "moves.rowCount", { count: group.moves.length })}</span>
+              </span>
             </Tabs.Trigger>
           {/each}
         </Tabs.List>
         {#each groups as group (group.methodId)}
           <Tabs.Content value={String(group.methodId)}>
-            <div class="table-scroll" role="region" aria-label={group.method.text} tabindex="0">
+            <p class="visually-hidden" id={`moves-guide-${group.methodId}`}>
+              <strong>{t(lang, "moves.allRows", { count: group.moves.length })}</strong>
+              <span>{t(lang, "moves.scrollHint")}</span>
+            </p>
+            <div class="table-scroll" role="region" aria-label={t(lang, "moves.table", { method: group.method.text })} aria-describedby={`moves-guide-${group.methodId}`} tabindex="0">
             <table>
               <caption class="visually-hidden"><Localized text={group.method} /></caption>
               <thead>
@@ -137,6 +146,9 @@
           </Tabs.Content>
         {/each}
       </Tabs.Root>
+      </div>
+    {:else}
+      <p>{t(lang, "moves.empty")}</p>
     {/if}
   {:else}
     <p>{reasonText(lang, learnset.reason)}</p>
@@ -144,9 +156,57 @@
 </section>
 
 <style>
-  .table-scroll { max-width: 100%; overflow-x: auto; }
-  table { width: 100%; }
-  th, td { vertical-align: middle; }
+  section, .learnset-tabs { min-width: 0; }
+  .learnset-tabs :global(.method-tab) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--page-text);
+    text-align: start;
+  }
+  .learnset-tabs :global(.method-tab[data-state="active"]) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .method-name { min-width: 0; overflow-wrap: anywhere; }
+  .method-count {
+    flex: 0 0 auto;
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+    color: var(--page-text);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .table-scroll {
+    max-width: 100%;
+    max-height: min(30rem, 65dvh);
+    overflow: auto;
+    scrollbar-gutter: stable;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+  }
+  .table-scroll:focus-visible {
+    outline: var(--border-width) solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  th, td { padding: 0.5rem 0.75rem; vertical-align: middle; }
+  thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    background: var(--surface-muted);
+    color: var(--page-text);
+  }
   th[scope="row"] { min-width: 10rem; font-weight: normal; }
   th a { display: inline-flex; align-items: center; gap: 0.375rem; }
   .numeric { white-space: nowrap; }

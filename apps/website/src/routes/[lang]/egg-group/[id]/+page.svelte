@@ -51,6 +51,6 @@
 <style>
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: start; padding: 0.6rem; border-block-end: 1px solid var(--border); }
+  th, td { text-align: start; padding: 0.6rem; border-block-end: var(--border-width) solid var(--border); }
   small { white-space: nowrap; }
 </style>

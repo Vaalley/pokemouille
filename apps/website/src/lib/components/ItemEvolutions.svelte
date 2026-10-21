@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
+  import { localize } from "../../../../../packages/pokemon-data/src/localization.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import Evolution from "#lib/components/pokemon/Evolution.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
@@ -37,7 +38,15 @@
     <p role="status">{t(lang, "evolution.loading")}</p>
   {:else}
     <p>{t(lang, "evolution.context")} <strong><Localized text={gameName} /></strong></p>
-    {#each data.chains as entry (entry.key)}
+    <div class="evolution-families">
+    {#each data.chains as entry, index (entry.key)}
+      <details class="evolution-family" open={index === 0}>
+        <summary>
+          {#each entry.chain.nodes as node, nodeIndex (node.speciesId)}
+            {#if nodeIndex > 0}{" / "}{/if}<Localized text={localize(node.names, lang, node.identifier)} />
+          {/each}
+        </summary>
+        <div class="family-body">
       <Evolution
         {lang}
         chain={entry.chain}
@@ -54,6 +63,17 @@
         embedded
         methodsOpen
       />
+        </div>
+      </details>
     {/each}
+    </div>
   {/if}
 </section>
+
+<style>
+  .evolution-families { display: grid; gap: 0.75rem; }
+  .evolution-family { min-width: 0; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  summary { min-height: 2.75rem; padding: 0.875rem 1rem; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+  details[open] > summary { border-block-end: var(--border-width) solid var(--border); }
+  .family-body { min-width: 0; padding: 0 1rem 1rem; }
+</style>

@@ -3,6 +3,12 @@ import type { Language } from "./core.ts";
 
 const en = {
   filters: "Filter the Pokédex",
+  advancedFilters: "Filters",
+  activeCount: "Active filters: {count}",
+  activeFilters: "Active filters",
+  removeFilter: "Remove filter: {filter}",
+  resultsOptions: "Result display and sorting",
+  sortNumberShort: "Number",
   intro:
     "Browse the National Pokédex or a regional Pokédex mapped to your selected game, with current default-form types, stats and abilities.",
   query: "Name or National Pokédex number",
@@ -52,6 +58,12 @@ const en = {
 };
 const fr = {
   filters: "Filtrer le Pokédex",
+  advancedFilters: "Filtres",
+  activeCount: "Filtres actifs : {count}",
+  activeFilters: "Filtres actifs",
+  removeFilter: "Supprimer le filtre : {filter}",
+  resultsOptions: "Affichage et tri des résultats",
+  sortNumberShort: "Numéro",
   intro:
     "Parcourez le Pokédex National ou un Pokédex régional associé au jeu sélectionné, avec les types, stats et talents actuels de la forme par défaut.",
   query: "Nom ou numéro du Pokédex National",
@@ -101,6 +113,12 @@ const fr = {
 } satisfies Record<keyof typeof en, string>;
 const ja = {
   filters: "図鑑を絞り込む",
+  advancedFilters: "絞り込み",
+  activeCount: "{count}件の絞り込み条件",
+  activeFilters: "適用中の絞り込み条件",
+  removeFilter: "絞り込み条件を解除：{filter}",
+  resultsOptions: "結果の表示と並び替え",
+  sortNumberShort: "図鑑番号",
   intro:
     "全国図鑑、または選択したゲームに対応する地方図鑑を、標準のすがたの現在のタイプ・種族値・とくせいとともに見られます。",
   query: "名前または全国図鑑番号",

@@ -30,7 +30,7 @@
 </script>
 
 <section aria-labelledby="types-heading">
-  <h2 id="types-heading">{t(lang, "types.heading")}</h2>
+  <h2 id="types-heading" class="visually-hidden">{t(lang, "types.heading")}</h2>
   {#if types.status === "available"}
     <!-- Both links share one hover region and one combined preview. -->
     <LinkPreview.Root openDelay={150} closeDelay={250}>
@@ -86,10 +86,10 @@
     max-height: min(38rem, var(--bits-floating-available-height, calc(100dvh - 1.5rem)));
     overflow-y: auto;
     padding: 1rem;
-    border: 1px solid;
-    border-radius: 0.75rem;
-    background: Canvas;
-    color: CanvasText;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    color: var(--page-text);
     box-shadow: var(--popover-shadow);
   }
   :global(.type-matchups h3) { margin: 0; }

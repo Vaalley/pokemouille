@@ -10,6 +10,7 @@ const en = {
   error: "Couldn’t resolve the selected game. Try reloading the page.",
   nojs: "Enable JavaScript to resolve your selected game and show its machine mappings.",
   empty: "No machine mapping is recorded for this selection in our data.",
+  machine: "Machine",
   teaches: "Teaches",
   learners: "Compatible Pokémon",
   noLearners:
@@ -31,6 +32,7 @@ const messages = {
     error: "Impossible de déterminer le jeu sélectionné. Rechargez la page.",
     nojs: "Activez JavaScript pour déterminer le jeu sélectionné et afficher ses correspondances de machines.",
     empty: "Nos données ne contiennent aucune correspondance de machine pour cette sélection.",
+    machine: "Machine",
     teaches: "Enseigne",
     learners: "Pokémon compatibles",
     noLearners:
@@ -48,6 +50,7 @@ const messages = {
     error: "選択中のゲームを確認できませんでした。ページを再読み込みしてください。",
     nojs: "選択中のゲームとマシンの対応を表示するには、JavaScriptを有効にしてください。",
     empty: "この選択に対応するマシンの記録はデータにありません。",
+    machine: "マシン",
     teaches: "覚えられる技：",
     learners: "対応するポケモン",
     noLearners:

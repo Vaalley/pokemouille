@@ -46,38 +46,51 @@
     {:else if !game || !gameName || !version}
       <p>{t(lang, "loading")}</p>
     {:else}
-      <p>{t(lang, "game")} <strong><Localized text={gameName} /></strong></p>
+      <p class="game-context">{t(lang, "game")} <strong><Localized text={gameName} /></strong></p>
       {#if mappings.length === 0}<p>{t(lang, "empty")}</p>{/if}
     {/if}
   </div>
   {#if !failed && game && version}
-    <ul class="mapping-list">
+    <ul class="mapping-list" class:move-mappings={kind === "move"}>
       {#each mappings as mapping (mapping.id)}
-        <li>
+        <li class:detail-panel={kind === "item"}>
           {#if kind === "move"}
-            <a class="resource-link" href={resolve(`${lang}/item/${mapping.item.id}/?${new URLSearchParams({ version })}` as PathnameWithSearchOrHash)}>
+            <a class="resource-link machine-link" href={resolve(`${lang}/item/${mapping.item.id}/?${new URLSearchParams({ version })}` as PathnameWithSearchOrHash)}>
               <ItemIcon identifier={mapping.item.identifier} /><Localized text={mapping.item.name} />
             </a>
           {:else}
-            <p class="resource-link"><ItemIcon identifier={mapping.item.identifier} /><Localized text={mapping.item.name} /></p>
-            <p>{t(lang, "teaches")}
-              <a class="resource-link" href={resolve(`${lang}/move/${mapping.move.id}/?${new URLSearchParams({ version })}` as PathnameWithSearchOrHash)}>
-                <MoveIcon typeId={mapping.move.typeId} /><Localized text={mapping.move.name} />
-              </a>
-            </p>
-            <h3>{t(lang, "learners")}</h3>
+            {@const learners = data.pokemon.filter((entry) => mapping.pokemonIds.includes(entry.pokemonId))}
+            <dl class="machine-association">
+              <div>
+                <dt>{t(lang, "machine")}</dt>
+                <dd class="resource-link"><ItemIcon identifier={mapping.item.identifier} /><Localized text={mapping.item.name} /></dd>
+              </div>
+              <div>
+                <dt>{t(lang, "teaches")}</dt>
+                <dd>
+                  <a class="resource-link" href={resolve(`${lang}/move/${mapping.move.id}/?${new URLSearchParams({ version })}` as PathnameWithSearchOrHash)}>
+                    <MoveIcon typeId={mapping.move.typeId} /><Localized text={mapping.move.name} />
+                  </a>
+                </dd>
+              </div>
+            </dl>
+            <h3 id={`${id}-learners-${mapping.id}`} class="learners-heading">
+              {t(lang, "learners")} <span>({learners.length})</span>
+            </h3>
             {#if mapping.pokemonIds.length === 0}
               <p>{t(lang, "noLearners")}</p>
             {:else}
-              <ul class="pokemon-list">
-                {#each data.pokemon.filter((entry) => mapping.pokemonIds.includes(entry.pokemonId)) as pokemon (pokemon.pokemonId)}
-                  <li>
-                    <a href={resolve(pokemonHref(lang, pokemon.speciesId, { version, form: pokemon.form }).slice(1) as PathnameWithSearchOrHash)}>
-                      <PokemonIcon speciesId={pokemon.speciesId} /><Localized text={pokemon.name} />
-                    </a>
-                  </li>
-                {/each}
-              </ul>
+              <div class="learner-region" role="region" aria-labelledby={`${id}-learners-${mapping.id}`} tabindex="0">
+                <ul class="pokemon-list">
+                  {#each learners as pokemon (pokemon.pokemonId)}
+                    <li>
+                      <a href={resolve(pokemonHref(lang, pokemon.speciesId, { version, form: pokemon.form }).slice(1) as PathnameWithSearchOrHash)}>
+                        <PokemonIcon speciesId={pokemon.speciesId} /><Localized text={pokemon.name} />
+                      </a>
+                    </li>
+                  {/each}
+                </ul>
+              </div>
             {/if}
             {#if mapping.missingIntroduction > 0}
               <p class="source-gap">{t(lang, "sourceGap", { count: mapping.missingIntroduction })}</p>
@@ -90,9 +103,48 @@
 </section>
 
 <style>
-  .mapping-list { list-style: none; padding: 0; }
-  .mapping-list > li + li { margin-block-start: 1.5rem; }
-  .resource-link { display: inline-flex; align-items: center; gap: 0.5rem; vertical-align: middle; }
-  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.5rem; padding: 0; list-style: none; }
-  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; overflow-wrap: anywhere; }
+  .game-context {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    padding: 0.75rem 1rem;
+    border-inline-start: var(--border-width) solid var(--accent);
+    border-radius: var(--radius-control);
+    background: var(--accent-soft);
+  }
+  .mapping-list { display: grid; gap: 1.25rem; list-style: none; padding: 0; }
+  .mapping-list > li { min-width: 0; }
+  .move-mappings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: 0.75rem; }
+  .resource-link { display: inline-flex; align-items: center; gap: 0.5rem; max-width: 100%; vertical-align: middle; overflow-wrap: anywhere; font-weight: 600; }
+  .machine-link {
+    display: flex;
+    height: 100%;
+    min-height: 3.5rem;
+    padding: 0.75rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+  }
+  .machine-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .machine-association { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem 2.5rem; margin: 0; }
+  .machine-association > div { min-width: 0; max-width: 100%; }
+  .machine-association dt { margin-block-end: 0.375rem; color: var(--muted); font-size: 0.875rem; }
+  .machine-association dd { margin: 0; }
+  .learners-heading { margin-block: 1.5rem 0.75rem; }
+  .learners-heading span { color: var(--muted); font-size: 0.875em; font-weight: 400; font-variant-numeric: tabular-nums; }
+  .learner-region {
+    max-height: min(32rem, 65dvh);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding: 0.5rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+  }
+  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+  .pokemon-list li { min-width: 0; }
+  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; height: 100%; padding: 0.375rem 0.5rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); overflow-wrap: anywhere; }
+  .pokemon-list a:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .source-gap { padding: 0.75rem 1rem; border-inline-start: var(--border-width) solid var(--border-strong); background: var(--surface-muted); }
 </style>

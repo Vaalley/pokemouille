@@ -23,47 +23,54 @@
   <meta name="description" content={`${data.name.text} (${t(lang, "heading")}). ${data.shortEffect?.text ?? t(lang, "scope")}`} />
 </svelte:head>
 
-<article>
+<article class="resource-detail">
   <header class="page-header">
     <p class="kicker">{t(lang, "number", { id: data.id })}</p>
-    <h1><MoveIcon typeId={data.typeId} /><Localized text={data.name} /></h1>
+    <h1><MoveIcon typeId={data.typeId} /><span><Localized text={data.name} /></span></h1>
     <p>{t(lang, "generation", { generation: data.generationId })}</p>
   </header>
 
-  <dl class="figures">
-    <div>
-      <dt>{t(lang, "type")}</dt>
-      <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
-    </div>
-    <div><dt>{t(lang, "category")}</dt><dd>{category}</dd></div>
-    <div><dt>{t(lang, "power")}</dt><dd>{data.power ?? t(lang, "variable")}</dd></div>
-    <div><dt>{t(lang, "accuracy")}</dt><dd>{data.accuracy === null ? t(lang, "variable") : `${data.accuracy}%`}</dd></div>
-    <div><dt>{t(lang, "pp")}</dt><dd>{data.pp ?? t(lang, "variable")}</dd></div>
-    <div><dt>{t(lang, "priority")}</dt><dd>{data.priority}</dd></div>
-    <div><dt>{t(lang, "effectChance")}</dt><dd>{data.effectChance === null ? t(lang, "variable") : `${data.effectChance}%`}</dd></div>
-  </dl>
-  <p class="note">{t(lang, "scope")}</p>
-  <MoveProperties {lang} move={data.move} stats={data.stats} />
+  <section aria-labelledby="overview-heading" aria-describedby="move-scope">
+    <h2 id="overview-heading">{t(lang, "overview")}</h2>
+    <p class="note" id="move-scope">{t(lang, "scope")}</p>
+    <dl class="move-identity">
+      <div>
+        <dt>{t(lang, "type")}</dt>
+        <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
+      </div>
+      <div><dt>{t(lang, "category")}</dt><dd>{category}</dd></div>
+    </dl>
+    <dl class="move-figures">
+      <div><dt>{t(lang, "power")}</dt><dd>{data.power ?? t(lang, "variable")}</dd></div>
+      <div><dt>{t(lang, "accuracy")}</dt><dd>{data.accuracy === null ? t(lang, "variable") : `${data.accuracy}%`}</dd></div>
+      <div><dt>{t(lang, "pp")}</dt><dd>{data.pp ?? t(lang, "variable")}</dd></div>
+      <div><dt>{t(lang, "priority")}</dt><dd>{data.priority}</dd></div>
+      <div><dt>{t(lang, "effectChance")}</dt><dd>{data.effectChance === null ? t(lang, "variable") : `${data.effectChance}%`}</dd></div>
+    </dl>
+  </section>
 
   <section aria-labelledby="effect-heading">
     <h2 id="effect-heading">{t(lang, "effect")}</h2>
     {#if data.shortEffect && data.shortEffect.text !== data.effect?.text}
-      <p><Localized text={data.shortEffect} /></p>
+      <p class="effect-summary"><Localized text={data.shortEffect} /></p>
     {/if}
     {#if data.effect}<p class="effect-text"><Localized text={data.effect} /></p>{:else}<p>{t(lang, "missing")}</p>{/if}
   </section>
+  <MoveProperties {lang} move={data.move} stats={data.stats} />
 
   <section aria-labelledby="descriptions-heading">
     <h2 id="descriptions-heading">{t(lang, "descriptions")}</h2>
     {#if data.descriptions.length > 0}
-      <table>
-        <thead><tr><th scope="col">{t(lang, "games")}</th><th scope="col">{t(lang, "description")}</th></tr></thead>
-        <tbody>
-          {#each data.descriptions as row (row.id)}
-            <tr><th scope="row">{row.games}</th><td><Localized text={row.text} /></td></tr>
-          {/each}
-        </tbody>
-      </table>
+      <div class="detail-table move-descriptions" role="region" aria-labelledby="descriptions-heading" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">{t(lang, "games")}</th><th scope="col">{t(lang, "description")}</th></tr></thead>
+          <tbody>
+            {#each data.descriptions as row (row.id)}
+              <tr><th scope="row">{row.games}</th><td><Localized text={row.text} /></td></tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
     {:else}
       <p>{t(lang, "noDescriptions")}</p>
     {/if}
@@ -74,5 +81,37 @@
 </article>
 
 <style>
-  .effect-text { white-space: pre-line; }
+  .move-identity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin-block: 1.25rem;
+  }
+  .move-identity > div { min-width: 0; }
+  .move-identity dt, .move-figures dt { color: var(--muted); font-size: 0.875rem; }
+  .move-identity dd { margin: 0.375rem 0 0; font-weight: 600; }
+  .move-figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+    gap: 0.75rem;
+    margin-block: 0;
+  }
+  .move-figures > div {
+    min-width: 0;
+    padding: 0.875rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+  }
+  .move-figures dd {
+    margin: 0.375rem 0 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .effect-summary { font-weight: 600; white-space: pre-wrap; }
+  .effect-text { max-width: var(--measure); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .move-descriptions th[scope="row"] { min-width: 8rem; width: 28%; }
+  .move-descriptions td { min-width: 12rem; white-space: pre-line; overflow-wrap: anywhere; }
 </style>

@@ -318,8 +318,8 @@
   }
   .card {
     min-width: 0;
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
     padding: 1rem;
     overflow-wrap: anywhere;
   }
@@ -354,8 +354,8 @@
     display: inline-block;
     margin: 0.25rem 0 0 0.25rem;
     padding: 0.15rem 0.4rem;
-    border: 1px solid var(--border);
-    border-radius: 0.3rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-pill);
     font-size: 0.8rem;
   }
   .methods {
@@ -380,7 +380,7 @@
   }
   .method {
     padding: 0.75rem;
-    border-radius: 0.4rem;
+    border-radius: var(--radius-panel);
     background: color-mix(in srgb, currentColor 5%, transparent);
   }
   .provenance,

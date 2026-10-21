@@ -12,6 +12,7 @@ import type {
 } from "../../../../../../../packages/pokemon-data/src/index.ts";
 import type { EvolutionForm } from "#lib/data/evolution-tree.ts";
 import { projectEvolutionForms } from "#lib/server/evolution-forms.ts";
+import { resolveMainSprite, spriteStyle } from "#lib/data/sprite-preference.ts";
 import { LANGUAGES, isLanguage } from "#lib/i18n/core.ts";
 import type { Language } from "#lib/i18n/core.ts";
 import type { EntryGenerator, PageServerLoad } from "./$types";
@@ -66,12 +67,21 @@ function languageIndex(lang: Language): LanguageIndex {
 // Species files are large; keep only what pages need, shared by all three languages.
 const species: Record<
   number,
-  Pick<SpeciesRecord, "genera" | "evolutionChainId" | "isLegendary" | "isMythical">
+  Pick<SpeciesRecord, "genera" | "evolutionChainId" | "isLegendary" | "isMythical"> & {
+    artwork: string | null;
+  }
 > = {};
 function speciesSummary(speciesId: number, path: string) {
   if (!species[speciesId]) {
-    const { genera, evolutionChainId, isLegendary, isMythical } = readJson<SpeciesRecord>(path);
-    species[speciesId] = { genera, evolutionChainId, isLegendary, isMythical };
+    const { genera, evolutionChainId, isLegendary, isMythical, varieties } =
+      readJson<SpeciesRecord>(path);
+    const media = varieties.find((variety) => variety.isDefault)?.media;
+    const artwork = resolveMainSprite(
+      media?.sprites,
+      media?.artwork ?? null,
+      spriteStyle(null),
+    ).url;
+    species[speciesId] = { genera, evolutionChainId, isLegendary, isMythical, artwork };
   }
   return species[speciesId];
 }
@@ -114,6 +124,7 @@ export const load: PageServerLoad = ({ params, locals }) => {
     datasetFiles.pokemonReferences,
     ...(chainId === null ? [] : [datasetFiles.evolution(chainId)]),
   ];
+  if (summary.artwork) locals.artworkPreload = summary.artwork;
   return {
     speciesId,
     evolutionChainId: chainId,

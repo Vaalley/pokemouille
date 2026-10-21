@@ -198,6 +198,12 @@ const en = {
 
   "moves.heading": "Moves",
   "moves.context": "Moves recorded for {games}.",
+  "moves.rowCount": "Rows: {count}",
+  "moves.allRows": "All rows: {count}",
+  "moves.table": "Move records — {method}",
+  "moves.scrollHint":
+    "Scroll within the table to read every row and column. With the table focused, use the arrow keys to scroll.",
+  "moves.empty": "No moves are recorded for these games.",
   "moves.level": "Level",
   "moves.move": "Move",
   "moves.mastery": "Mastery level",
@@ -439,6 +445,12 @@ const messages = {
 
     "moves.heading": "Capacités",
     "moves.context": "Capacités enregistrées pour {games}.",
+    "moves.rowCount": "Lignes : {count}",
+    "moves.allRows": "Toutes les lignes : {count}",
+    "moves.table": "Capacités enregistrées — {method}",
+    "moves.scrollHint":
+      "Faites défiler le tableau pour lire toutes les lignes et colonnes. Lorsque le tableau a le focus, utilisez les touches fléchées.",
+    "moves.empty": "Aucune capacité n’est enregistrée pour ces jeux.",
     "moves.level": "Niveau",
     "moves.move": "Capacité",
     "moves.mastery": "Niveau de maîtrise",
@@ -676,6 +688,12 @@ const messages = {
 
     "moves.heading": "わざ",
     "moves.context": "{games}で記録されているわざ。",
+    "moves.rowCount": "{count}行",
+    "moves.allRows": "全{count}行",
+    "moves.table": "わざの記録 — {method}",
+    "moves.scrollHint":
+      "表の中をスクロールすると、すべての行と列を確認できます。表にフォーカスを合わせると、矢印キーでスクロールできます。",
+    "moves.empty": "これらのゲームのわざは記録されていません。",
     "moves.level": "レベル",
     "moves.move": "わざ",
     "moves.mastery": "極めるレベル",

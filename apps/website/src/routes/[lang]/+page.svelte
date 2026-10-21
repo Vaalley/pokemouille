@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { pushState } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -64,6 +64,31 @@
   ));
   const typesById = $derived(new Map(data.catalogue.types.map((type) => [type.id, type])));
 
+  const activeFilters = $derived.by(() => {
+    const active: { key: keyof HomeFilters; label: string; value: string | LocalizedText }[] = [];
+    if (filters.q) active.push({ key: "q", label: home(data.lang, "query"), value: filters.q });
+    if (filters.dex !== null) active.push({ key: "dex", label: dex(data.lang, "selector"), value: dexSelection.status === "regional" ? dexSelection.dex.name : invalidDexName || filters.dex });
+    const type = typesById.get(filters.type ?? -1);
+    if (type) active.push({ key: "type", label: home(data.lang, "type"), value: type.name });
+    if (filters.generation !== null) active.push({ key: "generation", label: home(data.lang, "generation"), value: String(filters.generation) });
+    const ability = data.catalogue.abilities.find((entry) => entry.id === filters.ability);
+    if (ability) active.push({ key: "ability", label: home(data.lang, "ability"), value: ability.name });
+    if (filters.classification !== null) active.push({ key: "classification", label: home(data.lang, "classification"), value: home(data.lang, filters.classification) });
+    if (filters.minTotal !== null) active.push({ key: "minTotal", label: home(data.lang, "minTotal"), value: String(filters.minTotal) });
+    if (filters.maxTotal !== null) active.push({ key: "maxTotal", label: home(data.lang, "maxTotal"), value: String(filters.maxTotal) });
+    return active;
+  });
+  const advancedCount = $derived(activeFilters.filter(({ key }) => key !== "q" && key !== "dex").length);
+
+  async function removeFilter(key: keyof HomeFilters, button: HTMLButtonElement) {
+    const item = button.closest("li");
+    const next = item?.nextElementSibling?.querySelector("button")
+      ?? item?.previousElementSibling?.querySelector("button");
+    update({ [key]: key === "q" ? "" : null });
+    await tick();
+    (next ?? document.getElementById(`${id}-advanced-toggle`))?.focus();
+  }
+
   function update(changes: Partial<HomeFilters>, displayChanges: Partial<HomeDisplay> = {}) {
     const url = homeFiltersUrl(currentUrl, { ...filters, ...changes }, { ...display, ...displayChanges });
     if (version) url.searchParams.set("version", version);
@@ -102,15 +127,16 @@
 <h1>{dexName}</h1>
 <p>{home(data.lang, "intro")}</p>
 
-<form class="filters" onsubmit={(event) => event.preventDefault()} aria-label={home(data.lang, "filters")} aria-describedby="{id}-scope">
-  <div class="filter-field wide">
+<form class="catalogue-filters" onsubmit={(event) => event.preventDefault()} aria-label={home(data.lang, "filters")} aria-describedby="{id}-scope">
+  <div class="primary-filters">
+  <div class="filter-field">
     <label for="{id}-dex">{dex(data.lang, "selector")}</label>
     <select id="{id}-dex" name="dex"
-      value={dexId ?? filters.dex ?? "1"} disabled={!mounted || !version}
+      value={dexId ?? filters.dex ?? 1} disabled={!mounted || !version}
       aria-invalid={dexSelection.status === "invalid" ? "true" : undefined}
       aria-describedby={dexSelection.status === "invalid" ? `${id}-dex-error` : undefined}
       onchange={(event) => update({ dex: event.currentTarget.value === "1" ? null : event.currentTarget.value })}>
-      <option value="1">{dex(data.lang, "national")}</option>
+      <option value={1}>{dex(data.lang, "national")}</option>
       {#if dexSelection.status === "invalid"}
         <option value={dexSelection.requested}>{dex(data.lang, "invalidOption", { dex: invalidDexName })}</option>
       {/if}
@@ -119,7 +145,7 @@
       {/each}
     </select>
   </div>
-  <div class="filter-field wide">
+  <div class="filter-field">
     <label for="{id}-query">{home(data.lang, "query")}</label>
     <input
       id="{id}-query"
@@ -131,6 +157,13 @@
       oninput={(event) => update({ q: event.currentTarget.value })}
     />
   </div>
+  </div>
+  <details class="advanced-filters">
+    <summary id="{id}-advanced-toggle">
+      <span>{home(data.lang, "advancedFilters")}</span>
+      {#if advancedCount > 0}<span class="filter-count" aria-label={home(data.lang, "activeCount", { count: advancedCount })}>{advancedCount}</span>{/if}
+    </summary>
+    <div class="advanced-fields">
   <div class="filter-field">
     <label for="{id}-type">{home(data.lang, "type")}</label>
     <select id="{id}-type" name="type" value={filters.type ?? ""} disabled={!mounted}
@@ -183,6 +216,42 @@
       value={filters.maxTotal ?? ""} disabled={!mounted}
       oninput={(event) => update({ maxTotal: parseWholeNumber(event.currentTarget.value) })} />
   </div>
+    </div>
+    <div class="note" id="{id}-scope">
+      <p>{home(data.lang, "scope")}</p>
+      <p>{home(data.lang, "currentScope")}</p>
+      <p>{dex(data.lang, "scope")}</p>
+      {#if mounted && version && dexes.length === 0}<p>{dex(data.lang, "noMapped")}</p>{/if}
+    </div>
+  </details>
+  {#if hasHomeFilterParams(searchParams)}
+  <div class="active-filter-bar">
+    {#if activeFilters.length > 0}
+      <ul class="active-filters" aria-label={home(data.lang, "activeFilters")}>
+        {#each activeFilters as filter (filter.key)}
+          <li>
+            <button type="button" class="filter-chip"
+              aria-label={home(data.lang, "removeFilter", { filter: `${filter.label}: ${typeof filter.value === "string" ? filter.value : filter.value.text}` })}
+              onclick={(event) => removeFilter(filter.key, event.currentTarget)}>
+              <span>{filter.label}: {#if typeof filter.value === "string"}{filter.value}{:else}<Localized text={filter.value} />{/if}</span>
+              <span aria-hidden="true">×</span>
+            </button>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  <button type="button" disabled={!mounted || !hasHomeFilterParams(searchParams)}
+    onclick={() => update({ q: "", type: null, generation: null, ability: null, classification: null, minTotal: null, maxTotal: null, dex: null })}>{home(data.lang, "reset")}</button>
+  </div>
+  {/if}
+</form>
+<div class="results-toolbar" role="group" aria-label={home(data.lang, "resultsOptions")}>
+  {#if mounted && (dexSelection.status === "national" || dexSelection.status === "regional")}
+    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
+      {home(data.lang, "count", { filtered: species.length, total: data.catalogue.species.length })}
+    </p>
+  {/if}
+  <div class="toolbar-fields">
   <div class="filter-field">
     <label for="{id}-view">{home(data.lang, "view")}</label>
     <select id="{id}-view" name="view" value={display.view} disabled={!mounted}
@@ -199,7 +268,7 @@
         update({}, { sort, order: defaultHomeOrder(sort) });
       }}>
       {#each HOME_SORTS as sort (sort)}
-        {@const label = sortLabel(sort)}
+        {@const label = sort === "number" ? home(data.lang, "sortNumberShort") : sortLabel(sort)}
         <option value={sort} lang={optionLang(label)}>{typeof label === "string" ? label : label.text}</option>
       {/each}
     </select>
@@ -212,22 +281,15 @@
       <option value="desc">{home(data.lang, "descending")}</option>
     </select>
   </div>
-  <button type="button" disabled={!mounted || !hasHomeFilterParams(searchParams)}
-    onclick={() => update({ q: "", type: null, generation: null, ability: null, classification: null, minTotal: null, maxTotal: null, dex: null })}>{home(data.lang, "reset")}</button>
-</form>
-<div class="note" id="{id}-scope">
-  <p>{home(data.lang, "scope")}</p>
-  <p>{home(data.lang, "currentScope")}</p>
-  <p>{dex(data.lang, "scope")}</p>
-  {#if mounted && version && dexes.length === 0}<p>{dex(data.lang, "noMapped")}</p>{/if}
+  </div>
 </div>
 
 {#snippet speciesList(entries: CatalogueSpecies[], label: string)}
-  <ol class="species-list" class:regional={dexId !== null && dexId !== 1} aria-label={label}>
+  <ol class="species-list pokemon-cards" aria-label={label}>
     {#each entries as entry (entry.id)}
       <li>
-        <a href={speciesHref(entry.id)}>
-          <PokemonIcon speciesId={entry.id} />
+        <a class="pokemon-card" href={speciesHref(entry.id)}>
+          <span class="pokemon-card-icon"><PokemonIcon speciesId={entry.id} /></span>
           <span class="species-number">
             {#if dexId !== null && dexId !== 1}
               <span>{dex(data.lang, "regionalNumber")} {speciesDexNumber(entry, dexId)}</span>
@@ -236,7 +298,13 @@
               {t(data.lang, "home.number", { number: String(entry.id).padStart(4, "0") })}
             {/if}
           </span>
-          <span>{entry.name}</span>
+          <span class="pokemon-card-name">{entry.name}</span>
+          <span class="pokemon-card-types">
+            {#each entry.typeIds as typeId (typeId)}
+              {@const type = typesById.get(typeId)}
+              {#if type}<TypeBadge typeId={type.id} name={type.name} linked={false} />{/if}
+            {/each}
+          </span>
         </a>
       </li>
     {/each}
@@ -311,9 +379,6 @@
   <p id="{id}-dex-error" role="alert">{dex(data.lang, "invalid", { dex: invalidDexName })}</p>
   <button type="button" onclick={() => update({ dex: null })}>{dex(data.lang, "reset")}</button>
 {:else}
-  <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
-    {home(data.lang, "count", { filtered: species.length, total: data.catalogue.species.length })}
-  </p>
   {#if species.length === 0}
     <p>{home(data.lang, "empty")}</p>
   {:else if display.view === "table"}
@@ -330,8 +395,72 @@
 {/if}
 
 <style>
-  .species-list.regional { grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); }
-  .regional .species-number { display: grid; gap: 0.1rem; }
+  .catalogue-filters { display: grid; gap: 1rem; margin-block: 1.5rem 1rem; }
+  .primary-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 1rem; align-items: end; }
+  .advanced-filters { padding: 0.75rem 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); min-width: 0; }
+  .advanced-filters > summary { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; list-style: none; }
+  .advanced-filters > summary::-webkit-details-marker { display: none; }
+  .advanced-filters > summary::after { content: ""; width: 0.45rem; height: 0.45rem; margin-inline: auto 0.25rem; border-inline-end: var(--border-width) solid currentColor; border-block-end: var(--border-width) solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
+  .advanced-filters[open] > summary::after { transform: translateY(0.125rem) rotate(225deg); }
+  .filter-count { border-radius: var(--radius-pill); padding: 0.1rem 0.5rem; border: var(--border-width) solid var(--border); font-size: 0.875rem; }
+  .advanced-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; margin-block: 1rem; }
+  .catalogue-filters :is(input, select), .toolbar-fields select { min-width: 0; width: 100%; min-height: 2.75rem; padding: 0.6rem 0.75rem; border: var(--border-width) solid var(--border-strong); background: var(--surface); color: var(--page-text); font: inherit; }
+  .active-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
+  .active-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; min-width: 0; }
+  .active-filters li { min-width: 0; max-width: 100%; }
+  .catalogue-filters button { min-height: 2.75rem; padding: 0.5rem 0.75rem; border: var(--border-width) solid var(--border); background: var(--surface); color: var(--page-text); font: inherit; cursor: pointer; }
+  .filter-chip { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; border-radius: var(--radius-pill); text-align: start; overflow-wrap: anywhere; }
+  .filter-chip > span:first-child { min-width: 0; }
+  .results-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 0.75rem 1rem; margin-block: 1rem; }
+  .results-toolbar .result-count { flex: 1 1 12rem; margin: 0; }
+  .toolbar-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; width: min(100%, 38rem); }
+  @media (max-width: 40rem) {
+    .primary-filters { grid-template-columns: minmax(0, 1fr); }
+    .toolbar-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .toolbar-fields .filter-field:first-child { grid-column: 1 / -1; }
+    .toolbar-fields select { font-size: 0.875rem; }
+  }
+  .pokemon-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem; }
+  .pokemon-cards > li { min-width: 0; }
+  .pokemon-cards .pokemon-card {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    gap: 0.25rem 0.75rem;
+    height: 100%;
+    padding: 0.875rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    color: var(--page-text);
+    text-decoration: none;
+  }
+  .pokemon-card-icon {
+    display: grid;
+    place-items: center;
+    grid-row: 1 / 4;
+    align-self: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+  }
+  .pokemon-cards .species-number {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem 0.5rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+  }
+  .pokemon-card-name { min-width: 0; font-size: 1.0625rem; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
+  .pokemon-cards .pokemon-card > .pokemon-card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; min-width: 0; text-decoration: none; }
+  .pokemon-card:visited .pokemon-card-name { color: var(--link); }
+  .pokemon-card:hover { border-color: var(--border-strong); background: var(--surface-muted); }
+  .pokemon-card:hover .pokemon-card-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  .pokemon-card:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
   .note p { margin-block: 0.25rem; }
   .species-table { width: 100%; }
   .species-table :is(th, td) { vertical-align: middle; }

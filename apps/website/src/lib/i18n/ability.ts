@@ -27,6 +27,7 @@ const en = {
   "flavor.empty": "Our data has no in-game descriptions for this ability.",
   "flavor.games": "Games",
   "flavor.text": "Description",
+  "flavor.count": "Game groups: {count}",
 } as const satisfies Record<string, string>;
 
 type MessageKey = keyof typeof en;
@@ -60,6 +61,7 @@ const messages = {
     "flavor.empty": "Nos données ne contiennent aucune description en jeu pour ce talent.",
     "flavor.games": "Jeux",
     "flavor.text": "Description",
+    "flavor.count": "Groupes de jeux : {count}",
   },
   ja: {
     "meta.title": "{name} | 特性 | Pokémouille",
@@ -87,6 +89,7 @@ const messages = {
     "flavor.empty": "データには、この特性のゲーム内説明がありません。",
     "flavor.games": "ゲーム",
     "flavor.text": "説明",
+    "flavor.count": "ゲームグループ数：{count}",
   },
 } satisfies Record<Language, Record<MessageKey, string>>;
 

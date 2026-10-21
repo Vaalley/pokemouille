@@ -60,6 +60,7 @@
       <p class="note">{historyT(lang, "entries.form")}</p>
     {/if}
     {#if entries.length}
+      <div class="entries-scroll" role="region" aria-label={historyT(lang, "entries.summary", { count: entries.length })} tabindex="0">
       <table>
         <caption>{historyT(lang, "entries.caption")}</caption>
         <thead>
@@ -81,6 +82,7 @@
           {/each}
         </tbody>
       </table>
+      </div>
     {:else}
       <p>{historyT(lang, "entries.empty")}</p>
     {/if}
@@ -88,6 +90,15 @@
 </section>
 
 <style>
+  figure { margin: 0; padding: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  blockquote, blockquote p { margin: 0; }
+  figcaption { margin-block-start: 0.75rem; font-size: 0.875rem; color: var(--muted); }
+  details { margin-block-start: 1rem; }
+  summary { min-height: 2.75rem; padding-block: 0.5rem; font-weight: 600; }
+  .entries-scroll { max-height: min(28rem, 65dvh); overflow: auto; overscroll-behavior: contain; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
+  th, td { padding: 0.5rem 0.75rem; overflow-wrap: anywhere; }
+  thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+  tr.selected { background: var(--accent-soft); }
   table { width: 100%; }
   th[scope="row"] { font-weight: normal; vertical-align: top; }
   tr.selected th[scope="row"] { font-weight: bold; }

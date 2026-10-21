@@ -133,6 +133,8 @@
       <p class="source-gap">{t(lang, "sourceGap", { count: matches.missingIntroduction })}</p>
     {/if}
     {#if matches.rows.length > 0}
+      <p class="note" id={`${id}-scroll`}>{t(lang, "scrollHint")}</p>
+      <div class="related-window" role="region" aria-labelledby={`${id}-heading`} aria-describedby={`${id}-scroll`} tabindex="0">
       <ul class="pokemon-list">
         {#each matches.rows as match (match.pokemon.pokemonId)}
           <li class="pokemon-card">
@@ -175,23 +177,27 @@
           </li>
         {/each}
       </ul>
+      </div>
     {/if}
   {/if}
 </section>
 
 <style>
+  .related-window { max-height: min(38rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding: 0.25rem; border-radius: var(--radius-control); }
   .pokemon-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
     gap: 0.5rem;
     padding: 0;
     list-style: none;
+    margin: 0;
   }
   .pokemon-card {
     min-width: 0;
-    padding: 0.25rem 0.75rem 0.625rem;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem 0.75rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
     overflow-wrap: anywhere;
   }
   h3 { margin: 0; font-size: 1rem; }
@@ -200,6 +206,7 @@
   /* Details line up under the name, past the 40px icon and its gap. */
   .detail, .methods, .assignments { margin: 0; padding-inline-start: 3rem; font-size: 0.875rem; }
   .detail code { white-space: normal; }
+  .detail { color: var(--muted); }
   .methods, .assignments { display: flex; flex-wrap: wrap; gap: 0 0.75rem; margin-block-start: 0.25rem; list-style: none; }
   .source-gap { border-inline-start: 0.2rem solid currentColor; padding-inline-start: 0.75rem; }
 </style>

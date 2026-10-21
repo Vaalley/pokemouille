@@ -81,10 +81,10 @@
     max-height: var(--bits-floating-available-height, calc(100dvh - 1.5rem));
     overflow-y: auto;
     padding: 1rem;
-    border: 1px solid;
-    border-radius: 0.75rem;
-    background: Canvas;
-    color: CanvasText;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    color: var(--page-text);
     box-shadow: var(--popover-shadow);
     font-size: 1rem;
     font-weight: normal;

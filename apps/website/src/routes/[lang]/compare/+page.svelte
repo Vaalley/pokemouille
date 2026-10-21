@@ -544,10 +544,10 @@
   .remove {
     min-height: 2.75rem;
     padding: 0.4rem 0.75rem;
-    border: 1px solid currentColor;
-    border-radius: 0.35rem;
-    background: Canvas;
-    color: CanvasText;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--page-text);
     font: inherit;
   }
 

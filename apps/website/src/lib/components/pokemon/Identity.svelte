@@ -23,6 +23,7 @@
     games,
     pokemon,
     identityKey,
+    types,
     children,
   }: {
     lang: Language;
@@ -41,6 +42,8 @@
     pokemon: ResolvedPokemon | null;
     /** Current species/form URL identity, including while its data is loading. */
     identityKey: string;
+    /** Resolved game-specific types, grouped with the Pokémon's name. */
+    types?: Snippet;
     /** Page-level controls shown under the facts (game context, form picker). */
     children?: Snippet;
   } = $props();
@@ -55,6 +58,7 @@
 
 <header class="identity">
   <div class="summary">
+    <p class="kicker">{t(lang, "identity.number")} · {t(lang, "identity.numberValue", { number: speciesId })}</p>
     <h1>
       <Localized text={name} />
       {#if isMythical || isLegendary}
@@ -66,9 +70,8 @@
         </span>
       {/if}
     </h1>
+    {@render types?.()}
     <dl class="properties">
-      <dt>{t(lang, "identity.number")}</dt>
-      <dd>{t(lang, "identity.numberValue", { number: speciesId })}</dd>
       {#if genus}
         <dt>{t(lang, "identity.genus")}</dt>
         <dd><Localized text={genus} /></dd>
@@ -80,6 +83,8 @@
         <dd><Localized text={formName} /></dd>
       {/if}
     </dl>
+  </div>
+  <div class="controls">
     {@render children?.()}
   </div>
   {#if artwork !== undefined}
@@ -103,27 +108,55 @@
           <figcaption class="note">{t(lang, "sprites.mainMissing")}</figcaption>
         {/if}
       </figure>
-      {#key `${identityKey}:${pokemon?.pokemonId}:${pokemon?.formId}`}
-        {#if pokemon && pokemon.speciesId === speciesId}
-          <Cries {lang} cries={pokemon.cries} />
-        {/if}
-      {/key}
     </div>
   {/if}
+  <div class="audio">
+    {#key `${identityKey}:${pokemon?.pokemonId}:${pokemon?.formId}`}
+      {#if pokemon && pokemon.speciesId === speciesId}
+        <Cries {lang} cries={pokemon.cries} />
+      {/if}
+    {/key}
+  </div>
 </header>
 
 <style>
   .pixelated { image-rendering: pixelated; }
-  /* The artwork keeps a fixed column so the facts don't move once it loads. */
+  /* Reserve the artwork column while game/form data loads. */
   .identity {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 15rem;
-    gap: 1rem 2rem;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 0.75rem 2rem;
     align-items: start;
+    padding: 1.25rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
   }
 
   .summary {
     min-width: 0;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .controls {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+  }
+
+  .audio {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .kicker {
+    margin: 0 0 0.25rem;
+  }
+
+  .properties {
+    margin-block: 0.75rem 0;
+    gap: 0.25rem 1rem;
   }
 
   h1 {
@@ -138,8 +171,8 @@
     align-items: center;
     gap: 0.375rem;
     padding: 0.3rem 0.625rem;
-    border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
-    border-radius: 999px;
+    border: var(--border-width) solid color-mix(in srgb, currentColor 35%, transparent);
+    border-radius: var(--radius-pill);
     background: var(--legendary-background);
     color: var(--legendary);
     font-size: 0.75rem;
@@ -158,7 +191,8 @@
   }
 
   .media {
-    grid-column: 2;
+    grid-column: 1;
+    grid-row: 1 / 3;
     min-width: 0;
   }
 
@@ -171,13 +205,30 @@
     margin-block-start: 0.25rem;
   }
 
-  @media (max-width: 40rem) {
+  @media (max-width: 48rem) {
     .identity {
+      padding: 1rem;
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .summary {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .controls {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    .audio {
+      grid-row: 4;
     }
 
     .media {
       grid-column: 1;
+      grid-row: 2;
+      width: 100%;
       max-width: 15rem;
       margin-inline: auto;
     }

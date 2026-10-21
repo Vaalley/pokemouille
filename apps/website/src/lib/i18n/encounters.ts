@@ -4,6 +4,7 @@ import type { Language } from "./core.ts";
 const en = {
   heading: "Encounter locations",
   game: "Source records for {game}",
+  about: "About these records",
   scope:
     "These records belong to the Pokémon variety “{variety}”. They do not distinguish cosmetic forms within that variety and do not confirm a location for the selected cosmetic form.",
   limits:
@@ -37,6 +38,10 @@ const en = {
   noConditions: "No conditions recorded",
   incompleteConditions: "Some source conditions are missing from this record.",
   table: "Encounter slots — {method}",
+  rowCount: "Source rows: {count}",
+  allRows: "All source rows: {count}",
+  scrollHint:
+    "Scroll within the table to read every row and column. With the table focused, use the arrow keys to scroll.",
 } as const;
 
 type MessageKey = keyof typeof en;
@@ -45,6 +50,7 @@ const messages = {
   fr: {
     heading: "Lieux de rencontre",
     game: "Données source pour {game}",
+    about: "À propos de ces données",
     scope:
       "Ces données concernent la variété de Pokémon « {variety} ». Elles ne distinguent pas les formes cosmétiques de cette variété et ne confirment pas de lieu pour la forme cosmétique sélectionnée.",
     limits:
@@ -78,10 +84,15 @@ const messages = {
     noConditions: "Aucune condition renseignée",
     incompleteConditions: "Certaines conditions source manquent dans cet enregistrement.",
     table: "Emplacements de rencontre — {method}",
+    rowCount: "Lignes source : {count}",
+    allRows: "Toutes les lignes source : {count}",
+    scrollHint:
+      "Faites défiler le tableau pour lire toutes les lignes et colonnes. Lorsque le tableau a le focus, utilisez les touches fléchées.",
   },
   ja: {
     heading: "出会える場所",
     game: "{game}の出典データ",
+    about: "記録について",
     scope:
       "この記録はポケモンの種類「{variety}」に属します。同じ種類の見た目だけが異なるフォルムは区別されておらず、選択中の見た目のフォルムの出現場所を保証するものではありません。",
     limits:
@@ -114,6 +125,10 @@ const messages = {
     noConditions: "条件の記録なし",
     incompleteConditions: "この記録には出典の条件の一部が含まれていません。",
     table: "出現枠 — {method}",
+    rowCount: "出典の記録{count}行",
+    allRows: "出典の全{count}行",
+    scrollHint:
+      "表の中をスクロールすると、すべての行と列を確認できます。表にフォーカスを合わせると、矢印キーでスクロールできます。",
   },
 } satisfies Record<Language, Record<MessageKey, string>>;
 

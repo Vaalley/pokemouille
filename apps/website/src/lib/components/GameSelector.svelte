@@ -6,6 +6,10 @@
    * `null` until the browser has loaded the games and resolved URL/preference context.
    */
   export const [getSelectedVersion, setSelectedVersion] = createContext<() => string | null>();
+
+  /** Layout-owned selection updates both the shared preference and the current URL. */
+  export const [getVersionChangeHandler, setVersionChangeHandler] =
+    createContext<(version: string) => void>();
 </script>
 
 <script lang="ts">

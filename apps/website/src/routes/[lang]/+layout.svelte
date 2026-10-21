@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
-  import GameSelector, { setSelectedVersion } from "#lib/components/GameSelector.svelte";
+  import GameSelector, { setSelectedVersion, setVersionChangeHandler } from "#lib/components/GameSelector.svelte";
   import LanguageSwitcher from "#lib/components/LanguageSwitcher.svelte";
   import SearchDialog from "#lib/components/SearchDialog.svelte";
   import SpriteSelector, { setSelectedSprite } from "#lib/components/SpriteSelector.svelte";
@@ -24,6 +24,30 @@
   let savedVersion = $state<string | null>(null);
   let selectedSprite = $state("official");
   let spriteReady = $state(false);
+  let browseOpen = $state(false);
+  let settingsOpen = $state(false);
+
+  afterNavigate(() => {
+    browseOpen = false;
+    settingsOpen = false;
+  });
+
+  function dismissHeader(event: PointerEvent) {
+    if (event.target instanceof Element && event.target.closest(".header-disclosure, [data-select-content]")) return;
+    browseOpen = false;
+    settingsOpen = false;
+  }
+
+  function escapeHeader(event: KeyboardEvent) {
+    if (event.key !== "Escape" || event.defaultPrevented) return;
+    // A portalled select owns its first Escape; don't also dismiss its parent panel.
+    if (event.target instanceof Element && event.target.closest("[data-select-content]")) return;
+    const summary = document.querySelector<HTMLElement>(".header-disclosure[open] > summary");
+    if (!summary) return;
+    browseOpen = false;
+    settingsOpen = false;
+    summary.focus();
+  }
   setSelectedSprite(() => spriteStyle(selectedSprite));
 
   function selectSprite(next: string) {
@@ -101,39 +125,61 @@
       void goto(url, { reset: false });
     }
   }
+
+  setVersionChangeHandler(selectVersion);
 </script>
 
 <a class="skip-link" href="#main">{t(data.lang, "site.skipToContent")}</a>
 
+<svelte:window onpointerdown={dismissHeader} onkeydown={escapeHeader} />
+
+{#snippet browseLinks()}
+  <ul class="inline-list">
+    {#each sections as section (section.key)}
+      <li>
+        <a
+          href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
+          aria-current={current(section)}
+          onclick={() => { browseOpen = false; }}
+        >{navigation(data.lang, section.key)}</a>
+      </li>
+    {/each}
+  </ul>
+{/snippet}
+
 <header class="site-header">
   <div class="site-bar">
     <a class="site-name" href={resolve(`${data.lang}/`)}>{t(data.lang, "site.name")}</a>
-    <nav class="browse-navigation" aria-label={navigation(data.lang, "label")}>
-      <ul class="inline-list">
-        {#each sections as section (section.key)}
-          <li>
-            <a
-              href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
-              aria-current={current(section)}
-            >{navigation(data.lang, section.key)}</a>
-          </li>
-        {/each}
-      </ul>
-    </nav>
     <SearchDialog lang={data.lang} {games} {version} />
+    <details class="header-disclosure mobile-browse" name="header-panel" bind:open={browseOpen}>
+      <summary>{navigation(data.lang, "browse")}</summary>
+      <nav class="header-panel browse-navigation" aria-label={navigation(data.lang, "label")}>
+        {@render browseLinks()}
+      </nav>
+    </details>
+    <details class="header-disclosure settings-menu" name="header-panel" bind:open={settingsOpen}>
+      <summary>{t(data.lang, "site.settings")}</summary>
+      <div class="header-panel settings-panel" role="group" aria-label={t(data.lang, "site.controls")}>
+        <LanguageSwitcher lang={data.lang} />
+        <SpriteSelector lang={data.lang} {games} value={selectedSprite} ready={spriteReady && !!games} onchange={selectSprite} />
+        <ThemeSelector lang={data.lang} />
+      </div>
+    </details>
+    <nav class="browse-navigation desktop-navigation" aria-label={navigation(data.lang, "label")}>
+      {@render browseLinks()}
+    </nav>
   </div>
-  <div class="site-controls" role="group" aria-label={t(data.lang, "site.controls")}>
-    <LanguageSwitcher lang={data.lang} />
-    <GameSelector
-      lang={data.lang}
-      {games}
-      value={version}
-      onchange={selectVersion}
-      error={gamesFailed}
-    />
-    <SpriteSelector lang={data.lang} {games} value={selectedSprite} ready={spriteReady && !!games} onchange={selectSprite} />
-    <ThemeSelector lang={data.lang} />
-  </div>
+  {#if !page.route.id?.startsWith("/[lang]/pokemon/")}
+    <div class="site-controls">
+      <GameSelector
+        lang={data.lang}
+        {games}
+        value={version}
+        onchange={selectVersion}
+        error={gamesFailed}
+      />
+    </div>
+  {/if}
 </header>
 
 <noscript>

@@ -370,8 +370,8 @@
     gap: 0.375rem;
     min-height: 2.75rem;
     padding: 0.25rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 0.35rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-pill);
     background: none;
     color: inherit;
     font: inherit;

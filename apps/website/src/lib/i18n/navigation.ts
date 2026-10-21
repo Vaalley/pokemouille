@@ -2,6 +2,7 @@ import { createTranslator, type Language } from "./core.ts";
 
 const en = {
   label: "Browse the Pokédex",
+  browse: "Browse",
   pokemon: "Pokémon",
   moves: "Moves",
   abilities: "Abilities",
@@ -17,6 +18,7 @@ const dictionaries = {
   en,
   fr: {
     label: "Parcourir le Pokédex",
+    browse: "Parcourir",
     pokemon: "Pokémon",
     moves: "Capacités",
     abilities: "Talents",
@@ -28,6 +30,7 @@ const dictionaries = {
   },
   ja: {
     label: "ポケモン図鑑を閲覧",
+    browse: "閲覧",
     pokemon: "ポケモン",
     moves: "わざ",
     abilities: "とくせい",

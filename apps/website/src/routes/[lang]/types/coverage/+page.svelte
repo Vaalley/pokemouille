@@ -223,7 +223,7 @@
 {/if}
 
 <style>
-  .attack-types { margin: 0 0 1rem; padding: 0.75rem 1rem 1rem; border: 1px solid var(--border); }
+  .attack-types { margin: 0 0 1rem; padding: 0.75rem 1rem 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
   legend { padding: 0 0.25rem; font-weight: 600; }
   .attack-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); gap: 0.25rem 1rem; }
   .attack-options label, .toggle { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
@@ -236,16 +236,16 @@
   .chart-scroll { max-height: 75vh; overflow: auto; }
   .chart { border-collapse: separate; border-spacing: 0; }
   .chart caption { text-align: start; padding-block-end: 0.5rem; font-weight: 600; }
-  .chart :is(th, td) { padding: 0.3rem 0.45rem; border-block-end: 1px solid var(--border); }
-  .chart thead th { position: sticky; top: 0; z-index: 1; background: Canvas; vertical-align: bottom; }
-  .chart th[scope="row"] { position: sticky; left: 0; background: Canvas; text-align: start; white-space: nowrap; font-weight: normal; }
+  .chart :is(th, td) { padding: 0.3rem 0.45rem; border-block-end: var(--border-width) solid var(--border); }
+  .chart thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); vertical-align: bottom; }
+  .chart th[scope="row"] { position: sticky; left: 0; background: var(--surface); text-align: start; white-space: nowrap; font-weight: normal; }
   .chart thead th:first-child { left: 0; z-index: 2; text-align: start; }
   .attack-head { display: inline-flex; align-items: center; gap: 0.35rem; writing-mode: vertical-rl; font-size: 0.875rem; font-weight: normal; }
   .chart td { text-align: center; }
-  .chart .selected { background: color-mix(in srgb, currentColor 8%, Canvas); }
+  .chart .selected { background: var(--accent-soft); }
   .chart thead th.selected .attack-head { font-weight: 700; }
   td[data-multiplier="2"], td[data-multiplier="4"] { font-weight: 700; }
   td[data-multiplier="4"] { text-decoration: underline; }
-  td[data-multiplier="1"] { color: color-mix(in srgb, currentColor 45%, transparent); }
-  td[data-multiplier="0"], td[data-multiplier="0.25"], td[data-multiplier="0.5"] { color: GrayText; }
+  td[data-multiplier="1"] { color: var(--muted); }
+  td[data-multiplier="0"], td[data-multiplier="0.25"], td[data-multiplier="0.5"] { color: var(--page-text); }
 </style>

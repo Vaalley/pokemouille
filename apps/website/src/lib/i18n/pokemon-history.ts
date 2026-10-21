@@ -23,6 +23,7 @@ const en = {
   "history.unknownIntroduction":
     "The source doesn’t establish when this form was introduced, so its values can’t be placed in generations.",
   "history.types": "Types",
+  "history.stats": "Stat history",
   "history.effort": "{stat} (effort value)",
   "history.ability": "Ability {slot}",
   "history.hiddenAbility": "Hidden ability",
@@ -58,6 +59,7 @@ const fr = {
   "history.unknownIntroduction":
     "La source n’établit pas quand cette forme est apparue : ses valeurs ne peuvent pas être situées par génération.",
   "history.types": "Types",
+  "history.stats": "Historique des statistiques",
   "history.effort": "{stat} (points d’effort)",
   "history.ability": "Talent {slot}",
   "history.hiddenAbility": "Talent caché",
@@ -90,6 +92,7 @@ const ja = {
   "history.unknownIntroduction":
     "このすがたの初登場がデータソースで確認できないため、値を世代ごとに示せません。",
   "history.types": "タイプ",
+  "history.stats": "能力値の履歴",
   "history.effort": "{stat}（努力値）",
   "history.ability": "特性{slot}",
   "history.hiddenAbility": "隠れ特性",

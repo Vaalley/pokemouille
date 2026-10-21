@@ -16,6 +16,7 @@ const en = {
   generation: "Introduced in Generation {generation}",
   effectChance: "Effect chance",
   effect: "Effect",
+  overview: "At a glance",
   scope:
     "Current move data, not specific to the selected game. Older games may use different values or effects, and being listed doesn’t mean a move is available in a given game.",
   missing: "Not recorded",
@@ -41,6 +42,7 @@ const fr = {
   generation: "Introduite en génération {generation}",
   effectChance: "Probabilité de l’effet",
   effect: "Effet",
+  overview: "En bref",
   scope:
     "Données actuelles, indépendantes du jeu sélectionné. Les valeurs et effets peuvent différer dans les jeux plus anciens, et une capacité listée n’est pas forcément disponible dans un jeu donné.",
   missing: "Non renseigné",
@@ -66,6 +68,7 @@ const ja = {
   generation: "第{generation}世代で登場",
   effectChance: "追加効果の発生率",
   effect: "効果",
+  overview: "基本情報",
   scope:
     "現在のわざデータで、選択したゲーム固有のものではありません。過去のゲームでは数値や効果が違う場合があり、掲載されていても、そのゲームで使えるとは限りません。",
   missing: "データなし",

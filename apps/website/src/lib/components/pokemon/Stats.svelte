@@ -138,6 +138,5 @@
   /* Fixed-width, right-aligned values keep every meter starting at the same x. */
   .value { display: inline-block; min-width: 3ch; margin-inline-end: 0.5rem; text-align: end; font-variant-numeric: tabular-nums; }
   td.base :global([data-meter-root]) { width: calc(100% - 4ch); max-width: 12rem; }
-  th[scope="row"], thead th { white-space: nowrap; }
   tfoot th, tfoot td { border-block-end: none; font-weight: bold; }
 </style>

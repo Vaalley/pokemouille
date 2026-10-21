@@ -13,6 +13,7 @@
   import Encounters from "#lib/components/pokemon/Encounters.svelte";
   import Evolution from "#lib/components/pokemon/Evolution.svelte";
   import Facts from "#lib/components/pokemon/Facts.svelte";
+  import GameSelector, { getVersionChangeHandler } from "#lib/components/GameSelector.svelte";
   import FormSelector from "#lib/components/pokemon/FormSelector.svelte";
   import History from "#lib/components/pokemon/History.svelte";
   import Identity from "#lib/components/pokemon/Identity.svelte";
@@ -209,6 +210,8 @@
     );
   }
 
+  const selectVersion = getVersionChangeHandler();
+
   const neighbours = $derived([
     { key: "identity.previous", entry: data.previous },
     { key: "identity.next", entry: data.next },
@@ -274,24 +277,33 @@
     sprites={pokemon?.media.sprites}
     games={games ?? []}
   >
-    {#if context}
-      <p>
-        {t(lang, "context.game", { game: gameName })}
-        <small>({t(lang, SOURCE_KEYS[context.versionSource])})</small>
-      </p>
-      {#if context.rejectedVersion}
-        <p>
+    {#snippet types()}
+      {#if view && pokemon}
+        <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
+      {/if}
+    {/snippet}
+    <div class="pokemon-context">
+      <div class="context-fields">
+        <GameSelector {lang} {games} value={context?.version ?? null} onchange={selectVersion} error={!!gamesError} />
+        {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
+          <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
+        {/if}
+      </div>
+      <div class="context-meta">
+        {#if context}
+          <p class="note">{t(lang, SOURCE_KEYS[context.versionSource])}</p>
+        {/if}
+        {#if compareHref}<p><a href={compareHref}>{historyT(lang, "compare.link")}</a></p>{/if}
+      </div>
+      {#if context?.rejectedVersion}
+        <p class="note">
           {t(lang, "context.rejected", { version: context.rejectedVersion, game: gameName })}
           <a href={href(pokemonHref(lang, data.speciesId, context))}
             >{t(lang, "context.rejectedLink", { game: gameName })}</a
           >
         </p>
       {/if}
-    {/if}
-    {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
-      <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
-    {/if}
-    {#if compareHref}<p><a href={compareHref}>{historyT(lang, "compare.link")}</a></p>{/if}
+    </div>
   </Identity>
 
   <div aria-live="polite">
@@ -370,15 +382,14 @@
         game={gameName}
         references={view.references}
       />
-    <!-- Two columns on wide screens: figures on the left, prose on the right. -->
+    <!-- Balance the figure-heavy sections across columns instead of stacking both on the left. -->
     <div class="overview">
       <div class="column">
-        <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
         <Stats {lang} stats={pokemon.stats} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
-        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} regionalDexNumbers={pokemon.regionalDexNumbers} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
+        <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
       </div>
       <div class="column">
-        <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
+        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} regionalDexNumbers={pokemon.regionalDexNumbers} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
         <Dex {lang} flavorText={pokemon.flavorText} game={gameName} flavorTexts={view.record.flavorTexts} references={view.references} versionId={pokemon.context.versionId} formShared={!isDefaultForm} />
       </div>
     </div>
@@ -417,16 +428,61 @@
     content: " →" / "";
   }
 
+  .pokemon-context {
+    padding-block-start: 0.75rem;
+    border-block-start: var(--border-width) solid var(--border);
+  }
+
+  .context-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .context-fields :global(.game-selector),
+  .context-fields :global(.form-selector) {
+    display: grid;
+    flex: 1 1 12rem;
+    align-content: start;
+    align-items: start;
+    gap: 0.25rem;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .context-fields :global([data-select-trigger]) {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: var(--border-width) solid var(--border-strong);
+    background: var(--surface);
+    color: var(--page-text);
+    font: inherit;
+    text-align: start;
+    overflow-wrap: anywhere;
+  }
+
+  .context-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .context-meta p {
+    margin: 0;
+  }
+
   .context-notes {
-    margin-block: 1.5rem;
-    padding-inline-start: 0.75rem;
-    border-inline-start: 0.2rem solid var(--border);
+    margin-block: 0.75rem 1.25rem;
   }
 
   .context-notes p {
     margin-block: 0.25rem;
   }
-
   .overview {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -440,7 +496,7 @@
   /* Long full-width sections get a rule so each starts visibly. */
   .page-sections > :global(section) {
     margin-block-start: 3rem;
-    border-block-start: 1px solid var(--border);
+    border-block-start: var(--border-width) solid var(--border);
   }
 
   .page-sections > :global(section > h2) {

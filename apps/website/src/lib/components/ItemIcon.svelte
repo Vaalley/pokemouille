@@ -39,7 +39,7 @@
   .unavailable {
     width: 12px;
     height: 12px;
-    border: 1px dashed currentColor;
+    border: var(--border-width) dashed currentColor;
     border-radius: 3px;
     opacity: 0.45;
   }

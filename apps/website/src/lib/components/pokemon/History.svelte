@@ -44,13 +44,14 @@
 {/snippet}
 
 {#snippet numericTimeline(segments: Segment<number>[])}
-  {#each segments as segment, index (segment.from)}
-    {#if index > 0}<span aria-hidden="true"> → </span>{/if}
-    <span class="segment">
-      <span class="range">{generationRange(lang, segment.from, segment.to, segment.to === latest)}:</span>
-      {segment.value === null ? historyT(lang, "history.unknown") : integer.format(segment.value)}
-    </span>
-  {/each}
+  <ol class="timeline numeric-timeline" class:multi-segment={segments.length > 1}>
+    {#each segments as segment (segment.from)}
+      <li class="segment">
+        <span class="range">{generationRange(lang, segment.from, segment.to, segment.to === latest)}:</span>
+        <span class="value">{segment.value === null ? historyT(lang, "history.unknown") : integer.format(segment.value)}</span>
+      </li>
+    {/each}
+  </ol>
 {/snippet}
 
 <section aria-labelledby="history-heading">
@@ -61,78 +62,207 @@
     <p>{historyT(lang, "history.unknownIntroduction")}</p>
   {:else}
     {#if !changed}<p>{historyT(lang, "history.none")}</p>{/if}
-    <h3>{historyT(lang, "history.types")}</h3>
-    <p class="timeline">
-      {#each history.types as segment, index (segment.from)}
-        {#if index > 0}<span aria-hidden="true"> → </span>{/if}
-        <span class="segment">
-          <span class="range">{generationRange(lang, segment.from, segment.to, segment.to === latest)}:</span>
-          {#if segment.value === null}
-            {historyT(lang, "history.unknown")}
-          {:else}
-            {#each segment.value as type, typeIndex (type.id)}
-              {#if typeIndex > 0} / {/if}<Localized text={type.name} />
-            {/each}
-          {/if}
-        </span>
-      {/each}
-    </p>
+    <div class="history-overview">
+      <div class="history-panel">
+        <h3>{historyT(lang, "history.types")}</h3>
+        <ol class="timeline" class:multi-segment={history.types.length > 1}>
+          {#each history.types as segment (segment.from)}
+            <li class="segment">
+              <span class="range">{generationRange(lang, segment.from, segment.to, segment.to === latest)}:</span>
+              <span class="value">
+                {#if segment.value === null}
+                  {historyT(lang, "history.unknown")}
+                {:else}
+                  {#each segment.value as type, typeIndex (type.id)}
+                    {#if typeIndex > 0} / {/if}<Localized text={type.name} />
+                  {/each}
+                {/if}
+              </span>
+            </li>
+          {/each}
+        </ol>
+      </div>
 
-    <h3>{t(lang, "stats.base")}</h3>
+      <div class="history-panel">
+        <h3>{t(lang, "abilities.heading")}</h3>
+        {#if history.abilities.length}
+          <dl class="ability-slots">
+            {#each history.abilities as ability (ability.slot)}
+              <div>
+                <dt>{historyT(lang, ability.isHidden ? "history.hiddenAbility" : "history.ability", { slot: ability.slot })}</dt>
+                <dd>
+                  <ol class="timeline" class:multi-segment={ability.segments.length > 1}>
+                    {#each ability.segments as segment (segment.from)}
+                      <li class="segment">
+                        <span class="range">{generationRange(lang, segment.from, segment.to, segment.to === latest)}:</span>
+                        <span class="value">
+                          {#if segment.value === null}
+                            {historyT(lang, "history.unknown")}
+                          {:else if segment.value === "none"}
+                            {historyT(lang, "history.noAbility")}
+                          {:else}
+                            <Localized text={segment.value.name} />
+                          {/if}
+                        </span>
+                      </li>
+                    {/each}
+                  </ol>
+                </dd>
+              </div>
+            {/each}
+          </dl>
+        {:else}
+          <p>{historyT(lang, "history.unknown")}</p>
+        {/if}
+      </div>
+    </div>
+
+    <h3 id="history-stats-heading">{historyT(lang, "history.stats")}</h3>
     {#if history.stats.some((stat) => stat.id === 9)}
       <p class="note">{historyT(lang, "history.special")}</p>
     {/if}
-    <dl class="definitions">
-      {#each history.stats as stat (stat.id)}
-        <div>
-          <dt>{@render statName(stat)}</dt>
-          <dd class="timeline">{@render numericTimeline(stat.base)}</dd>
-        </div>
-      {/each}
-    </dl>
-
-    <h3>{t(lang, "stats.effort")}</h3>
-    <dl class="definitions">
-      {#each history.stats as stat (stat.id)}
-        <div>
-          <dt>{@render statName(stat)}</dt>
-          <dd class="timeline">{@render numericTimeline(stat.effort)}</dd>
-        </div>
-      {/each}
-    </dl>
-
-    <h3>{t(lang, "abilities.heading")}</h3>
-    {#if history.abilities.length}
-      <dl class="definitions">
-        {#each history.abilities as ability (ability.slot)}
-          <div>
-            <dt>{historyT(lang, ability.isHidden ? "history.hiddenAbility" : "history.ability", { slot: ability.slot })}</dt>
-            <dd class="timeline">
-              {#each ability.segments as segment, index (segment.from)}
-                {#if index > 0}<span aria-hidden="true"> → </span>{/if}
-                <span class="segment">
-                  <span class="range">{generationRange(lang, segment.from, segment.to, segment.to === latest)}:</span>
-                  {#if segment.value === null}
-                    {historyT(lang, "history.unknown")}
-                  {:else if segment.value === "none"}
-                    {historyT(lang, "history.noAbility")}
-                  {:else}
-                    <Localized text={segment.value.name} />
-                  {/if}
-                </span>
-              {/each}
-            </dd>
-          </div>
-        {/each}
-      </dl>
-    {:else}
-      <p>{historyT(lang, "history.unknown")}</p>
-    {/if}
+    <div class="table-scroll history-stats-scroll" role="region" aria-labelledby="history-stats-heading" tabindex="0">
+      <table class="history-stats" aria-labelledby="history-stats-heading">
+        <thead>
+          <tr>
+            <th scope="col">{t(lang, "stats.stat")}</th>
+            <th scope="col">{t(lang, "stats.heading")}</th>
+            <th scope="col">{t(lang, "stats.effort")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each history.stats as stat (stat.id)}
+            <tr>
+              <th scope="row">{@render statName(stat)}</th>
+              <td>{@render numericTimeline(stat.base)}</td>
+              <td>{@render numericTimeline(stat.effort)}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
   {/if}
 </section>
 
 <style>
-  .timeline { line-height: 1.8; }
-  .segment { display: inline-block; }
-  .range { font-weight: 500; }
+  .history-overview {
+    display: grid;
+    gap: 0.75rem;
+    margin-block: 1rem;
+  }
+
+  .history-panel {
+    min-width: 0;
+    padding: 0.75rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+  }
+
+  .history-panel h3 {
+    margin-block: 0 0.625rem;
+    font-size: 1rem;
+  }
+
+  .history-panel p {
+    margin: 0;
+  }
+
+  .ability-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .ability-slots > div {
+    min-width: 0;
+  }
+
+  .ability-slots dt {
+    margin-block-end: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .ability-slots dd {
+    margin: 0;
+  }
+
+  .timeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    line-height: 1.4;
+  }
+
+  .segment {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.125rem 0.5rem;
+    max-width: 100%;
+    padding: 0.25rem 0.5rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+  }
+
+  .multi-segment .segment {
+    border-color: var(--border-strong);
+    background: var(--accent-soft);
+  }
+
+  .range {
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+
+  .value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-weight: 600;
+  }
+
+  .numeric-timeline .value {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .history-stats-scroll {
+    min-width: 0;
+  }
+
+  .history-stats {
+    width: 100%;
+    min-width: 34rem;
+    table-layout: fixed;
+  }
+
+  .history-stats th,
+  .history-stats td {
+    padding: 0.5rem;
+    border-block-end: var(--border-width) solid var(--border);
+  }
+
+  .history-stats th:first-child {
+    width: 22%;
+    padding-inline-start: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .history-stats tbody th {
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+
+  @media (min-width: 56rem) {
+    .history-overview {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
 </style>
