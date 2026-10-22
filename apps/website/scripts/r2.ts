@@ -28,6 +28,7 @@ const STATE_DIR = join(ROOT, ".data", "state");
 // Never served: the Worker only exposes the dataset, _app/immutable/* and pinned derived data.
 const STATE_KEY = "state/state.tar.gz";
 const CONCURRENCY = 16;
+const ATTEMPTS = 5;
 
 const CONTENT_TYPES: Record<string, string> = {
   ".json": "application/json",
@@ -57,6 +58,28 @@ interface Bucket {
   ): Promise<unknown>;
 }
 
+/** Retries an idempotent bucket call; the remote binding proxy sporadically returns R2 500s. */
+export async function withRetry<T>(
+  label: string,
+  run: () => Promise<T>,
+  attempts = ATTEMPTS,
+  baseDelayMs = 500,
+): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await run();
+    } catch (error) {
+      if (attempt >= attempts) throw error;
+      const delay = baseDelayMs * 2 ** (attempt - 1);
+      console.warn(
+        `${label} failed (attempt ${attempt}/${attempts}), retrying in ${delay}ms:`,
+        error,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 async function openStore(local: boolean): Promise<Store> {
   const { env, dispose } = await getPlatformProxy<{ DATA: Bucket }>({
     configPath: CONFIG,
@@ -66,14 +89,16 @@ async function openStore(local: boolean): Promise<Store> {
       : { environment: "r2sync", remoteBindings: true }),
   });
   return {
-    size: async (key) => (await env.DATA.head(key))?.size ?? null,
-    async get(key) {
-      const object = await env.DATA.get(key);
-      return object ? new Uint8Array(await object.arrayBuffer()) : null;
-    },
-    async put(key, body, contentType) {
-      await env.DATA.put(key, body, { httpMetadata: { contentType } });
-    },
+    size: (key) => withRetry(`head ${key}`, async () => (await env.DATA.head(key))?.size ?? null),
+    get: (key) =>
+      withRetry(`get ${key}`, async () => {
+        const object = await env.DATA.get(key);
+        return object ? new Uint8Array(await object.arrayBuffer()) : null;
+      }),
+    put: (key, body, contentType) =>
+      withRetry(`put ${key}`, async () => {
+        await env.DATA.put(key, body, { httpMetadata: { contentType } });
+      }),
     close: dispose,
   };
 }

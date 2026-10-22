@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { sync } from "./r2.ts";
+import { sync, withRetry } from "./r2.ts";
 
 vi.mock("wrangler", () => ({ getPlatformProxy: vi.fn() }));
 
@@ -167,5 +167,24 @@ describe("retained asset sync", () => {
     await expect(sync(store, directories)).rejects.toThrow("refusing to overwrite");
     expect(objects.get(key)).toBe(oldBody);
     expect(writes.some(({ key }) => key === "data/manifest.json")).toBe(false);
+  });
+});
+
+describe("withRetry", () => {
+  it("retries transient failures and returns the eventual result", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const run = vi
+      .fn<() => Promise<string>>()
+      .mockRejectedValueOnce(new Error("get: Unspecified error (0)"))
+      .mockResolvedValueOnce("ok");
+    await expect(withRetry("get key", run, 3, 0)).resolves.toBe("ok");
+    expect(run).toHaveBeenCalledTimes(2);
+  });
+
+  it("rethrows the last error once attempts are exhausted", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const run = vi.fn<() => Promise<string>>().mockRejectedValue(new Error("boom"));
+    await expect(withRetry("get key", run, 3, 0)).rejects.toThrow("boom");
+    expect(run).toHaveBeenCalledTimes(3);
   });
 });
