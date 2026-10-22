@@ -13,7 +13,6 @@
   import Encounters from "#lib/components/pokemon/Encounters.svelte";
   import Evolution from "#lib/components/pokemon/Evolution.svelte";
   import Facts from "#lib/components/pokemon/Facts.svelte";
-  import GameSelector, { getVersionChangeHandler } from "#lib/components/GameSelector.svelte";
   import FormSelector from "#lib/components/pokemon/FormSelector.svelte";
   import History from "#lib/components/pokemon/History.svelte";
   import Identity from "#lib/components/pokemon/Identity.svelte";
@@ -210,8 +209,6 @@
     );
   }
 
-  const selectVersion = getVersionChangeHandler();
-
   const neighbours = $derived([
     { key: "identity.previous", entry: data.previous },
     { key: "identity.next", entry: data.next },
@@ -283,12 +280,11 @@
       {/if}
     {/snippet}
     <div class="pokemon-context">
-      <div class="context-fields">
-        <GameSelector {lang} {games} value={context?.version ?? null} onchange={selectVersion} error={!!gamesError} />
-        {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
+      {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
+        <div class="context-fields">
           <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
-        {/if}
-      </div>
+        </div>
+      {/if}
       <div class="context-meta">
         {#if context}
           <p class="note">{t(lang, SOURCE_KEYS[context.versionSource])}</p>
@@ -439,7 +435,6 @@
     gap: 0.75rem 1.5rem;
   }
 
-  .context-fields :global(.game-selector),
   .context-fields :global(.form-selector) {
     display: grid;
     flex: 1 1 12rem;

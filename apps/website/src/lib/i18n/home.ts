@@ -22,7 +22,7 @@ const en = {
     "Types are the default form’s current types, not the ones it had in the selected game. Generation is when the species first appeared. Being on this list doesn’t mean a Pokémon is available in any particular game.",
   count: "{filtered} of {total} Pokémon",
   empty: "No Pokémon match these filters.",
-  reset: "Reset filters",
+  reset: "Clear filters",
   loading: "Loading filters from the link…",
   javascript:
     "Turn on JavaScript to choose a regional Pokédex, filter the list or use filters saved in a link. The unfiltered National Pokédex is shown below.",
@@ -77,7 +77,7 @@ const fr = {
     "Les types sont ceux de la forme par défaut aujourd’hui, pas ceux qu’elle avait dans le jeu sélectionné. La génération indique la première apparition de l’espèce. Figurer dans cette liste ne veut pas dire qu’un Pokémon est disponible dans un jeu donné.",
   count: "{filtered} Pokémon sur {total}",
   empty: "Aucun Pokémon ne correspond à ces filtres.",
-  reset: "Réinitialiser les filtres",
+  reset: "Effacer les filtres",
   loading: "Chargement des filtres du lien…",
   javascript:
     "Activez JavaScript pour choisir un Pokédex régional, filtrer la liste ou utiliser les filtres d’un lien. Le Pokédex National complet est affiché ci-dessous.",
@@ -132,7 +132,7 @@ const ja = {
     "タイプは標準のすがたの現在のタイプで、選択したゲーム当時のタイプではありません。世代はその種が初めて登場した世代です。一覧にいても、各ゲームで入手できるとは限りません。",
   count: "全{total}匹中{filtered}匹",
   empty: "条件に一致するポケモンはいません。",
-  reset: "絞り込みをリセット",
+  reset: "絞り込みを解除",
   loading: "リンクの絞り込み条件を読み込み中…",
   javascript:
     "地方図鑑の選択、絞り込み、リンクの条件の利用にはJavaScriptを有効にしてください。以下には絞り込み前の全国図鑑を表示します。",

@@ -161,18 +161,21 @@
               id="{id}-input"
               bind:this={input}
               bind:value={query}
+              placeholder={t(lang, "search.placeholder")}
               aria-describedby="{id}-status"
             />
           </div>
-          <p id="{id}-status" class="search-status" role="status" aria-live="polite">
-            {t(lang, contentFailed ? "search.error" : "search.loading")}
-          </p>
-          {#if contentFailed}
-            <p>
-              <!-- A failed module import is cached by the browser; a fresh document can retry it. -->
-              <Button.Root type="button" onclick={() => window.location.reload()}>{t(lang, "search.reload")}</Button.Root>
+          <div class="search-feedback">
+            <p id="{id}-status" class="search-status" role="status" aria-live="polite">
+              {t(lang, contentFailed ? "search.error" : "search.loading")}
             </p>
-          {/if}
+            {#if contentFailed}
+              <p>
+                <!-- A failed module import is cached by the browser; a fresh document can retry it. -->
+                <Button.Root type="button" onclick={() => window.location.reload()}>{t(lang, "search.reload")}</Button.Root>
+              </p>
+            {/if}
+          </div>
         </div>
       </Dialog.Content>
     </Dialog.Portal>

@@ -224,6 +224,14 @@
       {#if mounted && version && dexes.length === 0}<p>{dex(data.lang, "noMapped")}</p>{/if}
     </div>
   </details>
+</form>
+<div class="results-toolbar" role="group" aria-label={home(data.lang, "resultsOptions")}>
+  <div class="results-summary">
+  {#if mounted && (dexSelection.status === "national" || dexSelection.status === "regional")}
+    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
+      {home(data.lang, "count", { filtered: species.length, total: data.catalogue.species.length })}
+    </p>
+  {/if}
   {#if hasHomeFilterParams(searchParams)}
   <div class="active-filter-bar">
     {#if activeFilters.length > 0}
@@ -241,16 +249,14 @@
       </ul>
     {/if}
   <button type="button" disabled={!mounted || !hasHomeFilterParams(searchParams)}
-    onclick={() => update({ q: "", type: null, generation: null, ability: null, classification: null, minTotal: null, maxTotal: null, dex: null })}>{home(data.lang, "reset")}</button>
+    onclick={async () => {
+      update({ q: "", type: null, generation: null, ability: null, classification: null, minTotal: null, maxTotal: null, dex: null });
+      await tick();
+      document.getElementById(`${id}-query`)?.focus();
+    }}>{home(data.lang, "reset")}</button>
   </div>
   {/if}
-</form>
-<div class="results-toolbar" role="group" aria-label={home(data.lang, "resultsOptions")}>
-  {#if mounted && (dexSelection.status === "national" || dexSelection.status === "regional")}
-    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
-      {home(data.lang, "count", { filtered: species.length, total: data.catalogue.species.length })}
-    </p>
-  {/if}
+  </div>
   <div class="toolbar-fields">
   <div class="filter-field">
     <label for="{id}-view">{home(data.lang, "view")}</label>
@@ -290,6 +296,7 @@
       <li>
         <a class="pokemon-card" href={speciesHref(entry.id)}>
           <span class="pokemon-card-icon"><PokemonIcon speciesId={entry.id} /></span>
+          <span class="pokemon-card-name">{entry.name}</span>
           <span class="species-number">
             {#if dexId !== null && dexId !== 1}
               <span>{dex(data.lang, "regionalNumber")} {speciesDexNumber(entry, dexId)}</span>
@@ -298,7 +305,6 @@
               {t(data.lang, "home.number", { number: String(entry.id).padStart(4, "0") })}
             {/if}
           </span>
-          <span class="pokemon-card-name">{entry.name}</span>
           <span class="pokemon-card-types">
             {#each entry.typeIds as typeId (typeId)}
               {@const type = typesById.get(typeId)}
@@ -397,26 +403,31 @@
 <style>
   .catalogue-filters { display: grid; gap: 1rem; margin-block: 1.5rem 1rem; }
   .primary-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 1rem; align-items: end; }
-  .advanced-filters { padding: 0.75rem 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); min-width: 0; }
+  .advanced-filters { padding: 0.375rem 0.875rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); min-width: 0; }
   .advanced-filters > summary { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; list-style: none; }
   .advanced-filters > summary::-webkit-details-marker { display: none; }
   .advanced-filters > summary::after { content: ""; width: 0.45rem; height: 0.45rem; margin-inline: auto 0.25rem; border-inline-end: var(--border-width) solid currentColor; border-block-end: var(--border-width) solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
   .advanced-filters[open] > summary::after { transform: translateY(0.125rem) rotate(225deg); }
-  .filter-count { border-radius: var(--radius-pill); padding: 0.1rem 0.5rem; border: var(--border-width) solid var(--border); font-size: 0.875rem; }
+  .filter-count { border-radius: var(--radius-pill); padding: 0.1rem 0.5rem; background: var(--accent-soft); color: var(--accent); border: var(--border-width) solid var(--accent); font-size: 0.875rem; font-weight: 650; }
   .advanced-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; margin-block: 1rem; }
   .catalogue-filters :is(input, select), .toolbar-fields select { min-width: 0; width: 100%; min-height: 2.75rem; padding: 0.6rem 0.75rem; border: var(--border-width) solid var(--border-strong); background: var(--surface); color: var(--page-text); font: inherit; }
-  .active-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
+  .results-summary { flex: 1 1 18rem; min-width: 0; display: grid; gap: 0.625rem; }
+  .active-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
   .active-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; min-width: 0; }
   .active-filters li { min-width: 0; max-width: 100%; }
-  .catalogue-filters button { min-height: 2.75rem; padding: 0.5rem 0.75rem; border: var(--border-width) solid var(--border); background: var(--surface); color: var(--page-text); font: inherit; cursor: pointer; }
+  .active-filter-bar button { min-height: 2.75rem; padding: 0.375rem 0.625rem; border: var(--border-width) solid var(--border-strong); background: var(--accent-soft); color: var(--page-text); font: inherit; cursor: pointer; }
+  .active-filter-bar > button { border-color: transparent; background: transparent; color: var(--link); text-decoration: underline; text-underline-offset: 0.2em; }
+  .active-filter-bar button:hover { border-color: var(--accent); }
   .filter-chip { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; border-radius: var(--radius-pill); text-align: start; overflow-wrap: anywhere; }
   .filter-chip > span:first-child { min-width: 0; }
-  .results-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 0.75rem 1rem; margin-block: 1rem; }
-  .results-toolbar .result-count { flex: 1 1 12rem; margin: 0; }
-  .toolbar-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; width: min(100%, 38rem); }
+  .filter-chip > span:last-child { color: var(--accent); font-size: 1.25rem; line-height: 1; }
+  .results-toolbar { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem 1.5rem; margin-block: 1rem; padding: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface-muted); }
+  .results-toolbar .result-count { margin: 0; font-weight: 650; }
+  .toolbar-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; width: min(100%, 34rem); }
   @media (max-width: 40rem) {
-    .primary-filters { grid-template-columns: minmax(0, 1fr); }
-    .toolbar-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .primary-filters { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+    .results-toolbar { padding: 0.75rem; gap: 0.75rem; }
+    .toolbar-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
     .toolbar-fields .filter-field:first-child { grid-column: 1 / -1; }
     .toolbar-fields select { font-size: 0.875rem; }
   }
@@ -424,7 +435,7 @@
   .pokemon-cards > li { min-width: 0; }
   .pokemon-cards .pokemon-card {
     display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr);
+    grid-template-columns: 4rem minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
     align-items: start;
     gap: 0.25rem 0.75rem;
@@ -441,11 +452,12 @@
     place-items: center;
     grid-row: 1 / 4;
     align-self: center;
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
     border-radius: var(--radius-control);
     background: var(--surface-muted);
   }
+  .pokemon-card-icon :global(.pokemon-icon) { transform: scale(1.5); }
   .pokemon-cards .species-number {
     display: flex;
     flex-wrap: wrap;
@@ -455,11 +467,10 @@
     font-variant-numeric: tabular-nums;
     line-height: 1.4;
   }
-  .pokemon-card-name { min-width: 0; font-size: 1.0625rem; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
+  .pokemon-card-name { min-width: 0; font-size: 1.125rem; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
   .pokemon-cards .pokemon-card > .pokemon-card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; min-width: 0; text-decoration: none; }
-  .pokemon-card:visited .pokemon-card-name { color: var(--link); }
-  .pokemon-card:hover { border-color: var(--border-strong); background: var(--surface-muted); }
-  .pokemon-card:hover .pokemon-card-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  .pokemon-card:is(:hover, :focus-visible) { border-color: var(--accent); background: var(--surface-muted); }
+  .pokemon-card:is(:hover, :focus-visible) .pokemon-card-name { text-decoration: underline; text-underline-offset: 0.2em; }
   .pokemon-card:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
   .note p { margin-block: 0.25rem; }
   .species-table { width: 100%; }

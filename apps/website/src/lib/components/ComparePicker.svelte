@@ -94,6 +94,7 @@
   );
   const gameName = $derived(selectedGame ? versionName(lang, selectedGame.version) : "");
   const full = $derived(selected.length >= MAX_COMPARED);
+  const pickerLabel = $derived(t(lang, selected.length === 0 ? "pickerFirstLabel" : selected.length === 1 ? "pickerNextLabel" : "pickerLabel"));
 
   const results = $derived(
     index && index.lang === lang && hasQuery && !full
@@ -127,13 +128,13 @@
   }
 </script>
 
-<Command.Root shouldFilter={false} vimBindings={false} label={t(lang, "pickerLabel")}>
+<Command.Root shouldFilter={false} vimBindings={false} label={pickerLabel}>
   {#snippet child({ props })}
     {@const { role: _role, ...commandProps } = props}
     <div {...commandProps} class="compare-picker">
       <div class="filters">
         <div class="filter-field wide">
-          <Label.Root for="{id}-input">{t(lang, "pickerLabel")}</Label.Root>
+          <Label.Root for="{id}-input">{pickerLabel}</Label.Root>
           <Command.Input
             id="{id}-input"
             bind:ref={input}
@@ -159,21 +160,23 @@
           {#each results as { entry, introduction } (entry.key)}
             {@const added = selected.includes(compareKey(toCompared(entry)))}
             <Command.Item value={entry.key} disabled={added} onSelect={() => add(entry)}>
-              <span class="species-number">{pokemonText(lang, "identity.numberValue", { number: entry.speciesId })}</span>
-              <PokemonIcon speciesId={entry.speciesId} />
-              <span class="result-name">
-                <Localized text={entry.name} />
-                {#if entry.speciesName.text !== entry.name.text}
-                  (<Localized text={entry.speciesName} />)
+              <span class="picker-icon"><PokemonIcon speciesId={entry.speciesId} /></span>
+              <span class="picker-result">
+                <span class="result-name"><Localized text={entry.name} /></span>
+                <span class="result-meta">
+                  <span class="species-number">{pokemonText(lang, "identity.numberValue", { number: entry.speciesId })}</span>
+                  {#if entry.speciesName.text !== entry.name.text}
+                    <span><Localized text={entry.speciesName} /></span>
+                  {/if}
+                </span>
+                {#if added}
+                  <span class="note">{t(lang, "added")}</span>
+                {:else if selectedGame && introduction === "not-introduced"}
+                  <span class="note">{t(lang, "resultNotIntroduced", { game: gameName })}</span>
+                {:else if selectedGame && introduction === "unknown"}
+                  <span class="note">{t(lang, "resultUnknown", { game: gameName })}</span>
                 {/if}
               </span>
-              {#if added}
-                <span class="note">{t(lang, "added")}</span>
-              {:else if selectedGame && introduction === "not-introduced"}
-                <span class="note">{t(lang, "resultNotIntroduced", { game: gameName })}</span>
-              {:else if selectedGame && introduction === "unknown"}
-                <span class="note">{t(lang, "resultUnknown", { game: gameName })}</span>
-              {/if}
             </Command.Item>
           {/each}
         </Command.Viewport>
@@ -183,12 +186,18 @@
 </Command.Root>
 
 <style>
-  .compare-picker {
-    max-width: 40rem;
-  }
-
-  .compare-picker .filters {
-    margin-block-end: 0.25rem;
+  .compare-picker { min-width: 0; }
+  .compare-picker .filters { margin: 0 0 0.25rem; }
+  .compare-picker :global(input) {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.625rem 0.75rem;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+    color: var(--page-text);
+    font: inherit;
   }
 
   .compare-picker > p {
@@ -198,7 +207,7 @@
   :global(.compare-results) {
     max-height: 20rem;
     margin: 0;
-    padding: 0;
+    padding: 0.25rem;
     overflow-y: auto;
     overscroll-behavior: contain;
     border: var(--border-width) solid var(--border);
@@ -206,17 +215,22 @@
     list-style: none;
   }
 
-  .result-name {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
+  .picker-icon { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: var(--radius-control); background: var(--surface-muted); }
+  .picker-result { display: grid; gap: 0.25rem; min-width: 0; overflow-wrap: anywhere; }
+  .result-name { font-size: 1.0625rem; font-weight: 650; line-height: 1.35; }
+  .result-meta { display: flex; flex-wrap: wrap; gap: 0.125rem 0.5rem; color: var(--muted); font-size: 0.8125rem; }
+  .result-meta .species-number { font-variant-numeric: tabular-nums; }
   :global(.compare-results [data-command-item]) {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.625rem;
+    min-height: 4rem;
     cursor: pointer;
   }
-
+  :global(.compare-results [data-command-item]:not([data-disabled]):is([data-selected], :hover)) { background: var(--accent-soft); }
   :global(.compare-results [data-command-item][data-disabled]) {
     cursor: default;
-    color: GrayText;
+    color: var(--muted);
   }
 </style>

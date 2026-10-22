@@ -5,7 +5,7 @@
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
-  import GameSelector, { setSelectedVersion, setVersionChangeHandler } from "#lib/components/GameSelector.svelte";
+  import GameSelector, { setSelectedVersion } from "#lib/components/GameSelector.svelte";
   import LanguageSwitcher from "#lib/components/LanguageSwitcher.svelte";
   import SearchDialog from "#lib/components/SearchDialog.svelte";
   import SpriteSelector, { setSelectedSprite } from "#lib/components/SpriteSelector.svelte";
@@ -126,7 +126,6 @@
     }
   }
 
-  setVersionChangeHandler(selectVersion);
 </script>
 
 <a class="skip-link" href="#main">{t(data.lang, "site.skipToContent")}</a>
@@ -160,6 +159,13 @@
     <details class="header-disclosure settings-menu" name="header-panel" bind:open={settingsOpen}>
       <summary>{t(data.lang, "site.settings")}</summary>
       <div class="header-panel settings-panel" role="group" aria-label={t(data.lang, "site.controls")}>
+        <GameSelector
+          lang={data.lang}
+          {games}
+          value={version}
+          onchange={selectVersion}
+          error={gamesFailed}
+        />
         <LanguageSwitcher lang={data.lang} />
         <SpriteSelector lang={data.lang} {games} value={selectedSprite} ready={spriteReady && !!games} onchange={selectSprite} />
         <ThemeSelector lang={data.lang} />
@@ -169,17 +175,6 @@
       {@render browseLinks()}
     </nav>
   </div>
-  {#if !page.route.id?.startsWith("/[lang]/pokemon/")}
-    <div class="site-controls">
-      <GameSelector
-        lang={data.lang}
-        {games}
-        value={version}
-        onchange={selectVersion}
-        error={gamesFailed}
-      />
-    </div>
-  {/if}
 </header>
 
 <noscript>

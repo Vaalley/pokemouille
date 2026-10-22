@@ -5,12 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="%sveltekit.assets%/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap"
+      rel="stylesheet"
+    />
     <script>
       // Apply the saved theme before first paint (key: "theme" in src/lib/data/context.ts).
       // Blocked storage or any other value keeps "auto", which follows prefers-color-scheme.
       try {
         var theme = localStorage.getItem("pokemouille.theme");
-        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+        if (["light", "dark", "dark-red", "dark-blue", "dark-yellow"].includes(theme))
+          document.documentElement.dataset.theme = theme;
       } catch {}
     </script>
     %sveltekit.head%

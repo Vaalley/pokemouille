@@ -15,7 +15,6 @@
     generationId: number;
     referenceTypes: ReferenceData["types"];
   } = $props();
-  const id = $props.id();
   const defendingTypes = $derived(types.status === "available" ? types.value.map((type) => type.id) : []);
   const matchups = $derived(defensiveMatchups(defendingTypes, generationId));
   const groups = $derived([
@@ -50,7 +49,6 @@
                 {defendingTypes}
                 onfocus={(event) => { if (typeof onfocus === "function") onfocus(event); }}
                 onblur={(event) => { if (typeof onblur === "function") onblur(event); }}
-                aria-describedby={`${id}-hint`}
                 aria-haspopup="dialog"
                 aria-expanded={expanded === "true"}
                 aria-controls={typeof controls === "string" ? controls : undefined}
@@ -71,7 +69,6 @@
         </LinkPreview.Content>
       </LinkPreview.Portal>
     </LinkPreview.Root>
-    <p id={`${id}-hint`} class="type-hint">{typeText(lang, "hint")}</p>
   {:else}
     <p>{reasonText(lang, types.reason)}</p>
   {/if}
@@ -79,7 +76,6 @@
 
 <style>
   .types { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; }
-  .type-hint { margin-block: 0.5rem; font-size: 0.875rem; }
   :global(.type-matchups) {
     z-index: 60;
     width: min(30rem, calc(100vw - 1.5rem));

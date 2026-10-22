@@ -7,7 +7,7 @@
 
   let { lang }: { lang: Language } = $props();
   const id = $props.id();
-  const themes = ["auto", "light", "dark"] as const;
+  const themes = ["auto", "light", "dark", "dark-red", "dark-blue", "dark-yellow"] as const;
   type Theme = (typeof themes)[number];
 
   // The inline script in src/app.html already applied the saved theme before first paint;
@@ -18,12 +18,12 @@
 
   onMount(() => {
     const saved = readPreference("theme");
-    value = saved === "light" || saved === "dark" ? saved : "auto";
+    value = themes.find((theme) => theme === saved) ?? "auto";
     ready = true;
   });
 
   function select(next: string) {
-    value = next === "light" || next === "dark" ? next : "auto";
+    value = themes.find((theme) => theme === next) ?? "auto";
     writePreference("theme", value);
     // "auto" removes the override so `prefers-color-scheme` decides again.
     if (value === "auto") delete document.documentElement.dataset.theme;

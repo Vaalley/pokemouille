@@ -207,7 +207,7 @@
 {/snippet}
 
 {#snippet branch(nodes: EvolutionTreeNode[])}
-  <ul class="branches">
+  <ul class="branches" class:fan={nodes.length > 3 && nodes.every((node) => node.children.length === 0)}>
     {#each nodes as node (node.key)}
       {@const name = node.form?.name ?? localize(node.names, lang, node.identifier)}
       <li class="branch">
@@ -275,13 +275,14 @@
 <style>
   section {
     min-width: 0;
+    container: evolution / inline-size;
   }
   .branches {
     display: grid;
-    gap: 1rem;
+    gap: 0.75rem;
     list-style: none;
     padding: 0;
-    margin: 1rem 0 0;
+    margin: 0.75rem 0 0;
     min-width: 0;
   }
   .branch {
@@ -291,41 +292,43 @@
   /* Each child owns its connector; a list-wide border would trail below
      the last child and cannot follow branches that wrap into grid rows. */
   .branch > .branches {
-    margin-top: 0;
-    margin-left: 1rem;
-    padding-top: 1rem;
-    padding-left: 1rem;
+    margin-block-start: 0;
+    margin-inline-start: 0.75rem;
+    padding-block-start: 0.75rem;
+    padding-inline-start: 1rem;
   }
   .branch > .branches > .branch::before {
     content: "";
     position: absolute;
-    top: -1rem;
-    bottom: -1rem;
+    top: -0.75rem;
+    bottom: -0.75rem;
     left: -1rem;
-    border-left: 2px solid var(--border);
+    border-left: var(--border-width) solid var(--border-strong);
   }
   .branch > .branches > .branch:last-child::before {
     bottom: auto;
-    height: 2.5rem;
+    height: 2.75rem;
   }
   .branch > .branches > .branch::after {
     content: "";
     position: absolute;
-    top: 1.5rem;
+    top: 2rem;
     left: -1rem;
     width: 1rem;
-    border-top: 2px solid var(--border);
+    border-top: var(--border-width) solid var(--border-strong);
   }
   .card {
     min-width: 0;
+    max-width: 24rem;
+    background: var(--surface);
     border: var(--border-width) solid var(--border);
     border-radius: var(--radius-panel);
-    padding: 1rem;
+    padding: 0.75rem;
     overflow-wrap: anywhere;
   }
   .current {
-    border-width: 2px;
-    border-color: currentColor;
+    border-color: var(--accent);
+    background: var(--accent-soft);
   }
   .identity {
     display: flex;
@@ -347,8 +350,7 @@
   .dex {
     display: block;
     font-size: 0.8rem;
-    font-variant-numeric: tabular-nums;
-    opacity: 0.75;
+    color: var(--muted);
   }
   .badge {
     display: inline-block;
@@ -359,11 +361,15 @@
     font-size: 0.8rem;
   }
   .methods {
-    margin-top: 0.75rem;
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.25rem;
+    border-block-start: var(--border-width) solid var(--border);
   }
   .methods summary {
     cursor: pointer;
-    padding-block: 0.35rem;
+    min-height: 2.75rem;
+    align-content: center;
+    padding-block: 0.5rem;
     font-weight: 600;
   }
   .methods summary:focus-visible {
@@ -379,9 +385,10 @@
     font-weight: 600;
   }
   .method {
-    padding: 0.75rem;
-    border-radius: var(--radius-panel);
-    background: color-mix(in srgb, currentColor 5%, transparent);
+    padding: 0.625rem;
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+    font-size: 0.875rem;
   }
   .provenance,
   .requirements {
@@ -425,6 +432,86 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+  /* Use the component's available width, including when embedded on item pages.
+     A parent occupies one column; its children stay grouped in the next. */
+  @container evolution (min-width: 56rem) {
+    .branch {
+      display: grid;
+      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+      align-items: start;
+      column-gap: 1.5rem;
+    }
+    .card { max-width: none; }
+    .branch > .branches {
+      position: relative;
+      margin: 0;
+      padding: 0;
+    }
+    .branch > .branches::before {
+      content: "";
+      position: absolute;
+      top: 2rem;
+      left: -1.5rem;
+      width: 1.5rem;
+      border-top: var(--border-width) solid var(--border-strong);
+    }
+    .branch > .branches > .branch::before {
+      top: -0.75rem;
+      bottom: -0.75rem;
+      left: -0.75rem;
+      height: auto;
+    }
+    .branch > .branches > .branch:first-child::before { top: 2rem; }
+    .branch > .branches > .branch:last-child::before {
+      bottom: calc(100% - 2rem);
+      height: auto;
+    }
+    .branch > .branches > .branch::after {
+      top: 2rem;
+      left: -0.75rem;
+      width: 0.75rem;
+    }
+  }
+  /* Large sets of final evolutions are siblings, not successive stages.
+     One stem and a shared rail connect the parent to the entire sibling grid. */
+  @container evolution (min-width: 36rem) {
+    .branch:has(> .fan) { display: block; }
+    .branch:has(> .fan) > .card {
+      width: 14rem;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    .branch > .branches.fan {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 1rem;
+      margin: 1.5rem 0 0;
+      padding: 1rem 0 0;
+      border-block-start: var(--border-width) solid var(--border-strong);
+    }
+    .branch > .fan::before {
+      content: "";
+      position: absolute;
+      top: -1.5rem;
+      left: 50%;
+      width: 0;
+      height: 1.5rem;
+      border: none;
+      border-inline-start: var(--border-width) solid var(--border-strong);
+    }
+    .branch > .fan > .branch { display: block; }
+    .branch > .fan > .branch::before,
+    .branch > .fan > .branch::after { content: none; }
+    .fan .card { max-width: none; }
+  }
+  @container evolution (min-width: 56rem) {
+    .branch > .branches.fan { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @container evolution (min-width: 68rem) {
+    .branch > .branches.fan { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
   @media (max-width: 30rem) {
     .card {

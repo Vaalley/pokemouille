@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Meter } from "bits-ui";
-  import { onMount, untrack } from "svelte";
+  import { onMount, tick, untrack } from "svelte";
   import { pushState } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -77,6 +77,21 @@
     const url = compareUrl(new URL(currentUrl.href), entries);
     if (version) url.searchParams.set("version", version);
     if (url.href !== currentUrl.href) pushState(url, page.state);
+  }
+
+  async function removeColumn(key: string, button: HTMLButtonElement) {
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>(".compare-table .remove")];
+    const index = buttons.indexOf(button);
+    const next = buttons[index + 1] ?? buttons[index - 1];
+    update(removeCompared(selection.entries, key));
+    await tick();
+    (next ?? document.querySelector<HTMLInputElement>(`#${id}-picker input`))?.focus();
+  }
+
+  async function clearSelection() {
+    update([]);
+    await tick();
+    document.querySelector<HTMLInputElement>(`#${id}-picker input`)?.focus();
   }
 
   // Only the compared species files load (shared, cached loader); forms reuse their species.
@@ -258,13 +273,26 @@
   <p role="status">{t(lang, "loading")}</p>
   <noscript><p>{t(lang, "javascript")}</p></noscript>
 {:else}
-  <ComparePicker
-    {lang}
-    {games}
-    {version}
-    selected={selectedKeys}
-    onadd={(entry) => update(addCompared(selection.entries, entry))}
-  />
+  <section class="comparison-setup" aria-label={t(lang, "pickerLabel")}>
+    <div class="selection-progress">
+      <p class="selection-count" role="status">{t(lang, "selectionCount", { count: selection.entries.length, max: MAX_COMPARED })}</p>
+      {#if selection.entries.length > 0}
+        <button type="button" onclick={clearSelection}>{t(lang, "clear")}</button>
+      {/if}
+    </div>
+    <div id="{id}-picker">
+      <ComparePicker
+        {lang}
+        {games}
+        {version}
+        selected={selectedKeys}
+        onadd={(entry) => update(addCompared(selection.entries, entry))}
+      />
+    </div>
+    {#if selection.entries.length < 2}
+      <p class="compare-guidance" role="status">{t(lang, selection.entries.length === 0 ? "empty" : "single")}</p>
+    {/if}
+  </section>
 
   {#if selection.invalid}
     <p class="note" role="status">{t(lang, "invalid")}</p>
@@ -276,73 +304,76 @@
   {#if gamesFailed}
     <p role="alert">{t(lang, "gamesError")}</p>
     <p><button type="button" onclick={loadGames}>{t(lang, "retry")}</button></p>
-  {:else if selection.entries.length === 0}
-    <p role="status">{t(lang, "empty")}</p>
   {:else if version === null || !game}
     <p role="status">{t(lang, "loadingGames")}</p>
-  {:else}
+  {:else if selection.entries.length > 0}
     <div class="compare-actions">
-      {#if selection.entries.length === 1}
-        <p role="status">{t(lang, "single")}</p>
-      {/if}
       {#if hasFailures}
         <button type="button" onclick={retry}>{t(lang, "retry")}</button>
       {/if}
-      <button type="button" onclick={() => update([])}>{t(lang, "clear")}</button>
     </div>
 
     <div class="table-scroll" role="region" aria-labelledby="{id}-caption" tabindex="0">
-      <table class="compare-table">
+      <table class="compare-table" style:--compared-count={columns.length}>
         <caption id="{id}-caption">{t(lang, "caption", { game: gameName })}</caption>
+        <colgroup>
+          <col class="attribute-column" />
+          {#each columns as column (column.key)}<col />{/each}
+        </colgroup>
         <thead>
           <tr>
             <th scope="col"><span class="visually-hidden">{t(lang, "attribute")}</span></th>
             {#each columns as column (column.key)}
               <th scope="col" class="pokemon-heading">
-                {#if column.state === "ready"}
-                  {@const artwork = column.pokemon.media.artwork}
-                  {#if artwork && !failedImages.includes(artwork)}
-                    <img
-                      src={artwork}
-                      alt={t(lang, "artwork", { name: column.pokemon.name.text })}
-                      width="96"
-                      height="96"
-                      loading="lazy"
-                      onerror={() => { failedImages = [...failedImages, artwork]; }}
-                    />
+                <div class="selection-card">
+                  {#if column.state === "ready"}
+                    {@const artwork = column.pokemon.media.artwork}
+                    <div class="selection-artwork">
+                      {#if artwork && !failedImages.includes(artwork)}
+                        <img
+                          src={artwork}
+                          alt={t(lang, "artwork", { name: column.pokemon.name.text })}
+                          width="64"
+                          height="64"
+                          loading="lazy"
+                          onerror={() => { failedImages = [...failedImages, artwork]; }}
+                        />
+                      {:else}
+                        <PokemonIcon speciesId={column.entry.speciesId} />
+                      {/if}
+                    </div>
+                    <a href={href(pokemonHref(lang, column.entry.speciesId, { version: column.pokemon.context.version, form: column.entry.form }))}
+                      ><Localized text={column.pokemon.name} /></a
+                    >
+                    <span class="species-number">{pokemonText(lang, "identity.numberValue", { number: column.entry.speciesId })}</span>
+                    {#if column.pokemon.speciesName.text !== column.pokemon.name.text}
+                      <span class="species-name">(<Localized text={column.pokemon.speciesName} />)</span>
+                    {/if}
+                    {#if column.pokemon.status !== "available"}
+                      <span class="note status">
+                        {pokemonText(
+                          lang,
+                          column.pokemon.status === "not-introduced" ? "status.notIntroduced" : "status.unknown",
+                          { name: column.pokemon.name.text, game: gameName },
+                        )}
+                      </span>
+                    {/if}
                   {:else}
                     <PokemonIcon speciesId={column.entry.speciesId} />
+                    <span>{columnName(column)}</span>
+                    {#if column.state === "error"}
+                      <span class="note status" role="alert">{column.message}</span>
+                    {:else}
+                      <span class="note status">{t(lang, "loadingColumn")}</span>
+                    {/if}
                   {/if}
-                  <span class="species-number">{pokemonText(lang, "identity.numberValue", { number: column.entry.speciesId })}</span>
-                  <a href={href(pokemonHref(lang, column.entry.speciesId, { version: column.pokemon.context.version, form: column.entry.form }))}
-                    ><Localized text={column.pokemon.name} /></a
-                  >
-                  {#if column.pokemon.speciesName.text !== column.pokemon.name.text}
-                    <span class="species-name">(<Localized text={column.pokemon.speciesName} />)</span>
-                  {/if}
-                  {#if column.pokemon.status !== "available"}
-                    <span class="note status">
-                      {pokemonText(
-                        lang,
-                        column.pokemon.status === "not-introduced" ? "status.notIntroduced" : "status.unknown",
-                        { name: column.pokemon.name.text, game: gameName },
-                      )}
-                    </span>
-                  {/if}
-                {:else}
-                  <PokemonIcon speciesId={column.entry.speciesId} />
-                  <span>{columnName(column)}</span>
-                  {#if column.state === "error"}
-                    <span class="note status" role="alert">{column.message}</span>
-                  {:else}
-                    <span class="note status">{t(lang, "loadingColumn")}</span>
-                  {/if}
-                {/if}
-                <button
-                  type="button"
-                  class="remove"
-                  onclick={() => update(removeCompared(selection.entries, column.key))}
-                >{t(lang, "remove", { name: columnName(column) })}</button>
+                  <button
+                    type="button"
+                    class="remove"
+                    aria-label={t(lang, "remove", { name: columnName(column) })}
+                    onclick={(event) => removeColumn(column.key, event.currentTarget)}
+                  >{t(lang, "removeShort")}</button>
+                </div>
               </th>
             {/each}
           </tr>
@@ -390,8 +421,10 @@
                   {@const pokemon = available(column)}
                   <td class="stat">
                     {#if value !== null && value !== undefined}
-                      <span class="value" class:highest={row.highest[index]}>{value}</span>{#if row.highest[index]}<span class="visually-hidden"> ({t(lang, "highest")})</span>{/if}
-                      <Meter.Root min={0} max={255} {value} aria-hidden="true"><span class="meter-fill" style="width: {(Math.min(255, value) / 255) * 100}%"></span></Meter.Root>
+                      <span class="stat-measure">
+                        <span class="value" class:highest={row.highest[index]}>{value}</span>{#if row.highest[index]}<span class="visually-hidden"> ({t(lang, "highest")})</span>{/if}
+                        <Meter.Root min={0} max={255} {value} aria-hidden="true"><span class="meter-fill" style="width: {(Math.min(255, value) / 255) * 100}%"></span></Meter.Root>
+                      </span>
                     {:else if !pokemon}
                       {@render blocked(column)}
                     {:else if pokemon.stats.status !== "available"}
@@ -528,19 +561,21 @@
 {/if}
 
 <style>
-  .compare-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-    margin-block: 1rem;
+  .comparison-setup {
+    max-width: 41rem;
+    padding: 1rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
   }
-
-  .compare-actions p {
-    margin: 0;
-  }
+  .selection-progress { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-block-end: 0.75rem; }
+  .selection-count { margin: 0; color: var(--muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+  .compare-guidance { margin: 0.75rem 0 0; padding: 0.75rem; border-radius: var(--radius-control); background: var(--accent-soft); }
+  .compare-actions { display: flex; gap: 0.5rem; margin-block: 1rem; }
+  .compare-actions:empty { display: none; }
 
   .compare-actions button,
+  .selection-progress button,
   .remove {
     min-height: 2.75rem;
     padding: 0.4rem 0.75rem;
@@ -549,40 +584,42 @@
     background: var(--surface);
     color: var(--page-text);
     font: inherit;
+    cursor: pointer;
   }
 
+  .table-scroll {
+    --attribute-width: 9rem;
+    --pokemon-width: 16rem;
+    /* Keep absolutely positioned screen-reader labels inside the scrolling region. */
+    position: relative;
+    width: fit-content;
+    max-height: min(48rem, 80dvh);
+    margin-block-start: 1rem;
+    overflow: auto;
+    overscroll-behavior: contain;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
+    isolation: isolate;
+  }
   .compare-table {
-    min-width: 100%;
+    width: calc(var(--attribute-width) + var(--pokemon-width) * var(--compared-count));
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
   }
+  .attribute-column { width: var(--attribute-width); }
+  .compare-table caption { padding: 0.75rem; }
+  .compare-table :is(th, td) { padding: 0.75rem; vertical-align: top; overflow-wrap: anywhere; }
+  .compare-table thead th { position: sticky; top: 0; z-index: 2; background: var(--surface); border-block-end-color: var(--border-strong); }
+  .compare-table th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface); font-size: 0.875rem; border-inline-end: var(--border-width) solid var(--border); }
+  .compare-table thead th:first-child { left: 0; z-index: 3; }
+  .selection-card { display: grid; justify-items: start; align-content: start; gap: 0.375rem; padding: 0.75rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); color: var(--page-text); }
+  .selection-artwork { display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: var(--radius-control); background: var(--surface-muted); }
+  .selection-artwork img { width: 4rem; height: 4rem; object-fit: contain; }
+  .selection-card > a { font-size: 1.125rem; font-weight: 650; line-height: 1.3; }
+  .selection-card .species-number { color: var(--muted); font-size: 0.75rem; font-weight: normal; font-variant-numeric: tabular-nums; }
 
-  .compare-table th[scope="row"] {
-    white-space: nowrap;
-  }
-
-  .compare-table td {
-    min-width: 11rem;
-  }
-
-  .pokemon-heading {
-    vertical-align: bottom;
-  }
-
-  .pokemon-heading > * {
-    display: block;
-    margin-block-end: 0.25rem;
-  }
-
-  .pokemon-heading img {
-    width: 6rem;
-    height: 6rem;
-    object-fit: contain;
-  }
-
-  .pokemon-heading a {
-    font-size: 1.0625rem;
-  }
-
-  .pokemon-heading .status {
+  .selection-card .status {
     max-width: 14rem;
     font-weight: normal;
     white-space: normal;
@@ -593,9 +630,9 @@
   }
 
   .remove {
-    min-height: 2.25rem;
-    margin-block-start: 0.5rem;
-    font-size: 0.8125rem;
+    min-height: 2.75rem;
+    margin-block-start: 0.25rem;
+    font-size: 0.875rem;
     font-weight: normal;
   }
 
@@ -604,28 +641,38 @@
   }
 
   th[scope="rowgroup"] {
-    padding-block-start: 0.75rem;
+    background: var(--surface-muted);
+    font-size: 0.875rem;
   }
-
-  .stat {
-    white-space: nowrap;
-  }
-
-  /* Fixed-width, right-aligned values keep every meter starting at the same x. */
+  .stat-measure { display: grid; grid-template-columns: 4ch minmax(0, 1fr); align-items: center; gap: 0.625rem; }
   .value {
     display: inline-block;
-    min-width: 3ch;
-    margin-inline-end: 0.5rem;
+    min-width: 4ch;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    font-size: 1.125rem;
+    line-height: 1.3;
     text-align: end;
     font-variant-numeric: tabular-nums;
   }
-
-  .value.highest {
-    font-weight: bold;
+  .value.highest { color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .stat :global([data-meter-root]) { width: 100%; height: 0.5rem; border: 0; background: var(--surface-muted); }
+  @media (forced-colors: active) {
+    .stat :global([data-meter-root]) { border: 1px solid CanvasText; }
+    .stat :global(.meter-fill) { background: CanvasText; }
+    .value.highest { outline: 1px solid Highlight; }
   }
-
-  .stat :global([data-meter-root]) {
-    width: 6rem;
+  @media (max-width: 40rem) {
+    .table-scroll {
+      --attribute-width: 6.5rem;
+      /* Fit one Pokémon beside the pinned labels, using this region's content width. */
+      --pokemon-width: clamp(10rem, calc(100cqi - var(--attribute-width)), 14rem);
+      container-type: inline-size;
+      width: 100%;
+    }
+    .comparison-setup { padding: 0.75rem; }
+    .compare-table :is(th, td) { padding: 0.625rem; }
+    .selection-card { padding: 0.625rem; }
   }
 
   .total > * {

@@ -54,7 +54,7 @@
     {#if stats.value.some((stat) => stat.id === SPECIAL_STAT_ID)}
       <p class="note">{t(lang, "stats.special")}</p>
     {/if}
-    <table>
+    <table class="stat-summary">
       <caption>{t(lang, "stats.caption", { game })}</caption>
       <thead>
         <tr>
@@ -65,11 +65,13 @@
       </thead>
       <tbody>
         {#each stats.value as stat (stat.id)}
-          <tr>
+          <tr data-stat={stat.id}>
             <th scope="row">{@render statName(stat)}</th>
             <td class="base">
-              <span class="value">{stat.value}</span>
-              <Meter.Root min={0} max={255} value={stat.value} aria-hidden="true"><span class="meter-fill" style="width: {(Math.min(255, stat.value) / 255) * 100}%"></span></Meter.Root>
+              <div class="stat-measure">
+                <span class="value">{integer.format(stat.value)}</span>
+                <Meter.Root min={0} max={255} value={stat.value} aria-hidden="true"><span class="meter-fill" style="width: {(Math.min(255, stat.value) / 255) * 100}%"></span></Meter.Root>
+              </div>
             </td>
             <td class="numeric">{stat.effort}</td>
           </tr>
@@ -78,12 +80,13 @@
       <tfoot>
         <tr>
           <th scope="row">{t(lang, "stats.total")}</th>
-          <td class="base"><span class="value">{stats.value.reduce((sum, stat) => sum + stat.value, 0)}</span></td>
+          <td class="base"><span class="value">{integer.format(stats.value.reduce((sum, stat) => sum + stat.value, 0))}</span></td>
           <td></td>
         </tr>
       </tfoot>
     </table>
     {#if ranges?.status === "computed"}
+      <div class="calculated-ranges">
       <h3>{calc(lang, "rangesHeading")}</h3>
       <table class="ranges">
         <caption>{calc(lang, "rangesCaption", { game })}</caption>
@@ -112,6 +115,7 @@
       {#if ranges.formula === "modern" && hasUnitHp}
         <p class="note">{calc(lang, "rangesShedinja")}</p>
       {/if}
+      </div>
     {:else if ranges?.status === "not-computed"}
       <p class="note">
         {calc(
@@ -132,11 +136,64 @@
 
 <style>
   table { width: 100%; }
+  .stat-summary {
+    --stat-color: var(--accent);
+    table-layout: fixed;
+  }
+  .stat-summary th, .stat-summary td {
+    vertical-align: middle;
+    padding-block: 0.5rem;
+    padding-inline-end: 0.5rem;
+  }
+  .stat-summary th:first-child { width: 30%; overflow-wrap: anywhere; }
+  .stat-summary .numeric { width: 16%; padding-inline-end: 0; }
+  .stat-summary tbody th { font-weight: 500; }
+  .stat-summary tbody .numeric { color: var(--muted); }
+  .stat-summary tr[data-stat="1"] { --stat-color: light-dark(#ab565c, #d68b91); }
+  .stat-summary tr[data-stat="2"] { --stat-color: light-dark(#a76b35, #d4a16f); }
+  .stat-summary tr[data-stat="3"] { --stat-color: light-dark(#4e78a5, #8aadd2); }
+  .stat-summary tr[data-stat="4"] { --stat-color: light-dark(#8464ab, #b39ad2); }
+  .stat-summary tr[data-stat="5"] { --stat-color: light-dark(#438477, #83bcad); }
+  .stat-summary tr[data-stat="6"] { --stat-color: light-dark(#a85e89, #d798bd); }
+  .stat-summary tr[data-stat="9"] { --stat-color: light-dark(#8e7839, #c8b67a); }
+  .base { width: 54%; }
+  .stat-measure {
+    display: grid;
+    grid-template-columns: 3ch minmax(1.5rem, 1fr);
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 1.125rem;
+  }
+  .value {
+    display: inline-block;
+    min-width: 3ch;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-measure :global([data-meter-root]) {
+    width: 100%;
+    height: 0.625rem;
+    border: none;
+    background: var(--surface-muted);
+  }
+  .stat-measure .meter-fill { background: var(--stat-color); }
+  tfoot th, tfoot td {
+    padding-block-start: 0.75rem;
+    border-block-end: none;
+    font-weight: 700;
+  }
+  .calculated-ranges {
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: var(--border-width) solid var(--border);
+  }
+  .calculated-ranges h3 { margin-block: 0 0.75rem; }
   .ranges td { white-space: nowrap; }
-  .base { width: 100%; }
-  td.base { white-space: nowrap; }
-  /* Fixed-width, right-aligned values keep every meter starting at the same x. */
-  .value { display: inline-block; min-width: 3ch; margin-inline-end: 0.5rem; text-align: end; font-variant-numeric: tabular-nums; }
-  td.base :global([data-meter-root]) { width: calc(100% - 4ch); max-width: 12rem; }
-  tfoot th, tfoot td { border-block-end: none; font-weight: bold; }
+  .ranges tbody th { font-weight: 500; }
+  @media (forced-colors: active) {
+    .stat-measure :global([data-meter-root]) { border: var(--border-width) solid CanvasText; }
+    .stat-measure .meter-fill { background: CanvasText; }
+  }
 </style>

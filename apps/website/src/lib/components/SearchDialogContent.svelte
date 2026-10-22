@@ -185,20 +185,23 @@
                 id="{id}-input"
                 bind:ref={input}
                 bind:value={query}
+                placeholder={t(lang, "search.placeholder")}
                 aria-describedby="{id}-status"
                 onkeydown={(e) => {
                   if (e.key === "Home" || e.key === "End") e.stopPropagation();
                 }}
               />
             </div>
-            <p id="{id}-status" class="search-status" role="status" aria-live="polite">
-              {statusMessage}
-            </p>
-            {#if status === "error"}
-              <p>
-                <Button.Root type="button" onclick={retry}>{t(lang, "search.retry")}</Button.Root>
+            <div class="search-status-region" class:search-feedback={results.length === 0}>
+              <p id="{id}-status" class="search-status" role="status" aria-live="polite">
+                {statusMessage}
               </p>
-            {/if}
+              {#if status === "error"}
+                <p>
+                  <Button.Root type="button" onclick={retry}>{t(lang, "search.retry")}</Button.Root>
+                </p>
+              {/if}
+            </div>
             <Command.List
               class="search-results"
               aria-label={t(lang, "search.results")}
@@ -214,30 +217,36 @@
                     tabindex={-1}
                     onclick={(e) => onResultClick(e, href)}
                   >
-                    <span class="search-result-kind">{t(lang, `search.kind.${entry.kind}`)}</span>
-                    <span class="species-number">
-                      {entry.kind === "pokemon" ? t(lang, "home.number", { number: entry.id }) : `#${entry.id}`}
-                    </span>
-                    {#if entry.kind === "pokemon"}
-                      <PokemonIcon speciesId={entry.speciesId} />
-                    {:else if entry.kind === "move"}
-                      <MoveIcon typeId={entry.typeId} />
-                    {:else if entry.kind === "ability"}
-                      <AbilityIcon />
-                    {:else}
-                      <ItemIcon identifier={entry.identifier} />
-                    {/if}
-                    <span class="search-result-name">
-                      <Localized text={entry.name} />
-                      {#if entry.kind === "pokemon" && entry.speciesName.text !== entry.name.text}
-                        (<Localized text={entry.speciesName} />)
+                    <span class="search-result-icon">
+                      {#if entry.kind === "pokemon"}
+                        <PokemonIcon speciesId={entry.speciesId} />
+                      {:else if entry.kind === "move"}
+                        <MoveIcon typeId={entry.typeId} />
+                      {:else if entry.kind === "ability"}
+                        <AbilityIcon />
+                      {:else}
+                        <ItemIcon identifier={entry.identifier} />
                       {/if}
                     </span>
-                    {#if selectedGame && result.introduction === "not-introduced"}
-                      <span>{t(lang, "search.notIntroduced", { game: gameName })}</span>
-                    {:else if selectedGame && result.introduction === "unknown"}
-                      <span>{t(lang, "search.unknownIntroduction", { game: gameName })}</span>
-                    {/if}
+                    <span class="search-result-body">
+                      <span class="search-result-name">
+                        <Localized text={entry.name} />
+                      </span>
+                      <span class="search-result-meta">
+                        <span class="search-result-kind">{t(lang, `search.kind.${entry.kind}`)}</span>
+                        <span class="species-number">
+                          {entry.kind === "pokemon" ? t(lang, "home.number", { number: entry.id }) : `#${entry.id}`}
+                        </span>
+                        {#if entry.kind === "pokemon" && entry.speciesName.text !== entry.name.text}
+                          <span><Localized text={entry.speciesName} /></span>
+                        {/if}
+                      </span>
+                      {#if selectedGame && result.introduction === "not-introduced"}
+                        <span class="search-result-note">{t(lang, "search.notIntroduced", { game: gameName })}</span>
+                      {:else if selectedGame && result.introduction === "unknown"}
+                        <span class="search-result-note">{t(lang, "search.unknownIntroduction", { game: gameName })}</span>
+                      {/if}
+                    </span>
                   </Command.LinkItem>
                 {/each}
               </Command.Viewport>
@@ -245,6 +254,11 @@
           </div>
         {/snippet}
       </Command.Root>
+      <div class="search-keyboard-hints">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> {t(lang, "search.navigate")}</span>
+        <span><kbd>Enter</kbd> {t(lang, "search.open")}</span>
+        <span><kbd>Esc</kbd> {t(lang, "search.close")}</span>
+      </div>
     </div>
   </Dialog.Content>
 </Dialog.Portal>
