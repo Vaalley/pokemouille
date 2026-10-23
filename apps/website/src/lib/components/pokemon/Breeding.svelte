@@ -136,28 +136,29 @@
 <style>
   .breeding, .breeding :is(section, div, ul, li) { min-width: 0; }
   .breeding { overflow-wrap: anywhere; }
-  .membership { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 1rem; }
-  .membership h3 { margin: 0; font-size: 1rem; }
+  .membership { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 1rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .membership h3 { margin: 0; font-size: var(--data-label-size); font-weight: 600; }
   .group-list { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
-  .group-list a { display: inline-block; padding: 0.375rem 0.625rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--accent-soft); font-weight: 600; }
-  .directory-link { padding-block: 0.375rem; font-size: 0.9375rem; }
-  .source-notes { margin-block: 0.75rem; padding-inline-start: 0.75rem; border-inline-start: var(--border-width) solid var(--border-strong); }
+  .group-list a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0.375rem 0.625rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); font-weight: 600; }
+  .directory-link { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.375rem; font-size: 0.875rem; }
+  .source-notes { margin-block: 0.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
   .source-notes p { margin-block: 0.375rem; }
-  .candidate-panel { border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
+  .candidate-panel { border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
   summary { min-height: 2.75rem; padding: 0.625rem 0.75rem; cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+  .candidate-panel[open] > summary { border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
   .count { display: inline-block; padding-inline: 0.4rem; border-radius: var(--radius-control); background: var(--surface-muted); color: var(--page-text); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; vertical-align: baseline; }
   .candidate-scope { margin: 0.5rem 0.75rem 0.75rem; }
   .breeding-rows { max-height: min(40rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
   .candidate-list { display: flex; flex-wrap: wrap; gap: 0.125rem 0.75rem; margin: 0; padding: 0; list-style: none; }
-  .candidate-list a { display: inline-block; padding-block: 0.375rem; }
+  .candidate-list a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.375rem; font-weight: 600; }
   .egg-move + .egg-move { border-block-start: var(--border-width) solid var(--border-strong); margin-block-start: 1rem; padding-block-start: 1rem; }
   .egg-move h3 { margin: 0 0 0.625rem; font-size: 1.125rem; }
-  .candidate-method + .candidate-method { margin-block-start: 0.875rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) dashed var(--border-strong); }
-  h4 { margin: 0 0 0.5rem; font-size: 0.9375rem; }
+  .candidate-method + .candidate-method { margin-block-start: 0.875rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
+  h4 { margin: 0 0 0.5rem; font-size: var(--data-label-size); font-weight: 600; }
   .candidate-categories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
-  .candidate-category { border-inline-start: var(--border-width) solid var(--accent); padding-inline-start: 0.625rem; }
-  .candidate-category.chain { border-inline-start-style: dashed; border-color: var(--border-strong); }
-  h5 { margin: 0 0 0.25rem; font: 600 0.875rem/1.5 var(--font-body); }
+  .candidate-category { border-inline-start: var(--data-rule) solid var(--border-strong); padding: var(--data-padding); background: var(--surface-muted); }
+  .candidate-category:has(.candidate-list) { border-inline-start-color: var(--accent); }
+  h5 { margin: 0 0 0.25rem; font: 600 var(--data-label-size)/1.5 var(--font-body); }
   .candidate-category p { margin: 0; font-size: 0.875rem; }
   :is(a, summary, button, .breeding-rows):focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: var(--radius-control); }
   @media (max-width: 40rem) {

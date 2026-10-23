@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { resolve } from "$app/paths";
+  import type { PathnameWithSearchOrHash } from "$app/types";
   import type { LocalizedText, ResolvedPokemon } from "../../../../../../packages/pokemon-data/src/index.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/pokemon.ts";
@@ -54,6 +56,8 @@
   const preferredFailed = $derived(image.url !== null && failedUrls.includes(image.url));
   const imageUrl = $derived(preferredFailed ? (artwork && !failedUrls.includes(artwork) ? artwork : null) : image.url);
   const fallback = $derived(image.fallback || preferredFailed);
+  const metres = $derived(new Intl.NumberFormat(lang, { style: "unit", unit: "meter", maximumFractionDigits: 1 }));
+  const kilograms = $derived(new Intl.NumberFormat(lang, { style: "unit", unit: "kilogram", maximumFractionDigits: 1 }));
 </script>
 
 <header class="identity">
@@ -71,18 +75,51 @@
       {/if}
     </h1>
     {@render types?.()}
-    <dl class="properties">
+    <dl class="identity-facts">
       {#if genus}
-        <dt>{t(lang, "identity.genus")}</dt>
-        <dd><Localized text={genus} /></dd>
+        <div>
+          <dt>{t(lang, "identity.genus")}</dt>
+          <dd><Localized text={genus} /></dd>
+        </div>
       {/if}
-      <dt>{t(lang, "identity.introduced")}</dt>
-      <dd>{t(lang, "identity.generation", { number: generationId })}</dd>
+      <div>
+        <dt>{t(lang, "identity.introduced")}</dt>
+        <dd>{t(lang, "identity.generation", { number: generationId })}</dd>
+      </div>
       {#if formName}
-        <dt>{t(lang, "identity.form")}</dt>
-        <dd><Localized text={formName} /></dd>
+        <div class="form-fact">
+          <dt>{t(lang, "identity.form")}</dt>
+          <dd><Localized text={formName} /></dd>
+        </div>
+      {/if}
+      {#if pokemon?.physical.status === "available"}
+        <div>
+          <dt>{t(lang, "facts.height")}</dt>
+          <dd>{metres.format(pokemon.physical.value.height / 10)}</dd>
+        </div>
+        <div>
+          <dt>{t(lang, "facts.weight")}</dt>
+          <dd>{kilograms.format(pokemon.physical.value.weight / 10)}</dd>
+        </div>
       {/if}
     </dl>
+    {#if pokemon?.physical.status === "available"}
+      <p class="measurement-note note">{t(lang, "scope.current")}</p>
+    {/if}
+    {#if pokemon?.abilities.status === "available"}
+      <dl class="identity-facts ability-facts">
+        {#each pokemon.abilities.value as ability (ability.slot)}
+          <div>
+            <dt>{t(lang, ability.isHidden ? "abilities.hidden" : "abilities.heading")}</dt>
+            <dd>
+              <a href={resolve(`${lang}/ability/${ability.id}/?version=${encodeURIComponent(pokemon.context.version)}` as PathnameWithSearchOrHash)}>
+                <Localized text={ability.name} />
+              </a>
+            </dd>
+          </div>
+        {/each}
+      </dl>
+    {/if}
   </div>
   <div class="controls">
     {@render children?.()}
@@ -125,9 +162,9 @@
   .identity {
     display: grid;
     grid-template-columns: 15rem minmax(0, 1fr);
-    gap: 0.75rem 2rem;
+    gap: 0.75rem 1.25rem;
     align-items: start;
-    padding: 1.25rem;
+    padding: 0.75rem;
     border: var(--border-width) solid var(--border);
     border-radius: var(--radius-panel);
     background: var(--surface);
@@ -146,18 +183,48 @@
   }
 
   .audio {
-    grid-column: 1 / -1;
+    grid-column: 2;
     min-width: 0;
   }
 
   .kicker {
-    margin: 0 0 0.25rem;
+    margin: 0 0 0.5rem;
+    font-size: var(--data-label-size);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
-  .properties {
+  .identity-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-block: 0.75rem 0;
-    gap: 0.25rem 1rem;
+    gap: 0.375rem;
+    overflow-wrap: anywhere;
   }
+
+  .identity-facts > div {
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
+  }
+
+  .identity-facts dt {
+    font-size: var(--data-label-size);
+    font-weight: 600;
+  }
+
+  .identity-facts dd {
+    margin: 0.125rem 0 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .identity-facts .form-fact { grid-column: 1 / -1; }
+  .ability-facts { grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); }
+  .ability-facts a { display: inline-flex; align-items: center; min-height: 2.75rem; }
+  .measurement-note { margin-block: 0.25rem 0; font-size: 0.75rem; }
+
 
   h1 {
     display: flex;
@@ -170,9 +237,9 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.3rem 0.625rem;
-    border: var(--border-width) solid color-mix(in srgb, currentColor 35%, transparent);
-    border-radius: var(--radius-pill);
+    padding: 0.375rem 0.5rem;
+    border-inline-start: var(--data-rule) solid currentColor;
+    border-radius: 0;
     background: var(--legendary-background);
     color: var(--legendary);
     font-size: 0.75rem;
@@ -198,6 +265,9 @@
 
   figure {
     margin: 0;
+    padding: 0.625rem;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
     text-align: center;
   }
 
@@ -207,7 +277,7 @@
 
   @media (max-width: 48rem) {
     .identity {
-      padding: 1rem;
+      padding: 0.75rem;
       grid-template-columns: minmax(0, 1fr);
     }
 
@@ -223,6 +293,7 @@
 
     .audio {
       grid-row: 4;
+      grid-column: 1;
     }
 
     .media {
@@ -232,5 +303,6 @@
       max-width: 15rem;
       margin-inline: auto;
     }
+
   }
 </style>

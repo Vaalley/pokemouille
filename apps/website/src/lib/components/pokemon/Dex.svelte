@@ -95,28 +95,28 @@
 
 <style>
   section { min-width: 0; }
-  figure { margin: 0; padding: 1rem; border: var(--border-width) solid var(--border); border-inline-start: 0.25rem solid var(--accent); border-radius: var(--radius-panel); background: var(--surface); }
+  figure { display: flex; flex-direction: column; gap: 0.375rem; margin: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
   blockquote, blockquote p { margin: 0; }
-  blockquote { max-width: 65ch; line-height: 1.75; overflow-wrap: anywhere; }
-  figcaption { margin-block-start: 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--muted); overflow-wrap: anywhere; }
+  blockquote { max-width: 65ch; line-height: 1.6; font-weight: 600; overflow-wrap: anywhere; }
+  figcaption { order: -1; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   details { margin-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
   summary { min-height: 2.75rem; padding-block: 0.75rem; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
   .note { max-width: 75ch; margin-block: 0 0.75rem; line-height: 1.6; overflow-wrap: anywhere; }
   .entries-scroll { max-height: min(32rem, 70dvh); overflow: auto; overscroll-behavior: contain; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
   table { width: 100%; table-layout: fixed; border-collapse: collapse; }
   caption { padding: 0.75rem; text-align: start; color: var(--muted); font-size: 0.875rem; line-height: 1.5; }
-  th, td { padding: 0.875rem; overflow-wrap: anywhere; text-align: start; vertical-align: top; border-block-end: var(--border-width) solid var(--border); }
-  thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); font-size: 0.875rem; }
+  th, td { padding: 0.625rem 0.75rem; overflow-wrap: anywhere; text-align: start; vertical-align: top; border-block-end: var(--border-width) solid var(--border); }
+  thead th { position: sticky; top: 0; z-index: 1; background: var(--surface-muted); font-size: var(--data-label-size); }
   thead th:first-child { width: 30%; }
   td { line-height: 1.7; }
   tbody tr:last-child > * { border-block-end: 0; }
-  tr.selected { background: var(--accent-soft); }
-  th[scope="row"] { font-size: 0.875rem; font-weight: 600; line-height: 1.5; }
+  tr.selected > th { border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
+  th[scope="row"] { font-size: var(--data-label-size); font-weight: 600; line-height: 1.5; }
   .entry-games { display: flex; flex-direction: column; gap: 0.375rem; }
   .game-label { display: block; }
-  .selected-label { display: inline-block; margin-block-start: 0.625rem; padding: 0.125rem 0.375rem; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-control); font-size: 0.75rem; line-height: 1.4; }
+  .selected-label { display: inline-block; margin-block-start: 0.625rem; padding: 0.25rem 0.375rem; border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface); font-size: 0.75rem; line-height: 1.4; }
   @media (max-width: 30rem) {
-    figure { padding: 0.75rem; }
+    figure { padding: 0.625rem; }
     th, td { padding: 0.625rem 0.5rem; }
     thead th:first-child { width: 34%; }
     th[scope="row"] { font-size: 0.8125rem; }

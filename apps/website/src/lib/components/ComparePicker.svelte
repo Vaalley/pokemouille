@@ -188,6 +188,9 @@
 <style>
   .compare-picker { min-width: 0; }
   .compare-picker .filters { margin: 0 0 0.25rem; }
+  .filter-field { gap: 0.375rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .filter-field:focus-within { border-inline-start-color: var(--accent); }
+  .filter-field :global(label) { font-size: var(--data-label-size); font-weight: 600; }
   .compare-picker :global(input) {
     width: 100%;
     min-width: 0;
@@ -195,7 +198,7 @@
     padding: 0.625rem 0.75rem;
     border: var(--border-width) solid var(--border-strong);
     border-radius: var(--radius-control);
-    background: var(--surface-muted);
+    background: var(--surface);
     color: var(--page-text);
     font: inherit;
   }
@@ -207,7 +210,7 @@
   :global(.compare-results) {
     max-height: 20rem;
     margin: 0;
-    padding: 0.25rem;
+    padding: 0.375rem;
     overflow-y: auto;
     overscroll-behavior: contain;
     border: var(--border-width) solid var(--border);
@@ -215,22 +218,29 @@
     list-style: none;
   }
 
-  .picker-icon { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: var(--radius-control); background: var(--surface-muted); }
+  .picker-icon { display: grid; place-items: center; width: 3rem; height: 3rem; }
   .picker-result { display: grid; gap: 0.25rem; min-width: 0; overflow-wrap: anywhere; }
-  .result-name { font-size: 1.0625rem; font-weight: 650; line-height: 1.35; }
-  .result-meta { display: flex; flex-wrap: wrap; gap: 0.125rem 0.5rem; color: var(--muted); font-size: 0.8125rem; }
+  .result-name { font-size: 1rem; font-weight: 650; line-height: 1.35; }
+  .result-meta { display: flex; flex-wrap: wrap; gap: 0.125rem 0.5rem; color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
   .result-meta .species-number { font-variant-numeric: tabular-nums; }
   :global(.compare-results [data-command-item]) {
     display: grid;
     grid-template-columns: 3rem minmax(0, 1fr);
     gap: 0.75rem;
-    padding: 0.625rem;
+    margin-block: 0.375rem;
+    padding: 0.5rem 0.625rem;
     min-height: 4rem;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
     cursor: pointer;
   }
-  :global(.compare-results [data-command-item]:not([data-disabled]):is([data-selected], :hover)) { background: var(--accent-soft); }
+  :global(.compare-results [data-command-item]:not([data-disabled]):is([data-selected], :hover)) { border-inline-start-color: var(--accent); background: var(--accent-soft); }
   :global(.compare-results [data-command-item][data-disabled]) {
     cursor: default;
     color: var(--muted);
+  }
+  :global(.compare-results [data-command-item][data-disabled]) { border-inline-start-style: dashed; }
+  @media (forced-colors: active) {
+    :global(.compare-results [data-command-item]:not([data-disabled])[data-selected]) { border-inline-start-color: Highlight; outline: 1px solid Highlight; outline-offset: -1px; }
   }
 </style>

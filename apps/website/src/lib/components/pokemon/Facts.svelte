@@ -191,12 +191,15 @@
 </section>
 
 <style>
-  /* Several lists stack here: a shared label width keeps their values aligned. */
+  section { min-width: 0; }
+  /* Keep every inset label/value row aligned across the stacked fact groups. */
   dl {
     grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    gap: 0.375rem 0;
     overflow-wrap: anywhere;
   }
+  h3 { margin-block: 1.25rem 0.625rem; font-size: 1rem; }
   @media (max-width: 32rem) {
-    dl { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 0.375rem 0.75rem; }
+    dl { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
   }
 </style>

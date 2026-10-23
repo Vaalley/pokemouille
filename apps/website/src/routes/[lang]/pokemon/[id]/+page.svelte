@@ -407,15 +407,36 @@
 <style>
   .pager {
     margin-block-end: 1rem;
-    font-size: 0.875rem;
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
 
   .pager ul {
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .pager li {
+    min-width: 0;
+  }
+  .pager a {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .pager a:is(:hover, :focus-visible) {
+    border-inline-start-color: var(--accent);
   }
 
   .pager .next {
-    margin-inline-start: auto;
+    grid-column: 2;
+    margin-inline-start: 0;
   }
 
   .pager .previous a::before {
@@ -427,28 +448,38 @@
   }
 
   .pokemon-context {
-    padding-block-start: 0.75rem;
-    border-block-start: var(--border-width) solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
   }
 
   .context-fields {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem 1.5rem;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .context-fields :global(.form-selector) {
     display: grid;
-    flex: 1 1 12rem;
+    flex: 0 1 auto;
+    max-width: 28rem;
     align-content: start;
     align-items: start;
     gap: 0.25rem;
     min-width: 0;
     margin: 0;
   }
+  .context-fields :global(.form-selector > label) {
+    font-size: var(--data-label-size);
+    font-weight: 600;
+  }
 
   .context-fields :global([data-select-trigger]) {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     min-width: 0;
     min-height: 2.75rem;
     padding: 0.5rem 0.75rem;
@@ -461,12 +492,9 @@
   }
 
   .context-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.25rem 1rem;
-    margin-block-start: 0.5rem;
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.375rem;
   }
 
   .context-meta p {
@@ -475,6 +503,9 @@
 
   .context-notes {
     margin-block: 0.75rem 1.25rem;
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
   }
 
   .context-notes p {
@@ -483,7 +514,7 @@
   .overview {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 3rem;
+    gap: 0 1.5rem;
   }
 
   .column {
@@ -492,12 +523,13 @@
 
   /* Long full-width sections get a rule so each starts visibly. */
   .page-sections > :global(section) {
-    margin-block-start: 3rem;
+    margin-block-start: 2rem;
+    padding-block-start: 0.75rem;
     border-block-start: var(--border-width) solid var(--border);
   }
 
   .page-sections > :global(section > h2) {
-    margin-block-start: 1.25rem;
+    margin-block-start: 0.5rem;
   }
 
   @media (max-width: 48rem) {

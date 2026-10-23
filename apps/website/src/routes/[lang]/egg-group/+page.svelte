@@ -35,14 +35,14 @@
 
 <style>
   h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
-  .group-count { border-radius: var(--radius-control); padding-inline: 0.5rem; background: var(--surface-muted); color: var(--muted); font: 600 1rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
-  .source-notes { padding-inline-start: 0.75rem; border-inline-start: var(--border-width) solid var(--border-strong); margin-block-end: 1rem; }
+  .group-count { padding-inline: 0.5rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); color: var(--muted); font: 600 1rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
+  .source-notes { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); margin-block-end: 1rem; }
   .source-notes p { margin: 0; }
   .group-directory { min-width: 0; }
   ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.5rem; padding: 0; margin: 0; list-style: none; }
   li { min-width: 0; }
-  a { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 3rem; height: 100%; padding: 0.625rem 0.75rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); font-weight: 600; overflow-wrap: anywhere; }
-  a:hover { background: var(--accent-soft); border-color: var(--accent); }
+  a { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 2.75rem; height: 100%; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); font-weight: 600; overflow-wrap: anywhere; }
+  a:hover { background: var(--accent-soft); border-inline-start-color: var(--accent); }
   a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
   .arrow { flex-shrink: 0; color: var(--muted); }
 </style>

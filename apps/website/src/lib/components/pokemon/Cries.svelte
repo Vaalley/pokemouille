@@ -56,7 +56,7 @@
   {#if source}
     {#if sources.length > 1}
       <label>
-        <span>{t(lang, "source")}</span>
+        <span class="visually-hidden">{t(lang, "source")}</span>
         <select bind:value={selected}>
           {#each sources as entry (entry.id)}
             <option value={entry.id}>{t(lang, entry.id)}</option>
@@ -84,7 +84,10 @@
         <a href={source.url} target="_blank" rel="noopener noreferrer">{t(lang, "open")}</a>
       </div>
     {/if}
-    <p class="note">{t(lang, "scope")}</p>
+    <details class="audio-details">
+      <summary>{t(lang, "details")}</summary>
+      <p class="note">{t(lang, "scope")}</p>
+    </details>
   {:else}
     <p class="note">{t(lang, "missing")}</p>
   {/if}
@@ -95,9 +98,12 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem 0.75rem;
-    padding-block-start: 0.75rem;
-    border-block-start: var(--border-width) solid var(--border);
+    gap: 0.375rem 0.625rem;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.5rem 0.625rem;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
     min-width: 0;
   }
 
@@ -106,37 +112,63 @@
   }
 
   h2 {
-    font-size: 1rem;
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
 
   .actions {
     flex-basis: 100%;
   }
 
+  .audio-details {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 38rem;
+    font-size: var(--data-label-size);
+  }
+
+  .audio-details summary {
+    width: fit-content;
+    min-height: 2.75rem;
+    padding-block: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .audio-details .note {
+    margin-block: 0.25rem;
+    line-height: 1.5;
+  }
+
   .cries > .note {
-    flex: 1 1 20rem;
+    flex-basis: 100%;
     margin: 0;
   }
 
   label {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem 0.5rem;
+    display: grid;
+    flex: 0 0 auto;
+    gap: 0.25rem;
     min-width: 0;
+    max-width: 100%;
   }
 
   label, .source {
-    font-size: 0.875rem;
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
 
   select {
     max-width: 100%;
     min-height: 2.75rem;
+    padding: 0.375rem 0.5rem;
   }
 
+  .source { padding: 0.5rem 0.625rem; background: var(--surface); }
+  .actions a { display: inline-flex; align-items: center; min-height: 2.75rem; }
+
   audio {
-    width: min(100%, 20rem);
+    width: min(100%, 18rem);
     min-width: 0;
   }
 

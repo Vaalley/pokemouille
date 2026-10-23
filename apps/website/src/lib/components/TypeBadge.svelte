@@ -71,21 +71,22 @@
   .type-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.5rem;
-    border: var(--border-width) solid color-mix(in srgb, var(--type-color) 38%, var(--border));
-    border-radius: var(--radius-pill);
-    background: light-dark(
-      color-mix(in srgb, var(--type-color) 10%, var(--surface)),
-      color-mix(in srgb, var(--type-color) 18%, var(--surface))
-    );
+    justify-content: flex-start;
+    gap: 0.375rem;
+    max-width: 100%;
+    padding: 0.25rem 0.5rem;
+    border: var(--border-width) solid var(--border);
+    border-inline-start: var(--data-rule) solid var(--type-color);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
     color: var(--page-text);
-    font-size: 0.8125rem;
-    font-weight: 500;
+    font-size: var(--data-label-size);
+    font-weight: 600;
     line-height: 1.4;
     vertical-align: middle;
   }
+
+  a.type-badge { min-height: 2.75rem; }
 
   a.type-badge:any-link,
   a.type-badge:visited {
@@ -94,11 +95,8 @@
   }
 
   a.type-badge:any-link:hover {
-    border-color: color-mix(in srgb, var(--type-color) 70%, var(--border));
-    background: light-dark(
-      color-mix(in srgb, var(--type-color) 17%, var(--surface)),
-      color-mix(in srgb, var(--type-color) 26%, var(--surface))
-    );
+    border-inline-start-color: var(--type-color);
+    background: var(--accent-soft);
   }
 
   a.type-badge:focus-visible {
@@ -114,6 +112,7 @@
 
   .type-name {
     min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   @media (forced-colors: active) {

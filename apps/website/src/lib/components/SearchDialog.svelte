@@ -181,3 +181,16 @@
     </Dialog.Portal>
   {/if}
 </Dialog.Root>
+
+<style>
+  :global(.search-trigger) { min-height: 2.75rem; padding: var(--data-padding); border: var(--border-width) solid var(--border); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface-muted); color: var(--page-text); font-weight: 600; text-align: start; }
+  :global(.search-trigger:is(:hover, :focus-visible)) { border-inline-start-color: var(--accent); background: var(--accent-soft); }
+  .search-dialog-header { padding-block-end: 0.625rem; border-block-end: var(--border-width) solid var(--border); }
+  .search-dialog-header :global([data-dialog-title]) { font-size: 1rem; font-weight: 650; }
+  .search-field { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .search-field:focus-within { border-inline-start-color: var(--accent); }
+  .search-field label { font-size: var(--data-label-size); font-weight: 600; }
+  .search-field input { min-height: 2.75rem; background: var(--surface); }
+  .search-dialog-body > .search-feedback { flex: 0 0 auto; align-items: start; justify-content: start; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; text-align: start; }
+  .search-status { font-size: var(--data-label-size); }
+</style>

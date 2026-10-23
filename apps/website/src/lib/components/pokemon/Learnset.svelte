@@ -167,52 +167,58 @@
   section, .learnset-tabs { position: relative; min-width: 0; }
   .learnset-context {
     margin-block-end: 1rem;
-    padding-inline-start: 0.75rem;
-    border-inline-start: var(--border-width) solid var(--accent);
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
   }
   .game-context { margin-block: 0 0.25rem; font-weight: 700; overflow-wrap: anywhere; }
   .value-provenance { color: var(--muted); font-size: 0.875rem; }
   .value-provenance summary {
     width: fit-content;
     max-width: 100%;
+    min-height: 2.75rem;
+    align-content: center;
     cursor: pointer;
     overflow-wrap: anywhere;
   }
   .value-provenance p { max-width: var(--measure); margin-block: 0.5rem 0; }
-  .learnset-tabs :global([data-tabs-list]) { gap: 0.375rem; }
+  .learnset-tabs :global([data-tabs-list]) { flex-wrap: wrap; gap: 0.375rem; border-block-end: 0; }
   .learnset-tabs :global(.method-tab) {
     position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
     max-width: 100%;
-    padding: 0.375rem 0.625rem;
-    border: var(--border-width) solid var(--border-strong);
-    border-radius: var(--radius-control);
-    background: var(--surface);
+    min-height: 2.75rem;
+    padding: 0.5rem 0.625rem;
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
+    background: var(--surface-muted);
     color: var(--page-text);
+    font-size: var(--data-label-size);
+    font-weight: 600;
     text-align: start;
     line-height: 1.25;
   }
   .learnset-tabs :global(.method-tab[data-state="active"]) {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-    color: var(--accent);
+    border-inline-start-color: var(--accent);
+    background: var(--surface-muted);
+    color: var(--page-text);
     text-decoration: none;
   }
   .method-name { min-width: 0; overflow-wrap: anywhere; }
   .method-count {
     flex: 0 0 auto;
     padding: 0.125rem 0.375rem;
-    border-radius: var(--radius-pill);
-    background: var(--surface-muted);
+    background: var(--surface);
     color: var(--page-text);
     font-size: 0.8125rem;
     font-variant-numeric: tabular-nums;
   }
-  .method-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.75rem; }
-  .method-heading h3 { margin: 0; font-size: 1.125rem; overflow-wrap: anywhere; }
-  .row-count { color: var(--muted); font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .method-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
+  .method-heading h3 { margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+  .row-count { font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
   .scroll-hint { margin-block: 0.375rem 0.625rem; color: var(--muted); font-size: 0.8125rem; }
   .table-scroll {
     position: relative;
@@ -230,7 +236,7 @@
     outline-offset: 3px;
   }
   table { width: 100%; min-width: 34rem; border-collapse: separate; border-spacing: 0; }
-  th, td { padding: 0.5rem 0.625rem; vertical-align: middle; }
+  th, td { padding: 0.5rem 0.625rem; vertical-align: middle; border-block-end: var(--border-width) solid var(--border); }
   thead th {
     position: sticky;
     inset-block-start: 0;
@@ -238,6 +244,8 @@
     background: var(--surface-muted);
     color: var(--muted);
     line-height: 1.25;
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
   .move-identity {
     position: sticky;
@@ -250,7 +258,7 @@
   }
   thead .move-identity { z-index: 3; color: var(--page-text); }
   tbody .move-identity { z-index: 1; background: var(--surface); font-weight: 700; }
-  th a { display: flex; align-items: center; gap: 0.375rem; min-width: 0; }
+  th a { display: flex; align-items: center; gap: 0.375rem; min-width: 0; min-height: 2.75rem; }
   th a :global(svg), th a :global(img) { flex-shrink: 0; }
   th a :global(small) { font-weight: 400; }
   tbody tr:hover > :is(th, td), tbody tr:focus-within > :is(th, td) { background: var(--accent-soft); }
@@ -263,7 +271,7 @@
     display: inline-block;
     min-width: 2.25rem;
     padding: 0.125rem 0.375rem;
-    border-radius: var(--radius-control);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
     background: var(--surface-muted);
     color: var(--page-text);
     text-align: center;

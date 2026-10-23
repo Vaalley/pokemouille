@@ -44,3 +44,29 @@
     </ul>
   </nav>
 </main>
+
+<style>
+  main { padding-block-start: 3rem; }
+  nav { margin-block-start: 1.5rem; }
+  ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0.375rem;
+    max-width: 45rem;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
+    font-weight: 600;
+  }
+  a:is(:hover, :focus-visible) {
+    border-inline-start-color: var(--accent);
+    background: var(--accent-soft);
+  }
+</style>

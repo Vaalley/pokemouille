@@ -48,7 +48,7 @@
 </script>
 
 <div class="form-selector">
-  <Label.Root for="{id}-form">{t(lang, "forms.label")}</Label.Root>
+  <Label.Root for="{id}-form" class="form-label">{t(lang, "forms.label")}</Label.Root>
   <Select.Root
     type="single"
     allowDeselect={false}
@@ -58,17 +58,21 @@
     }}
     {items}
   >
-    <Select.Trigger id="{id}-form">
+    <Select.Trigger id="{id}-form" class="form-trigger">
       {#if current}
-        <Localized text={current.form.name} /> ({current.details})
+        <span class="form-value">
+          <strong><Localized text={current.form.name} /></strong>
+          <span class="form-detail">({current.details})</span>
+        </span>
       {/if}
     </Select.Trigger>
     <Select.Portal>
-      <Select.Content>
+      <Select.Content class="forms-menu">
         <Select.Viewport>
           {#each options as { form, details } (form.id)}
-            <Select.Item value={form.identifier} label="{form.name.text} ({details})">
-              <Localized text={form.name} /> ({details})
+            <Select.Item value={form.identifier} label="{form.name.text} ({details})" class="form-option">
+              <strong><Localized text={form.name} /></strong>
+              <span class="form-detail">({details})</span>
             </Select.Item>
           {/each}
         </Select.Viewport>
@@ -79,10 +83,22 @@
 
 <style>
   .form-selector {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    margin-block: 0.75rem;
+    display: grid;
+    gap: 0.375rem;
+    width: fit-content;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--accent);
+    background: var(--surface-muted);
   }
+  .form-selector :global(.form-label) { font-size: var(--data-label-size); font-weight: 600; }
+  .form-selector :global(.form-trigger) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; min-width: 0; max-width: 100%; min-height: 2.75rem; padding: 0.5rem 0.75rem; text-align: start; white-space: normal; overflow-wrap: anywhere; }
+  .form-selector :global(.form-trigger)::after { content: ""; width: 0.4rem; height: 0.4rem; margin-inline-start: 0.5rem; border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
+  .form-value { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; min-width: 0; }
+  .form-detail { font-size: var(--data-label-size); font-weight: 400; line-height: 1.4; overflow-wrap: anywhere; }
+  :global(.forms-menu .form-option) { display: grid; gap: 0.25rem; min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); white-space: normal; overflow-wrap: anywhere; }
+  :global(.forms-menu .form-option + .form-option) { margin-block-start: 0.375rem; }
+  :global(.forms-menu .form-option[data-selected]), :global(.forms-menu .form-option[data-highlighted]) { border-inline-start-color: var(--accent); }
 </style>

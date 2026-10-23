@@ -107,31 +107,35 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem 0.5rem;
-    padding: 0.75rem 1rem;
-    border-inline-start: var(--border-width) solid var(--accent);
-    border-radius: var(--radius-control);
-    background: var(--accent-soft);
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--accent);
+    background: var(--surface-muted);
+    font-size: var(--data-label-size);
   }
-  .mapping-list { display: grid; gap: 1.25rem; list-style: none; padding: 0; }
+  .mapping-list { display: grid; gap: 0.75rem; list-style: none; padding: 0; }
   .mapping-list > li { min-width: 0; }
+  .mapping-list > .detail-panel { padding: 0.75rem; background: var(--surface); }
   .move-mappings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: 0.75rem; }
   .resource-link { display: inline-flex; align-items: center; gap: 0.5rem; max-width: 100%; vertical-align: middle; overflow-wrap: anywhere; font-weight: 600; }
   .machine-link {
     display: flex;
     height: 100%;
-    min-height: 3.5rem;
-    padding: 0.75rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
-    background: var(--surface);
+    min-height: 2.75rem;
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
+    background: var(--surface-muted);
+    text-decoration: none;
   }
-  .machine-link:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .machine-association { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem 2.5rem; margin: 0; }
-  .machine-association > div { min-width: 0; max-width: 100%; }
-  .machine-association dt { margin-block-end: 0.375rem; color: var(--muted); font-size: 0.875rem; }
-  .machine-association dd { margin: 0; }
-  .learners-heading { margin-block: 1.5rem 0.75rem; }
-  .learners-heading span { color: var(--muted); font-size: 0.875em; font-weight: 400; font-variant-numeric: tabular-nums; }
+  .machine-link:is(:hover, :focus-visible) { border-inline-start-color: var(--accent); background: var(--accent-soft); text-decoration: underline; }
+  .machine-association { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); align-items: start; gap: 0.75rem; margin: 0; }
+  .machine-association > div { min-width: 0; max-width: 100%; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .machine-association dt { margin-block-end: 0.375rem; font-size: var(--data-label-size); font-weight: 600; }
+  .machine-association dd { margin: 0; font-weight: 600; }
+  .machine-association a { min-height: 2.75rem; }
+  .learners-heading { margin-block: 1rem 0.625rem; font-size: var(--data-label-size); font-weight: 600; }
+  .learners-heading span { color: var(--muted); font-size: inherit; font-weight: 600; font-variant-numeric: tabular-nums; }
   .learner-region {
     max-height: min(32rem, 65dvh);
     overflow: auto;
@@ -140,11 +144,11 @@
     padding: 0.5rem;
     border: var(--border-width) solid var(--border);
     border-radius: var(--radius-control);
-    background: var(--surface-muted);
+    background: var(--surface);
   }
-  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
   .pokemon-list li { min-width: 0; }
-  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; height: 100%; padding: 0.375rem 0.5rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); overflow-wrap: anywhere; }
-  .pokemon-list a:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .source-gap { padding: 0.75rem 1rem; border-inline-start: var(--border-width) solid var(--border-strong); background: var(--surface-muted); }
+  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; height: 100%; padding: 0.375rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+  .pokemon-list a:is(:hover, :focus-visible) { border-inline-start-color: var(--accent); background: var(--accent-soft); text-decoration: underline; }
+  .source-gap { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); }
 </style>

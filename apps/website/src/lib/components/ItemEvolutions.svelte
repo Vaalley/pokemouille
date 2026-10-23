@@ -37,7 +37,7 @@
   {:else if !game || !gameName || !version}
     <p role="status">{t(lang, "evolution.loading")}</p>
   {:else}
-    <p>{t(lang, "evolution.context")} <strong><Localized text={gameName} /></strong></p>
+    <p class="game-context">{t(lang, "evolution.context")} <strong><Localized text={gameName} /></strong></p>
     <div class="evolution-families">
     {#each data.chains as entry, index (entry.key)}
       <details class="evolution-family" open={index === 0}>
@@ -71,9 +71,11 @@
 </section>
 
 <style>
+  section { min-width: 0; }
+  .game-context { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); font-size: var(--data-label-size); }
   .evolution-families { display: grid; gap: 0.75rem; }
   .evolution-family { min-width: 0; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
-  summary { min-height: 2.75rem; padding: 0.875rem 1rem; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
-  details[open] > summary { border-block-end: var(--border-width) solid var(--border); }
-  .family-body { min-width: 0; padding: 0 1rem 1rem; }
+  summary { min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+  details[open] > summary { border-inline-start-color: var(--accent); border-block-end: var(--border-width) solid var(--border); }
+  .family-body { min-width: 0; padding: 0 0.75rem 0.75rem; }
 </style>

@@ -50,5 +50,7 @@
 </div>
 
 <style>
-  .theme-selector { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; min-width: 0; }
+  .theme-selector { display: grid; align-content: start; gap: 0.375rem; min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .theme-selector :global(label) { font-size: var(--data-label-size); font-weight: 600; }
+  .theme-selector :global([data-select-trigger]) { width: 100%; min-width: 0; min-height: 2.75rem; text-align: start; font-weight: 600; background: var(--surface); }
 </style>

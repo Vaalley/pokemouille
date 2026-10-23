@@ -30,13 +30,13 @@
 
 <style>
   .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0.75rem; }
-  section { min-width: 0; padding: 0.875rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
-  :is(h2, h3, h4) { margin: 0 0 0.75rem; font-family: var(--font-heading); font-size: 1rem; line-height: 1.3; overflow-wrap: anywhere; }
-  ul { display: grid; gap: 0.4rem; padding: 0; margin: 0; list-style: none; }
-  li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.35rem 0.5rem; }
-  strong { min-width: 3.25rem; padding: 0.1rem 0.4rem; border: 1px solid var(--border-strong); border-radius: var(--radius-control); text-align: center; font-variant-numeric: tabular-nums; }
-  [data-effect="weak"] strong { border-width: var(--border-width); background: var(--accent-soft); }
-  [data-effect="resisted"] strong { border-style: dashed; }
-  [data-effect="immune"] strong { border-style: double; border-width: 3px; }
-  p { margin: 0; color: var(--muted); }
+  section { min-width: 0; padding: 0.75rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  :is(h2, h3, h4) { margin: 0 0 0.625rem; font-size: var(--data-label-size); font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+  ul { display: grid; gap: 0.375rem; padding: 0; margin: 0; list-style: none; }
+  li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.375rem 0.5rem; padding: 0.375rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  li[data-effect="weak"] { border-inline-start-color: var(--accent); }
+  li[data-effect="resisted"] { border-inline-start-style: dashed; }
+  li[data-effect="immune"] { border-inline-start-style: double; }
+  strong { min-width: 3.25rem; text-align: end; font-weight: 650; font-variant-numeric: tabular-nums; }
+  p { margin: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); color: var(--muted); font-size: var(--data-label-size); }
 </style>

@@ -145,28 +145,40 @@
 
   .effect-copy {
     display: grid;
-    gap: 1.25rem;
+    gap: 0.5rem;
     max-width: var(--measure);
     margin-block: 1rem;
   }
-
-  .effect-copy dd {
-    margin: 0.5rem 0 0;
-    line-height: 1.7;
-  }
-
-  .effect-summary {
-    border-inline-start-color: var(--accent);
+  .effect-copy > div {
+    min-width: 0;
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
     background: var(--surface-muted);
   }
 
+  .effect-copy dt {
+    font-size: var(--data-label-size);
+    font-weight: 600;
+  }
+
+  .effect-copy dd {
+    margin: 0.25rem 0 0;
+    line-height: 1.6;
+  }
+
+  .effect-copy > .effect-summary {
+    border-inline-start-color: var(--accent);
+  }
+
   .effect-summary dd {
-    font-size: 1.0625rem;
+    font-weight: 600;
   }
 
   .history-list {
     display: grid;
-    gap: 1rem;
+    gap: 0.5rem;
     max-width: var(--measure);
     margin-block: 1rem;
     padding: 0;
@@ -175,12 +187,17 @@
 
   .history-entry {
     min-width: 0;
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--accent);
+    border-radius: 0;
+    background: var(--surface-muted);
     overflow-wrap: anywhere;
   }
 
   .history-entry h3 {
-    margin: 0 0 0.75rem;
-    font-size: 1rem;
+    margin: 0 0 0.5rem;
+    font-size: var(--data-label-size);
     line-height: 1.5;
   }
 
@@ -188,8 +205,8 @@
     display: block;
     margin-block-end: 0.25rem;
     color: var(--muted);
-    font-size: 0.875rem;
-    font-weight: 400;
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
 
   .history-texts {
@@ -213,6 +230,8 @@
   .description-table thead th:first-child {
     width: 32%;
   }
+  .description-table thead th { font-size: var(--data-label-size); font-weight: 600; }
+  .description-table tbody th { font-weight: 600; }
 
   .source-text {
     white-space: pre-line;

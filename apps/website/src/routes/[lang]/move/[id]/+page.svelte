@@ -84,23 +84,24 @@
   .move-identity {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem 2.5rem;
-    margin-block: 1.25rem;
+    gap: 0.5rem;
+    margin-block: 1rem;
   }
-  .move-identity > div { min-width: 0; }
-  .move-identity dt, .move-figures dt { color: var(--muted); font-size: 0.875rem; }
-  .move-identity dd { margin: 0.375rem 0 0; font-weight: 600; }
+  .move-identity > div { flex: 1 1 10rem; min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .move-identity dt, .move-figures dt { color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
+  .move-identity dd { margin: 0.25rem 0 0; font-weight: 600; }
   .move-figures {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
-    gap: 0.75rem;
+    gap: 0.5rem;
     margin-block: 0;
   }
   .move-figures > div {
     min-width: 0;
-    padding: 0.875rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
     background: var(--surface-muted);
   }
   .move-figures dd {
@@ -110,8 +111,10 @@
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
   }
-  .effect-summary { font-weight: 600; white-space: pre-wrap; }
-  .effect-text { max-width: var(--measure); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .effect-summary { max-width: var(--measure); padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .effect-text { max-width: var(--measure); padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .move-descriptions thead th { font-size: var(--data-label-size); font-weight: 600; }
+  .move-descriptions tbody th { font-weight: 600; }
   .move-descriptions th[scope="row"] { min-width: 8rem; width: 28%; }
   .move-descriptions td { min-width: 12rem; white-space: pre-line; overflow-wrap: anywhere; }
 </style>

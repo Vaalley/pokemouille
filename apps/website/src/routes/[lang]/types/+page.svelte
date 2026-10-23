@@ -169,21 +169,22 @@
 
 <style>
   .selection-panel { margin-block: 1.5rem; }
-  fieldset { min-width: 0; margin: 0; padding: 1rem; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-panel); background: var(--surface); }
-  legend { max-width: 100%; padding-inline: 0.4rem; font-family: var(--font-heading); font-weight: 700; overflow-wrap: anywhere; }
+  fieldset { min-width: 0; margin: 0; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  legend { max-width: 100%; padding-inline: 0.4rem; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .filters { margin: 0; }
   .filter-field { min-width: 0; }
+  .filter-field label { font-size: var(--data-label-size); font-weight: 600; }
   select, button { max-width: 100%; }
-  .result-panel { min-width: 0; margin-block: 1.5rem; padding: clamp(0.75rem, 2vw, 1.25rem); border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
-  .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.4rem; overflow-wrap: anywhere; }
+  .result-panel { min-width: 0; margin-block: 1.5rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
+  .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.25rem; overflow-wrap: anywhere; }
   .result-panel > .note { margin-block: 0 1rem; }
   .attack-result + .attack-result { margin-block-start: 1.25rem; padding-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
   .attack-result > h3 { margin-block: 0 0.75rem; font-size: 1.125rem; }
   ul { list-style: none; padding: 0; }
-  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.25rem 1rem; }
+  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.375rem; }
   .pokemon-list li { min-width: 0; }
-  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.25rem; border-radius: var(--radius-control); overflow-wrap: anywhere; }
-  .pokemon-list a:hover { background: var(--accent-soft); }
+  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.375rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-weight: 600; overflow-wrap: anywhere; }
+  .pokemon-list a:hover { border-inline-start-color: var(--accent); background: var(--accent-soft); }
   .pokemon-list a > span { min-width: 0; }
   @media (max-width: 30rem) {
     .filters button { width: 100%; }

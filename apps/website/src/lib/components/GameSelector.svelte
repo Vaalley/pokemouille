@@ -109,3 +109,10 @@
     <p id="{id}-error" role="alert">{t(lang, "game.error")}</p>
   {/if}
 </div>
+
+<style>
+  .game-selector { display: grid; align-content: start; gap: 0.375rem; min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
+  .game-selector :global(label) { font-size: var(--data-label-size); font-weight: 600; }
+  .game-selector :global([data-select-trigger]) { width: 100%; min-width: 0; min-height: 2.75rem; text-align: start; font-weight: 600; background: var(--surface); }
+  .game-selector p { margin: 0; font-size: var(--data-label-size); overflow-wrap: anywhere; }
+</style>

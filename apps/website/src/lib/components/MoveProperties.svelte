@@ -74,44 +74,26 @@
 </section>
 
 <style>
-  .mechanic-group { margin-block-start: 1.5rem; }
-  .flag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-  .flag-list li {
-    max-width: 100%;
-    padding: 0.25rem 0.625rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-pill);
-    background: var(--surface-muted);
-    font-size: 0.875rem;
-    overflow-wrap: anywhere;
-  }
-  .properties {
-    grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-    overflow-wrap: anywhere;
-  }
+  section { min-width: 0; }
+  .detail-grid { gap: 0.75rem; }
+  .detail-panel { min-width: 0; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  .detail-panel h3, .mechanic-group > h3 { margin-block: 0 0.5rem; font-size: var(--data-label-size); font-weight: 600; }
+  .detail-panel p { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .mechanic-group { margin-block-start: 1rem; }
+  .flag-list { display: flex; flex-wrap: wrap; gap: 0.375rem; padding: 0; margin: 0; list-style: none; }
+  .flag-list li { max-width: 100%; padding: 0.5rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
+  .properties { grid-template-columns: minmax(0, 16rem) minmax(0, 1fr); margin: 0; }
+  .properties dd { font-variant-numeric: tabular-nums; }
   .stat-changes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .stat-changes dd { font-weight: 700; font-variant-numeric: tabular-nums; }
-  .metadata-raw {
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
-    overflow: clip;
-  }
-  .metadata-raw summary {
-    padding: 0.875rem 1rem;
-    background: var(--surface-muted);
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .raw-content { padding: 0 1rem 0.5rem; }
+  .stat-changes dd { color: var(--accent); }
+  .metadata-raw { border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
+  .metadata-raw summary { min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; cursor: pointer; }
+  .metadata-raw[open] summary { border-inline-start-color: var(--accent); border-block-end: var(--border-width) solid var(--border); }
+  .raw-content { min-width: 0; padding: 0.75rem; }
   @media (max-width: 32rem) {
-    .properties { grid-template-columns: minmax(0, 1fr); gap: 0.25rem; }
-    .properties dd { margin-block-end: 0.75rem; }
+    .properties { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .properties dt { padding-block-end: 0.125rem; }
+    .properties dd { padding-block-start: 0; border-inline-start: var(--data-rule) solid var(--border-strong); }
+    .properties dd:not(:last-child) { margin-block-end: 0.375rem; }
   }
 </style>

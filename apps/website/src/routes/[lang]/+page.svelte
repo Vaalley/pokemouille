@@ -401,28 +401,30 @@
 {/if}
 
 <style>
-  .catalogue-filters { display: grid; gap: 1rem; margin-block: 1.5rem 1rem; }
-  .primary-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 1rem; align-items: end; }
-  .advanced-filters { padding: 0.375rem 0.875rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); min-width: 0; }
+  .catalogue-filters { display: grid; gap: 0.75rem; margin-block: 1.25rem 1rem; }
+  .primary-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 0.75rem; align-items: end; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .advanced-filters { padding: 0.375rem 0.75rem; border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); min-width: 0; }
   .advanced-filters > summary { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; list-style: none; }
   .advanced-filters > summary::-webkit-details-marker { display: none; }
   .advanced-filters > summary::after { content: ""; width: 0.45rem; height: 0.45rem; margin-inline: auto 0.25rem; border-inline-end: var(--border-width) solid currentColor; border-block-end: var(--border-width) solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
   .advanced-filters[open] > summary::after { transform: translateY(0.125rem) rotate(225deg); }
-  .filter-count { border-radius: var(--radius-pill); padding: 0.1rem 0.5rem; background: var(--accent-soft); color: var(--accent); border: var(--border-width) solid var(--accent); font-size: 0.875rem; font-weight: 650; }
-  .advanced-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; margin-block: 1rem; }
+  .advanced-filters[open] { border-inline-start-color: var(--accent); }
+  .filter-field label, .advanced-filters > summary { font-size: var(--data-label-size); font-weight: 600; }
+  .filter-count { padding: 0.1rem 0.5rem; background: var(--accent-soft); color: var(--accent); border-inline-start: var(--data-rule) solid var(--accent); font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .advanced-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0.75rem; margin-block: 0.75rem; }
   .catalogue-filters :is(input, select), .toolbar-fields select { min-width: 0; width: 100%; min-height: 2.75rem; padding: 0.6rem 0.75rem; border: var(--border-width) solid var(--border-strong); background: var(--surface); color: var(--page-text); font: inherit; }
   .results-summary { flex: 1 1 18rem; min-width: 0; display: grid; gap: 0.625rem; }
   .active-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
   .active-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; min-width: 0; }
   .active-filters li { min-width: 0; max-width: 100%; }
-  .active-filter-bar button { min-height: 2.75rem; padding: 0.375rem 0.625rem; border: var(--border-width) solid var(--border-strong); background: var(--accent-soft); color: var(--page-text); font: inherit; cursor: pointer; }
+  .active-filter-bar button { min-height: 2.75rem; padding: 0.375rem 0.625rem; border: 0; border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); color: var(--page-text); font: inherit; cursor: pointer; }
   .active-filter-bar > button { border-color: transparent; background: transparent; color: var(--link); text-decoration: underline; text-underline-offset: 0.2em; }
   .active-filter-bar button:hover { border-color: var(--accent); }
-  .filter-chip { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; border-radius: var(--radius-pill); text-align: start; overflow-wrap: anywhere; }
+  .filter-chip { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; border-radius: 0; text-align: start; overflow-wrap: anywhere; }
   .filter-chip > span:first-child { min-width: 0; }
   .filter-chip > span:last-child { color: var(--accent); font-size: 1.25rem; line-height: 1; }
-  .results-toolbar { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem 1.5rem; margin-block: 1rem; padding: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface-muted); }
-  .results-toolbar .result-count { margin: 0; font-weight: 650; }
+  .results-toolbar { display: flex; flex-wrap: wrap; align-items: start; gap: 0.75rem 1.25rem; margin-block: 1rem; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  .results-toolbar .result-count { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
   .toolbar-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; width: min(100%, 34rem); }
   @media (max-width: 40rem) {
     .primary-filters { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
@@ -440,10 +442,11 @@
     align-items: start;
     gap: 0.25rem 0.75rem;
     height: 100%;
-    padding: 0.875rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-panel);
-    background: var(--surface);
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
+    background: var(--surface-muted);
     color: var(--page-text);
     text-decoration: none;
   }
@@ -454,8 +457,7 @@
     align-self: center;
     width: 4rem;
     height: 4rem;
-    border-radius: var(--radius-control);
-    background: var(--surface-muted);
+    background: var(--surface);
   }
   .pokemon-card-icon :global(.pokemon-icon) { transform: scale(1.5); }
   .pokemon-cards .species-number {
@@ -469,14 +471,15 @@
   }
   .pokemon-card-name { min-width: 0; font-size: 1.125rem; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
   .pokemon-cards .pokemon-card > .pokemon-card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; min-width: 0; text-decoration: none; }
-  .pokemon-card:is(:hover, :focus-visible) { border-color: var(--accent); background: var(--surface-muted); }
+  .pokemon-card:is(:hover, :focus-visible) { border-inline-start-color: var(--accent); background: var(--accent-soft); }
   .pokemon-card:is(:hover, :focus-visible) .pokemon-card-name { text-decoration: underline; text-underline-offset: 0.2em; }
   .pokemon-card:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
   .note p { margin-block: 0.25rem; }
   .species-table { width: 100%; }
-  .species-table :is(th, td) { vertical-align: middle; }
-  .species-table th[scope="row"] { min-width: 9rem; font-weight: normal; }
-  .species-table thead th { white-space: nowrap; }
+  .species-table :is(th, td) { vertical-align: middle; border-block-end: var(--border-width) solid var(--border); }
+  .species-table th[scope="row"] { min-width: 9rem; font-weight: 600; }
+  .species-table thead th { white-space: nowrap; background: var(--surface-muted); font-size: var(--data-label-size); }
+  .species-table tbody tr:last-child > * { border-block-end: 0; }
   .sort-button {
     display: inline-flex;
     align-items: center;

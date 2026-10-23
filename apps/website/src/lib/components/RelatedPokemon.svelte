@@ -183,7 +183,9 @@
 </section>
 
 <style>
-  .related-window { max-height: min(38rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding: 0.25rem; border-radius: var(--radius-control); }
+  .related { min-width: 0; }
+  .result-count { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); font-size: var(--data-label-size); font-variant-numeric: tabular-nums; }
+  .related-window { max-height: min(38rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding: 0.375rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
   .pokemon-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
@@ -195,18 +197,20 @@
   .pokemon-card {
     min-width: 0;
     padding: 0.5rem 0.75rem 0.75rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-panel);
-    background: var(--surface);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
     overflow-wrap: anywhere;
   }
+  .pokemon-card:has(a:is(:hover, :focus-visible)) { border-inline-start-color: var(--accent); }
   h3 { margin: 0; font-size: 1rem; }
-  h3 a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
+  h3 a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; font-weight: 650; text-decoration: none; }
+  h3 a:is(:hover, :focus-visible) { text-decoration: underline; text-underline-offset: 0.2em; }
   h3 a > span { min-width: 0; }
   /* Details line up under the name, past the 40px icon and its gap. */
-  .detail, .methods, .assignments { margin: 0; padding-inline-start: 3rem; font-size: 0.875rem; }
+  .detail, .methods, .assignments { margin: 0; padding-inline-start: 3rem; font-size: var(--data-label-size); }
   .detail code { white-space: normal; }
-  .detail { color: var(--muted); }
-  .methods, .assignments { display: flex; flex-wrap: wrap; gap: 0 0.75rem; margin-block-start: 0.25rem; list-style: none; }
-  .source-gap { border-inline-start: 0.2rem solid currentColor; padding-inline-start: 0.75rem; }
+  .detail { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .methods, .assignments { display: grid; gap: 0.25rem; margin-block-start: 0.375rem; list-style: none; }
+  .methods li, .assignments li { padding-block-start: 0.25rem; border-block-start: var(--border-width) solid var(--border); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .source-gap { border-inline-start: var(--data-rule) solid var(--border-strong); padding: var(--data-padding); background: var(--surface-muted); font-size: var(--data-label-size); }
 </style>

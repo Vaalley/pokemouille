@@ -326,21 +326,28 @@
     padding: 0.75rem;
     overflow-wrap: anywhere;
   }
-  .current {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+  .current .identity {
+    border-inline-start-color: var(--accent);
   }
   .identity {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    background: var(--surface-muted);
   }
   .identity > div {
     min-width: 0;
   }
   .identity a,
   .identity strong {
-    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 1rem;
+    font-weight: 600;
   }
   .identity a:focus-visible {
     outline: 2px solid currentColor;
@@ -349,16 +356,18 @@
   }
   .dex {
     display: block;
-    font-size: 0.8rem;
-    color: var(--muted);
+    font-size: var(--data-label-size);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
   .badge {
     display: inline-block;
-    margin: 0.25rem 0 0 0.25rem;
-    padding: 0.15rem 0.4rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-pill);
-    font-size: 0.8rem;
+    margin: 0.25rem 0 0;
+    padding: 0.25rem 0.375rem;
+    border-inline-start: var(--data-rule) solid var(--accent);
+    background: var(--surface-muted);
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
   .methods {
     margin-block-start: 0.5rem;
@@ -385,15 +394,15 @@
     font-weight: 600;
   }
   .method {
-    padding: 0.625rem;
-    border-radius: var(--radius-control);
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
     background: var(--surface-muted);
     font-size: 0.875rem;
   }
   .provenance,
   .requirements {
     margin: 0.25rem 0;
-    font-size: 0.8rem;
+    font-size: var(--data-label-size);
   }
   .requirements {
     margin-top: 0.75rem;
@@ -401,15 +410,19 @@
   .conditions {
     margin: 0.25rem 0 0;
   }
-  .condition + .condition {
-    margin-top: 0.5rem;
+  .condition {
+    min-width: 0;
+    padding-block: 0.5rem;
+    border-block-start: var(--border-width) solid var(--border);
   }
   .condition dt {
-    font-size: 0.85rem;
+    font-size: var(--data-label-size);
+    font-weight: 600;
   }
   .condition dd {
-    margin: 0.15rem 0 0;
-    font-weight: 500;
+    margin: 0.25rem 0 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
   .and {
     margin-right: 0.4rem;

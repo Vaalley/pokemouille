@@ -75,20 +75,21 @@
 </section>
 
 <style>
-  .types { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; }
+  section { min-width: 0; }
+  .types { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; max-width: 100%; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
   :global(.type-matchups) {
     z-index: 60;
     width: min(30rem, calc(100vw - 1.5rem));
     max-height: min(38rem, var(--bits-floating-available-height, calc(100dvh - 1.5rem)));
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0.75rem;
     border: var(--border-width) solid var(--border-strong);
     border-radius: var(--radius-panel);
     background: var(--surface);
     color: var(--page-text);
     box-shadow: var(--popover-shadow);
   }
-  :global(.type-matchups h3) { margin: 0; }
-  :global(.type-matchups h4) { margin-block: 0.75rem 0.375rem; }
-  :global(.type-matchups .matchup-scope) { margin-block: 0.75rem 0; font-size: 0.875rem; }
+  :global(.type-matchups h3) { margin: 0 0 0.75rem; font-size: 1rem; }
+  :global(.type-matchups h4) { margin-block: 0.75rem 0.375rem; font-size: var(--data-label-size); font-weight: 600; }
+  :global(.type-matchups .matchup-scope) { margin-block: 0.75rem 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; }
 </style>

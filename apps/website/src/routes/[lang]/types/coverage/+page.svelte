@@ -238,56 +238,59 @@
 {/if}
 
 <style>
-  .selection-panel { min-width: 0; margin-block: 1.5rem; padding: 1rem; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-panel); background: var(--surface); }
+  .selection-panel { min-width: 0; margin-block: 1.5rem; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
   .attack-types { min-width: 0; margin: 0; padding: 0; border: 0; }
-  legend { max-width: 100%; padding: 0; margin-block-end: 0.75rem; font-family: var(--font-heading); font-weight: 700; overflow-wrap: anywhere; }
+  legend { max-width: 100%; padding: 0; margin-block-end: 0.75rem; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .attack-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); gap: 0.4rem; }
   .attack-options label, .toggle { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; }
-  .attack-options label { min-width: 0; padding: 0.4rem 0.5rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
+  .attack-options label { min-width: 0; padding: 0.4rem 0.5rem; border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface); border-radius: 0; font-size: var(--data-label-size); font-weight: 600; }
   .attack-options label > span { min-width: 0; overflow-wrap: anywhere; }
   .attack-options label > img { flex: 0 0 22px; }
-  .attack-options label.chosen { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .attack-options label.chosen { border-inline-start-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
   .attack-options label:has(input:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
-  .attack-options label:has(input:disabled) { color: var(--muted); border-style: dashed; cursor: not-allowed; }
+  .attack-options label:has(input:disabled) { color: var(--muted); border-inline-start-style: dashed; cursor: not-allowed; }
   input[type="checkbox"] { flex: 0 0 1.25rem; width: 1.25rem; height: 1.25rem; margin: 0; }
   .selection-panel .filters { margin: 1rem 0 0; }
   .filters button { max-width: 100%; }
-  .result-panel { min-width: 0; margin-block: 1.5rem; padding: clamp(0.75rem, 2vw, 1.25rem); border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
-  .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.4rem; overflow-wrap: anywhere; }
+  .result-panel { min-width: 0; margin-block: 1.5rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
+  .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.25rem; overflow-wrap: anywhere; }
   .result-panel > h3 { overflow-wrap: anywhere; }
   .result-panel > .note { margin-block: 0 1rem; }
   .figures { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 0.5rem; }
-  .figures > div { min-width: 0; padding: 0.75rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface-muted); }
-  .figures dd { font-size: 1rem; overflow-wrap: anywhere; }
-  .multiplier { display: inline-block; min-width: 3.25rem; padding: 0.1rem 0.4rem; border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface); color: var(--page-text); font-size: 0.9375rem; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: center; }
+  .figures > div { min-width: 0; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  .figures > div[data-effect="weak"] { border-inline-start-color: var(--accent); }
+  .figures dt { font-size: var(--data-label-size); font-weight: 600; }
+  .figures dd { font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .multiplier { display: inline-block; min-width: 3.25rem; padding: 0.1rem 0.4rem; border: 1px solid var(--border-strong); border-radius: 0; background: var(--surface); color: var(--page-text); font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: center; }
   [data-effect="weak"] .multiplier { border-width: var(--border-width); background: var(--accent-soft); font-weight: 700; }
   [data-effect="resisted"] .multiplier { border-style: dashed; }
   [data-effect="immune"] .multiplier { border-width: 3px; border-style: double; font-weight: 700; }
   [data-effect="neutral"] .multiplier { border-color: transparent; background: transparent; color: var(--muted); }
-  details { margin-block: 0.5rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
-  summary { min-height: 2.75rem; display: list-item; padding: 0.6rem 0.75rem; cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+  details { margin-block: 0.5rem; border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  details[open] { border-inline-start-color: var(--accent); }
+  summary { min-height: 2.75rem; display: list-item; padding: var(--data-padding); cursor: pointer; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .bucket-label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.75rem; max-width: calc(100% - 1rem); vertical-align: middle; }
-  .species-list { margin: 0; padding: 0.5rem 0.75rem 0.75rem; border-block-start: var(--border-width) solid var(--border); list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.25rem 0.75rem; }
+  .species-list { margin: 0; padding: 0.375rem 0.75rem 0.75rem; border-block-start: var(--border-width) solid var(--border); list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.25rem 0.75rem; background: var(--surface); }
   .species-list li, .species-list a > span { min-width: 0; }
   .species-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.25rem; border-radius: var(--radius-control); overflow-wrap: anywhere; }
   .species-list a:hover { background: var(--accent-soft); }
   .combinations { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0; padding: 0; list-style: none; }
-  .combinations li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-width: 0; padding-block: 0.5rem; border-block-end: 1px solid var(--border); }
+  .combinations li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-width: 0; padding: 0.5rem 0.625rem; border-block-end: 1px solid var(--border); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
   .combinations .multiplier { margin-inline-start: auto; }
   .chart-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0; margin-block: 1rem; list-style: none; }
   .chart-legend li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.875rem; }
   .toggle { padding-block: 0.5rem; }
   .chart-navigation { font-style: italic; }
-  .chart-scroll { width: 100%; max-width: 100%; max-height: 75vh; overflow: auto; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-control); isolation: isolate; }
+  .chart-scroll { width: 100%; max-width: 100%; max-height: 75vh; overflow: auto; border: 0; border-block: var(--border-width) solid var(--border-strong); border-radius: 0; isolation: isolate; }
   .chart { width: max-content; min-width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
   .chart caption { max-width: min(60ch, calc(100vw - 6rem)); text-align: start; padding: 0.75rem; font-size: 0.875rem; font-weight: 600; overflow-wrap: anywhere; }
   .chart :is(th, td) { padding: 0.4rem; border-block-end: 1px solid var(--border); border-inline-end: 1px solid var(--border); }
   .chart thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-muted); vertical-align: bottom; border-block-end: var(--border-width) solid var(--border-strong); }
-  .chart th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface); text-align: start; font-size: 0.875rem; font-weight: 500; border-inline-end: var(--border-width) solid var(--border-strong); }
+  .chart th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface-muted); text-align: start; font-size: var(--data-label-size); font-weight: 600; border-inline-end: var(--border-width) solid var(--border-strong); }
   .chart th:first-child { min-width: 7rem; width: 8.5rem; max-width: 8.5rem; overflow-wrap: anywhere; }
-  .chart th[scope="row"] a { display: block; max-width: 7.5rem; padding-block: 0.25rem; }
+  .chart th[scope="row"] a { display: flex; align-items: center; max-width: 7.5rem; min-height: 2.75rem; padding-block: 0.25rem; }
   .chart thead th:first-child { left: 0; z-index: 3; text-align: start; border-inline-end: var(--border-width) solid var(--border-strong); }
-  .attack-head { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 0.35rem; width: 4.5rem; min-height: 4.5rem; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; overflow-wrap: anywhere; }
+  .attack-head { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 0.35rem; width: 4.5rem; min-height: 4.5rem; font-size: var(--data-label-size); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
   .attack-head img { flex: 0 0 22px; }
   .chart td { text-align: center; }
   .chart .selected { background: var(--accent-soft); }

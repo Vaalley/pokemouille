@@ -70,17 +70,19 @@
 </section>
 
 <style>
-  .ability-list { margin: 0; padding: 0; list-style: none; }
-  .ability-list > li + li { margin-block-start: 0.75rem; }
-  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin: 0; font-size: 1.125rem; }
-  .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; }
-  h3 small { font-weight: normal; }
+  section { min-width: 0; }
+  .ability-list { display: grid; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
+  .ability-list > li { min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .ability-list > li:has(small) { border-inline-start-color: var(--accent); }
+  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
+  .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; font-weight: 600; }
+  h3 small { font-size: var(--data-label-size); font-weight: 600; }
   :global(.ability-preview) {
     z-index: 60;
     width: min(22rem, calc(100vw - 1.5rem));
     max-height: var(--bits-floating-available-height, calc(100dvh - 1.5rem));
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0.75rem;
     border: var(--border-width) solid var(--border-strong);
     border-radius: var(--radius-panel);
     background: var(--surface);
@@ -90,5 +92,5 @@
     font-weight: normal;
   }
   :global(.ability-preview p) { margin: 0; white-space: pre-line; }
-  :global(.ability-preview .ability-preview-scope) { margin-block-end: 0.5rem; font-size: 0.875rem; }
+  :global(.ability-preview .ability-preview-scope) { margin-block-end: 0.625rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; }
 </style>

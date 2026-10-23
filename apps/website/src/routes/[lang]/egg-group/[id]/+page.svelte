@@ -75,30 +75,30 @@
   </div>
 </section>
 <style>
-  .source-notes { margin-block: 0.75rem 1.25rem; padding-inline-start: 0.75rem; border-inline-start: var(--border-width) solid var(--border-strong); }
+  .source-notes { margin-block: 0.75rem 1.25rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
   .source-notes p { margin-block: 0.375rem; }
-  .page-header nav a { display: inline-block; padding-block: 0.375rem; overflow-wrap: anywhere; }
+  .page-header nav a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.375rem; overflow-wrap: anywhere; }
   h1 { overflow-wrap: anywhere; }
   h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; }
-  .member-count { padding-inline: 0.5rem; border-radius: var(--radius-control); background: var(--surface-muted); color: var(--muted); font: 600 0.875rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
+  .member-count { padding-inline: 0.5rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); color: var(--muted); font: 600 0.875rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
   .members, .member-table { min-width: 0; }
-  .member-table { border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
+  .member-table { border-block: var(--border-width) solid var(--border); background: var(--surface); }
   table { width: 100%; table-layout: fixed; border-collapse: collapse; overflow-wrap: anywhere; }
   thead { background: var(--surface-muted); }
   th, td { text-align: start; vertical-align: top; padding: 0.625rem 0.75rem; }
-  thead th { font-size: 0.875rem; }
+  thead th { font-size: var(--data-label-size); font-weight: 600; }
   th:first-child { width: 26%; }
   tbody th { font-weight: 600; }
   tbody tr + tr :is(th, td) { border-block-start: var(--border-width) solid var(--border); }
   tbody tr:focus-within { background: var(--accent-soft); }
-  .member-link { display: inline-block; padding-block: 0.25rem; }
+  .member-link { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.25rem; }
   small { display: block; color: var(--muted); font-size: 0.8125rem; font-weight: normal; font-variant-numeric: tabular-nums; }
-  .member-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem 1rem; margin: 0; }
-  .member-facts > div { min-width: 0; }
-  dt { color: var(--muted); font-size: 0.8125rem; }
-  dd { margin: 0.125rem 0 0; font-size: 0.9375rem; }
+  .member-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin: 0; }
+  .member-facts > div { min-width: 0; padding: 0.5rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  dt { color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
+  dd { margin: 0.25rem 0 0; font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }
   .other-groups { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; list-style: none; margin: 0; padding: 0; }
-  .other-groups a { display: inline-block; padding-block: 0.25rem; }
+  .other-groups a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.25rem; }
   .later { color: var(--muted); }
   .undated { text-decoration: underline dotted; text-underline-offset: 0.2em; }
   a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: var(--radius-control); }

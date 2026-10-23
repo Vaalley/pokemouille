@@ -389,31 +389,33 @@
   .page-heading p { max-width: var(--measure); }
   .scope-notes {
     margin-block: 1.25rem;
-    padding: 0.875rem 1rem;
-    border-inline-start: var(--border-width) solid var(--accent);
+    padding: var(--data-padding);
+    border-inline-start: var(--data-rule) solid var(--border-strong);
     background: var(--surface-muted);
-    border-radius: 0 var(--radius-control) var(--radius-control) 0;
   }
-  .scope-title { margin: 0; font-weight: 700; }
+  .scope-title { margin: 0; font-size: var(--data-label-size); font-weight: 600; }
   .scope-notes .note { margin-block: 0.5rem 0; }
   .scope-notes .legality { color: var(--page-text); font-weight: 600; }
   .picker-panel {
     min-width: 0;
-    padding: 1rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-panel);
-    background: var(--surface);
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
+    background: var(--surface-muted);
   }
   .picker-panel h2 { margin-block: 0 0.75rem; }
   .filters { margin-block-end: 0.25rem; }
   .filter-field, .filter-field input { min-width: 0; }
+  .filter-field label { font-size: var(--data-label-size); font-weight: 600; }
   .filter-field small, .selection-limit { font-size: 0.875rem; color: var(--muted); }
   .selection-limit { margin-block: 0.5rem 0.75rem; }
   .selection-limit.at-limit {
     padding: 0.5rem 0.75rem;
-    border: var(--border-width) solid var(--accent);
-    border-radius: var(--radius-control);
-    background: var(--accent-soft);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--accent);
+    border-radius: 0;
+    background: var(--surface);
     color: var(--page-text);
     font-weight: 600;
   }
@@ -427,14 +429,15 @@
     width: 100%;
     min-height: 2.75rem;
     padding: 0.375rem 0.625rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
     background: var(--surface);
     text-align: start;
     cursor: pointer;
   }
-  .suggestions button:not(:disabled):hover { border-color: var(--accent); background: var(--accent-soft); }
-  .suggestions button:disabled { color: var(--muted); background: var(--surface-muted); cursor: default; }
+  .suggestions button:not(:disabled):hover { border-inline-start-color: var(--accent); background: var(--accent-soft); }
+  .suggestions button:disabled { color: var(--muted); background: var(--surface-muted); border-inline-start-style: dashed; cursor: default; }
   .move-name { min-width: 0; overflow-wrap: anywhere; }
   .suggestion-action { margin-inline-start: auto; flex-shrink: 0; font-size: 0.75rem; font-weight: 700; }
   .selection-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.375rem 1rem; margin-block-start: 1rem; }
@@ -455,9 +458,10 @@
     max-width: 100%;
     min-width: 0;
     padding-inline-start: 0.625rem;
-    border: var(--border-width) solid var(--border-strong);
-    border-radius: var(--radius-control);
-    background: var(--accent-soft);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--accent);
+    border-radius: 0;
+    background: var(--surface);
   }
   .selected a { display: inline-flex; align-items: center; gap: 0.375rem; min-width: 0; min-height: 2.75rem; }
   .selected button {
@@ -466,40 +470,40 @@
     min-height: 2.75rem;
     border: 0;
     border-inline-start: var(--border-width) solid var(--border);
-    border-radius: 0 calc(var(--radius-control) - var(--border-width)) calc(var(--radius-control) - var(--border-width)) 0;
+    border-radius: 0;
     background: transparent;
     color: inherit;
     font-size: 1.5rem;
     cursor: pointer;
   }
   .selected button:hover { background: var(--surface); }
-  .empty-selection { margin-block-end: 0; padding: 0.75rem; border: var(--border-width) dashed var(--border); border-radius: var(--radius-control); color: var(--muted); }
+  .empty-selection { margin-block-end: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface); color: var(--muted); }
   .results-panel { min-width: 0; margin-block-start: 1.75rem; }
   .results-panel h2 { margin-block-end: 0.75rem; }
-  .state-message { padding: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface-muted); overflow-wrap: anywhere; }
+  .state-message { padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); overflow-wrap: anywhere; }
   .state-message p { margin-block: 0 0.75rem; }
   .error-message { border-color: var(--border-strong); border-inline-start-color: var(--accent); }
-  .result-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.375rem 1rem; padding-block-end: 0.75rem; border-block-end: var(--border-width) solid var(--border); }
+  .result-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.375rem 1rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
   .result-summary p { margin: 0; overflow-wrap: anywhere; }
-  .matching-count { font-weight: 700; font-size: 1.125rem; }
-  .game-context { font-size: 0.875rem; color: var(--muted); }
+  .matching-count { font-weight: 700; font-size: 1.125rem; font-variant-numeric: tabular-nums; }
+  .game-context { font-size: var(--data-label-size); color: var(--muted); }
   .game-context strong { color: var(--page-text); }
   .per-move { display: flex; flex-wrap: wrap; gap: 0.375rem 0.75rem; }
-  .per-move li { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; max-width: 100%; padding: 0.375rem 0.625rem; background: var(--surface-muted); border-radius: var(--radius-control); font-size: 0.875rem; overflow-wrap: anywhere; }
+  .per-move li { display: grid; gap: 0.25rem; align-content: start; max-width: 100%; padding: var(--data-padding); background: var(--surface-muted); border-inline-start: var(--data-rule) solid var(--border-strong); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .per-move strong { color: var(--accent); font-variant-numeric: tabular-nums; }
   .table-help { margin-block-end: 0.5rem; }
-  .table-scroll { min-width: 0; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
-  table { width: 100%; border-spacing: 0; }
+  .table-scroll { min-width: 0; border: 0; border-block: var(--border-width) solid var(--border); border-radius: 0; background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; }
   caption { padding: 0.75rem; text-align: start; font-weight: 600; }
-  th, td { padding: 0.625rem 0.75rem; vertical-align: top; }
-  thead th { background: var(--surface-muted); text-align: start; }
+  th, td { padding: 0.625rem 0.75rem; vertical-align: top; border-block-end: var(--border-width) solid var(--border); }
+  thead th { background: var(--surface-muted); text-align: start; font-size: var(--data-label-size); font-weight: 600; }
   th[scope="row"] { min-width: 11rem; max-width: 16rem; font-weight: normal; }
   th[scope="row"] a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; overflow-wrap: anywhere; }
   .detail { display: block; padding-inline-start: 3rem; font-size: 0.75rem; color: var(--muted); }
   .detail code { white-space: normal; overflow-wrap: anywhere; }
   .methods { margin: 0; display: grid; gap: 0.5rem; }
-  .methods li { display: grid; gap: 0.125rem; overflow-wrap: anywhere; }
-  .method-name { font-size: 0.875rem; }
+  .methods li { display: grid; gap: 0.125rem; padding-inline-start: 0.5rem; border-inline-start: var(--data-rule) solid var(--border-strong); overflow-wrap: anywhere; }
+  .method-name { font-size: var(--data-label-size); font-weight: 600; }
   .method-level { color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
   td { min-width: 10rem; }
   tbody tr:last-child :is(th, td) { border-block-end: 0; }

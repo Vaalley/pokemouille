@@ -4,6 +4,7 @@ import type { Language } from "./core.ts";
 const en = {
   heading: "Cry",
   source: "Audio source",
+  details: "About this audio",
   latest: "Current source cry",
   legacy: "Legacy source cry",
   scope:
@@ -23,6 +24,7 @@ const messages = {
   fr: {
     heading: "Cri",
     source: "Source audio",
+    details: "À propos de cet audio",
     latest: "Cri actuel de la source",
     legacy: "Ancien cri de la source",
     scope:
@@ -38,6 +40,7 @@ const messages = {
   ja: {
     heading: "鳴き声",
     source: "音声ソース",
+    details: "音声について",
     latest: "出典の現在の鳴き声",
     legacy: "出典の旧版の鳴き声",
     scope:

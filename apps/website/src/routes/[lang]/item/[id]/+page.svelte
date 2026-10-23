@@ -110,23 +110,35 @@
 
   .effect-copy {
     display: grid;
-    gap: 1.25rem;
+    gap: 0.5rem;
     max-width: var(--measure);
     margin-block: 1rem;
   }
-
-  .effect-copy dd {
-    margin: 0.5rem 0 0;
-    line-height: 1.7;
-  }
-
-  .effect-summary {
-    border-inline-start-color: var(--accent);
+  .effect-copy > div {
+    min-width: 0;
+    padding: var(--data-padding);
+    border: 0;
+    border-inline-start: var(--data-rule) solid var(--border-strong);
+    border-radius: 0;
     background: var(--surface-muted);
   }
 
+  .effect-copy dt {
+    font-size: var(--data-label-size);
+    font-weight: 600;
+  }
+
+  .effect-copy dd {
+    margin: 0.25rem 0 0;
+    line-height: 1.6;
+  }
+
+  .effect-copy > .effect-summary {
+    border-inline-start-color: var(--accent);
+  }
+
   .effect-summary dd {
-    font-size: 1.0625rem;
+    font-weight: 600;
   }
 
   .description-table table {
@@ -141,6 +153,8 @@
   .description-table thead th:first-child {
     width: 32%;
   }
+  .description-table thead th { font-size: var(--data-label-size); font-weight: 600; }
+  .description-table tbody th { font-weight: 600; }
 
   .source-text {
     white-space: pre-wrap;
