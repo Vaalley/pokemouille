@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
@@ -134,7 +135,7 @@
     {/if}
     {#if matches.rows.length > 0}
       <p class="note" id={`${id}-scroll`}>{t(lang, "scrollHint")}</p>
-      <div class="related-window" role="region" aria-labelledby={`${id}-heading`} aria-describedby={`${id}-scroll`} tabindex="0">
+      <div class="related-window" role="region" aria-labelledby={`${id}-heading`} aria-describedby={`${id}-scroll`} use:scrollable>
       <ul class="pokemon-list">
         {#each matches.rows as match (match.pokemon.pokemonId)}
           <li class="pokemon-card">

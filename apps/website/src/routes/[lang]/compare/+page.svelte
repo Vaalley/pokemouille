@@ -11,6 +11,7 @@
     ResolvedPokemon,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../packages/pokemon-data/src/localization.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import ComparePicker from "#lib/components/ComparePicker.svelte";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
@@ -313,7 +314,7 @@
       {/if}
     </div>
 
-    <div class="table-scroll" role="region" aria-labelledby="{id}-caption" tabindex="0">
+    <div class="table-scroll" role="region" aria-labelledby="{id}-caption" use:scrollable>
       <table class="compare-table" style:--compared-count={columns.length}>
         <caption id="{id}-caption">{t(lang, "caption", { game: gameName })}</caption>
         <colgroup>

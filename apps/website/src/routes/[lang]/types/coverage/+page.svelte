@@ -6,6 +6,7 @@
   import type { AssetPath, PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../../packages/pokemon-data/src/localization.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
   import TypeBadge from "#lib/components/TypeBadge.svelte";
@@ -199,7 +200,7 @@
         : t(data.lang, "existingCount", { count: chart.length })}
     </p>
     <p class="note chart-navigation" id={`${id}-chart-navigation`}>{matchupText(data.lang, "chartNavigation")}</p>
-    <div class="table-scroll chart-scroll" role="region" aria-labelledby={`${id}-chart-caption`} aria-describedby={`${id}-chart-navigation`} tabindex="0">
+    <div class="table-scroll chart-scroll" role="region" aria-labelledby={`${id}-chart-caption`} aria-describedby={`${id}-chart-navigation`} use:scrollable>
       <table class="chart">
         <caption id={`${id}-chart-caption`}>{t(data.lang, "chartCaption", { generation })}</caption>
         <thead>

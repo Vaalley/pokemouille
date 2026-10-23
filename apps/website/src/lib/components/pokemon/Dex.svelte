@@ -4,6 +4,7 @@
     PokemonReferences,
     ResolvedPokemon,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { dexEntries, normalizeFlavorText } from "#lib/data/pokemon-history.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t as historyT } from "#lib/i18n/pokemon-history.ts";
@@ -60,7 +61,7 @@
       <p class="note">{historyT(lang, "entries.form")}</p>
     {/if}
     {#if entries.length}
-      <div class="entries-scroll" role="region" aria-label={historyT(lang, "entries.summary", { count: entries.length })} tabindex="0">
+      <div class="entries-scroll" role="region" aria-label={historyT(lang, "entries.summary", { count: entries.length })} use:scrollable>
       <table>
         <caption>{historyT(lang, "entries.caption")}</caption>
         <thead>

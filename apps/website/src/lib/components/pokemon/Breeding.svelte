@@ -3,6 +3,7 @@
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { Language, PokemonReferences, ResolvedPokemon, SpeciesRecord, VersionGroup } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../packages/pokemon-data/src/localization.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { breedingMechanic, ordinaryBreeder, parentCandidates, type BreedingMember, type BreedingProjection } from "#lib/data/breeding.ts";
   import { pokemonHref } from "#lib/data/context.ts";
   import { t } from "#lib/i18n/breeding.ts";
@@ -89,7 +90,7 @@
         {#if failed}<p role="alert">{t(lang, "error")} <button type="button" onclick={() => attempt++}>{t(lang, "retry")}</button></p>
         {:else if !projection}<p role="status">{t(lang, "loading")}</p>
         {:else}
-          <div class="breeding-rows" role="region" aria-label={t(lang, "open")} tabindex="0">
+          <div class="breeding-rows" role="region" aria-label={t(lang, "open")} use:scrollable>
           {#each rows as row (row.id)}
             <section class="egg-move" aria-labelledby={`egg-move-${row.id}`}>
               <h3 id={`egg-move-${row.id}`}><a href={href(`/${lang}/move/${row.id}/?${new URLSearchParams({ version })}`)}>{row.name.text}</a></h3>

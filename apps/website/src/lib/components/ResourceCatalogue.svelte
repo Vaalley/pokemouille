@@ -4,6 +4,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "./GameSelector.svelte";
   import MoveIcon from "./MoveIcon.svelte";
   import DamageClassIcon from "./DamageClassIcon.svelte";
@@ -156,7 +157,7 @@
 
 {#snippet resourceList(rows: typeof entries)}
   {#if catalogue.kind === "move"}
-    <div class="table-scroll" role="region" aria-label={t(lang, "move")} tabindex="0">
+    <div class="table-scroll" role="region" aria-label={t(lang, "move")} use:scrollable>
       <table class="move-list">
         <caption class="visually-hidden">{t(lang, "move")}</caption>
         <colgroup>

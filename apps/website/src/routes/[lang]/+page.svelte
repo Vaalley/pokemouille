@@ -4,6 +4,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import type { PathnameWithSearchOrHash } from "$app/types";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
@@ -329,7 +330,7 @@
 {/snippet}
 
 {#snippet speciesTable(entries: CatalogueSpecies[])}
-  <div class="table-scroll" role="region" aria-labelledby="{id}-caption" tabindex="0">
+  <div class="table-scroll" role="region" aria-labelledby="{id}-caption" use:scrollable>
     <table class="species-table">
       <caption id="{id}-caption">{dex(data.lang, "table", { dex: dexName })}</caption>
       <thead>

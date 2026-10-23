@@ -14,22 +14,38 @@ allowBuilds:
 catalogMode: prefer
 
 catalog:
-  "@cloudflare/workers-types": ^5.20261015.1
+  "@cloudflare/workers-types": ^5.20261023.1
   "@internationalized/date": ^3.12.4
   "@types/node": ^26.6.5
   "@types/pngjs": ^6.0.5
-  bits-ui: ^2.19.5
+  bits-ui: ^2.20.2
   pngjs: ^7.0.0
+  # SvelteKit 3.1 and svelte-check 4.7 require the TypeScript 6 compiler API.
   typescript: ^6.0.3
-  vite: npm:@voidzero-dev/vite-plus-core@1.2.0
-  vite-plus: 1.2.0
-  wrangler: ^4.151.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite-plus: 1.4.0
+  wrangler: ^4.152.0
 overrides:
   vite@*: "catalog:"
+  # Used APIs are unchanged; runed 0.38 updates its optional Kit peer to v3.
+  bits-ui@2.20.2>runed: 0.38.0
+  svelte-toolbelt@0.10.6>runed: 0.38.0
 peerDependencyRules:
   allowAny:
     - vite
   allowedVersions:
     vite: "*"
 minimumReleaseAgeExclude:
-  - "@sveltejs/kit@3.1.0"
+  - "@cloudflare/workers-types@5.20261023.1"
+  - "@voidzero-dev/vite-plus-core@1.4.0"
+  - "@voidzero-dev/vite-plus-darwin-arm64@1.4.0"
+  - "@voidzero-dev/vite-plus-darwin-x64@1.4.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.4.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.4.0"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.4.0"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@1.4.0"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.4.0"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.4.0"
+  - bits-ui@2.20.2
+  - runed@0.38.0
+  - vite-plus@1.4.0

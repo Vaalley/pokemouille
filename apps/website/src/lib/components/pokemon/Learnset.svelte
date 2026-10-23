@@ -7,6 +7,7 @@
     ResolvedPokemon,
     ReferenceData,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { reasonText, t } from "#lib/i18n/pokemon.ts";
   import Localized from "./Localized.svelte";
@@ -109,7 +110,7 @@
             <p class="scroll-hint" id={`moves-guide-${group.methodId}`}>
               {t(lang, "moves.scrollHint")}
             </p>
-            <div class="table-scroll" role="region" aria-label={t(lang, "moves.table", { method: group.method.text })} aria-describedby={`moves-guide-${group.methodId}`} tabindex="0">
+            <div class="table-scroll" role="region" aria-label={t(lang, "moves.table", { method: group.method.text })} aria-describedby={`moves-guide-${group.methodId}`} use:scrollable>
             <table>
               <caption class="visually-hidden"><Localized text={group.method} /></caption>
               <thead>

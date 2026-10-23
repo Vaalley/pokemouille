@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import Localized from "#lib/components/pokemon/Localized.svelte";
   import RelatedPokemon from "#lib/components/RelatedPokemon.svelte";
   import MoveIcon from "#lib/components/MoveIcon.svelte";
@@ -61,7 +62,7 @@
   <section aria-labelledby="descriptions-heading">
     <h2 id="descriptions-heading">{t(lang, "descriptions")}</h2>
     {#if data.descriptions.length > 0}
-      <div class="detail-table move-descriptions" role="region" aria-labelledby="descriptions-heading" tabindex="0">
+      <div class="detail-table move-descriptions" role="region" aria-labelledby="descriptions-heading" use:scrollable>
         <table>
           <thead><tr><th scope="col">{t(lang, "games")}</th><th scope="col">{t(lang, "description")}</th></tr></thead>
           <tbody>

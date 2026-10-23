@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
@@ -107,7 +108,7 @@
                       <h4 id="{id}-method-{area.area.id}-{group.method.id}"><Localized text={group.method.name} /></h4>
                       <p>{encounters(lang, "rowCount", { count: group.rows.length })}</p>
                     </div>
-                    <div class="table-scroll" role="region" aria-label={label} aria-describedby="{id}-scroll" tabindex="0">
+                    <div class="table-scroll" role="region" aria-label={label} aria-describedby="{id}-scroll" use:scrollable>
                       <table>
                         <caption class="visually-hidden">{label}</caption>
                     <thead>

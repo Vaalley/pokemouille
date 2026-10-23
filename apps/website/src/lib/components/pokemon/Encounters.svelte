@@ -3,6 +3,7 @@
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { NamedResource, PokemonReferences, PokemonVariety, ResolvedPokemon } from "../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../packages/pokemon-data/src/localization.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { resolveEncounters } from "#lib/data/encounters.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { t } from "#lib/i18n/encounters.ts";
@@ -67,7 +68,7 @@
             <strong>{t(lang, "allRows", { count: group.rows.length })}</strong>
             <span>{t(lang, "scrollHint")}</span>
           </p>
-          <div class="table-scroll" role="region" aria-label={`${name(group.location).text} · ${name(group.area).text} · ${t(lang, "table", { method: name(group.method).text })}`} aria-describedby={`encounters-guide-${group.location.id}-${group.area.id}-${group.method.id}`} tabindex="0">
+          <div class="table-scroll" role="region" aria-label={`${name(group.location).text} · ${name(group.area).text} · ${t(lang, "table", { method: name(group.method).text })}`} aria-describedby={`encounters-guide-${group.location.id}-${group.area.id}-${group.method.id}`} use:scrollable>
             <table>
               <caption>{t(lang, "table", { method: name(group.method).text })}</caption>
               <thead>

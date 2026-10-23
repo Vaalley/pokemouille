@@ -3,6 +3,7 @@
     PokemonReferences,
     SpeciesRecord,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import {
     hasRecordedChange,
     pokemonHistory,
@@ -121,7 +122,7 @@
     {#if history.stats.some((stat) => stat.id === 9)}
       <p class="note">{historyT(lang, "history.special")}</p>
     {/if}
-    <div class="table-scroll history-stats-scroll" role="region" aria-labelledby="history-stats-heading" tabindex="0">
+    <div class="table-scroll history-stats-scroll" role="region" aria-labelledby="history-stats-heading" use:scrollable>
       <table class="history-stats" aria-labelledby="history-stats-heading">
         <thead>
           <tr>

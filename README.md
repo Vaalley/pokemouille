@@ -19,7 +19,6 @@ A multilingual, game-aware Pokédex built with Vite+ and SvelteKit, live at <htt
 - Further visual direction and layout refinement.
 - Game-specific evolution applicability and special game-mechanics rules: need sufficient source evidence before display.
 - Native-speaker review of the fr/ja "not introduced" wording.
-- Validate `@sveltejs/kit@3.1.0` before removing it from `minimumReleaseAgeExclude`.
 - **Later — installable offline mode (PWA):** not started. Add a service worker that caches the app shell and the immutable `data/revisions/*` files the visitor has opened, a web app manifest, and an "update ready" banner when a new deployment or dataset revision is available. Keep revision pinning and the caching contract below intact.
 
 ## Setup and verification
@@ -33,7 +32,13 @@ vp test
 vp run -r build
 ```
 
-The workspace uses copied/hoisted dependencies and disables automatic workspace-package hoisting to avoid untrusted Windows directory junction traversal. TypeScript 6 is shared through the catalog. On a restricted Windows process where the global `current` junction is blocked, invoke the installed versioned `vp.exe` directly and put its bin directory and the installed Node runtime directory on the process PATH. This does not require changing Windows security settings.
+The workspace uses copied/hoisted dependencies and disables automatic workspace-package hoisting to avoid untrusted Windows directory junction traversal. Vite+ and its aliased Vite core are pinned together at 1.4.0. TypeScript 6.0.3 is shared through the catalog: SvelteKit 3.1 and svelte-check 4.7 require its compiler API; TypeScript 7 currently breaks `svelte-kit sync`. Exact-version `minimumReleaseAgeExclude` entries permit the freshly updated packages without disabling the release-age policy globally.
+
+Bits UI 2.20.2 and svelte-toolbelt 0.10.6 use narrowly scoped overrides to runed 0.38.0, whose optional SvelteKit peer supports Kit 3. Their consumed runed APIs, declarations, and helper implementations are unchanged from 0.35.1; neither imports the changed `runed/kit` entrypoint. Keep these overrides scoped to the verified dependency versions and revisit them when upgrading those packages.
+
+On a restricted Windows process where the global `current` junction is blocked, invoke the installed versioned `vp.exe` directly and put its bin directory and the installed Node runtime directory on the process PATH. This does not require changing Windows security settings.
+
+Scrollable tables and bounded reference lists use `src/lib/actions/scrollable.ts` to join the tab order only while their visible content overflows. Resize/content observers keep that state current; labels, descriptions, focus rings, and native arrow/PageDown scrolling remain intact without assigning interactive roles to reference content.
 
 ## Website
 

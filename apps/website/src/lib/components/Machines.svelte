@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import ItemIcon from "#lib/components/ItemIcon.svelte";
   import MoveIcon from "#lib/components/MoveIcon.svelte";
@@ -80,7 +81,7 @@
             {#if mapping.pokemonIds.length === 0}
               <p>{t(lang, "noLearners")}</p>
             {:else}
-              <div class="learner-region" role="region" aria-labelledby={`${id}-learners-${mapping.id}`} tabindex="0">
+              <div class="learner-region" role="region" aria-labelledby={`${id}-learners-${mapping.id}`} use:scrollable>
                 <ul class="pokemon-list">
                   {#each learners as pokemon (pokemon.pokemonId)}
                     <li>

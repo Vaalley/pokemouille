@@ -12,6 +12,7 @@
   import { resolve } from "$app/paths";
   import type { PathnameWithSearchOrHash } from "$app/types";
   import type { GameOption } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { getSelectedVersion } from "#lib/components/GameSelector.svelte";
   import MoveIcon from "#lib/components/MoveIcon.svelte";
   import PokemonIcon from "#lib/components/PokemonIcon.svelte";
@@ -318,7 +319,7 @@
       {/if}
       {#if result.rows.length}
         <p class="note table-help" id="{id}-table-help">{t(data.lang, "tableHelp")}</p>
-        <div class="table-scroll" role="region" aria-labelledby="{id}-caption" aria-describedby="{id}-table-help" tabindex="0">
+        <div class="table-scroll" role="region" aria-labelledby="{id}-caption" aria-describedby="{id}-table-help" use:scrollable>
           <table>
             <caption id="{id}-caption">{t(data.lang, "caption")}</caption>
             <thead>

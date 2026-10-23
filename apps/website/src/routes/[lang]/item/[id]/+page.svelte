@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import ItemIcon from "#lib/components/ItemIcon.svelte";
   import ItemEvolutions from "#lib/components/ItemEvolutions.svelte";
   import Machines from "#lib/components/Machines.svelte";
@@ -65,7 +66,7 @@
         role="region"
         aria-labelledby="descriptions-heading"
         aria-describedby="descriptions-scope"
-        tabindex="0"
+        use:scrollable
       >
         <table>
           <thead>

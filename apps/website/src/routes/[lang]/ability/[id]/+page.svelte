@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import AbilityIcon from "#lib/components/AbilityIcon.svelte";
   import Localized from "#lib/components/pokemon/Localized.svelte";
   import RelatedPokemon from "#lib/components/RelatedPokemon.svelte";
@@ -97,7 +98,7 @@
         role="region"
         aria-labelledby="descriptions-heading"
         aria-describedby="descriptions-scope"
-        tabindex="0"
+        use:scrollable
       >
         <table>
           <thead>

@@ -4,6 +4,7 @@
     LocalizedText,
     ResolvedPokemon,
   } from "../../../../../../packages/pokemon-data/src/index.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { RANGE_LEVELS, statRanges, type MechanicsGame, type StatBounds } from "#lib/data/stat-formulas.ts";
   import type { Language } from "#lib/i18n/core.ts";
   import { reasonText, t } from "#lib/i18n/pokemon.ts";
@@ -88,7 +89,7 @@
     {#if ranges?.status === "computed"}
       <div class="calculated-ranges">
       <h3 id="stat-ranges-heading">{calc(lang, "rangesHeading")}</h3>
-      <div class="ranges-scroll" role="region" aria-labelledby="stat-ranges-heading" tabindex="0">
+      <div class="ranges-scroll" role="region" aria-labelledby="stat-ranges-heading" use:scrollable>
       <table class="ranges">
         <caption>{calc(lang, "rangesCaption", { game })}</caption>
         <thead>
