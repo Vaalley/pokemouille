@@ -1,6 +1,6 @@
 # Pokémouille
 
-A multilingual, game-aware Pokédex built with Vite+ and SvelteKit, live at <https://pokemouille.vaaleyou.workers.dev>. Localized browsing, Pokémon histories and calculated figures, regional dexes, breeding references, moveset search, locations, comparison, type coverage, opt-in cries, and instant global search are implemented in English, French, and Japanese.
+A multilingual, game-aware Pokédex built with Vite+ and SvelteKit, live at <https://pokemouille.app/>. Localized browsing, Pokémon histories and calculated figures, regional dexes, breeding references, moveset search, locations, comparison, type coverage, opt-in cries, and instant global search are implemented in English, French, and Japanese.
 
 **Architecture:** [text guide](docs/architecture.md) · [SVG](docs/architecture.svg) · [PNG](docs/architecture.png). Start here when changing data ingestion, prerendering, browser-side resolution, or Cloudflare delivery.
 
@@ -64,6 +64,8 @@ The Pokédex catalogue keeps search and Pokédex selection visible, with type, i
 Pokémon details use one rounded identity panel: artwork beside the number, name, resolved types and species facts on desktop; a stacked layout on narrow screens. The form selector stays with the Pokémon, while game selection lives in the header's Settings dropdown on every page. Layout-owned game changes preserve URL and saved-preference behavior. Type links retain their combined defensive-matchup preview. Cry controls form a compact panel footer and remain opt-in; image, audio and availability caveats remain visible.
 
 Egg Groups is available in both the desktop header navigation and mobile Browse menu, with English/French/Japanese labels. Its link preserves the selected game and marks both the directory and member pages as the current section.
+
+Egg Group directory and member pages prerender without game query parameters; URL and saved-game context are resolved only in the browser.
 
 Pokémon history combines base-stat and effort timelines in one compact wrapping table, with vertically separated generation ranges and separate type/ability panels. Every recorded range, value, ability slot and missing-history caveat remains available. Pokédex entries use bounded prose widths, stacked source-game labels and a selected-version marker, preserving every entry and per-version language fallback. Learnsets use compact method tabs, an active-method heading, row counts, pinned move names/headers, aligned numbers and separate level badges; selected-game provenance stays visible while current-value caveats remain in a native disclosure. Encounter location groups are native disclosures, with source explanations under “About these records.” Breeding membership and candidate panels distinguish ordinary parent sources, unresolved egg-only chains and Mirror Herb transfer; egg-group links preserve game context and member facts stack on narrow screens.
 

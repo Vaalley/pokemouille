@@ -14,10 +14,11 @@
   let { data }: PageProps = $props();
   let games = $state<GameOption[] | null>(null);
   let failed = $state(false);
-  onMount(() => { getGames().then((loaded) => { games = loaded; }, () => { failed = true; }); });
+  let mounted = $state(false);
+  onMount(() => { mounted = true; getGames().then((loaded) => { games = loaded; }, () => { failed = true; }); });
   const context = $derived(games ? resolveContext({ url: page.shallow?.url ?? page.url, language: data.lang, games, savedVersion: readPreference("version") }) : null);
   const game = $derived(games?.find((entry) => entry.version.identifier === context?.version));
-  const linkVersion = $derived(context?.version ?? (page.shallow?.url ?? page.url).searchParams.get("version"));
+  const linkVersion = $derived(context?.version ?? (mounted ? (page.shallow?.url ?? page.url).searchParams.get("version") : null));
   const name = $derived(localize(data.group.names, data.lang, data.group.identifier).text);
   function href(path: string) { return resolve(path.slice(1) as PathnameWithSearchOrHash); }
 </script>

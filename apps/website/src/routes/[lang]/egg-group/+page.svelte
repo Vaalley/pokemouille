@@ -11,7 +11,7 @@
   let saved = $state<string | null>(null);
   let mounted = $state(false);
   onMount(() => { saved = readPreference("version"); mounted = true; });
-  const version = $derived((page.shallow?.url ?? page.url).searchParams.get("version") ?? (mounted ? saved ?? DEFAULT_VERSION : null));
+  const version = $derived(mounted ? (page.shallow?.url ?? page.url).searchParams.get("version") ?? saved ?? DEFAULT_VERSION : null);
 </script>
 <svelte:head><title>{t(data.lang, "index")} — Pokémouille</title></svelte:head>
 <header class="page-header">
