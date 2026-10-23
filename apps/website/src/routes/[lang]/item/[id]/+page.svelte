@@ -37,7 +37,7 @@
           {#if data.shortEffect}
             <Localized text={data.shortEffect} />
           {:else}
-            {t(lang, "effect.missing")}
+            <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "effect.missing")}</span>
           {/if}
         </dd>
       </div>
@@ -47,7 +47,7 @@
           {#if data.effect}
             <Localized text={data.effect} />
           {:else}
-            {t(lang, "effect.missing")}
+            <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "effect.missing")}</span>
           {/if}
         </dd>
       </div>
@@ -86,7 +86,7 @@
                   {#if description.text}
                     <Localized text={description.text} />
                   {:else}
-                    {t(lang, "flavor.missing")}
+                    <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "flavor.missing")}</span>
                   {/if}
                 </td>
               </tr>
@@ -95,7 +95,7 @@
         </table>
       </div>
     {:else}
-      <p>{t(lang, "flavor.empty")}</p>
+      <p class="detail-feedback detail-feedback--empty">{t(lang, "flavor.empty")}</p>
     {/if}
   </section>
   <Machines {lang} kind="item" data={data.machines} />

@@ -5,6 +5,7 @@ const en = {
   heading: "Moveset search",
   intro:
     "Choose up to {max} moves to find every Pokémon variety that can learn all of them in the selected game.",
+  scopeHeading: "Individual learnability, not a legal moveset",
   scope:
     "Only learnsets recorded for the selected game’s exact version group are used, with that group’s methods and levels. Forms introduced after the selected game are left out.",
   obtainable:
@@ -15,11 +16,13 @@ const en = {
   search: "Find a move",
   placeholder: "e.g. Thunderbolt",
   searchHelp: "Type part of a move name, then add it from the list.",
+  limit: "Choose up to {max} moves. Results must match every selected move.",
   suggestions: "Matching moves",
   suggestionCount: "{count} matching moves",
   moreSuggestions: "Showing the first {shown}. Keep typing to narrow the list.",
   noSuggestions: "No move matches this name.",
   add: "Add {move}",
+  addShort: "Add",
   added: "Added",
   selected: "Selected moves ({count} of {max})",
   noneSelected: "No moves selected yet.",
@@ -46,6 +49,8 @@ const en = {
   sourceGap:
     "{count} possible matches are hidden because our data can’t place their form’s introduction in this game’s timeline. The data is incomplete; these Pokémon aren’t marked as unavailable.",
   caption: "Pokémon varieties that can learn every selected move, with learning methods",
+  tableHelp:
+    "Each column shows how the Pokémon learns that move in this game. Scroll the table sideways on smaller screens.",
   table: "Results",
   pokemon: "Pokémon",
   number: "No. {id}",
@@ -61,6 +66,7 @@ const fr = {
   heading: "Recherche par capacités",
   intro:
     "Choisissez jusqu’à {max} capacités pour trouver toutes les variétés de Pokémon capables de les apprendre toutes dans le jeu sélectionné.",
+  scopeHeading: "Apprentissage individuel, pas validation d’une combinaison",
   scope:
     "Seuls les apprentissages enregistrés pour le groupe de versions exact du jeu sélectionné sont utilisés, avec les méthodes et niveaux de ce groupe. Les formes apparues après le jeu sélectionné ne sont pas incluses.",
   obtainable:
@@ -71,11 +77,14 @@ const fr = {
   search: "Trouver une capacité",
   placeholder: "Ex. Tonnerre",
   searchHelp: "Saisissez une partie du nom d’une capacité, puis ajoutez-la depuis la liste.",
+  limit:
+    "Choisissez jusqu’à {max} capacités. Les résultats doivent correspondre à toutes les capacités sélectionnées.",
   suggestions: "Capacités correspondantes",
   suggestionCount: "{count} capacités correspondantes",
   moreSuggestions: "Affichage des {shown} premières. Continuez à saisir pour affiner la liste.",
   noSuggestions: "Aucune capacité ne correspond à ce nom.",
   add: "Ajouter {move}",
+  addShort: "Ajouter",
   added: "Ajoutée",
   selected: "Capacités sélectionnées ({count} sur {max})",
   noneSelected: "Aucune capacité sélectionnée pour l’instant.",
@@ -104,6 +113,8 @@ const fr = {
     "{count} correspondances possibles sont masquées : nos données ne permettent pas de situer l’apparition de leur forme par rapport à ce jeu. Les données sont incomplètes ; ces Pokémon ne sont pas marqués comme indisponibles.",
   caption:
     "Variétés de Pokémon capables d’apprendre toutes les capacités sélectionnées, avec les méthodes d’apprentissage",
+  tableHelp:
+    "Chaque colonne indique comment le Pokémon apprend cette capacité dans ce jeu. Sur petit écran, faites défiler le tableau horizontalement.",
   table: "Résultats",
   pokemon: "Pokémon",
   number: "Nº {id}",
@@ -118,6 +129,7 @@ const fr = {
 const ja = {
   heading: "覚えるわざ検索",
   intro: "わざを{max}つまで選ぶと、選択したゲームでそのすべてを覚えられるポケモンを探せます。",
+  scopeHeading: "各わざの習得可否であり、同時習得の保証ではありません",
   scope:
     "選択したゲームと同じバージョングループで記録された習得データだけを、そのグループでの方法とレベルで使います。選択したゲームより後に登場したフォルムは含みません。",
   obtainable:
@@ -128,11 +140,13 @@ const ja = {
   search: "わざを探す",
   placeholder: "例：10まんボルト",
   searchHelp: "わざの名前の一部を入力し、一覧から追加してください。",
+  limit: "わざは{max}つまで選べます。選択したすべてのわざを覚えられるポケモンを表示します。",
   suggestions: "一致するわざ",
   suggestionCount: "一致するわざ：{count}件",
   moreSuggestions: "最初の{shown}件を表示しています。さらに入力すると絞り込めます。",
   noSuggestions: "この名前に一致するわざはありません。",
   add: "{move}を追加",
+  addShort: "追加",
   added: "追加済み",
   selected: "選択したわざ（{count}/{max}）",
   noneSelected: "まだわざを選んでいません。",
@@ -158,6 +172,8 @@ const ja = {
   sourceGap:
     "{count}件の候補は、フォルムの登場時期をこのゲームの時系列に位置づけられないため非表示です。データが不完全なだけで、入手不可とは判断していません。",
   caption: "選択したすべてのわざを覚えられるポケモンと習得方法",
+  tableHelp:
+    "各列に、このゲームでそのわざを覚える方法を表示します。画面が狭い場合は表を横にスクロールしてください。",
   table: "結果",
   pokemon: "ポケモン",
   number: "No.{id}",

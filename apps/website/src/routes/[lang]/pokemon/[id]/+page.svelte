@@ -304,9 +304,10 @@
 
   <div aria-live="polite">
     {#if errorMessage}
+      <div class="detail-feedback detail-feedback--error">
       <h2>{t(lang, "state.errorHeading")}</h2>
       <p>{errorMessage}</p>
-      <p>
+      <p class="detail-feedback__actions">
         <Button.Root type="button" onclick={retry}>{t(lang, "state.retry")}</Button.Root>
         {#if context?.form}
           <a
@@ -315,12 +316,13 @@
           >
         {/if}
       </p>
+      </div>
     {:else if !games}
-      <p>{t(lang, "state.loadingGames")}</p>
+      <p class="detail-feedback detail-feedback--loading">{t(lang, "state.loadingGames")}</p>
     {:else if !view}
-      <p>{t(lang, "state.loading", { game: gameName })}</p>
+      <p class="detail-feedback detail-feedback--loading">{t(lang, "state.loading", { game: gameName })}</p>
     {:else if pokemon && pokemon.status !== "available"}
-      <p>
+      <p class="detail-feedback detail-feedback--missing">
         {t(lang, pokemon.status === "not-introduced" ? "status.notIntroduced" : "status.unknown", {
           name: pokemon.name.text,
           game: gameName,

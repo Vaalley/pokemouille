@@ -145,6 +145,16 @@
 </section>
 
 <style>
+  section { min-width: 0; }
+
+  .note {
+    max-width: 75ch;
+    margin-block: 0.5rem;
+    color: var(--muted);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
   .history-overview {
     display: grid;
     gap: 0.75rem;
@@ -190,8 +200,7 @@
   }
 
   .timeline {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     align-items: start;
     gap: 0.375rem;
     margin: 0;
@@ -201,25 +210,23 @@
   }
 
   .segment {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.125rem 0.5rem;
+    display: grid;
+    gap: 0.25rem;
     max-width: 100%;
-    padding: 0.25rem 0.5rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
+    padding: 0.5rem 0.625rem;
+    border-inline-start: 0.1875rem solid var(--border-strong);
     background: var(--surface-muted);
   }
 
   .multi-segment .segment {
-    border-color: var(--border-strong);
-    background: var(--accent-soft);
+    border-inline-start-color: var(--accent);
   }
 
   .range {
-    color: var(--muted);
+    color: inherit;
     font-size: 0.8125rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
   }
 
   .value {
@@ -238,7 +245,7 @@
 
   .history-stats {
     width: 100%;
-    min-width: 34rem;
+    border-collapse: collapse;
     table-layout: fixed;
   }
 
@@ -246,17 +253,39 @@
   .history-stats td {
     padding: 0.5rem;
     border-block-end: var(--border-width) solid var(--border);
+    vertical-align: top;
+    text-align: start;
+    overflow-wrap: anywhere;
   }
 
   .history-stats th:first-child {
     width: 22%;
-    padding-inline-start: 0;
+    padding-inline-start: 0.5rem;
     overflow-wrap: anywhere;
   }
 
   .history-stats tbody th {
     font-size: 0.875rem;
-    vertical-align: middle;
+    font-weight: 600;
+  }
+
+  .history-stats thead th {
+    background: var(--surface-muted);
+    font-size: 0.8125rem;
+  }
+
+  .history-stats tbody tr:last-child > * {
+    border-block-end: 0;
+  }
+
+  @media (max-width: 30rem) {
+    .history-panel { padding: 0.625rem; }
+    .history-stats th,
+    .history-stats td { padding: 0.5rem 0.25rem; }
+    .history-stats th:first-child { width: 25%; padding-inline-start: 0.25rem; }
+    .history-stats tbody th { font-size: 0.8125rem; }
+    .numeric-timeline .segment { padding: 0.375rem 0.25rem; }
+    .numeric-timeline .range { font-size: 0.75rem; }
   }
 
   @media (min-width: 56rem) {

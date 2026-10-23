@@ -37,7 +37,7 @@
           {#if data.shortEffect}
             <Localized text={data.shortEffect} />
           {:else}
-            {t(lang, "effect.missing")}
+            <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "effect.missing")}</span>
           {/if}
         </dd>
       </div>
@@ -47,7 +47,7 @@
           {#if data.effect}
             <Localized text={data.effect} />
           {:else}
-            {t(lang, "effect.missing")}
+            <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "effect.missing")}</span>
           {/if}
         </dd>
       </div>
@@ -74,7 +74,7 @@
                   {#if text}
                     <Localized {text} />
                   {:else}
-                    {t(lang, "history.missing")}
+                    <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "history.missing")}</span>
                   {/if}
                 </p>
               {/each}
@@ -83,7 +83,7 @@
         {/each}
       </ol>
     {:else}
-      <p>{t(lang, "history.empty")}</p>
+      <p class="detail-feedback detail-feedback--empty">{t(lang, "history.empty")}</p>
     {/if}
   </section>
 
@@ -118,7 +118,7 @@
                   {#if description.text}
                     <Localized text={description.text} />
                   {:else}
-                    {t(lang, "flavor.missing")}
+                    <span class="detail-feedback detail-feedback--missing detail-feedback--inline">{t(lang, "flavor.missing")}</span>
                   {/if}
                 </td>
               </tr>
@@ -127,7 +127,7 @@
         </table>
       </div>
     {:else}
-      <p>{t(lang, "flavor.empty")}</p>
+      <p class="detail-feedback detail-feedback--empty">{t(lang, "flavor.empty")}</p>
     {/if}
   </section>
   <RelatedPokemon {lang} kind="ability" data={data.related} />

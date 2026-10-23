@@ -99,50 +99,61 @@
     <p>{t(lang, "sprites.missing")}</p>
   {:else}
     <Tabs.Root value={activeTab} onValueChange={(value) => (selectedTab = value)}>
-      <Tabs.List aria-label={t(lang, "sprites.heading")}>
+      <Tabs.List class="sprite-tabs" aria-label={t(lang, "sprites.heading")}>
         {#each groups as group (group.id)}
-          <Tabs.Trigger value={group.id}>{t(lang, `sprites.${group.id}`)}</Tabs.Trigger>
+          <Tabs.Trigger class="sprite-tab" value={group.id}>{t(lang, `sprites.${group.id}`)}</Tabs.Trigger>
         {/each}
       </Tabs.List>
       {#each groups as group (group.id)}
         <Tabs.Content value={group.id}>
           {#if activeTab === group.id && activeSource}
-            {#if group.id === "games" || group.id === "artwork" || group.id === "icons"}
-              <div class="source-picker">
-                <label for={`sprite-source-${group.id}`}>{t(lang, group.id === "games" ? "sprites.game" : "sprites.source")}</label>
-                <select id={`sprite-source-${group.id}`} value={activeSource.id} onchange={(event) => (selections[group.id] = event.currentTarget.value)}>
-                  {#if group.id === "games"}
-                    {#each [...new Set(group.sources.map((source) => source.generation))] as generation}
-                      <optgroup label={generation}>
-                        {#each group.sources.filter((source) => source.generation === generation) as source (source.id)}
-                          <option value={source.id}>{source.label}</option>
-                        {/each}
-                      </optgroup>
-                    {/each}
-                  {:else}
-                    {#each group.sources as source (source.id)}
-                      <option value={source.id}>{source.label}</option>
-                    {/each}
-                  {/if}
-                </select>
+            <div class="gallery-toolbar">
+              <div class="source-context" aria-live="polite" aria-atomic="true">
+                <span class="source-label">{t(lang, "sprites.source")}</span>
+                <strong>{activeSource.label || t(lang, `sprites.${group.id}`)}</strong>
+                {#if activeSource.label}
+                  <span class="source-category">{activeSource.generation ? `${activeSource.generation} · ` : ""}{t(lang, `sprites.${group.id}`)}</span>
+                {/if}
               </div>
-            {/if}
+              {#if group.id === "games" || group.id === "artwork" || group.id === "icons"}
+                <div class="source-picker">
+                  <label for={`sprite-source-${group.id}`}>{t(lang, group.id === "games" ? "sprites.game" : "sprites.source")}</label>
+                  <select id={`sprite-source-${group.id}`} value={activeSource.id} onchange={(event) => (selections[group.id] = event.currentTarget.value)}>
+                    {#if group.id === "games"}
+                      {#each [...new Set(group.sources.map((source) => source.generation))] as generation}
+                        <optgroup label={generation}>
+                          {#each group.sources.filter((source) => source.generation === generation) as source (source.id)}
+                            <option value={source.id}>{source.label}</option>
+                          {/each}
+                        </optgroup>
+                      {/each}
+                    {:else}
+                      {#each group.sources as source (source.id)}
+                        <option value={source.id}>{source.label}</option>
+                      {/each}
+                    {/if}
+                  </select>
+                </div>
+              {/if}
+            </div>
             <div class="sprite-grid" class:menu-icons={group.id === "icons"}>
               {#each activeSource.images as image (`${activeSource.id}-${image.view}-${image.url}`)}
                 <figure>
-                  {#if failedUrls.includes(image.url)}
-                    <p class="sprite-missing" role="status">{t(lang, "sprites.loadError")}</p>
-                  {:else}
-                    <img
-                      src={image.url}
-                      alt={t(lang, "sprites.alt", { name, view: `${activeSource.label ? `${activeSource.label}, ` : ""}${t(lang, `sprites.${image.view}`)}` })}
-                      width={group.id === "icons" ? 64 : 192}
-                      height={group.id === "icons" ? 64 : 192}
-                      loading="lazy"
-                      class:pixelated={group.id === "pixel" || group.id === "animated" || group.id === "icons" || group.id === "games"}
-                      onerror={() => (failedUrls = [...failedUrls, image.url])}
-                    />
-                  {/if}
+                  <div class="sprite-frame">
+                    {#if failedUrls.includes(image.url)}
+                      <p class="sprite-missing" role="status">{t(lang, "sprites.loadError")}</p>
+                    {:else}
+                      <img
+                        src={image.url}
+                        alt={t(lang, "sprites.alt", { name, view: `${activeSource.label || t(lang, `sprites.${group.id}`)}, ${t(lang, `sprites.${image.view}`)}` })}
+                        width={group.id === "icons" ? 64 : 192}
+                        height={group.id === "icons" ? 64 : 192}
+                        loading="lazy"
+                        class:pixelated={group.id === "pixel" || group.id === "animated" || group.id === "icons" || group.id === "games"}
+                        onerror={() => (failedUrls = [...failedUrls, image.url])}
+                      />
+                    {/if}
+                  </div>
                   <figcaption>{t(lang, `sprites.${image.view}`)}</figcaption>
                 </figure>
               {/each}
@@ -155,12 +166,67 @@
 </section>
 
 <style>
-  .source-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-block: 1rem; }
-  select { min-width: 0; max-width: 100%; min-height: 2.75rem; padding: 0.5rem; font: inherit; }
-  .sprite-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 1rem; margin-block: 1rem; }
-  figure { margin: 0; text-align: center; }
-  img { max-width: 100%; object-fit: contain; }
+  .sprite-gallery { min-width: 0; }
+  .sprite-gallery :global(.sprite-tabs) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+    gap: 0.375rem;
+    margin-block: 1rem 0.75rem;
+  }
+  .sprite-gallery :global(.sprite-tab) {
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.5rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .sprite-gallery :global(.sprite-tab[data-state="active"]) {
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+  .gallery-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+  }
+  .source-context { display: grid; gap: 0.125rem; min-width: 0; overflow-wrap: anywhere; }
+  .source-label, .source-category { color: var(--muted); font-size: 0.875rem; }
+  .source-picker { display: grid; gap: 0.25rem; flex: 0 1 22rem; min-width: 0; max-width: 100%; }
+  .source-picker label { font-size: 0.875rem; }
+  select { width: 100%; min-width: 0; max-width: 100%; min-height: 2.75rem; padding: 0.5rem; font: inherit; }
+  .sprite-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 7.5rem), 1fr)); gap: 0.75rem; margin-block: 0.75rem 1rem; }
+  figure {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    text-align: center;
+  }
+  .sprite-frame {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    min-width: 0;
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
+  }
+  img { width: 100%; height: 100%; max-width: 12rem; max-height: 12rem; object-fit: contain; }
+  .menu-icons img { width: 4rem; height: 4rem; }
   .pixelated { image-rendering: pixelated; }
-  .sprite-missing { display: grid; align-items: center; min-height: 12rem; margin: 0; }
-  .menu-icons .sprite-missing { min-height: 4rem; }
+  .sprite-missing { margin: 0; padding: 0.5rem; color: var(--muted); font-size: 0.875rem; overflow-wrap: anywhere; }
+  figcaption { min-height: 2.6em; font-size: 0.875rem; line-height: 1.3; overflow-wrap: anywhere; }
+  @media (max-width: 30rem) {
+    .gallery-toolbar { align-items: stretch; }
+    .source-picker { flex-basis: 100%; }
+  }
 </style>

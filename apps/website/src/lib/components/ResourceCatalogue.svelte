@@ -50,7 +50,7 @@
     (next ?? document.getElementById(`${id}-query`))?.focus();
   }
 
-  async function resetMoves() {
+  async function resetFilters() {
     update({ q: "", type: null, category: null }, "name");
     await tick();
     document.getElementById(`${id}-query`)?.focus();
@@ -78,7 +78,7 @@
 
 <h1>{t(lang, catalogue.kind)}</h1>
 <p>{t(lang, "intro")}</p>
-<form class="filters" class:move-filters={catalogue.kind === "move"} onsubmit={(event) => event.preventDefault()} aria-label={t(lang, "filters")} aria-describedby="{id}-scope">
+<form class="filters" class:move-filters={catalogue.kind === "move"} class:resource-filters={catalogue.kind !== "move"} onsubmit={(event) => event.preventDefault()} aria-label={t(lang, "filters")} aria-describedby="{id}-scope">
   <div class="filter-field wide">
     <label for="{id}-query">{t(lang, "query")}</label>
     <input id="{id}-query" type="search" name="q" value={filters.q} placeholder={t(lang, "placeholder")}
@@ -106,19 +106,15 @@
       </select>
     </div>
   {/if}
-  {#if catalogue.kind !== "move"}
-    <button type="button" disabled={!mounted || !active} onclick={() => update({ q: "", type: null, category: null }, "name")}>{t(lang, "reset")}</button>
-  {/if}
 </form>
-{#if catalogue.kind === "move"}
-  <details class="move-scope">
-    <summary>{t(lang, "aboutMoves")}</summary>
-    <div class="note" id="{id}-scope">
-      <p>{t(lang, "scope")}</p>
-      <p>{t(lang, "moveScope")}</p>
-    </div>
-  </details>
-  <div class="results-toolbar" role="group" aria-label={t(lang, "resultsOptions")}>
+<details class="move-scope">
+  <summary>{t(lang, catalogue.kind === "move" ? "aboutMoves" : "aboutList")}</summary>
+  <div class="note" id="{id}-scope">
+    <p>{t(lang, "scope")}</p>
+    <p>{t(lang, catalogue.kind === "move" ? "moveScope" : catalogue.kind === "ability" ? "abilityScope" : "itemScope")}</p>
+  </div>
+</details>
+  <div class="results-toolbar" role="group" aria-label={t(lang, catalogue.kind === "move" ? "resultsOptions" : "resultsFilters")}>
     <div class="results-summary">
       {#if mounted}
         <p class="result-count" role="status" aria-live="polite" aria-atomic="true">{t(lang, "count", { filtered: entries.length, total: catalogue.entries.length })}</p>
@@ -139,18 +135,12 @@
               {/each}
             </ul>
           {/if}
-          <button type="button" class="reset-moves" onclick={resetMoves}>{t(lang, "resetMoves")}</button>
+          <button type="button" class="reset-moves" onclick={resetFilters}>{t(lang, catalogue.kind === "move" ? "resetMoves" : "reset")}</button>
         </div>
       {/if}
     </div>
-    {@render moveSort()}
+    {#if catalogue.kind === "move"}{@render moveSort()}{/if}
   </div>
-{:else}
-  <div class="note" id="{id}-scope">
-    <p>{t(lang, "scope")}</p>
-    <p>{t(lang, catalogue.kind === "ability" ? "abilityScope" : "itemScope")}</p>
-  </div>
-{/if}
 
 {#snippet moveSort()}
   <div class="filter-field">
@@ -211,9 +201,11 @@
         {@const href = `${lang}/${catalogue.kind}/${entry.id}/${version ? `?version=${encodeURIComponent(version)}` : ""}`}
         <li>
           <a href={resolve(href as PathnameWithSearchOrHash)}>
-            {#if catalogue.kind === "ability"}<AbilityIcon />
-            {:else}<ItemIcon identifier={entry.identifier} />{/if}
-            <Localized text={entry.name} />
+            <span class="resource-icon" aria-hidden="true">
+              {#if catalogue.kind === "ability"}<AbilityIcon />
+              {:else}<ItemIcon identifier={entry.identifier} />{/if}
+            </span>
+            <span class="resource-name"><Localized text={entry.name} /></span>
           </a>
         </li>
       {/each}
@@ -229,18 +221,22 @@
     {@render resourceList(defaultEntries)}
   </noscript>
 {:else}
-  {#if catalogue.kind !== "move"}
-    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">{t(lang, "count", { filtered: entries.length, total: catalogue.entries.length })}</p>
-  {/if}
   {#if entries.length === 0}<p>{t(lang, "empty")}</p>
   {:else}{@render resourceList(entries)}{/if}
 {/if}
 
 <style>
   .note p { margin-block: 0.25rem; }
-  .resource-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0.25rem 1rem; }
-  .resource-list li { min-width: 0; }
-  .resource-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
+  .resource-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0 1rem; }
+  .resource-list li { min-width: 0; border-block-end: var(--border-width) solid var(--border); }
+  .resource-list a { display: grid; grid-template-columns: 2rem minmax(0, 1fr); align-items: center; gap: 0.625rem; min-height: 2.75rem; padding: 0.375rem 0.5rem; border-radius: var(--radius-panel); font-weight: 650; text-decoration: none; }
+  .resource-list a:is(:hover, :focus-visible) { background: var(--accent-soft); }
+  .resource-list a:is(:hover, :focus-visible) .resource-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  .resource-name { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+  .resource-icon { display: grid; place-items: center; width: 2rem; height: 2rem; }
+  .resource-filters { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .resource-filters .filter-field { min-width: 0; }
+  .resource-filters input { width: 100%; min-width: 0; min-height: 2.75rem; padding: 0.625rem 0.75rem; border: var(--border-width) solid var(--border-strong); background: var(--surface); color: var(--page-text); font: inherit; }
   .move-filters { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: end; }
   .move-filters :is(input, select), .results-toolbar select { width: 100%; min-width: 0; min-height: 2.75rem; padding: 0.625rem 0.75rem; border: var(--border-width) solid var(--border-strong); background: var(--surface); color: var(--page-text); font: inherit; }
   .move-scope { margin-block: 0.75rem; }

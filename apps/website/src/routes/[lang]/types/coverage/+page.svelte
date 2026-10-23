@@ -26,6 +26,7 @@
   import { isIntroduced } from "#lib/data/type-matchups.ts";
   import { typesHref } from "#lib/data/type-selection.ts";
   import { t } from "#lib/i18n/type-coverage.ts";
+  import { t as matchupText } from "#lib/i18n/types.ts";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -78,18 +79,18 @@
 <p><a href={resolve(typesHref(data.lang, [], selectedVersion()) as PathnameWithSearchOrHash)}>{t(data.lang, "back")}</a></p>
 <h1>{t(data.lang, "heading")}</h1>
 <p>{t(data.lang, "intro")}</p>
-<form onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
+<form class="selection-panel" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
   <fieldset class="attack-types">
     <legend>{t(data.lang, "attackLegend")}</legend>
     <div class="attack-options">
       {#each types as type (type.id)}
         {@const checked = selection.ids.includes(type.id)}
-        <label>
+        <label class:chosen={checked}>
           <input type="checkbox" name="attack" value={type.id} {checked}
             disabled={!mounted || !generation || (!checked && !isIntroduced(type.id, generation))}
             onchange={(event) => toggle(type.id, event.currentTarget.checked)} />
           <img src={asset(`/type-icons/${type.identifier}.svg` as AssetPath)} alt="" width="22" height="22" />
-          <Localized text={name(type.id)} />
+          <span><Localized text={name(type.id)} /></span>
         </label>
       {/each}
     </div>
@@ -108,7 +109,7 @@
 {:else if !game || !generation}
   <p role="status">{t(data.lang, "loading")}</p>
 {:else}
-  <section aria-labelledby={`${id}-coverage`}>
+  <section class="result-panel" aria-labelledby={`${id}-coverage`}>
     <h2 id={`${id}-coverage`}>{t(data.lang, "coverageHeading")}</h2>
     {#if selection.invalid}
       <p role="status">{t(data.lang, "invalid")}</p>
@@ -121,8 +122,8 @@
       <h3>{t(data.lang, "bucketsLabel")}</h3>
       <dl class="figures" aria-live="polite">
         {#each coverage.buckets as bucket (bucket.multiplier)}
-          <div>
-            <dt>{formatMultiplier(bucket.multiplier)}</dt>
+          <div data-effect={bucket.multiplier === 0 ? "immune" : bucket.multiplier < 1 ? "resisted" : bucket.multiplier > 1 ? "weak" : "neutral"}>
+            <dt><span class="multiplier">{formatMultiplier(bucket.multiplier)}</span></dt>
             <dd>{t(data.lang, "bucketCount", { count: bucket.members.length })}</dd>
           </div>
         {/each}
@@ -136,7 +137,12 @@
       {#each coverage.buckets as bucket (bucket.multiplier)}
         {#if bucket.members.length}
           <details bind:open={open[bucket.multiplier]}>
-            <summary>{t(data.lang, "bucketSummary", { multiplier: formatMultiplier(bucket.multiplier), count: bucket.members.length })}</summary>
+            <summary>
+              <span class="bucket-label" data-effect={bucket.multiplier === 0 ? "immune" : bucket.multiplier < 1 ? "resisted" : bucket.multiplier > 1 ? "weak" : "neutral"}>
+                <span class="multiplier">{formatMultiplier(bucket.multiplier)}</span>
+                <span>{t(data.lang, "bucketCount", { count: bucket.members.length })}</span>
+              </span>
+            </summary>
             {#if open[bucket.multiplier]}
               <ul class="species-list">
                 {#each bucket.members as pokemon (`${pokemon.pokemonId}:${pokemon.form ?? ""}`)}
@@ -160,11 +166,11 @@
       {#if resistant.length}
         <ul class="combinations">
           {#each resistant as row (combinationKey(row.types))}
-            <li>
+            <li data-effect={row.multiplier === 0 ? "immune" : "resisted"}>
               {#each row.types as typeId (typeId)}
                 <TypeBadge {typeId} name={name(typeId)} defendingTypes={row.types} />
               {/each}
-              <strong>{formatMultiplier(row.multiplier)}</strong>
+              <strong class="multiplier">{formatMultiplier(row.multiplier)}</strong>
             </li>
           {/each}
         </ul>
@@ -174,9 +180,15 @@
     {/if}
   </section>
 
-  <section aria-labelledby={`${id}-chart`}>
+  <section class="result-panel chart-panel" aria-labelledby={`${id}-chart`}>
     <h2 id={`${id}-chart`}>{t(data.lang, "chartHeading")}</h2>
     <p class="note">{t(data.lang, "chartScope", { generation })}</p>
+    <ul class="chart-legend" aria-label={matchupText(data.lang, "heading")}>
+      <li data-effect="weak"><span class="multiplier">×2 / ×4</span><span>{matchupText(data.lang, "weaknesses")}</span></li>
+      <li data-effect="neutral"><span class="multiplier">×1</span><span>{matchupText(data.lang, "neutral")}</span></li>
+      <li data-effect="resisted"><span class="multiplier">×½ / ×¼</span><span>{matchupText(data.lang, "resistances")}</span></li>
+      <li data-effect="immune"><span class="multiplier">×0</span><span>{matchupText(data.lang, "immunities")}</span></li>
+    </ul>
     <label class="toggle">
       <input type="checkbox" bind:checked={theoretical} />
       {t(data.lang, "theoretical")}
@@ -186,7 +198,8 @@
         ? t(data.lang, "theoreticalCount", { count: chart.length, generation })
         : t(data.lang, "existingCount", { count: chart.length })}
     </p>
-    <div class="table-scroll chart-scroll" role="region" aria-labelledby={`${id}-chart-caption`} tabindex="0">
+    <p class="note chart-navigation" id={`${id}-chart-navigation`}>{matchupText(data.lang, "chartNavigation")}</p>
+    <div class="table-scroll chart-scroll" role="region" aria-labelledby={`${id}-chart-caption`} aria-describedby={`${id}-chart-navigation`} tabindex="0">
       <table class="chart">
         <caption id={`${id}-chart-caption`}>{t(data.lang, "chartCaption", { generation })}</caption>
         <thead>
@@ -196,7 +209,7 @@
               <th scope="col" class:selected={selection.ids.includes(type.id)}>
                 <span class="attack-head">
                   <img src={asset(`/type-icons/${type.identifier}.svg` as AssetPath)} alt="" width="22" height="22" />
-                  <Localized text={name(type.id)} />
+                  <span><Localized text={name(type.id)} /></span>
                 </span>
               </th>
             {/each}
@@ -212,7 +225,9 @@
               </th>
               {#each row.multipliers as cell (cell.typeId)}
                 <td class="numeric" class:selected={selection.ids.includes(cell.typeId)}
-                  data-multiplier={cell.multiplier}>{formatMultiplier(cell.multiplier)}</td>
+                  data-effect={cell.multiplier === 0 ? "immune" : cell.multiplier < 1 ? "resisted" : cell.multiplier > 1 ? "weak" : "neutral"}>
+                  <span class="multiplier">{formatMultiplier(cell.multiplier)}</span>
+                </td>
               {/each}
             </tr>
           {/each}
@@ -223,29 +238,65 @@
 {/if}
 
 <style>
-  .attack-types { margin: 0 0 1rem; padding: 0.75rem 1rem 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
-  legend { padding: 0 0.25rem; font-weight: 600; }
-  .attack-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); gap: 0.25rem 1rem; }
-  .attack-options label, .toggle { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
-  .attack-options label:has(input:disabled) { color: GrayText; }
-  input[type="checkbox"] { width: 1.25rem; height: 1.25rem; margin: 0; }
-  details { margin-block: 0.5rem; }
-  summary { min-height: 2.75rem; display: list-item; padding-block: 0.6rem; cursor: pointer; font-weight: 600; }
-  .combinations { display: grid; gap: 0.5rem; padding: 0; list-style: none; }
-  .combinations li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
-  .chart-scroll { max-height: 75vh; overflow: auto; }
-  .chart { border-collapse: separate; border-spacing: 0; }
-  .chart caption { text-align: start; padding-block-end: 0.5rem; font-weight: 600; }
-  .chart :is(th, td) { padding: 0.3rem 0.45rem; border-block-end: var(--border-width) solid var(--border); }
-  .chart thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); vertical-align: bottom; }
-  .chart th[scope="row"] { position: sticky; left: 0; background: var(--surface); text-align: start; white-space: nowrap; font-weight: normal; }
-  .chart thead th:first-child { left: 0; z-index: 2; text-align: start; }
-  .attack-head { display: inline-flex; align-items: center; gap: 0.35rem; writing-mode: vertical-rl; font-size: 0.875rem; font-weight: normal; }
+  .selection-panel { min-width: 0; margin-block: 1.5rem; padding: 1rem; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-panel); background: var(--surface); }
+  .attack-types { min-width: 0; margin: 0; padding: 0; border: 0; }
+  legend { max-width: 100%; padding: 0; margin-block-end: 0.75rem; font-family: var(--font-heading); font-weight: 700; overflow-wrap: anywhere; }
+  .attack-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); gap: 0.4rem; }
+  .attack-options label, .toggle { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; }
+  .attack-options label { min-width: 0; padding: 0.4rem 0.5rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
+  .attack-options label > span { min-width: 0; overflow-wrap: anywhere; }
+  .attack-options label > img { flex: 0 0 22px; }
+  .attack-options label.chosen { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .attack-options label:has(input:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+  .attack-options label:has(input:disabled) { color: var(--muted); border-style: dashed; cursor: not-allowed; }
+  input[type="checkbox"] { flex: 0 0 1.25rem; width: 1.25rem; height: 1.25rem; margin: 0; }
+  .selection-panel .filters { margin: 1rem 0 0; }
+  .filters button { max-width: 100%; }
+  .result-panel { min-width: 0; margin-block: 1.5rem; padding: clamp(0.75rem, 2vw, 1.25rem); border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.4rem; overflow-wrap: anywhere; }
+  .result-panel > h3 { overflow-wrap: anywhere; }
+  .result-panel > .note { margin-block: 0 1rem; }
+  .figures { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 0.5rem; }
+  .figures > div { min-width: 0; padding: 0.75rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface-muted); }
+  .figures dd { font-size: 1rem; overflow-wrap: anywhere; }
+  .multiplier { display: inline-block; min-width: 3.25rem; padding: 0.1rem 0.4rem; border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface); color: var(--page-text); font-size: 0.9375rem; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: center; }
+  [data-effect="weak"] .multiplier { border-width: var(--border-width); background: var(--accent-soft); font-weight: 700; }
+  [data-effect="resisted"] .multiplier { border-style: dashed; }
+  [data-effect="immune"] .multiplier { border-width: 3px; border-style: double; font-weight: 700; }
+  [data-effect="neutral"] .multiplier { border-color: transparent; background: transparent; color: var(--muted); }
+  details { margin-block: 0.5rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
+  summary { min-height: 2.75rem; display: list-item; padding: 0.6rem 0.75rem; cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+  .bucket-label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.75rem; max-width: calc(100% - 1rem); vertical-align: middle; }
+  .species-list { margin: 0; padding: 0.5rem 0.75rem 0.75rem; border-block-start: var(--border-width) solid var(--border); list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.25rem 0.75rem; }
+  .species-list li, .species-list a > span { min-width: 0; }
+  .species-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.25rem; border-radius: var(--radius-control); overflow-wrap: anywhere; }
+  .species-list a:hover { background: var(--accent-soft); }
+  .combinations { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0; padding: 0; list-style: none; }
+  .combinations li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-width: 0; padding-block: 0.5rem; border-block-end: 1px solid var(--border); }
+  .combinations .multiplier { margin-inline-start: auto; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0; margin-block: 1rem; list-style: none; }
+  .chart-legend li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.875rem; }
+  .toggle { padding-block: 0.5rem; }
+  .chart-navigation { font-style: italic; }
+  .chart-scroll { width: 100%; max-width: 100%; max-height: 75vh; overflow: auto; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-control); isolation: isolate; }
+  .chart { width: max-content; min-width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
+  .chart caption { max-width: min(60ch, calc(100vw - 6rem)); text-align: start; padding: 0.75rem; font-size: 0.875rem; font-weight: 600; overflow-wrap: anywhere; }
+  .chart :is(th, td) { padding: 0.4rem; border-block-end: 1px solid var(--border); border-inline-end: 1px solid var(--border); }
+  .chart thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-muted); vertical-align: bottom; border-block-end: var(--border-width) solid var(--border-strong); }
+  .chart th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface); text-align: start; font-size: 0.875rem; font-weight: 500; border-inline-end: var(--border-width) solid var(--border-strong); }
+  .chart th:first-child { min-width: 7rem; width: 8.5rem; max-width: 8.5rem; overflow-wrap: anywhere; }
+  .chart th[scope="row"] a { display: block; max-width: 7.5rem; padding-block: 0.25rem; }
+  .chart thead th:first-child { left: 0; z-index: 3; text-align: start; border-inline-end: var(--border-width) solid var(--border-strong); }
+  .attack-head { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 0.35rem; width: 4.5rem; min-height: 4.5rem; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; overflow-wrap: anywhere; }
+  .attack-head img { flex: 0 0 22px; }
   .chart td { text-align: center; }
   .chart .selected { background: var(--accent-soft); }
+  .chart thead th.selected { box-shadow: inset 0 3px 0 var(--accent); }
   .chart thead th.selected .attack-head { font-weight: 700; }
-  td[data-multiplier="2"], td[data-multiplier="4"] { font-weight: 700; }
-  td[data-multiplier="4"] { text-decoration: underline; }
-  td[data-multiplier="1"] { color: var(--muted); }
-  td[data-multiplier="0"], td[data-multiplier="0.25"], td[data-multiplier="0.5"] { color: var(--page-text); }
+  .chart tbody tr:hover th[scope="row"] { background: var(--surface-muted); }
+  @media (max-width: 30rem) {
+    .filters button { width: 100%; }
+    .chart th:first-child { min-width: 6rem; width: 7rem; max-width: 7rem; }
+    .chart th[scope="row"] a { max-width: 6rem; }
+  }
 </style>

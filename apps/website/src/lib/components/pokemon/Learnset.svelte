@@ -79,8 +79,13 @@
 <section aria-labelledby="moves-heading">
   <h2 id="moves-heading">{t(lang, "moves.heading")}</h2>
   {#if learnset.status === "available"}
-    <p class="note">{t(lang, "moves.context", { games })}</p>
-    <p class="note">{t(lang, "moves.currentValues")}</p>
+    <div class="learnset-context">
+      <p class="game-context">{t(lang, "moves.context", { games })}</p>
+      <details class="value-provenance">
+        <summary>{t(lang, "scope.current")}</summary>
+        <p>{t(lang, "moves.currentValues")}</p>
+      </details>
+    </div>
     {#if groups.length > 0}
       <div class="learnset-tabs">
       <Tabs.Root value={activeTab} onValueChange={(v) => (selectedTab = v)}>
@@ -97,18 +102,21 @@
         </Tabs.List>
         {#each groups as group (group.methodId)}
           <Tabs.Content value={String(group.methodId)}>
-            <p class="visually-hidden" id={`moves-guide-${group.methodId}`}>
-              <strong>{t(lang, "moves.allRows", { count: group.moves.length })}</strong>
-              <span>{t(lang, "moves.scrollHint")}</span>
+            <div class="method-heading">
+              <h3><Localized text={group.method} /></h3>
+              <span class="row-count">{t(lang, "moves.allRows", { count: group.moves.length })}</span>
+            </div>
+            <p class="scroll-hint" id={`moves-guide-${group.methodId}`}>
+              {t(lang, "moves.scrollHint")}
             </p>
             <div class="table-scroll" role="region" aria-label={t(lang, "moves.table", { method: group.method.text })} aria-describedby={`moves-guide-${group.methodId}`} tabindex="0">
             <table>
               <caption class="visually-hidden"><Localized text={group.method} /></caption>
               <thead>
                 <tr>
-                  {#if group.levelUp}<th scope="col" class="numeric">{t(lang, "moves.level")}</th>{/if}
-                  <th scope="col">{t(lang, "moves.move")}</th>
-                  <th scope="col">{t(lang, "moves.category")}</th>
+                  <th scope="col" class="move-identity">{t(lang, "moves.move")}</th>
+                  {#if group.levelUp}<th scope="col" class="numeric level">{t(lang, "moves.level")}</th>{/if}
+                  <th scope="col" class="category">{t(lang, "moves.category")}</th>
                   <th scope="col" class="numeric">{t(lang, "moves.power")}</th>
                   <th scope="col" class="numeric">{t(lang, "moves.accuracy")}</th>
                   <th scope="col" class="numeric">{t(lang, "moves.pp")}</th>
@@ -120,24 +128,24 @@
                 {#each group.moves as move, index (index)}
                   {@const metadata = moveMetadata.get(move.moveId)}
                   <tr>
-                    {#if group.levelUp}<td class="numeric">{move.level}</td>{/if}
-                    <th scope="row">
+                    <th scope="row" class="move-identity">
                       <a
                         href={`${resolve(`${lang}/move/${move.moveId}/`)}${page.url.searchParams.has("version") ? `?version=${encodeURIComponent(page.url.searchParams.get("version")!)}` : ""}`}
                       ><MoveIcon typeId={metadata?.typeId} /><Localized text={move.name} /></a>
                     </th>
-                    <td>
+                    {#if group.levelUp}<td class="numeric level"><span class="level-value">{move.level}</span></td>{/if}
+                    <td class="category">
                       <span class="damage-class" title={categoryName(metadata?.damageClassId)}>
                         <DamageClassIcon damageClassId={metadata?.damageClassId} />
                         <span class="visually-hidden">{categoryName(metadata?.damageClassId)}</span>
                         {#if !metadata || ![1, 2, 3].includes(metadata.damageClassId)}—{/if}
                       </span>
                     </td>
-                    <td class="numeric">{metadata?.power ? metadata.power : "—"}</td>
-                    <td class="numeric">{metadata?.accuracy == null ? "—" : `${metadata.accuracy}%`}</td>
-                    <td class="numeric">{metadata?.pp ?? "—"}</td>
-                    {#if group.hasPriority}<td class="numeric">{metadata?.priority == null ? "—" : metadata.priority > 0 ? `+${metadata.priority}` : metadata.priority}</td>{/if}
-                    {#if group.hasMastery}<td class="numeric">{move.mastery ?? ""}</td>{/if}
+                    <td class="numeric" class:missing={!metadata?.power}>{metadata?.power ? metadata.power : "—"}</td>
+                    <td class="numeric" class:missing={metadata?.accuracy == null}>{metadata?.accuracy == null ? "—" : `${metadata.accuracy}%`}</td>
+                    <td class="numeric" class:missing={metadata?.pp == null}>{metadata?.pp ?? "—"}</td>
+                    {#if group.hasPriority}<td class="numeric" class:missing={metadata?.priority == null}>{metadata?.priority == null ? "—" : metadata.priority > 0 ? `+${metadata.priority}` : metadata.priority}</td>{/if}
+                    {#if group.hasMastery}<td class="numeric" class:missing={move.mastery == null}>{move.mastery ?? "—"}</td>{/if}
                   </tr>
                 {/each}
               </tbody>
@@ -156,18 +164,35 @@
 </section>
 
 <style>
-  section, .learnset-tabs { min-width: 0; }
+  section, .learnset-tabs { position: relative; min-width: 0; }
+  .learnset-context {
+    margin-block-end: 1rem;
+    padding-inline-start: 0.75rem;
+    border-inline-start: var(--border-width) solid var(--accent);
+  }
+  .game-context { margin-block: 0 0.25rem; font-weight: 700; overflow-wrap: anywhere; }
+  .value-provenance { color: var(--muted); font-size: 0.875rem; }
+  .value-provenance summary {
+    width: fit-content;
+    max-width: 100%;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+  .value-provenance p { max-width: var(--measure); margin-block: 0.5rem 0; }
+  .learnset-tabs :global([data-tabs-list]) { gap: 0.375rem; }
   .learnset-tabs :global(.method-tab) {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
     max-width: 100%;
-    padding: 0.5rem 0.75rem;
+    padding: 0.375rem 0.625rem;
     border: var(--border-width) solid var(--border-strong);
     border-radius: var(--radius-control);
     background: var(--surface);
     color: var(--page-text);
     text-align: start;
+    line-height: 1.25;
   }
   .learnset-tabs :global(.method-tab[data-state="active"]) {
     border-color: var(--accent);
@@ -179,13 +204,19 @@
   .method-count {
     flex: 0 0 auto;
     padding: 0.125rem 0.375rem;
-    border-radius: var(--radius-control);
+    border-radius: var(--radius-pill);
     background: var(--surface-muted);
     color: var(--page-text);
     font-size: 0.8125rem;
     font-variant-numeric: tabular-nums;
   }
+  .method-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.75rem; }
+  .method-heading h3 { margin: 0; font-size: 1.125rem; overflow-wrap: anywhere; }
+  .row-count { color: var(--muted); font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .scroll-hint { margin-block: 0.375rem 0.625rem; color: var(--muted); font-size: 0.8125rem; }
   .table-scroll {
+    position: relative;
+    isolation: isolate;
     max-width: 100%;
     max-height: min(30rem, 65dvh);
     overflow: auto;
@@ -198,17 +229,51 @@
     outline: var(--border-width) solid var(--focus-ring);
     outline-offset: 3px;
   }
-  table { width: 100%; border-collapse: separate; border-spacing: 0; }
-  th, td { padding: 0.5rem 0.75rem; vertical-align: middle; }
+  table { width: 100%; min-width: 34rem; border-collapse: separate; border-spacing: 0; }
+  th, td { padding: 0.5rem 0.625rem; vertical-align: middle; }
   thead th {
     position: sticky;
     inset-block-start: 0;
-    z-index: 1;
+    z-index: 2;
+    background: var(--surface-muted);
+    color: var(--muted);
+    line-height: 1.25;
+  }
+  .move-identity {
+    position: sticky;
+    inset-inline-start: 0;
+    width: 11rem;
+    min-width: 11rem;
+    max-width: 11rem;
+    border-inline-end: var(--border-width) solid var(--border);
+    overflow-wrap: anywhere;
+  }
+  thead .move-identity { z-index: 3; color: var(--page-text); }
+  tbody .move-identity { z-index: 1; background: var(--surface); font-weight: 700; }
+  th a { display: flex; align-items: center; gap: 0.375rem; min-width: 0; }
+  th a :global(svg), th a :global(img) { flex-shrink: 0; }
+  th a :global(small) { font-weight: 400; }
+  tbody tr:hover > :is(th, td), tbody tr:focus-within > :is(th, td) { background: var(--accent-soft); }
+  tbody tr:last-child > :is(th, td) { border-block-end: none; }
+  .numeric { white-space: nowrap; text-align: end; font-variant-numeric: tabular-nums; }
+  td.numeric { font-weight: 600; }
+  td.missing { color: var(--muted); font-weight: 400; }
+  .level { width: 4.5rem; }
+  .level-value {
+    display: inline-block;
+    min-width: 2.25rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--radius-control);
     background: var(--surface-muted);
     color: var(--page-text);
+    text-align: center;
+    font-weight: 700;
   }
-  th[scope="row"] { min-width: 10rem; font-weight: normal; }
-  th a { display: inline-flex; align-items: center; gap: 0.375rem; }
-  .numeric { white-space: nowrap; }
-  .damage-class { display: inline-flex; align-items: center; }
+  .category { text-align: center; }
+  .damage-class { position: relative; display: inline-flex; align-items: center; vertical-align: middle; }
+  @media (max-width: 30rem) {
+    .move-identity { width: 8.5rem; min-width: 8.5rem; max-width: 8.5rem; }
+    th, td { padding-inline: 0.5rem; }
+    th a { flex-wrap: wrap; gap: 0.25rem; }
+  }
 </style>

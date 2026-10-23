@@ -6,6 +6,10 @@ const en = {
   defensive: "Defensive matchups",
   offensive: "Offensive matchups",
   attacking: "{type} attacks",
+  selectionHeading: "Defending types",
+  neutral: "Neutral",
+  chartNavigation:
+    "Scroll the chart horizontally to compare attacking types. Defending types stay pinned on the left.",
   first: "First type",
   second: "Second type (optional)",
   choose: "Choose a type",
@@ -47,6 +51,10 @@ const fr = {
   defensive: "Affinités défensives",
   offensive: "Affinités offensives",
   attacking: "Attaques de type {type}",
+  selectionHeading: "Types défensifs",
+  neutral: "Neutre",
+  chartNavigation:
+    "Faites défiler la table horizontalement pour comparer les types d’attaque. Les types défensifs restent visibles à gauche.",
   first: "Premier type",
   second: "Second type (facultatif)",
   choose: "Choisir un type",
@@ -88,6 +96,10 @@ const ja = {
   defensive: "防御の相性",
   offensive: "攻撃の相性",
   attacking: "{type}タイプのわざ",
+  selectionHeading: "防御タイプ",
+  neutral: "等倍",
+  chartNavigation:
+    "表を横にスクロールすると各攻撃タイプを比較できます。防御タイプは左端に固定されます。",
   first: "タイプ1",
   second: "タイプ2（任意）",
   choose: "タイプを選択",

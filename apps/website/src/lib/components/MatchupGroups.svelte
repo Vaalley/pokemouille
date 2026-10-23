@@ -17,7 +17,10 @@
       {#if group.rows.length}
         <ul>
           {#each group.rows as row (row.typeId)}
-            <li><TypeBadge typeId={row.typeId} name={name(row.typeId)} /><strong>×{row.multiplier}</strong></li>
+            <li data-effect={row.multiplier === 0 ? "immune" : row.multiplier < 1 ? "resisted" : "weak"}>
+              <TypeBadge typeId={row.typeId} name={name(row.typeId)} />
+              <strong>×{row.multiplier}</strong>
+            </li>
           {/each}
         </ul>
       {:else}<p>{none}</p>{/if}
@@ -26,8 +29,14 @@
 </div>
 
 <style>
-  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0 2rem; }
-  ul { display: grid; gap: 0.5rem; justify-items: start; padding: 0; margin: 0; list-style: none; }
-  li { display: flex; align-items: center; gap: 0.5rem; }
-  p { margin: 0; }
+  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0.75rem; }
+  section { min-width: 0; padding: 0.875rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
+  :is(h2, h3, h4) { margin: 0 0 0.75rem; font-family: var(--font-heading); font-size: 1rem; line-height: 1.3; overflow-wrap: anywhere; }
+  ul { display: grid; gap: 0.4rem; padding: 0; margin: 0; list-style: none; }
+  li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.35rem 0.5rem; }
+  strong { min-width: 3.25rem; padding: 0.1rem 0.4rem; border: 1px solid var(--border-strong); border-radius: var(--radius-control); text-align: center; font-variant-numeric: tabular-nums; }
+  [data-effect="weak"] strong { border-width: var(--border-width); background: var(--accent-soft); }
+  [data-effect="resisted"] strong { border-style: dashed; }
+  [data-effect="immune"] strong { border-style: double; border-width: 3px; }
+  p { margin: 0; color: var(--muted); }
 </style>

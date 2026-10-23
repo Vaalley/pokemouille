@@ -85,7 +85,10 @@
 <h1>{t(data.lang, "heading")}</h1>
 <p>{t(data.lang, "intro")}</p>
 <p><a href={resolve(typeCoverageHref(data.lang, selection.invalid ? [] : selection.ids, selectedVersion()) as PathnameWithSearchOrHash)}>{coverageText(data.lang, "link")}</a></p>
-<form class="filters" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
+<form class="selection-panel" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
+  <fieldset>
+    <legend>{t(data.lang, "selectionHeading")}</legend>
+    <div class="filters">
   {#each [0, 1] as slot}
     <div class="filter-field">
       <label for="{id}-type-{slot}">{t(data.lang, slot === 0 ? "first" : "second")}</label>
@@ -101,6 +104,8 @@
     </div>
   {/each}
   <button type="button" disabled={!mounted || (!selection.ids.length && !selection.invalid)} onclick={() => update([])}>{t(data.lang, "reset")}</button>
+    </div>
+  </fieldset>
 </form>
 
 {#if !mounted}
@@ -117,21 +122,23 @@
   <p role="status">{t(data.lang, "empty")}</p>
 {:else}
   {#if matchups}
-    <section aria-labelledby={`${id}-defensive`} aria-live="polite">
+    <section class="result-panel" aria-labelledby={`${id}-defensive`} aria-live="polite">
       <h2 id={`${id}-defensive`}>{t(data.lang, "defensive")}</h2>
-      <MatchupGroups groups={defensive} {name} heading="h3" none={t(data.lang, "none")} />
       <p class="note">{t(data.lang, "scope", { generation: game.group.generationId })}</p>
+      <MatchupGroups groups={defensive} {name} heading="h3" none={t(data.lang, "none")} />
     </section>
-    <section aria-labelledby={`${id}-offensive`} aria-live="polite">
+    <section class="result-panel" aria-labelledby={`${id}-offensive`} aria-live="polite">
       <h2 id={`${id}-offensive`}>{t(data.lang, "offensive")}</h2>
-      {#each offensive as attack (attack.typeId)}
-        {#if offensive.length > 1}<h3>{t(data.lang, "attacking", { type: name(attack.typeId).text })}</h3>{/if}
-        <MatchupGroups groups={attack.groups} {name} heading={offensive.length > 1 ? "h4" : "h3"} none={t(data.lang, "none")} />
-      {/each}
       <p class="note">{t(data.lang, "offensiveScope", { generation: game.group.generationId })}</p>
+      {#each offensive as attack (attack.typeId)}
+        <div class="attack-result">
+          {#if offensive.length > 1}<h3>{t(data.lang, "attacking", { type: name(attack.typeId).text })}</h3>{/if}
+          <MatchupGroups groups={attack.groups} {name} heading={offensive.length > 1 ? "h4" : "h3"} none={t(data.lang, "none")} />
+        </div>
+      {/each}
     </section>
   {:else}<p role="status">{t(data.lang, "unavailable")}</p>{/if}
-  <section aria-labelledby={`${id}-pokemon-heading`} aria-describedby={`${id}-pokemon-scope`}>
+  <section class="result-panel" aria-labelledby={`${id}-pokemon-heading`} aria-describedby={`${id}-pokemon-scope`}>
     <h2 id={`${id}-pokemon-heading`}>{t(data.lang, "pokemonHeading")}</h2>
     <p class="note" id={`${id}-pokemon-scope`}>{t(data.lang, "pokemonScope")}</p>
     <p class="result-count" role="status" aria-live="polite">{t(data.lang, "pokemonCount", { count: membership.rows.length })}</p>
@@ -161,8 +168,24 @@
 {/if}
 
 <style>
+  .selection-panel { margin-block: 1.5rem; }
+  fieldset { min-width: 0; margin: 0; padding: 1rem; border: var(--border-width) solid var(--border-strong); border-radius: var(--radius-panel); background: var(--surface); }
+  legend { max-width: 100%; padding-inline: 0.4rem; font-family: var(--font-heading); font-weight: 700; overflow-wrap: anywhere; }
+  .filters { margin: 0; }
+  .filter-field { min-width: 0; }
+  select, button { max-width: 100%; }
+  .result-panel { min-width: 0; margin-block: 1.5rem; padding: clamp(0.75rem, 2vw, 1.25rem); border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.4rem; overflow-wrap: anywhere; }
+  .result-panel > .note { margin-block: 0 1rem; }
+  .attack-result + .attack-result { margin-block-start: 1.25rem; padding-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
+  .attack-result > h3 { margin-block: 0 0.75rem; font-size: 1.125rem; }
   ul { list-style: none; padding: 0; }
   .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.25rem 1rem; }
   .pokemon-list li { min-width: 0; }
-  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; overflow-wrap: anywhere; }
+  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.25rem; border-radius: var(--radius-control); overflow-wrap: anywhere; }
+  .pokemon-list a:hover { background: var(--accent-soft); }
+  .pokemon-list a > span { min-width: 0; }
+  @media (max-width: 30rem) {
+    .filters button { width: 100%; }
+  }
 </style>

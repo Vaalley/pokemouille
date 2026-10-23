@@ -275,7 +275,7 @@
 {:else}
   <section class="comparison-setup" aria-label={t(lang, "pickerLabel")}>
     <div class="selection-progress">
-      <p class="selection-count" role="status">{t(lang, "selectionCount", { count: selection.entries.length, max: MAX_COMPARED })}</p>
+      <p class="selection-count" role="status" aria-atomic="true">{t(lang, "selectionCount", { count: selection.entries.length, max: MAX_COMPARED })}</p>
       {#if selection.entries.length > 0}
         <button type="button" onclick={clearSelection}>{t(lang, "clear")}</button>
       {/if}
@@ -290,7 +290,7 @@
       />
     </div>
     {#if selection.entries.length < 2}
-      <p class="compare-guidance" role="status">{t(lang, selection.entries.length === 0 ? "empty" : "single")}</p>
+      <p class="compare-guidance">{t(lang, selection.entries.length === 0 ? "empty" : "single")}</p>
     {/if}
   </section>
 
@@ -303,7 +303,7 @@
 
   {#if gamesFailed}
     <p role="alert">{t(lang, "gamesError")}</p>
-    <p><button type="button" onclick={loadGames}>{t(lang, "retry")}</button></p>
+    <p class="compare-actions"><button type="button" onclick={loadGames}>{t(lang, "retry")}</button></p>
   {:else if version === null || !game}
     <p role="status">{t(lang, "loadingGames")}</p>
   {:else if selection.entries.length > 0}

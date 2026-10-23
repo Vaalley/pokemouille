@@ -61,6 +61,7 @@
     { key: "moves", path: "move/", detail: "move/" },
     { key: "abilities", path: "ability/", detail: "ability/" },
     { key: "items", path: "item/", detail: "item/" },
+    { key: "eggGroups", path: "egg-group/", detail: "egg-group/" },
     { key: "types", path: "types/", detail: "types/" },
     { key: "compare", path: "compare/", detail: "compare/" },
     { key: "moveset", path: "moveset/", detail: "moveset/" },

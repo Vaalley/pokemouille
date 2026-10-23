@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
   import { resolve } from "$app/paths";
@@ -41,6 +41,7 @@
   let gamesFailed = $state(false);
   let query = $state("");
   let searchInput = $state<HTMLInputElement>();
+  let selectedList = $state<HTMLUListElement>();
   let loaded = $state.raw<{ key: string; files: MoveLearners[] } | null>(null);
   let loadFailed = $state(false);
   let attempt = $state(0);
@@ -155,8 +156,17 @@
     query = "";
     searchInput?.focus();
   }
-  function remove(moveId: number) {
+  async function remove(moveId: number) {
+    const index = selection.ids.indexOf(moveId);
     update(selection.ids.filter((entry) => entry !== moveId));
+    await tick();
+    const buttons = selectedList?.querySelectorAll<HTMLButtonElement>("button");
+    const next = buttons?.[Math.min(index, buttons.length - 1)];
+    (next ?? searchInput)?.focus();
+  }
+  async function clear() {
+    update([]);
+    await tick();
     searchInput?.focus();
   }
   function withVersion(path: string) {
@@ -171,13 +181,18 @@
 </script>
 
 <svelte:head><title>{t(data.lang, "heading")} | Pokémouille</title></svelte:head>
-<h1>{t(data.lang, "heading")}</h1>
-<p>{t(data.lang, "intro", { max: MAX_MOVES })}</p>
-<p class="note" id="{id}-scope">{t(data.lang, "scope")}</p>
-<p class="note">{t(data.lang, "obtainable")}</p>
-<p class="note">{t(data.lang, "legality")}</p>
+<header class="page-heading">
+  <h1>{t(data.lang, "heading")}</h1>
+  <p>{t(data.lang, "intro", { max: MAX_MOVES })}</p>
+</header>
+<aside class="scope-notes" aria-label={t(data.lang, "scopeHeading")}>
+  <p class="scope-title">{t(data.lang, "scopeHeading")}</p>
+  <p class="note" id="{id}-scope">{t(data.lang, "scope")}</p>
+  <p class="note">{t(data.lang, "obtainable")}</p>
+  <p class="note legality">{t(data.lang, "legality")}</p>
+</aside>
 
-<section aria-labelledby="{id}-picker">
+<section class="picker-panel" aria-labelledby="{id}-picker">
   <h2 id="{id}-picker">{t(data.lang, "picker")}</h2>
   <form class="filters" role="search" onsubmit={(event) => {
     event.preventDefault();
@@ -191,15 +206,18 @@
         type="search"
         autocomplete="off"
         placeholder={t(data.lang, "placeholder")}
-        aria-describedby="{id}-search-help"
+        aria-describedby="{id}-search-help {id}-limit"
         aria-controls="{id}-suggestions"
         disabled={!mounted}
         bind:this={searchInput}
         bind:value={query}
       />
-      <small id="{id}-search-help">{full ? t(data.lang, "full", { max: MAX_MOVES }) : t(data.lang, "searchHelp")}</small>
+      <small id="{id}-search-help">{t(data.lang, "searchHelp")}</small>
     </div>
   </form>
+  <p id="{id}-limit" class:at-limit={full} class="selection-limit" role="status" aria-live="polite">
+    {full ? t(data.lang, "full", { max: MAX_MOVES }) : t(data.lang, "limit", { max: MAX_MOVES })}
+  </p>
 
   <div id="{id}-suggestions">
     {#if query.trim()}
@@ -223,8 +241,8 @@
                 onclick={() => add(move.id)}
               >
                 <MoveIcon typeId={move.typeId} />
-                <Localized text={move.name} />
-                {#if chosen}<small>({t(data.lang, "added")})</small>{/if}
+                <span class="move-name"><Localized text={move.name} /></span>
+                <small class="suggestion-action">{chosen ? t(data.lang, "added") : t(data.lang, "addShort")}</small>
               </button>
             </li>
           {/each}
@@ -233,15 +251,20 @@
     {/if}
   </div>
 
-  <h3 id="{id}-selected">{t(data.lang, "selected", { count: selection.ids.length, max: MAX_MOVES })}</h3>
+  <div class="selection-heading">
+    <h3 id="{id}-selected">{t(data.lang, "selected", { count: selection.ids.length, max: MAX_MOVES })}</h3>
+    {#if selection.ids.length}
+      <button class="clear-button" type="button" onclick={clear}>{t(data.lang, "reset")}</button>
+    {/if}
+  </div>
   {#if selection.ids.length}
-    <ul class="selected" aria-labelledby="{id}-selected">
+    <ul class="selected" aria-labelledby="{id}-selected" bind:this={selectedList}>
       {#each selection.ids as moveId (moveId)}
         {@const move = moveById.get(moveId)!}
         <li>
           <a href={withVersion(`${data.lang}/move/${moveId}/`)}>
             <MoveIcon typeId={move.typeId} />
-            <Localized text={move.name} />
+            <span class="move-name"><Localized text={move.name} /></span>
           </a>
           <button
             type="button"
@@ -251,50 +274,51 @@
         </li>
       {/each}
     </ul>
-    <button type="button" onclick={() => update([])}>{t(data.lang, "reset")}</button>
   {:else}
-    <p>{t(data.lang, "noneSelected")}</p>
+    <p class="empty-selection">{t(data.lang, "noneSelected")}</p>
   {/if}
   {#if selection.invalid}
     <p class="note" role="status">{t(data.lang, "invalid", { max: MAX_MOVES })}</p>
   {/if}
 </section>
 
-<section aria-labelledby="{id}-results" aria-describedby="{id}-scope">
+<section class="results-panel" aria-labelledby="{id}-results" aria-describedby="{id}-scope">
   <h2 id="{id}-results">{t(data.lang, "table")}</h2>
   {#if !mounted}
-    <p role="status">{t(data.lang, "loading")}</p>
+    <p class="state-message" role="status">{t(data.lang, "loading")}</p>
     <noscript><p>{t(data.lang, "javascript")}</p></noscript>
   {:else if gamesFailed || (games && version && !game)}
-    <p role="alert">{t(data.lang, "gamesError")}</p>
+    <p class="state-message error-message" role="alert">{t(data.lang, "gamesError")}</p>
   {:else if !selection.ids.length}
-    <p role="status">{t(data.lang, "empty")}</p>
+    <p class="state-message" role="status">{t(data.lang, "empty")}</p>
   {:else if loadFailed}
-    <p role="alert">{t(data.lang, "error")}</p>
-    <button type="button" onclick={() => attempt++}>{t(data.lang, "retry")}</button>
+    <div class="state-message error-message">
+      <p role="alert">{t(data.lang, "error")}</p>
+      <button class="retry-button" type="button" onclick={() => attempt++}>{t(data.lang, "retry")}</button>
+    </div>
   {:else if !game || !gameName || !result}
-    <p role="status">{t(data.lang, "loading")}</p>
+    <p class="state-message" role="status">{t(data.lang, "loading")}</p>
   {:else}
-    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
-      {t(data.lang, "count", { count: result.rows.length })}
-      <span aria-hidden="true">·</span>
-      {t(data.lang, "game")} <strong><Localized text={gameName} /></strong>
-    </p>
+    <div class="result-summary" role="status" aria-live="polite" aria-atomic="true">
+      <p class="matching-count">{t(data.lang, "count", { count: result.rows.length })}</p>
+      <p class="game-context">{t(data.lang, "game")} <strong><Localized text={gameName} /></strong></p>
+    </div>
     {#if game.coverageState.learnsets === "missing"}
-      <p>{t(data.lang, "noLearnsets")}</p>
+      <p class="state-message">{t(data.lang, "noLearnsets")}</p>
     {:else}
       <h3 id="{id}-per-move">{t(data.lang, "perMove")}</h3>
       <ul class="per-move" aria-labelledby="{id}-per-move">
         {#each result.counts as count (count.moveId)}
           {@const move = moveById.get(count.moveId)!}
-          <li><Localized text={move.name} /> <span aria-hidden="true">·</span> {t(data.lang, "moveCount", { count: count.count })}</li>
+          <li><span><Localized text={move.name} /></span><strong>{t(data.lang, "moveCount", { count: count.count })}</strong></li>
         {/each}
       </ul>
       {#if result.missingIntroduction}
         <p class="note">{t(data.lang, "sourceGap", { count: result.missingIntroduction })}</p>
       {/if}
       {#if result.rows.length}
-        <div class="table-scroll" role="region" aria-labelledby="{id}-caption" tabindex="0">
+        <p class="note table-help" id="{id}-table-help">{t(data.lang, "tableHelp")}</p>
+        <div class="table-scroll" role="region" aria-labelledby="{id}-caption" aria-describedby="{id}-table-help" tabindex="0">
           <table>
             <caption id="{id}-caption">{t(data.lang, "caption")}</caption>
             <thead>
@@ -330,17 +354,19 @@
                           {@const methodName = methods.get(method.learnMethodId)}
                           {@const levels = method.learnMethodId === 1 ? method.levels : method.levels.filter((level) => level > 0)}
                           <li>
-                            {#if methodName}
-                              <Localized text={methodName} />
-                            {:else if method.learnMethodId === 1}
-                              {t(data.lang, "levelUp")}
-                            {:else}
-                              {t(data.lang, "missingMethod", { id: method.learnMethodId })}
-                            {/if}
+                            <span class="method-name">
+                              {#if methodName}
+                                <Localized text={methodName} />
+                              {:else if method.learnMethodId === 1}
+                                {t(data.lang, "levelUp")}
+                              {:else}
+                                {t(data.lang, "missingMethod", { id: method.learnMethodId })}
+                              {/if}
+                            </span>
                             {#if levels.length === 1}
-                              ({t(data.lang, "level", { level: levels[0]! })})
+                              <span class="method-level">{t(data.lang, "level", { level: levels[0]! })}</span>
                             {:else if levels.length > 1}
-                              ({t(data.lang, "levels", { levels: levels.join(", ") })})
+                              <span class="method-level">{t(data.lang, "levels", { levels: levels.join(", ") })}</span>
                             {/if}
                           </li>
                         {/each}
@@ -353,50 +379,137 @@
           </table>
         </div>
       {:else}
-        <p>{t(data.lang, "noResults")}</p>
+        <p class="state-message">{t(data.lang, "noResults")}</p>
       {/if}
     {/if}
   {/if}
 </section>
 
 <style>
-  .filters { margin-block-end: 0.25rem; }
-  .filter-field small { font-size: 0.875rem; }
-  ul { padding: 0; list-style: none; }
-  .suggestions, .selected { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.5rem 1rem; }
-  .suggestions button, .selected li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    min-height: 2.75rem;
-    padding: 0.25rem 0.75rem;
+  .page-heading p { max-width: var(--measure); }
+  .scope-notes {
+    margin-block: 1.25rem;
+    padding: 0.875rem 1rem;
+    border-inline-start: var(--border-width) solid var(--accent);
+    background: var(--surface-muted);
+    border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  }
+  .scope-title { margin: 0; font-weight: 700; }
+  .scope-notes .note { margin-block: 0.5rem 0; }
+  .scope-notes .legality { color: var(--page-text); font-weight: 600; }
+  .picker-panel {
+    min-width: 0;
+    padding: 1rem;
     border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-pill);
-    background: none;
-    color: inherit;
-    font: inherit;
+    border-radius: var(--radius-panel);
+    background: var(--surface);
   }
-  .suggestions button:disabled { color: GrayText; cursor: default; }
-  .selected li { padding-inline-end: 0.25rem; }
-  .selected a { display: inline-flex; align-items: center; gap: 0.375rem; }
+  .picker-panel h2 { margin-block: 0 0.75rem; }
+  .filters { margin-block-end: 0.25rem; }
+  .filter-field, .filter-field input { min-width: 0; }
+  .filter-field small, .selection-limit { font-size: 0.875rem; color: var(--muted); }
+  .selection-limit { margin-block: 0.5rem 0.75rem; }
+  .selection-limit.at-limit {
+    padding: 0.5rem 0.75rem;
+    border: var(--border-width) solid var(--accent);
+    border-radius: var(--radius-control);
+    background: var(--accent-soft);
+    color: var(--page-text);
+    font-weight: 600;
+  }
+  ul { padding: 0; list-style: none; }
+  .suggestions { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.375rem; margin-block: 0.5rem 1rem; }
+  .suggestions li { min-width: 0; }
+  .suggestions button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.375rem 0.625rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    text-align: start;
+    cursor: pointer;
+  }
+  .suggestions button:not(:disabled):hover { border-color: var(--accent); background: var(--accent-soft); }
+  .suggestions button:disabled { color: var(--muted); background: var(--surface-muted); cursor: default; }
+  .move-name { min-width: 0; overflow-wrap: anywhere; }
+  .suggestion-action { margin-inline-start: auto; flex-shrink: 0; font-size: 0.75rem; font-weight: 700; }
+  .selection-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.375rem 1rem; margin-block-start: 1rem; }
+  .selection-heading h3 { margin: 0; font-size: 1rem; }
+  .clear-button, .retry-button {
+    min-height: 2.75rem;
+    max-width: 100%;
+    padding: 0.375rem 0.75rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+  .selected { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.75rem 0; }
+  .selected li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: 100%;
+    min-width: 0;
+    padding-inline-start: 0.625rem;
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: var(--accent-soft);
+  }
+  .selected a { display: inline-flex; align-items: center; gap: 0.375rem; min-width: 0; min-height: 2.75rem; }
   .selected button {
-    min-width: 2.75rem;
-    min-height: 2.25rem;
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
     border: 0;
-    background: none;
+    border-inline-start: var(--border-width) solid var(--border);
+    border-radius: 0 calc(var(--radius-control) - var(--border-width)) calc(var(--radius-control) - var(--border-width)) 0;
+    background: transparent;
     color: inherit;
-    font-size: 1.25rem;
-    line-height: 1;
+    font-size: 1.5rem;
+    cursor: pointer;
   }
-  .per-move { display: grid; gap: 0.25rem; }
-  .table-scroll:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-  table { width: 100%; }
-  caption { text-align: start; font-weight: 600; }
-  th, td { vertical-align: top; }
-  th[scope="row"] { min-width: 12rem; font-weight: normal; }
+  .selected button:hover { background: var(--surface); }
+  .empty-selection { margin-block-end: 0; padding: 0.75rem; border: var(--border-width) dashed var(--border); border-radius: var(--radius-control); color: var(--muted); }
+  .results-panel { min-width: 0; margin-block-start: 1.75rem; }
+  .results-panel h2 { margin-block-end: 0.75rem; }
+  .state-message { padding: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface-muted); overflow-wrap: anywhere; }
+  .state-message p { margin-block: 0 0.75rem; }
+  .error-message { border-color: var(--border-strong); border-inline-start-color: var(--accent); }
+  .result-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.375rem 1rem; padding-block-end: 0.75rem; border-block-end: var(--border-width) solid var(--border); }
+  .result-summary p { margin: 0; overflow-wrap: anywhere; }
+  .matching-count { font-weight: 700; font-size: 1.125rem; }
+  .game-context { font-size: 0.875rem; color: var(--muted); }
+  .game-context strong { color: var(--page-text); }
+  .per-move { display: flex; flex-wrap: wrap; gap: 0.375rem 0.75rem; }
+  .per-move li { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; max-width: 100%; padding: 0.375rem 0.625rem; background: var(--surface-muted); border-radius: var(--radius-control); font-size: 0.875rem; overflow-wrap: anywhere; }
+  .per-move strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .table-help { margin-block-end: 0.5rem; }
+  .table-scroll { min-width: 0; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
+  table { width: 100%; border-spacing: 0; }
+  caption { padding: 0.75rem; text-align: start; font-weight: 600; }
+  th, td { padding: 0.625rem 0.75rem; vertical-align: top; }
+  thead th { background: var(--surface-muted); text-align: start; }
+  th[scope="row"] { min-width: 11rem; max-width: 16rem; font-weight: normal; }
   th[scope="row"] a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; overflow-wrap: anywhere; }
-  .detail { display: block; padding-inline-start: 3rem; }
-  .detail code { white-space: normal; }
-  .methods { margin: 0; display: grid; gap: 0.125rem; }
-  td { min-width: 9rem; }
+  .detail { display: block; padding-inline-start: 3rem; font-size: 0.75rem; color: var(--muted); }
+  .detail code { white-space: normal; overflow-wrap: anywhere; }
+  .methods { margin: 0; display: grid; gap: 0.5rem; }
+  .methods li { display: grid; gap: 0.125rem; overflow-wrap: anywhere; }
+  .method-name { font-size: 0.875rem; }
+  .method-level { color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  td { min-width: 10rem; }
+  tbody tr:last-child :is(th, td) { border-block-end: 0; }
+  tbody tr:hover { background: var(--accent-soft); }
+  @media (max-width: 30rem) {
+    .picker-panel { padding: 0.75rem; }
+    .scope-notes { padding: 0.75rem; }
+    .selected { display: grid; }
+    .selected li { justify-content: space-between; }
+    .per-move { display: grid; }
+    .per-move li { justify-content: space-between; }
+  }
 </style>

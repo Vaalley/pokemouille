@@ -54,7 +54,7 @@
     {#if data.shortEffect && data.shortEffect.text !== data.effect?.text}
       <p class="effect-summary"><Localized text={data.shortEffect} /></p>
     {/if}
-    {#if data.effect}<p class="effect-text"><Localized text={data.effect} /></p>{:else}<p>{t(lang, "missing")}</p>{/if}
+    {#if data.effect}<p class="effect-text"><Localized text={data.effect} /></p>{:else}<p class="detail-feedback detail-feedback--missing">{t(lang, "missing")}</p>{/if}
   </section>
   <MoveProperties {lang} move={data.move} stats={data.stats} />
 
@@ -72,7 +72,7 @@
         </table>
       </div>
     {:else}
-      <p>{t(lang, "noDescriptions")}</p>
+      <p class="detail-feedback detail-feedback--empty">{t(lang, "noDescriptions")}</p>
     {/if}
   </section>
   <Machines {lang} kind="move" data={data.machines} />

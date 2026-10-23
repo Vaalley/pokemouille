@@ -116,6 +116,74 @@ body {
   line-height: 1.5;
 }
 
+/* Detail feedback: keep loading, failures, empty records and missing fields distinct. */
+.detail-feedback {
+  min-width: 0;
+  margin-block: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: var(--border-width) solid var(--border);
+  border-inline-start: 0.25rem solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  overflow-wrap: anywhere;
+}
+
+.detail-feedback > :first-child {
+  margin-block-start: 0;
+}
+
+.detail-feedback > :last-child {
+  margin-block-end: 0;
+}
+
+.detail-feedback--loading {
+  display: grid;
+  align-content: center;
+  min-block-size: 6rem;
+  border-inline-start-color: var(--accent);
+}
+
+.detail-feedback--error {
+  border-inline-start-style: double;
+  border-inline-start-width: 0.5rem;
+  border-inline-start-color: var(--page-text);
+  background: var(--surface);
+}
+
+.detail-feedback--empty {
+  border-style: dashed;
+  background: transparent;
+}
+
+.detail-feedback--missing {
+  color: var(--muted);
+  border-inline-start-style: dotted;
+}
+
+.detail-feedback--inline {
+  padding: 0.125rem 0.375rem;
+  margin: 0;
+  border: 0;
+  border-inline-start: var(--border-width) dotted var(--border-strong);
+  border-radius: 0;
+  background: transparent;
+  box-decoration-break: clone;
+}
+
+.detail-feedback__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.detail-feedback__actions > * {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 ::selection {
   background: var(--accent);
   color: var(--surface);
@@ -243,6 +311,14 @@ main:focus {
   position: absolute;
   left: 1rem;
   top: -100vh;
+  z-index: 100;
+  max-width: calc(100% - 2rem);
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--page-text);
 }
 
 .skip-link:focus {
@@ -333,6 +409,7 @@ main p {
 
 .header-disclosure {
   position: relative;
+  min-width: 0;
 }
 
 .header-disclosure > summary {
@@ -340,6 +417,7 @@ main p {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  overflow-wrap: anywhere;
   min-height: 2.75rem;
   padding: 0.5rem 0.75rem;
   border: var(--border-width) solid var(--border-strong);
@@ -412,7 +490,9 @@ main p {
 }
 
 .browse-navigation a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   padding-block: 0.4rem;
 }
 
@@ -447,6 +527,7 @@ main p {
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+  overflow-wrap: anywhere;
   min-width: 14rem;
   /* 44px touch target (WCAG 2.5.5); this is the only search entry point on touch devices. */
   min-height: 2.75rem;
@@ -744,11 +825,14 @@ button:disabled {
   min-width: 0;
   min-height: 0;
   padding: 1rem;
+  /* At high zoom or with a short viewport, keep the close button and feedback reachable. */
+  overflow-y: auto;
 }
 
 .search-dialog-header {
   display: flex;
   flex: 0 0 auto;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -763,6 +847,8 @@ button:disabled {
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
   line-height: 1.2;
 }
 
@@ -839,7 +925,7 @@ button:disabled {
 }
 
 .search-keyboard-hints {
-  display: flex;
+  display: none;
   flex: 0 0 auto;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
@@ -861,6 +947,19 @@ button:disabled {
   background: var(--surface-muted);
   color: var(--page-text);
   font: inherit;
+}
+
+/* Touch users need the result space, not instructions for keys they cannot press. */
+@media (hover: hover) and (pointer: fine) {
+  .search-keyboard-hints {
+    display: flex;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .search-trigger kbd {
+    display: none;
+  }
 }
 
 @media (max-width: 30rem) {
@@ -1077,6 +1176,8 @@ button:disabled {
 
   .site-name {
     margin-inline-end: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .desktop-navigation {

@@ -56,18 +56,23 @@
   {:else}<p class="note">{t(lang, "empty")}</p>{/if}
 {/snippet}
 
-<section aria-labelledby="breeding-heading">
+<section class="breeding" aria-labelledby="breeding-heading">
   <h2 id="breeding-heading">{t(lang, "heading")}</h2>
-  {#if pokemon.eggGroups.status === "available"}
-    <ul class="inline-list">
-      {#each pokemon.eggGroups.value.groups as eggGroup (eggGroup.id)}
-        <li><a href={href(`/${lang}/egg-group/${eggGroup.id}/?${new URLSearchParams({ version })}`)}>{eggGroup.name.text}</a></li>
-      {/each}
-    </ul>
-  {:else}<p>{t(lang, "missingGroups")}</p>{/if}
-  <p class="note">{t(lang, "current")}</p>
-  <p class="note">{t(lang, "formScope")}</p>
-  <p><a href={href(`/${lang}/egg-group/?${new URLSearchParams({ version })}`)}>{t(lang, "groupsLink")}</a></p>
+  <div class="membership">
+    <h3>{t(lang, "membership")}</h3>
+    {#if pokemon.eggGroups.status === "available"}
+      <ul class="group-list">
+        {#each pokemon.eggGroups.value.groups as eggGroup (eggGroup.id)}
+          <li><a href={href(`/${lang}/egg-group/${eggGroup.id}/?${new URLSearchParams({ version })}`)}>{eggGroup.name.text}</a></li>
+        {/each}
+      </ul>
+    {:else}<p>{t(lang, "missingGroups")}</p>{/if}
+    <a class="directory-link" href={href(`/${lang}/egg-group/?${new URLSearchParams({ version })}`)}>{t(lang, "groupsLink")}</a>
+  </div>
+  <aside class="source-notes" aria-label={t(lang, "sourceNotes")}>
+    <p class="note">{t(lang, "current")}</p>
+    <p class="note">{t(lang, "formScope")}</p>
+  </aside>
   {#if mechanic === "none"}<p>{t(lang, "none")}</p>
   {:else if pokemon.status !== "available"}<p>{t(lang, "selectedUnknown")}</p>
   {:else}
@@ -78,24 +83,45 @@
     {#if mechanic === "mirror-herb"}<p class="note">{t(lang, "mirror")}</p>{/if}
     {#if !moves.length}<p>{t(lang, "noMoves")}</p>
     {:else}
-      <details bind:open>
-        <summary>{t(lang, "open")}</summary>
-        <p class="note">{t(lang, "scope")}</p>
+      <details class="candidate-panel" bind:open>
+        <summary>{t(lang, "open")} <span class="count">{moves.length}</span></summary>
+        <p class="note candidate-scope">{t(lang, "scope")}</p>
         {#if failed}<p role="alert">{t(lang, "error")} <button type="button" onclick={() => attempt++}>{t(lang, "retry")}</button></p>
         {:else if !projection}<p role="status">{t(lang, "loading")}</p>
         {:else}
-          <div class="breeding-rows" role="region" aria-labelledby="breeding-heading" tabindex="0">
+          <div class="breeding-rows" role="region" aria-label={t(lang, "open")} tabindex="0">
           {#each rows as row (row.id)}
-            <section class="egg-move">
-              <h3><a href={href(`/${lang}/move/${row.id}/?${new URLSearchParams({ version })}`)}>{row.name.text}</a></h3>
+            <section class="egg-move" aria-labelledby={`egg-move-${row.id}`}>
+              <h3 id={`egg-move-${row.id}`}><a href={href(`/${lang}/move/${row.id}/?${new URLSearchParams({ version })}`)}>{row.name.text}</a></h3>
               {#if target && ordinaryBreeder(target)}
-                <h4>{t(lang, "direct")}</h4>{@render candidates(row.candidates.direct)}
-                <h4>{t(lang, "chain")}</h4>{@render candidates(row.candidates.chain)}
+                <section class="candidate-method" aria-labelledby={`parent-candidates-${row.id}`}>
+                  <h4 id={`parent-candidates-${row.id}`}>{t(lang, "candidates")}</h4>
+                  <div class="candidate-categories">
+                    <div class="candidate-category">
+                      <h5>{t(lang, "direct")} <span class="count">{row.candidates.direct.length}</span></h5>
+                      {@render candidates(row.candidates.direct)}
+                    </div>
+                    <div class="candidate-category chain">
+                      <h5>{t(lang, "chain")} <span class="count">{row.candidates.chain.length}</span></h5>
+                      {@render candidates(row.candidates.chain)}
+                    </div>
+                  </div>
+                </section>
               {/if}
               {#if mechanic === "mirror-herb"}
-                <h4>{t(lang, "transfer")}</h4>
-                <p>{t(lang, "transferDirect")}</p>{@render candidates(row.candidates.transfer)}
-                <p>{t(lang, "transferChain")}</p>{@render candidates(row.candidates.transferChain)}
+                <section class="candidate-method transfer" aria-labelledby={`transfer-candidates-${row.id}`}>
+                  <h4 id={`transfer-candidates-${row.id}`}>{t(lang, "transfer")}</h4>
+                  <div class="candidate-categories">
+                    <div class="candidate-category">
+                      <h5>{t(lang, "transferDirect")} <span class="count">{row.candidates.transfer.length}</span></h5>
+                      {@render candidates(row.candidates.transfer)}
+                    </div>
+                    <div class="candidate-category chain">
+                      <h5>{t(lang, "transferChain")} <span class="count">{row.candidates.transferChain.length}</span></h5>
+                      {@render candidates(row.candidates.transferChain)}
+                    </div>
+                  </div>
+                </section>
               {/if}
               {#if row.candidates.missingChronology}<p class="note">{t(lang, "gap", { count: row.candidates.missingChronology })}</p>{/if}
             </section>
@@ -108,9 +134,34 @@
 </section>
 
 <style>
-  .breeding-rows { max-height: min(36rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding-inline: 0.5rem; margin-block-start: 1rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
-  .candidate-list { display: flex; flex-wrap: wrap; gap: 0.35rem 1.5rem; padding-inline-start: 1.25rem; }
-  .egg-move { border-block-start: var(--border-width) solid var(--border); margin-block-start: 1rem; padding-block-start: 0.5rem; }
-  .egg-move:first-child { border-block-start: 0; margin-block-start: 0; }
-  summary { min-height: 2.75rem; padding-block: 0.5rem; cursor: pointer; }
+  .breeding, .breeding :is(section, div, ul, li) { min-width: 0; }
+  .breeding { overflow-wrap: anywhere; }
+  .membership { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .membership h3 { margin: 0; font-size: 1rem; }
+  .group-list { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
+  .group-list a { display: inline-block; padding: 0.375rem 0.625rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--accent-soft); font-weight: 600; }
+  .directory-link { padding-block: 0.375rem; font-size: 0.9375rem; }
+  .source-notes { margin-block: 0.75rem; padding-inline-start: 0.75rem; border-inline-start: var(--border-width) solid var(--border-strong); }
+  .source-notes p { margin-block: 0.375rem; }
+  .candidate-panel { border: var(--border-width) solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
+  summary { min-height: 2.75rem; padding: 0.625rem 0.75rem; cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+  .count { display: inline-block; padding-inline: 0.4rem; border-radius: var(--radius-control); background: var(--surface-muted); color: var(--page-text); font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; vertical-align: baseline; }
+  .candidate-scope { margin: 0.5rem 0.75rem 0.75rem; }
+  .breeding-rows { max-height: min(40rem, 72dvh); overflow: auto; overscroll-behavior: contain; padding: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
+  .candidate-list { display: flex; flex-wrap: wrap; gap: 0.125rem 0.75rem; margin: 0; padding: 0; list-style: none; }
+  .candidate-list a { display: inline-block; padding-block: 0.375rem; }
+  .egg-move + .egg-move { border-block-start: var(--border-width) solid var(--border-strong); margin-block-start: 1rem; padding-block-start: 1rem; }
+  .egg-move h3 { margin: 0 0 0.625rem; font-size: 1.125rem; }
+  .candidate-method + .candidate-method { margin-block-start: 0.875rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) dashed var(--border-strong); }
+  h4 { margin: 0 0 0.5rem; font-size: 0.9375rem; }
+  .candidate-categories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+  .candidate-category { border-inline-start: var(--border-width) solid var(--accent); padding-inline-start: 0.625rem; }
+  .candidate-category.chain { border-inline-start-style: dashed; border-color: var(--border-strong); }
+  h5 { margin: 0 0 0.25rem; font: 600 0.875rem/1.5 var(--font-body); }
+  .candidate-category p { margin: 0; font-size: 0.875rem; }
+  :is(a, summary, button, .breeding-rows):focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: var(--radius-control); }
+  @media (max-width: 40rem) {
+    .candidate-categories { grid-template-columns: minmax(0, 1fr); }
+    .breeding-rows { padding: 0.625rem; }
+  }
 </style>
