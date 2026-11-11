@@ -70,13 +70,14 @@
 </section>
 
 <style>
-  section { min-width: 0; }
-  .ability-list { display: grid; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
-  .ability-list > li { min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .ability-list > li:has(small) { border-inline-start-color: var(--accent); }
-  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
-  .ability-link { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; font-weight: 600; }
-  h3 small { font-size: var(--data-label-size); font-weight: 600; }
+  section { min-width: 0; overflow-wrap: anywhere; }
+  h2 { margin-block: 0 0.625rem; }
+  .ability-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .ability-list > li { min-width: 0; padding-block: 0.25rem; }
+  .ability-list > li + li { border-block-start: 1px solid var(--border); }
+  h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.125rem 0.75rem; margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .ability-link { display: inline-flex; align-items: center; gap: 0.5rem; min-width: 0; max-width: 100%; min-height: 2.75rem; font-weight: 600; }
+  h3 small { color: var(--muted); font-size: 0.875rem; font-weight: 400; }
   :global(.ability-preview) {
     z-index: 60;
     width: min(22rem, calc(100vw - 1.5rem));
@@ -91,6 +92,6 @@
     font-size: 1rem;
     font-weight: normal;
   }
-  :global(.ability-preview p) { margin: 0; white-space: pre-line; }
-  :global(.ability-preview .ability-preview-scope) { margin-block-end: 0.625rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; }
+  :global(.ability-preview p) { margin: 0; white-space: pre-line; line-height: 1.6; overflow-wrap: anywhere; }
+  :global(.ability-preview .ability-preview-scope) { margin-block-end: 0.625rem; color: var(--muted); font-size: 0.875rem; }
 </style>

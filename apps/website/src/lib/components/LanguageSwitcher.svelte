@@ -78,7 +78,7 @@
 </div>
 
 <style>
-  .language-selector { display: grid; align-content: start; gap: 0.375rem; min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .language-selector { display: grid; align-content: start; gap: 0.375rem; min-width: 0; }
   .language-selector :global(label) { font-size: var(--data-label-size); font-weight: 600; }
   .language-selector :global([data-select-trigger]) { width: 100%; min-width: 0; min-height: 2.75rem; text-align: start; font-weight: 600; background: var(--surface); }
   .inline-list { margin: 0; padding: 0; list-style: none; }

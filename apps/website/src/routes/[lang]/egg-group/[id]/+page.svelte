@@ -6,6 +6,7 @@
   import type { GameOption } from "../../../../../../../packages/pokemon-data/src/index.ts";
   import { localize } from "../../../../../../../packages/pokemon-data/src/localization.ts";
   import { introductionStatus } from "../../../../../../../packages/pokemon-data/src/resolve.ts";
+  import { scrollable } from "#lib/actions/scrollable.ts";
   import { genderPercent } from "#lib/data/breeding.ts";
   import { pokemonHref, readPreference, resolveContext } from "#lib/data/context.ts";
   import { getGames } from "#lib/data/loader.ts";
@@ -36,7 +37,7 @@
 {#if failed}<p role="alert">{t(data.lang, "gameError")}</p>{:else if !game}<p role="status">{t(data.lang, "gamePending")}</p>{/if}
 <section class="members" aria-labelledby="members-heading">
   <h2 id="members-heading">{t(data.lang, "members")} <span class="member-count">{data.members.length}</span></h2>
-  <div class="member-table">
+  <div class="member-table" role="region" aria-labelledby="members-heading" use:scrollable>
     <table>
       <thead><tr><th scope="col">Pokémon</th><th scope="col">{t(data.lang, "memberFacts")}</th></tr></thead>
       <tbody>
@@ -75,36 +76,37 @@
   </div>
 </section>
 <style>
-  .source-notes { margin-block: 0.75rem 1.25rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .source-notes p { margin-block: 0.375rem; }
+  .page-header { padding-block-end: 1.25rem; border-block-end: 1px solid var(--border); }
+  .source-notes { max-width: var(--measure); margin-block: 1rem 2rem; overflow-wrap: anywhere; }
+  .source-notes p { margin-block: 0.5rem; }
   .page-header nav a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.375rem; overflow-wrap: anywhere; }
   h1 { overflow-wrap: anywhere; }
   h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; }
-  .member-count { padding-inline: 0.5rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); color: var(--muted); font: 600 0.875rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
+  .member-count { color: var(--muted); font: 500 0.875rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
   .members, .member-table { min-width: 0; }
-  .member-table { border-block: var(--border-width) solid var(--border); background: var(--surface); }
-  table { width: 100%; table-layout: fixed; border-collapse: collapse; overflow-wrap: anywhere; }
-  thead { background: var(--surface-muted); }
-  th, td { text-align: start; vertical-align: top; padding: 0.625rem 0.75rem; }
-  thead th { font-size: var(--data-label-size); font-weight: 600; }
+  .member-table { max-width: 100%; max-height: min(42rem, 75vh); overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; border: 1px solid var(--border); border-radius: var(--radius-control); }
+  .member-table:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+  table { width: 100%; min-width: 34rem; table-layout: fixed; border-collapse: separate; border-spacing: 0; overflow-wrap: anywhere; }
+  th, td { text-align: start; vertical-align: top; padding: 0.875rem 1rem; }
+  thead th { position: sticky; top: 0; z-index: 1; background: var(--surface-muted); border-block-end: 1px solid var(--border-strong); font-size: var(--data-label-size); font-weight: 600; }
   th:first-child { width: 26%; }
   tbody th { font-weight: 600; }
-  tbody tr + tr :is(th, td) { border-block-start: var(--border-width) solid var(--border); }
-  tbody tr:focus-within { background: var(--accent-soft); }
+  tbody tr + tr :is(th, td) { border-block-start: 1px solid var(--border); }
+  tbody tr:hover, tbody tr:focus-within { background: var(--accent-soft); }
   .member-link { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.25rem; }
   small { display: block; color: var(--muted); font-size: 0.8125rem; font-weight: normal; font-variant-numeric: tabular-nums; }
-  .member-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin: 0; }
-  .member-facts > div { min-width: 0; padding: 0.5rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  dt { color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
-  dd { margin: 0.25rem 0 0; font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .member-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1.25rem; margin: 0; }
+  .member-facts > div { min-width: 0; }
+  dt { color: var(--muted); font-size: var(--data-label-size); font-weight: 500; }
+  dd { margin: 0.375rem 0 0; font-size: 0.9375rem; font-weight: 500; font-variant-numeric: tabular-nums; }
   .other-groups { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; list-style: none; margin: 0; padding: 0; }
   .other-groups a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0.25rem; }
   .later { color: var(--muted); }
   .undated { text-decoration: underline dotted; text-underline-offset: 0.2em; }
   a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: var(--radius-control); }
   @media (max-width: 48rem) {
-    .member-facts { grid-template-columns: minmax(0, 1fr); gap: 0.625rem; }
+    .member-facts { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
     th:first-child { width: 35%; }
-    th, td { padding: 0.5rem; }
+    th, td { padding: 0.75rem; }
   }
 </style>

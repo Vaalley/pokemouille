@@ -23,6 +23,10 @@ const en = {
   "identity.adjacent": "Neighbouring Pokémon",
   "identity.previous": "Previous: No. {number} {name}",
   "identity.next": "Next: No. {number} {name}",
+  "page.contents": "On this page",
+  "page.overview": "Overview",
+  "page.exploreStats": "Explore stats",
+  "page.compare": "Compare Pokémon",
 
   "sprites.heading": "Sprites",
   "sprites.preference": "Default sprite",
@@ -265,6 +269,10 @@ const messages = {
     "identity.adjacent": "Pokémon voisins",
     "identity.previous": "Précédent : n° {number} {name}",
     "identity.next": "Suivant : n° {number} {name}",
+    "page.contents": "Sur cette page",
+    "page.overview": "Vue d’ensemble",
+    "page.exploreStats": "Voir les statistiques",
+    "page.compare": "Comparer",
 
     "sprites.heading": "Sprites",
     "sprites.preference": "Sprite par défaut",
@@ -508,6 +516,10 @@ const messages = {
     "identity.adjacent": "前後のポケモン",
     "identity.previous": "前：No.{number} {name}",
     "identity.next": "次：No.{number} {name}",
+    "page.contents": "このページの内容",
+    "page.overview": "概要",
+    "page.exploreStats": "種族値を見る",
+    "page.compare": "ポケモンを比較",
 
     "sprites.heading": "スプライト",
     "sprites.preference": "標準の画像",

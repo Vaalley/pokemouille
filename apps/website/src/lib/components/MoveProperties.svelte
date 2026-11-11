@@ -75,25 +75,23 @@
 
 <style>
   section { min-width: 0; }
-  .detail-grid { gap: 0.75rem; }
-  .detail-panel { min-width: 0; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
-  .detail-panel h3, .mechanic-group > h3 { margin-block: 0 0.5rem; font-size: var(--data-label-size); font-weight: 600; }
-  .detail-panel p { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
-  .mechanic-group { margin-block-start: 1rem; }
-  .flag-list { display: flex; flex-wrap: wrap; gap: 0.375rem; padding: 0; margin: 0; list-style: none; }
-  .flag-list li { max-width: 100%; padding: 0.5rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
-  .properties { grid-template-columns: minmax(0, 16rem) minmax(0, 1fr); margin: 0; }
+  .detail-panel h3, .mechanic-group > h3 { margin-block: 0 0.75rem; font-size: 1rem; font-weight: 600; }
+  .detail-panel p { margin: 0; overflow-wrap: anywhere; }
+  .mechanic-group { margin-block-start: 1.75rem; }
+  .flag-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0 1.5rem; padding: 0; margin: 0; list-style: none; }
+  .flag-list li { min-width: 0; padding-block: 0.625rem; border-block-end: 1px solid var(--border); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
+  .properties { max-width: var(--measure); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin: 0; }
   .properties dd { font-variant-numeric: tabular-nums; }
-  .stat-changes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .stat-changes dd { color: var(--accent); }
-  .metadata-raw { border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
-  .metadata-raw summary { min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; cursor: pointer; }
-  .metadata-raw[open] summary { border-inline-start-color: var(--accent); border-block-end: var(--border-width) solid var(--border); }
-  .raw-content { min-width: 0; padding: 0.75rem; }
+  .metadata-raw { max-width: var(--measure); margin-block-start: 1.25rem; border-block: 1px solid var(--border); }
+  .metadata-raw summary { min-height: 2.75rem; padding: 0.75rem 0.25rem; font-size: var(--data-label-size); font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+  .metadata-raw summary:hover { color: var(--accent); }
+  .metadata-raw[open] summary { border-block-end: 1px solid var(--border); }
+  .raw-content { min-width: 0; padding-block: 0.75rem 1rem; }
+  .raw-content > .note { margin-block: 0 0.75rem; }
   @media (max-width: 32rem) {
-    .properties { grid-template-columns: minmax(0, 1fr); gap: 0; }
-    .properties dt { padding-block-end: 0.125rem; }
-    .properties dd { padding-block-start: 0; border-inline-start: var(--data-rule) solid var(--border-strong); }
-    .properties dd:not(:last-child) { margin-block-end: 0.375rem; }
+    .properties:not(.stat-changes) { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .properties:not(.stat-changes) dt { padding-block-end: 0.125rem; border-block-end: 0; }
+    .properties:not(.stat-changes) dd { padding-block-start: 0; }
   }
 </style>

@@ -93,8 +93,8 @@
       <dt>{t(lang, "facts.mythical")}</dt>
       <dd>{yesNo(facts.isMythical)}</dd>
     </dl>
-    <Collapsible.Root>
-      <Collapsible.Trigger>{t(lang, "facts.source")}</Collapsible.Trigger>
+    <Collapsible.Root class="source-facts">
+      <Collapsible.Trigger class="source-trigger">{t(lang, "facts.source")}<span aria-hidden="true" class="disclosure-mark"></span></Collapsible.Trigger>
       <Collapsible.Content>
         <dl class="properties">
           {#each Object.entries(facts.sourceFacts) as [key, value] (key)}
@@ -191,15 +191,51 @@
 </section>
 
 <style>
-  section { min-width: 0; }
-  /* Keep every inset label/value row aligned across the stacked fact groups. */
-  dl {
-    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
-    gap: 0.375rem 0;
+  section { min-width: 0; overflow-wrap: anywhere; }
+  h2 { margin-block: 0 1rem; }
+  .properties {
+    grid-template-columns: minmax(0, 42%) minmax(0, 1fr);
+    column-gap: 1rem;
+    row-gap: 0;
+    margin-block: 0;
+  }
+  .properties dt, .properties dd {
+    min-width: 0;
+    padding: 0.625rem 0;
+    border-block-end: 1px solid var(--border);
+    background: none;
+    line-height: 1.5;
     overflow-wrap: anywhere;
   }
-  h3 { margin-block: 1.25rem 0.625rem; font-size: 1rem; }
-  @media (max-width: 32rem) {
-    dl { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
+  .properties dt { color: var(--muted); font-size: 0.875rem; font-weight: 400; }
+  .properties dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+  h3 { margin-block: 1.75rem 0.625rem; font-size: 1.0625rem; overflow-wrap: anywhere; }
+  .note { margin-block: 0.75rem 0; line-height: 1.6; }
+  :global(.source-facts) { margin-block-start: 0.5rem; }
+  :global(.source-trigger) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    max-width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--page-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: start;
+    overflow-wrap: anywhere;
+  }
+  :global(.source-trigger:is(:hover, :focus-visible)) { background: var(--accent-soft); }
+  .disclosure-mark { flex: none; }
+  .disclosure-mark::after { content: "+"; }
+  :global(.source-trigger[data-state="open"]) .disclosure-mark::after { content: "−"; }
+  @media (max-width: 24rem) {
+    .properties { grid-template-columns: minmax(0, 1fr); }
+    .properties dt { padding-block: 0.625rem 0.125rem; border-block-end: 0; }
+    .properties dd { padding-block: 0 0.625rem; }
   }
 </style>

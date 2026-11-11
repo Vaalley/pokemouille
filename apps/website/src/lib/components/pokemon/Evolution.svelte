@@ -277,6 +277,8 @@
     min-width: 0;
     container: evolution / inline-size;
   }
+  h2 { margin-block: 0 1rem; }
+  .note { margin-block: 0.5rem; line-height: 1.6; overflow-wrap: anywhere; }
   .branches {
     display: grid;
     gap: 0.75rem;
@@ -320,23 +322,21 @@
   .card {
     min-width: 0;
     max-width: 24rem;
-    background: var(--surface);
-    border: var(--border-width) solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius-panel);
-    padding: 0.75rem;
+    padding: 1rem;
     overflow-wrap: anywhere;
   }
-  .current .identity {
-    border-inline-start-color: var(--accent);
+  .card.current {
+    border-color: var(--accent);
+    background: var(--accent-soft);
   }
   .identity {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     min-width: 0;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
+    padding: 0;
   }
   .identity > div {
     min-width: 0;
@@ -348,6 +348,7 @@
     min-height: 2.75rem;
     font-size: 1rem;
     font-weight: 600;
+    overflow-wrap: anywhere;
   }
   .identity a:focus-visible {
     outline: 2px solid currentColor;
@@ -357,18 +358,19 @@
   .dex {
     display: block;
     font-size: var(--data-label-size);
+    color: var(--muted);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
   .badge {
-    display: inline-block;
+    display: block;
     margin: 0.25rem 0 0;
-    padding: 0.25rem 0.375rem;
-    border-inline-start: var(--data-rule) solid var(--accent);
-    background: var(--surface-muted);
     font-size: var(--data-label-size);
     font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
   }
+  .current .identity .badge { color: var(--accent); }
   .methods {
     margin-block-start: 0.5rem;
     padding-block-start: 0.25rem;
@@ -387,36 +389,37 @@
     border-radius: 2px;
   }
   .methods[open] summary {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.625rem;
   }
   .trigger {
     margin: 0 0 0.4rem;
     font-weight: 600;
   }
   .method {
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
+    padding: 0;
     font-size: 0.875rem;
+    line-height: 1.6;
   }
   .provenance,
   .requirements {
     margin: 0.25rem 0;
     font-size: var(--data-label-size);
+    line-height: 1.5;
   }
+  .provenance { color: var(--muted); }
   .requirements {
     margin-top: 0.75rem;
   }
   .conditions {
-    margin: 0.25rem 0 0;
+    margin: 0.5rem 0 0;
   }
   .condition {
     min-width: 0;
-    padding-block: 0.5rem;
-    border-block-start: var(--border-width) solid var(--border);
+    padding-block: 0.375rem;
   }
   .condition dt {
     font-size: var(--data-label-size);
+    color: var(--muted);
     font-weight: 600;
   }
   .condition dd {
@@ -528,7 +531,7 @@
   }
   @media (max-width: 30rem) {
     .card {
-      padding: 0.65rem;
+      padding: 0.75rem;
     }
     .branch > .branches {
       margin-left: 0.35rem;

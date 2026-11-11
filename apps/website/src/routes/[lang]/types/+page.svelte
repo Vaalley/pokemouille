@@ -82,9 +82,11 @@
 </script>
 
 <svelte:head><title>{t(data.lang, "heading")} | Pokémouille</title></svelte:head>
-<h1>{t(data.lang, "heading")}</h1>
-<p>{t(data.lang, "intro")}</p>
-<p><a href={resolve(typeCoverageHref(data.lang, selection.invalid ? [] : selection.ids, selectedVersion()) as PathnameWithSearchOrHash)}>{coverageText(data.lang, "link")}</a></p>
+<header class="tool-heading">
+  <h1>{t(data.lang, "heading")}</h1>
+  <p>{t(data.lang, "intro")}</p>
+  <p><a href={resolve(typeCoverageHref(data.lang, selection.invalid ? [] : selection.ids, selectedVersion()) as PathnameWithSearchOrHash)}>{coverageText(data.lang, "link")}</a></p>
+</header>
 <form class="selection-panel" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
   <fieldset>
     <legend>{t(data.lang, "selectionHeading")}</legend>
@@ -168,25 +170,27 @@
 {/if}
 
 <style>
-  .selection-panel { margin-block: 1.5rem; }
-  fieldset { min-width: 0; margin: 0; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  .tool-heading p { max-width: var(--measure); }
+  .selection-panel { min-width: 0; margin-block: 1.5rem 2rem; }
+  fieldset { min-width: 0; margin: 0; padding: 1.25rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
   legend { max-width: 100%; padding-inline: 0.4rem; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .filters { margin: 0; }
   .filter-field { min-width: 0; }
   .filter-field label { font-size: var(--data-label-size); font-weight: 600; }
   select, button { max-width: 100%; }
-  .result-panel { min-width: 0; margin-block: 1.5rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
+  .result-panel { min-width: 0; margin-block: 2rem; padding-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
   .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.25rem; overflow-wrap: anywhere; }
   .result-panel > .note { margin-block: 0 1rem; }
   .attack-result + .attack-result { margin-block-start: 1.25rem; padding-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
   .attack-result > h3 { margin-block: 0 0.75rem; font-size: 1.125rem; }
   ul { list-style: none; padding: 0; }
-  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.375rem; }
-  .pokemon-list li { min-width: 0; }
-  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.375rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-weight: 600; overflow-wrap: anywhere; }
-  .pokemon-list a:hover { border-inline-start-color: var(--accent); background: var(--accent-soft); }
+  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0 1.25rem; }
+  .pokemon-list li { min-width: 0; border-block-end: 1px solid var(--border); }
+  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.5rem 0.25rem; border-radius: var(--radius-control); font-weight: 600; overflow-wrap: anywhere; text-decoration: none; }
+  .pokemon-list a:hover { background: var(--accent-soft); text-decoration: underline; }
   .pokemon-list a > span { min-width: 0; }
   @media (max-width: 30rem) {
+    fieldset { padding: 0.875rem; }
     .filters button { width: 100%; }
   }
 </style>

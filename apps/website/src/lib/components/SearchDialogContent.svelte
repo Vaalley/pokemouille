@@ -266,17 +266,16 @@
 <style>
   .search-dialog-header { padding-block-end: 0.625rem; border-block-end: var(--border-width) solid var(--border); }
   .search-dialog-header :global([data-dialog-title]) { font-size: 1rem; font-weight: 650; }
-  .search-field { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .search-field:focus-within { border-inline-start-color: var(--accent); }
+  .search-field { padding: 0; }
   .search-field :global(label) { font-size: var(--data-label-size); font-weight: 600; }
   .search-field :global(input) { min-height: 2.75rem; background: var(--surface); }
-  .search-command > .search-feedback { flex: 0 0 auto; align-items: start; justify-content: start; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; text-align: start; }
+  .search-command > .search-feedback { padding: 1rem; border-radius: var(--radius-control); }
   .search-status { font-size: var(--data-label-size); }
-  .search-command :global(.search-results) { padding: 0.375rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
-  .search-command :global(.search-results a[data-command-item]) { margin-block: 0.375rem; padding: 0.5rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .search-command :global(.search-results a[data-command-item]:is([data-selected], :hover, :focus-visible)) { border-inline-start-color: var(--accent); background: var(--accent-soft); outline: none; }
+  .search-command :global(.search-results) { padding: 0.25rem; }
+  .search-command :global(.search-results a[data-command-item]) { margin-block: 0.25rem; padding: 0.75rem; border: 1px solid transparent; border-radius: var(--radius-control); background: var(--surface); }
+  .search-command :global(.search-results a[data-command-item]:is([data-selected], :hover, :focus-visible)) { border-color: var(--accent); background: var(--accent-soft); outline: none; }
   .search-command :global(.search-results a[data-command-item]:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
-  .search-result-icon { border-radius: 0; background: transparent; }
+  .search-result-icon { border-radius: var(--radius-control); background: var(--surface-muted); }
   .search-result-name { font-size: 1rem; font-weight: 650; }
   .search-result-meta { font-size: var(--data-label-size); font-weight: 600; }
   .search-result-kind { padding: 0; border: 0; border-radius: 0; }

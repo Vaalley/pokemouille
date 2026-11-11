@@ -54,23 +54,23 @@
   {#if !failed && game && version}
     <ul class="mapping-list" class:move-mappings={kind === "move"}>
       {#each mappings as mapping (mapping.id)}
-        <li class:detail-panel={kind === "item"}>
+        <li class:item-mapping={kind === "item"}>
           {#if kind === "move"}
             <a class="resource-link machine-link" href={resolve(`${lang}/item/${mapping.item.id}/?${new URLSearchParams({ version })}` as PathnameWithSearchOrHash)}>
-              <ItemIcon identifier={mapping.item.identifier} /><Localized text={mapping.item.name} />
+              <ItemIcon identifier={mapping.item.identifier} /><span><Localized text={mapping.item.name} /></span>
             </a>
           {:else}
             {@const learners = data.pokemon.filter((entry) => mapping.pokemonIds.includes(entry.pokemonId))}
             <dl class="machine-association">
               <div>
                 <dt>{t(lang, "machine")}</dt>
-                <dd class="resource-link"><ItemIcon identifier={mapping.item.identifier} /><Localized text={mapping.item.name} /></dd>
+                <dd class="resource-link"><ItemIcon identifier={mapping.item.identifier} /><span><Localized text={mapping.item.name} /></span></dd>
               </div>
               <div>
                 <dt>{t(lang, "teaches")}</dt>
                 <dd>
                   <a class="resource-link" href={resolve(`${lang}/move/${mapping.move.id}/?${new URLSearchParams({ version })}` as PathnameWithSearchOrHash)}>
-                    <MoveIcon typeId={mapping.move.typeId} /><Localized text={mapping.move.name} />
+                    <MoveIcon typeId={mapping.move.typeId} /><span><Localized text={mapping.move.name} /></span>
                   </a>
                 </dd>
               </div>
@@ -86,7 +86,7 @@
                   {#each learners as pokemon (pokemon.pokemonId)}
                     <li>
                       <a href={resolve(pokemonHref(lang, pokemon.speciesId, { version, form: pokemon.form }).slice(1) as PathnameWithSearchOrHash)}>
-                        <PokemonIcon speciesId={pokemon.speciesId} /><Localized text={pokemon.name} />
+                        <PokemonIcon speciesId={pokemon.speciesId} /><span><Localized text={pokemon.name} /></span>
                       </a>
                     </li>
                   {/each}
@@ -104,52 +104,28 @@
 </section>
 
 <style>
-  .game-context {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.5rem;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--accent);
-    background: var(--surface-muted);
-    font-size: var(--data-label-size);
-  }
-  .mapping-list { display: grid; gap: 0.75rem; list-style: none; padding: 0; }
+  section { min-width: 0; }
+  .game-context { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; margin-block: 1rem; color: var(--muted); font-size: var(--data-label-size); }
+  .game-context strong { color: var(--page-text); font-weight: 600; }
+  .mapping-list { display: grid; gap: 1.5rem; list-style: none; padding: 0; margin-block: 1rem 0; }
   .mapping-list > li { min-width: 0; }
-  .mapping-list > .detail-panel { padding: 0.75rem; background: var(--surface); }
-  .move-mappings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: 0.75rem; }
+  .item-mapping + .item-mapping { padding-block-start: 1.5rem; border-block-start: 1px solid var(--border); }
+  .move-mappings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: 0 1.5rem; }
   .resource-link { display: inline-flex; align-items: center; gap: 0.5rem; max-width: 100%; vertical-align: middle; overflow-wrap: anywhere; font-weight: 600; }
-  .machine-link {
-    display: flex;
-    height: 100%;
-    min-height: 2.75rem;
-    padding: var(--data-padding);
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
-    text-decoration: none;
-  }
-  .machine-link:is(:hover, :focus-visible) { border-inline-start-color: var(--accent); background: var(--accent-soft); text-decoration: underline; }
-  .machine-association { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); align-items: start; gap: 0.75rem; margin: 0; }
-  .machine-association > div { min-width: 0; max-width: 100%; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .machine-association dt { margin-block-end: 0.375rem; font-size: var(--data-label-size); font-weight: 600; }
-  .machine-association dd { margin: 0; font-weight: 600; }
-  .machine-association a { min-height: 2.75rem; }
-  .learners-heading { margin-block: 1rem 0.625rem; font-size: var(--data-label-size); font-weight: 600; }
-  .learners-heading span { color: var(--muted); font-size: inherit; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .learner-region {
-    max-height: min(32rem, 65dvh);
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    padding: 0.5rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
-    background: var(--surface);
-  }
-  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
+  .resource-link > span, .pokemon-list a > span { min-width: 0; }
+  .machine-link { display: flex; height: 100%; min-height: 2.75rem; padding: 0.625rem 0.25rem; border-block-end: 1px solid var(--border); text-decoration: none; }
+  .machine-link:is(:hover, :focus-visible) { border-block-end-color: var(--accent); text-decoration: underline; text-underline-offset: 0.2em; }
+  .machine-association { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); align-items: start; gap: 1rem 2rem; margin: 0; }
+  .machine-association > div { min-width: 0; max-width: 100%; }
+  .machine-association dt { margin-block-end: 0.375rem; color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
+  .machine-association dd { min-width: 0; margin: 0; font-weight: 600; }
+  .machine-association .resource-link { min-height: 2.75rem; }
+  .learners-heading { margin-block: 1.25rem 0.75rem; font-size: var(--data-label-size); font-weight: 600; }
+  .learners-heading span { color: var(--muted); font-size: inherit; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .learner-region { max-height: min(32rem, 65dvh); overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-control); }
+  .pokemon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0 1.5rem; margin: 0; padding: 0; list-style: none; }
   .pokemon-list li { min-width: 0; }
-  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; height: 100%; padding: 0.375rem 0.625rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
-  .pokemon-list a:is(:hover, :focus-visible) { border-inline-start-color: var(--accent); background: var(--accent-soft); text-decoration: underline; }
-  .source-gap { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); }
+  .pokemon-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; height: 100%; padding: 0.5rem 0.25rem; border-block-end: 1px solid var(--border); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+  .pokemon-list a:is(:hover, :focus-visible) { border-block-end-color: var(--accent); text-decoration: underline; text-underline-offset: 0.2em; }
+  .source-gap { max-width: var(--measure); color: var(--muted); font-size: var(--data-label-size); line-height: 1.6; }
 </style>

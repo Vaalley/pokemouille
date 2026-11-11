@@ -67,7 +67,7 @@
       {/if}
     </Select.Trigger>
     <Select.Portal>
-      <Select.Content class="forms-menu">
+      <Select.Content class="forms-menu" collisionPadding={12} sideOffset={8} preventScroll>
         <Select.Viewport>
           {#each options as { form, details } (form.id)}
             <Select.Item value={form.identifier} label="{form.name.text} ({details})" class="form-option">
@@ -89,16 +89,14 @@
     max-width: 100%;
     min-width: 0;
     margin: 0;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--accent);
-    background: var(--surface-muted);
   }
   .form-selector :global(.form-label) { font-size: var(--data-label-size); font-weight: 600; }
   .form-selector :global(.form-trigger) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; min-width: 0; max-width: 100%; min-height: 2.75rem; padding: 0.5rem 0.75rem; text-align: start; white-space: normal; overflow-wrap: anywhere; }
   .form-selector :global(.form-trigger)::after { content: ""; width: 0.4rem; height: 0.4rem; margin-inline-start: 0.5rem; border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
   .form-value { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; min-width: 0; }
   .form-detail { font-size: var(--data-label-size); font-weight: 400; line-height: 1.4; overflow-wrap: anywhere; }
-  :global(.forms-menu .form-option) { display: grid; gap: 0.25rem; min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); white-space: normal; overflow-wrap: anywhere; }
-  :global(.forms-menu .form-option + .form-option) { margin-block-start: 0.375rem; }
-  :global(.forms-menu .form-option[data-selected]), :global(.forms-menu .form-option[data-highlighted]) { border-inline-start-color: var(--accent); }
+  :global(.forms-menu) { width: min(28rem, calc(100vw - 1.5rem)); max-width: calc(100vw - 1.5rem); max-height: min(24rem, var(--bits-floating-available-height, calc(100dvh - 2rem))); }
+  :global(.forms-menu .form-option) { display: grid; gap: 0.25rem; min-height: 2.75rem; padding: var(--data-padding); border: 1px solid transparent; border-radius: var(--radius-control); background: var(--surface); white-space: normal; overflow-wrap: anywhere; }
+  :global(.forms-menu .form-option + .form-option) { margin-block-start: 0.25rem; }
+  :global(.forms-menu .form-option[data-selected]), :global(.forms-menu .form-option[data-highlighted]) { border-color: var(--accent); background: var(--accent-soft); }
 </style>

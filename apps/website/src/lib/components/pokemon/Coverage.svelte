@@ -60,7 +60,8 @@
 
 <style>
   section { min-width: 0; }
-  h3 { margin-block: 1rem 0.625rem; font-size: 1rem; }
-  ul { display: grid; gap: 0.375rem; margin: 0.75rem 0; padding: 0; list-style: none; }
-  li { min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: 0.875rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .note { max-width: 75ch; color: var(--muted); font-size: 0.875rem; line-height: 1.6; overflow-wrap: anywhere; }
+  h3 { margin-block: 1.25rem 0.5rem; font-size: 1rem; overflow-wrap: anywhere; }
+  ul { margin: 0.5rem 0 1rem; padding: 0; list-style: none; }
+  li { min-width: 0; padding-block: 0.625rem; border-block-end: var(--border-width) solid var(--border); font-size: 0.875rem; line-height: 1.6; overflow-wrap: anywhere; }
 </style>

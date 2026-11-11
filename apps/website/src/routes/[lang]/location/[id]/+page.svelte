@@ -183,32 +183,31 @@
   .location-detail, .encounter-section { min-width: 0; }
   .directory-link { margin-block: 0 0.75rem; }
   .directory-link a { display: inline-flex; align-items: center; min-height: 2.75rem; gap: 0.25rem; }
-  .page-header { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .page-header { padding-block: 0 1.25rem; border-block-end: 1px solid var(--border); margin-block-end: 2rem; }
   .page-header h1, .properties dd, .encounter-heading { min-width: 0; overflow-wrap: anywhere; }
   .page-header h1 { margin-block: 0.25rem 0.75rem; }
   .properties { margin-block-end: 0; gap: 0.375rem 0.75rem; }
   .encounter-heading { margin-block: 0 0.75rem; }
-  .state-message { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); max-width: var(--measure); }
+  .state-message { padding-block: 1rem; border-block: 1px solid var(--border); max-width: var(--measure); overflow-wrap: anywhere; }
   .state-message p { margin-block: 0 0.75rem; }
   .state-message button { min-height: 2.75rem; padding: 0.5rem 0.75rem; }
-  .rarity-note { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .rarity-note { max-width: var(--measure); margin-block: 0.75rem; }
   .record-notes { max-width: var(--measure); margin-block: 0.75rem; }
-  .record-notes > summary { max-width: 100%; min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); cursor: pointer; font-size: var(--data-label-size); font-weight: 600; }
-  .record-notes[open] > summary { border-inline-start-color: var(--accent); }
-  .record-notes > div { padding-inline: 0.75rem; }
+  .record-notes > summary { max-width: 100%; min-height: 2.75rem; padding-block: 0.75rem; border-block-end: 1px solid var(--border); cursor: pointer; font-size: var(--data-label-size); font-weight: 600; }
+  .record-notes > div { padding-block-start: 0.25rem; }
   .scroll-hint { margin-block: 1rem 0.75rem; }
-  .areas { display: grid; gap: 1rem; }
-  .area { min-width: 0; border: 0; border-block-end: var(--border-width) solid var(--border); border-radius: 0; background: var(--surface); }
-  .area > summary { min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); cursor: pointer; background: var(--surface-muted); overflow-wrap: anywhere; }
-  .area[open] > summary { border-inline-start-color: var(--accent); }
-  .area > summary:hover { background: var(--accent-soft); }
+  .areas { display: grid; gap: 1.75rem; }
+  .area { min-width: 0; border: 0; border-block-end: 1px solid var(--border); border-radius: 0; }
+  .area > summary { min-height: 2.75rem; padding-block: 0.875rem; border-block-start: 1px solid var(--border); cursor: pointer; overflow-wrap: anywhere; }
+  .area > summary:hover { color: var(--accent); }
+  .area > summary:focus-visible, .record-notes > summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
   h3 { display: inline; margin: 0; font-size: 1rem; }
-  .area-content { padding: 0 1rem 1rem; min-width: 0; }
-  .method { min-width: 0; margin-block-start: 1rem; }
+  .area-content { padding-block: 0 1.25rem; min-width: 0; }
+  .method { min-width: 0; margin-block-start: 1.25rem; }
   .method-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 1rem; margin-block-end: 0.5rem; }
   h4 { margin: 0; overflow-wrap: anywhere; font-size: 1rem; }
-  .method-heading p { margin: 0; color: var(--muted); font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .table-scroll { max-width: 100%; max-height: min(32rem, 70vh); overflow: auto; overscroll-behavior: contain; border-block: var(--border-width) solid var(--border); scrollbar-gutter: stable; }
+  .method-heading p { margin: 0; color: var(--muted); font-size: var(--data-label-size); font-variant-numeric: tabular-nums; }
+  .table-scroll { min-width: 0; max-width: 100%; max-height: min(32rem, 70vh); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--border); border-radius: var(--radius-control); scrollbar-gutter: stable; }
   .table-scroll:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
   table { width: 100%; min-width: 48rem; border-collapse: separate; border-spacing: 0; text-align: start; }
   th, td { padding: 0.625rem 0.75rem; vertical-align: top; border-block-end: 1px solid var(--border); }
@@ -224,19 +223,15 @@
   .conditions li + li { margin-block-start: 0.5rem; padding-block-start: 0.5rem; border-block-start: 1px solid var(--border); }
   .condition-name, .condition-default { display: block; font-size: var(--data-label-size); color: var(--muted); font-weight: 600; }
   .condition-value { font-weight: 600; }
-  .condition-warning { margin-block: 0.5rem 0; border-inline-start: var(--data-rule) solid var(--border-strong); padding-inline-start: 0.5rem; }
+  .condition-warning { max-width: 30ch; margin-block: 0.5rem 0; padding-block-start: 0.5rem; border-block-start: 1px solid var(--border-strong); }
   .unrecorded { color: var(--muted); font-size: 0.875rem; }
   .source { min-width: 10rem; }
   .source span, .source small { display: block; }
   .source small { margin-block-start: 0.25rem; color: var(--muted); }
-  .other-games { margin-block-start: 1.25rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .other-games { margin-block-start: 1.75rem; padding-block-start: 1.25rem; border-block-start: 1px solid var(--border); }
   .other-games h3 { display: block; font-size: 1rem; }
   .other-games ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin-block: 0.25rem 0; padding: 0; }
   .other-games a { display: inline-flex; align-items: center; min-height: 2.75rem; }
-  .note { font-size: 0.875rem; }
-  .limits { margin-block-start: 1.25rem; padding-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
-  @media (max-width: 30rem) {
-    .area > summary { padding: 0.75rem; }
-    .area-content { padding: 0 0.5rem 0.5rem; }
-  }
+  .note { max-width: var(--measure); font-size: 0.875rem; overflow-wrap: anywhere; }
+  .limits { margin-block-start: 1.75rem; padding-block-start: 1rem; border-block-start: 1px solid var(--border); }
 </style>

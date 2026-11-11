@@ -25,16 +25,19 @@
   let selectedSprite = $state("official");
   let spriteReady = $state(false);
   let browseOpen = $state(false);
+  let moreOpen = $state(false);
   let settingsOpen = $state(false);
 
   afterNavigate(() => {
     browseOpen = false;
+    moreOpen = false;
     settingsOpen = false;
   });
 
   function dismissHeader(event: PointerEvent) {
     if (event.target instanceof Element && event.target.closest(".header-disclosure, [data-select-content]")) return;
     browseOpen = false;
+    moreOpen = false;
     settingsOpen = false;
   }
 
@@ -45,6 +48,7 @@
     const summary = document.querySelector<HTMLElement>(".header-disclosure[open] > summary");
     if (!summary) return;
     browseOpen = false;
+    moreOpen = false;
     settingsOpen = false;
     summary.focus();
   }
@@ -67,6 +71,9 @@
     { key: "moveset", path: "moveset/", detail: "moveset/" },
     { key: "locations", path: "location/", detail: "location/" },
   ] as const;
+  const primarySections = sections.slice(0, 4);
+  const secondarySections = sections.slice(4);
+  const secondaryCurrent = $derived(secondarySections.some((section) => current(section)));
 
   function current(section: (typeof sections)[number]) {
     const pathname = currentUrl.pathname;
@@ -133,28 +140,49 @@
 
 <svelte:window onpointerdown={dismissHeader} onkeydown={escapeHeader} />
 
-{#snippet browseLinks()}
+{#snippet sectionLink(section: (typeof sections)[number])}
+  <a
+    href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
+    aria-current={current(section)}
+    onclick={() => { browseOpen = false; moreOpen = false; }}
+  >{navigation(data.lang, section.key)}</a>
+{/snippet}
+
+{#snippet browseLinks(items: readonly (typeof sections)[number][])}
   <ul class="inline-list">
-    {#each sections as section (section.key)}
-      <li>
-        <a
-          href={resolve(`${data.lang}/${section.path}${version ? `?version=${encodeURIComponent(version)}` : ""}` as PathnameWithSearchOrHash)}
-          aria-current={current(section)}
-          onclick={() => { browseOpen = false; }}
-        >{navigation(data.lang, section.key)}</a>
-      </li>
+    {#each items as section (section.key)}
+      <li>{@render sectionLink(section)}</li>
     {/each}
   </ul>
 {/snippet}
 
 <header class="site-header">
   <div class="site-bar">
-    <a class="site-name" href={resolve(`${data.lang}/`)}>{t(data.lang, "site.name")}</a>
+    <a class="site-name" href={resolve(`${data.lang}/`)}>
+      {t(data.lang, "site.name")}<span class="site-mark" aria-hidden="true">.</span>
+    </a>
+    <nav class="primary-navigation desktop-navigation" aria-label={navigation(data.lang, "label")}>
+      <ul class="inline-list">
+        {#each primarySections as section (section.key)}
+          <li>{@render sectionLink(section)}</li>
+        {/each}
+        <li>
+          <details class="more-menu header-disclosure" name="header-panel" bind:open={moreOpen}>
+            <summary class:current={secondaryCurrent} aria-current={secondaryCurrent ? "true" : undefined}>
+              {navigation(data.lang, "more")}
+            </summary>
+            <nav class="header-panel more-navigation" aria-label={navigation(data.lang, "more")}>
+              {@render browseLinks(secondarySections)}
+            </nav>
+          </details>
+        </li>
+      </ul>
+    </nav>
     <SearchDialog lang={data.lang} {games} {version} />
     <details class="header-disclosure mobile-browse" name="header-panel" bind:open={browseOpen}>
       <summary>{navigation(data.lang, "browse")}</summary>
       <nav class="header-panel browse-navigation" aria-label={navigation(data.lang, "label")}>
-        {@render browseLinks()}
+        {@render browseLinks(sections)}
       </nav>
     </details>
     <details class="header-disclosure settings-menu" name="header-panel" bind:open={settingsOpen}>
@@ -172,9 +200,6 @@
         <ThemeSelector lang={data.lang} />
       </div>
     </details>
-    <nav class="browse-navigation desktop-navigation" aria-label={navigation(data.lang, "label")}>
-      {@render browseLinks()}
-    </nav>
   </div>
 </header>
 

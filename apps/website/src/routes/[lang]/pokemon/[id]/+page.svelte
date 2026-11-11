@@ -31,6 +31,8 @@
   import { loadPokemonData, resolvePokemonView } from "#lib/data/pokemon.ts";
   import type { PokemonData, PokemonView } from "#lib/data/pokemon.ts";
   import { reasonText, t, versionGroupName, versionName } from "#lib/i18n/pokemon.ts";
+  import { t as breedingT } from "#lib/i18n/breeding.ts";
+  import { t as encountersT } from "#lib/i18n/encounters.ts";
   import { t as historyT } from "#lib/i18n/pokemon-history.ts";
   import type { PageProps } from "./$types";
 
@@ -218,6 +220,23 @@
     preference: "context.source.preference",
     default: "context.source.default",
   } as const;
+
+  let contentsOpen = $state(false);
+  const currentHash = $derived((page.shallow?.url ?? page.url).hash);
+  const sectionItems = $derived([
+    { id: "pokemon-overview", label: t(lang, "page.overview") },
+    { id: "pokemon-stats", label: t(lang, "stats.heading") },
+    { id: "pokemon-facts", label: t(lang, "facts.heading") },
+    { id: "pokemon-abilities", label: t(lang, "abilities.heading") },
+    { id: "pokemon-dex", label: t(lang, "dex.heading") },
+    { id: "pokemon-evolution", label: t(lang, "evolution.heading") },
+    { id: "pokemon-breeding", label: breedingT(lang, "heading") },
+    { id: "pokemon-sprites", label: t(lang, "sprites.heading") },
+    { id: "pokemon-history", label: historyT(lang, "history.heading") },
+    { id: "pokemon-moves", label: t(lang, "moves.heading") },
+    { id: "pokemon-encounters", label: encountersT(lang, "heading") },
+    { id: "pokemon-coverage", label: t(lang, "coverage.heading") },
+  ]);
 </script>
 
 <svelte:head>
@@ -239,7 +258,31 @@
   />
 </svelte:head>
 
-<article>
+{#snippet contentsLinks()}
+  <ol>
+    {#each sectionItems as section (section.id)}
+      <li><a href={`#${section.id}`} aria-current={currentHash === `#${section.id}` || (!currentHash && section.id === "pokemon-overview") ? "location" : undefined} onclick={() => { contentsOpen = false; }}>{section.label}</a></li>
+    {/each}
+  </ol>
+{/snippet}
+
+<div class="pokemon-layout">
+  <aside class="page-contents">
+    {#if view}
+      <nav aria-label={t(lang, "page.contents")}>
+        <p class="contents-heading">{t(lang, "page.contents")}</p>
+        {@render contentsLinks()}
+        {#if context}<div class="contents-context"><span>{t(lang, "context.game", { game: gameName })}</span></div>{/if}
+      </nav>
+    {/if}
+  </aside>
+  <article id="pokemon-overview" tabindex="-1">
+    {#if view}
+      <details class="mobile-contents" bind:open={contentsOpen}>
+        <summary>{t(lang, "page.contents")}</summary>
+        <nav aria-label={t(lang, "page.contents")}>{@render contentsLinks()}</nav>
+      </details>
+    {/if}
   <nav class="pager" aria-label={t(lang, "identity.adjacent")}>
     <ul class="inline-list">
       {#each neighbours as { key, entry } (key)}
@@ -274,25 +317,33 @@
     sprites={pokemon?.media.sprites}
     games={games ?? []}
   >
+    {#snippet actions()}
+      {#if compareHref}
+        <a class="compare-link" href={compareHref}>{t(lang, "page.compare")} <span aria-hidden="true">↗</span></a>
+      {/if}
+      {#if view && pokemon}
+        <a class="stats-link" href="#pokemon-stats">{t(lang, "page.exploreStats")} <span aria-hidden="true">↓</span></a>
+      {/if}
+    {/snippet}
     {#snippet types()}
       {#if view && pokemon}
         <Types {lang} types={pokemon.types} generationId={pokemon.context.generationId} referenceTypes={view.references.types} />
       {/if}
     {/snippet}
     <div class="pokemon-context">
+      {#if context}
+        <div class="context-game">
+          <strong>{t(lang, "context.game", { game: gameName })}</strong>
+          <p class="note">{t(lang, SOURCE_KEYS[context.versionSource])}</p>
+        </div>
+      {/if}
       {#if view && pokemon && pokemon.forms.length > 1 && selectedForm}
         <div class="context-fields">
           <FormSelector {lang} forms={pokemon.forms} selected={selectedForm.identifier} onselect={selectForm} />
         </div>
       {/if}
-      <div class="context-meta">
-        {#if context}
-          <p class="note">{t(lang, SOURCE_KEYS[context.versionSource])}</p>
-        {/if}
-        {#if compareHref}<p><a href={compareHref}>{historyT(lang, "compare.link")}</a></p>{/if}
-      </div>
       {#if context?.rejectedVersion}
-        <p class="note">
+        <p class="context-rejected note">
           {t(lang, "context.rejected", { version: context.rejectedVersion, game: gameName })}
           <a href={href(pokemonHref(lang, data.speciesId, context))}
             >{t(lang, "context.rejectedLink", { game: gameName })}</a
@@ -365,176 +416,120 @@
       {/if}
     </div>
 
-      <Evolution
-        {lang}
-        {chain}
-        loading={evolutionLoading}
-        failed={evolutionFailure}
-        onretry={() => { evolutionAttempt += 1; }}
-        forms={data.evolutionForms}
-        hasChain={view.record.evolutionChainId !== null}
-        speciesId={data.speciesId}
-        formId={pokemon.formId}
-        version={context.version}
-        generationId={pokemon.context.generationId}
-        game={gameName}
-        references={view.references}
-      />
-    <!-- Balance the figure-heavy sections across columns instead of stacking both on the left. -->
     <div class="overview">
       <div class="column">
-        <Stats {lang} stats={pokemon.stats} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
-        <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
+        <div class="detail-section" id="pokemon-stats" tabindex="-1">
+          <Stats {lang} stats={pokemon.stats} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
+        </div>
+        <div class="detail-section" id="pokemon-abilities" tabindex="-1">
+          <Abilities {lang} abilities={pokemon.abilities} games={groupName} />
+        </div>
       </div>
       <div class="column">
-        <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} regionalDexNumbers={pokemon.regionalDexNumbers} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
-        <Dex {lang} flavorText={pokemon.flavorText} game={gameName} flavorTexts={view.record.flavorTexts} references={view.references} versionId={pokemon.context.versionId} formShared={!isDefaultForm} />
+        <div class="detail-section" id="pokemon-facts" tabindex="-1">
+          <Facts {lang} physical={pokemon.physical} speciesFacts={pokemon.speciesFacts} regionalDexNumbers={pokemon.regionalDexNumbers} game={gameName} mechanicsGame={{ generationId: pokemon.context.generationId, versionGroup: game.group.identifier }} />
+        </div>
+        <div class="detail-section" id="pokemon-dex" tabindex="-1">
+          <Dex {lang} flavorText={pokemon.flavorText} game={gameName} flavorTexts={view.record.flavorTexts} references={view.references} versionId={pokemon.context.versionId} formShared={!isDefaultForm} />
+        </div>
       </div>
     </div>
-    <Breeding {lang} record={view.record} {pokemon} references={view.references} group={game.group} version={context.version} />
     <div class="page-sections">
-      {#key pokemon.pokemonId}
-        <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} versions={view.references.versions} versionGroups={view.references.versionGroups} />
-      {/key}
-      <History {lang} record={view.record} references={view.references} form={context.form ?? undefined} />
-      <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
-      <Encounters {lang} varieties={view.record.varieties} {pokemon} version={context.version} references={view.references} game={gameName} />
-      <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
+      <div class="detail-section" id="pokemon-evolution" tabindex="-1">
+        <Evolution
+          {lang}
+          {chain}
+          loading={evolutionLoading}
+          failed={evolutionFailure}
+          onretry={() => { evolutionAttempt += 1; }}
+          forms={data.evolutionForms}
+          hasChain={view.record.evolutionChainId !== null}
+          speciesId={data.speciesId}
+          formId={pokemon.formId}
+          version={context.version}
+          generationId={pokemon.context.generationId}
+          game={gameName}
+          references={view.references}
+        />
+      </div>
+      <div class="detail-section" id="pokemon-breeding" tabindex="-1">
+        <Breeding {lang} record={view.record} {pokemon} references={view.references} group={game.group} version={context.version} />
+      </div>
+      <div class="detail-section" id="pokemon-sprites" tabindex="-1">
+        {#key pokemon.pokemonId}
+          <Sprites {lang} name={pokemon.name.text} sprites={pokemon.media.sprites} versions={view.references.versions} versionGroups={view.references.versionGroups} />
+        {/key}
+      </div>
+      <div class="detail-section" id="pokemon-history" tabindex="-1">
+        <History {lang} record={view.record} references={view.references} form={context.form ?? undefined} />
+      </div>
+      <div class="detail-section" id="pokemon-moves" tabindex="-1">
+        <Learnset {lang} learnset={pokemon.learnset} games={groupName} referenceMoves={view.references.moves} />
+      </div>
+      <div class="detail-section" id="pokemon-encounters" tabindex="-1">
+        <Encounters {lang} varieties={view.record.varieties} {pokemon} version={context.version} references={view.references} game={gameName} />
+      </div>
+      <div class="detail-section" id="pokemon-coverage" tabindex="-1">
+        <Coverage {lang} coverage={pokemon.coverage} games={groupName} />
+      </div>
     </div>
   {/if}
-</article>
+  </article>
+</div>
 
 <style>
-  .pager {
-    margin-block-end: 1rem;
-    font-size: var(--data-label-size);
-    font-weight: 600;
+  .pokemon-layout { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+  article { min-width: 0; scroll-margin-block-start: 1.5rem; }
+  .page-contents { position: sticky; top: 1.5rem; min-width: 0; max-height: calc(100dvh - 3rem); overflow-y: auto; padding-inline-end: 1.25rem; border-inline-end: 1px solid var(--border); }
+  .contents-heading { margin: 0 0 1rem; color: var(--muted); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.08em; }
+  .page-contents ol, .mobile-contents ol { margin: 0; padding: 0; list-style: none; }
+  .page-contents a, .mobile-contents a { display: flex; align-items: center; min-height: 2.75rem; padding: 0.5rem 0.625rem; border-inline-start: 2px solid transparent; color: var(--muted); font-size: 0.75rem; line-height: 1.5; text-decoration: none; overflow-wrap: anywhere; }
+  .page-contents a[aria-current], .mobile-contents a[aria-current] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .page-contents a:hover, .mobile-contents a:hover { color: var(--page-text); text-decoration: underline; text-underline-offset: 0.25em; }
+  .contents-context { margin-block-start: 2rem; padding-block-start: 1rem; border-block-start: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; overflow-wrap: anywhere; }
+  .mobile-contents { display: none; }
+  .pager { margin-block-end: 0.75rem; font-size: 0.6875rem; font-weight: 400; }
+  .pager ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .pager li { min-width: 0; }
+  .pager a { display: flex; align-items: center; gap: 0.625rem; min-height: 2.75rem; padding: 0.375rem 0; color: var(--muted); text-underline-offset: 0.25em; line-height: 1.5; overflow-wrap: anywhere; }
+  .pager a:is(:hover, :focus-visible) { color: var(--page-text); }
+  .pager .next { grid-column: 2; }
+  .pager .next a { justify-content: flex-end; text-align: end; }
+  .pager a::before, .pager a::after { flex-shrink: 0; }
+  .pager .previous a::before { content: "← " / ""; }
+  .pager .next a::after { content: " →" / ""; }
+  .pokemon-context { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 1rem 1.5rem; min-width: 0; }
+  .context-game, .context-fields { min-width: 0; }
+  .context-game strong { display: block; overflow-wrap: anywhere; font-size: 0.875rem; font-weight: 500; }
+  .context-game p { margin: 0.25rem 0 0; font-size: 0.6875rem; }
+  .context-fields :global(.form-selector) { width: 100%; }
+  .context-fields :global(.form-trigger) { width: 100%; font-size: 0.8125rem; }
+  .compare-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 1.25rem; min-height: 2.75rem; max-width: 100%; padding: 0.625rem 0.875rem; border: 1px solid var(--page-text); border-radius: var(--radius-control); color: var(--page-background); background: var(--page-text); font-size: 0.8125rem; font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+  .compare-link:hover { color: var(--page-background); background: var(--muted); border-color: var(--muted); }
+  .stats-link { display: inline-flex; align-items: center; gap: 0.75rem; min-height: 2.75rem; font-size: 0.8125rem; text-decoration: none; }
+  .stats-link:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+  .context-rejected { grid-column: 1 / -1; margin: 0; }
+  .context-notes { margin-block: 1rem 2.5rem; color: var(--muted); font-size: 0.75rem; line-height: 1.7; }
+  .context-notes p { margin-block: 0.25rem; max-width: var(--measure); }
+  .overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem; }
+  .column { min-width: 0; display: flex; flex-direction: column; gap: 2rem; }
+  .detail-section { min-width: 0; scroll-margin-block-start: 1.5rem; }
+  .page-sections > .detail-section { margin-block-start: 2.5rem; padding-block-start: 2rem; border-block-start: 1px solid var(--border); }
+  .page-sections > .detail-section :global(section > h2:first-child) { margin-block-start: 0; }
+  @media (max-width: 74rem) {
+    .pokemon-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .page-contents { display: none; }
+    .mobile-contents { display: block; margin-block-end: 1rem; border-block-end: 1px solid var(--border); }
+    .mobile-contents > summary { min-height: 2.75rem; align-content: center; padding-block: 0.625rem; color: var(--muted); font-size: 0.8125rem; cursor: pointer; }
+    .mobile-contents nav { max-height: 60dvh; overflow-y: auto; padding-block-end: 0.75rem; }
   }
-
-  .pager ul {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-
-  .pager li {
-    min-width: 0;
-  }
-  .pager a {
-    display: flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
-    overflow-wrap: anywhere;
-  }
-
-  .pager a:is(:hover, :focus-visible) {
-    border-inline-start-color: var(--accent);
-  }
-
-  .pager .next {
-    grid-column: 2;
-    margin-inline-start: 0;
-  }
-
-  .pager .previous a::before {
-    content: "← " / "";
-  }
-
-  .pager .next a::after {
-    content: " →" / "";
-  }
-
-  .pokemon-context {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: 0.75rem 1rem;
-  }
-
-  .context-fields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1.5rem;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .context-fields :global(.form-selector) {
-    display: grid;
-    flex: 0 1 auto;
-    max-width: 28rem;
-    align-content: start;
-    align-items: start;
-    gap: 0.25rem;
-    min-width: 0;
-    margin: 0;
-  }
-  .context-fields :global(.form-selector > label) {
-    font-size: var(--data-label-size);
-    font-weight: 600;
-  }
-
-  .context-fields :global([data-select-trigger]) {
-    width: auto;
-    max-width: 100%;
-    min-width: 0;
-    min-height: 2.75rem;
-    padding: 0.5rem 0.75rem;
-    border: var(--border-width) solid var(--border-strong);
-    background: var(--surface);
-    color: var(--page-text);
-    font: inherit;
-    text-align: start;
-    overflow-wrap: anywhere;
-  }
-
-  .context-meta {
-    display: grid;
-    gap: 0.25rem;
-    padding-block: 0.375rem;
-  }
-
-  .context-meta p {
-    margin: 0;
-  }
-
-  .context-notes {
-    margin-block: 0.75rem 1.25rem;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
-  }
-
-  .context-notes p {
-    margin-block: 0.25rem;
-  }
-  .overview {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 1.5rem;
-  }
-
-  .column {
-    min-width: 0;
-  }
-
-  /* Long full-width sections get a rule so each starts visibly. */
-  .page-sections > :global(section) {
-    margin-block-start: 2rem;
-    padding-block-start: 0.75rem;
-    border-block-start: var(--border-width) solid var(--border);
-  }
-
-  .page-sections > :global(section > h2) {
-    margin-block-start: 0.5rem;
-  }
-
   @media (max-width: 48rem) {
-    .overview {
-      grid-template-columns: minmax(0, 1fr);
-    }
+    .overview { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  }
+  @media (max-width: 40rem) {
+    .pokemon-context { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (forced-colors: active) {
+    .compare-link, .compare-link:hover { color: LinkText; background: Canvas; border-color: ButtonBorder; }
   }
 </style>

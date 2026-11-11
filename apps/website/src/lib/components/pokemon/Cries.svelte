@@ -95,15 +95,13 @@
 
 <style>
   .cries {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.375rem 0.625rem;
-    width: fit-content;
-    max-width: 100%;
-    padding: 0.5rem 0.625rem;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
+    gap: 0.5rem 0.75rem;
+    width: 100%;
+    padding-block-start: 1rem;
+    border-block-start: var(--border-width) solid var(--border);
     min-width: 0;
   }
 
@@ -114,14 +112,15 @@
   h2 {
     font-size: var(--data-label-size);
     font-weight: 600;
+    grid-column: 1 / -1;
   }
 
   .actions {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
   }
 
   .audio-details {
-    flex: 0 1 auto;
+    grid-column: 1 / -1;
     min-width: 0;
     max-width: 38rem;
     font-size: var(--data-label-size);
@@ -141,13 +140,13 @@
   }
 
   .cries > .note {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
     margin: 0;
   }
 
   label {
     display: grid;
-    flex: 0 0 auto;
+    width: 100%;
     gap: 0.25rem;
     min-width: 0;
     max-width: 100%;
@@ -159,16 +158,17 @@
   }
 
   select {
-    max-width: 100%;
+    width: 100%;
     min-height: 2.75rem;
     padding: 0.375rem 0.5rem;
   }
 
-  .source { padding: 0.5rem 0.625rem; background: var(--surface); }
+  .source { color: var(--muted); }
   .actions a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 
   audio {
-    width: min(100%, 18rem);
+    grid-column: 1 / -1;
+    width: 100%;
     min-width: 0;
   }
 

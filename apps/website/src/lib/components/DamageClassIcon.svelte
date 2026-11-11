@@ -18,7 +18,7 @@
 </script>
 
 {#if icon}
-  <img src={asset(`/damage-class-icons/${icon}.png` as AssetPath)} alt="" width="32" height="14" />
+  <img src={asset(`damage-class-icons/${icon}.png` as AssetPath)} alt="" width="32" height="14" />
 {/if}
 
 <style>

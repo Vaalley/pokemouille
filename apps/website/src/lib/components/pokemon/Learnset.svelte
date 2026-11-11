@@ -168,9 +168,6 @@
   section, .learnset-tabs { position: relative; min-width: 0; }
   .learnset-context {
     margin-block-end: 1rem;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
   }
   .game-context { margin-block: 0 0.25rem; font-weight: 700; overflow-wrap: anywhere; }
   .value-provenance { color: var(--muted); font-size: 0.875rem; }
@@ -192,10 +189,9 @@
     max-width: 100%;
     min-height: 2.75rem;
     padding: 0.5rem 0.625rem;
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
+    border: var(--border-width) solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface);
     color: var(--page-text);
     font-size: var(--data-label-size);
     font-weight: 600;
@@ -203,24 +199,26 @@
     line-height: 1.25;
   }
   .learnset-tabs :global(.method-tab[data-state="active"]) {
-    border-inline-start-color: var(--accent);
-    background: var(--surface-muted);
-    color: var(--page-text);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    box-shadow: inset 0 -2px 0 var(--accent);
     text-decoration: none;
   }
   .method-name { min-width: 0; overflow-wrap: anywhere; }
   .method-count {
     flex: 0 0 auto;
     padding: 0.125rem 0.375rem;
-    background: var(--surface);
+    background: var(--surface-muted);
+    border-radius: var(--radius-control);
     color: var(--page-text);
     font-size: 0.8125rem;
     font-variant-numeric: tabular-nums;
   }
-  .method-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
-  .method-heading h3 { margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
-  .row-count { font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .scroll-hint { margin-block: 0.375rem 0.625rem; color: var(--muted); font-size: 0.8125rem; }
+  .method-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.75rem; padding-block: 0.75rem 0.25rem; }
+  .method-heading h3 { min-width: 0; margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+  .row-count { min-width: 0; color: var(--muted); font-size: var(--data-label-size); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .scroll-hint { margin-block: 0.375rem 0.75rem; color: var(--muted); font-size: 0.8125rem; overflow-wrap: anywhere; }
   .table-scroll {
     position: relative;
     isolation: isolate;
@@ -229,7 +227,7 @@
     overflow: auto;
     scrollbar-gutter: stable;
     border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
+    border-radius: var(--radius-panel);
     background: var(--surface);
   }
   .table-scroll:focus-visible {
@@ -243,7 +241,7 @@
     inset-block-start: 0;
     z-index: 2;
     background: var(--surface-muted);
-    color: var(--muted);
+    color: var(--page-text);
     line-height: 1.25;
     font-size: var(--data-label-size);
     font-weight: 600;
@@ -271,15 +269,18 @@
   .level-value {
     display: inline-block;
     min-width: 2.25rem;
-    padding: 0.125rem 0.375rem;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
     color: var(--page-text);
     text-align: center;
-    font-weight: 700;
+    font-weight: 600;
   }
   .category { text-align: center; }
   .damage-class { position: relative; display: inline-flex; align-items: center; vertical-align: middle; }
+  @media (forced-colors: active) {
+    .learnset-tabs :global(.method-tab[data-state="active"]) {
+      text-decoration: underline;
+      text-underline-offset: 0.25em;
+    }
+  }
   @media (max-width: 30rem) {
     .move-identity { width: 8.5rem; min-width: 8.5rem; max-width: 8.5rem; }
     th, td { padding-inline: 0.5rem; }

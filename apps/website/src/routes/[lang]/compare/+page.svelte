@@ -243,8 +243,10 @@
   <title>{t(lang, "heading")} | Pokémouille</title>
 </svelte:head>
 
-<h1>{t(lang, "heading")}</h1>
-<p>{t(lang, "intro", { max: MAX_COMPARED })}</p>
+<header class="tool-heading">
+  <h1>{t(lang, "heading")}</h1>
+  <p>{t(lang, "intro", { max: MAX_COMPARED })}</p>
+</header>
 
 {#snippet blocked(column: Column)}
   {#if column.state === "loading"}
@@ -562,17 +564,16 @@
 {/if}
 
 <style>
+  .tool-heading p { max-width: var(--measure); }
   .comparison-setup {
-    max-width: 41rem;
-    padding: var(--data-padding);
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
+    max-width: 44rem;
+    margin-block: 1.5rem 2rem;
+    padding-block: 1rem;
+    border-block: var(--border-width) solid var(--border);
   }
   .selection-progress { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-block-end: 0.75rem; }
   .selection-count { margin: 0; font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .compare-guidance { margin: 0.75rem 0 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface); }
+  .compare-guidance { margin: 0.75rem 0 0; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); color: var(--muted); }
   .compare-actions { display: flex; gap: 0.5rem; margin-block: 1rem; }
   .compare-actions:empty { display: none; }
 
@@ -595,13 +596,14 @@
     /* Keep absolutely positioned screen-reader labels inside the scrolling region. */
     position: relative;
     width: fit-content;
+    max-width: 100%;
+    min-width: 0;
     max-height: min(48rem, 80dvh);
     margin-block-start: 1rem;
     overflow: auto;
     overscroll-behavior: contain;
-    border: 0;
-    border-block: var(--border-width) solid var(--border);
-    border-radius: 0;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-panel);
     isolation: isolate;
   }
   .compare-table {
@@ -611,13 +613,13 @@
     border-spacing: 0;
   }
   .attribute-column { width: var(--attribute-width); }
-  .compare-table caption { padding: 0.75rem; }
+  .compare-table caption { padding: 0.875rem 0.75rem; text-align: start; font-weight: 600; }
   .compare-table :is(th, td) { padding: 0.625rem 0.75rem; vertical-align: top; overflow-wrap: anywhere; border-block-end: var(--border-width) solid var(--border); }
   .compare-table thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-muted); border-block-end-color: var(--border-strong); }
   .compare-table th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; border-inline-end: var(--border-width) solid var(--border); }
   .compare-table thead th:first-child { left: 0; z-index: 3; }
-  .selection-card { display: grid; justify-items: start; align-content: start; gap: 0.375rem; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--accent); border-radius: 0; background: var(--surface); color: var(--page-text); }
-  .selection-artwork { display: grid; place-items: center; width: 4rem; height: 4rem; background: var(--surface-muted); }
+  .selection-card { display: grid; justify-items: start; align-content: start; gap: 0.375rem; min-width: 0; padding: 0.25rem; color: var(--page-text); text-align: start; }
+  .selection-artwork { display: grid; place-items: center; width: 4rem; height: 4rem; }
   .selection-artwork img { width: 4rem; height: 4rem; object-fit: contain; }
   .selection-card > a { font-size: 1.125rem; font-weight: 650; line-height: 1.3; }
   .selection-card .species-number { color: var(--muted); font-size: 0.75rem; font-weight: normal; font-variant-numeric: tabular-nums; }
@@ -653,13 +655,14 @@
     display: inline-block;
     min-width: 4ch;
     padding: 0.125rem 0.25rem;
-    border-inline-start: var(--data-rule) solid transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
     font-size: 1.125rem;
     line-height: 1.3;
     text-align: end;
     font-variant-numeric: tabular-nums;
   }
-  .value.highest { border-inline-start-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .value.highest { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 700; }
   .stat :global([data-meter-root]) { width: 100%; height: 0.5rem; border: 0; background: var(--surface-muted); }
   @media (forced-colors: active) {
     .stat :global([data-meter-root]) { border: 1px solid CanvasText; }
@@ -674,9 +677,8 @@
       container-type: inline-size;
       width: 100%;
     }
-    .comparison-setup { padding: 0.75rem; }
     .compare-table :is(th, td) { padding: 0.625rem; }
-    .selection-card { padding: 0.625rem; }
+    .selection-card { padding: 0; }
   }
 
   .total > * {
@@ -712,7 +714,8 @@
   }
 
   .compare-notes {
-    margin-block: 1rem;
+    max-width: var(--measure);
+    margin-block: 1.25rem;
   }
 
   .compare-notes p {

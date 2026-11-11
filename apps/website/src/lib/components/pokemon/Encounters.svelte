@@ -119,32 +119,28 @@
 </section>
 
 <style>
-  .game-scope { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
+  .game-scope { margin-block: 0 0.5rem; font-weight: 700; overflow-wrap: anywhere; }
   section { min-width: 0; }
-  .source-notes { margin-block: 0.75rem 1rem; padding: 0.25rem 0.75rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .source-notes > summary { min-height: 2.75rem; padding: 0.5rem 0; border-radius: 0; font-size: var(--data-label-size); font-weight: 600; }
-  .source-notes .note { margin-block: 0.5rem; }
+  .source-notes { max-width: 75ch; margin-block: 0.25rem 1rem; color: var(--muted); font-size: 0.875rem; }
+  .source-notes > summary { min-height: 2.75rem; padding: 0.5rem 0; border: 0; border-radius: var(--radius-control); font-size: 0.875rem; font-weight: 600; }
+  .source-notes .note { margin-block: 0.5rem; line-height: 1.6; }
   .encounter-groups { display: grid; gap: 0.75rem; }
   .encounter-group {
     min-width: 0;
-    border: var(--border-width) solid var(--border);
+    border: var(--border-width) solid var(--border-strong);
     border-radius: var(--radius-panel);
     background: var(--surface);
   }
   summary {
     min-height: 2.75rem;
-    padding: 0.625rem 0.75rem;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
+    padding: 0.75rem 1rem;
     border-radius: var(--radius-panel);
-    background: var(--surface-muted);
     cursor: pointer;
   }
-  details[open] > summary {
+  .encounter-group[open] > summary {
     border-block-end: var(--border-width) solid var(--border);
-    border-inline-start-color: var(--accent);
     border-end-start-radius: 0;
     border-end-end-radius: 0;
-    background: var(--surface-muted);
   }
   .group-summary {
     display: inline-grid;
@@ -154,9 +150,9 @@
     overflow-wrap: anywhere;
   }
   .group-location { font-weight: 650; }
-  .group-context { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.375rem 0.75rem; font-size: var(--data-label-size); font-weight: 600; }
+  .group-context { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.375rem 0.75rem; color: var(--muted); font-size: var(--data-label-size); }
   .group-count { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .group-body { min-width: 0; padding: 0.75rem; }
+  .group-body { min-width: 0; padding: 0.5rem 1rem 1rem; }
   h3 { margin-block: 0 0.625rem; font-size: 1rem; overflow-wrap: anywhere; }
   h3 a { display: inline-flex; align-items: center; min-height: 2.75rem; }
   .table-scroll {
@@ -164,8 +160,8 @@
     max-height: min(30rem, 65dvh);
     overflow: auto;
     scrollbar-gutter: stable;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-control);
+    border: 0;
+    border-radius: 0;
     background: var(--surface);
   }
   .table-scroll:focus-visible { outline: var(--border-width) solid var(--focus-ring); outline-offset: 3px; }
@@ -183,8 +179,15 @@
   }
   .numeric { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
   .conditions { display: grid; gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
-  .conditions li { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .conditions li { overflow-wrap: anywhere; }
+  .conditions li + li { padding-block-start: 0.375rem; border-block-start: var(--border-width) solid var(--border); }
+  .conditions small { color: var(--muted); }
   .source span, .source small { display: block; }
   .source small { margin-block-start: 0.25rem; }
   .note { font-size: 0.875rem; }
+  tbody tr:last-child > td { border-block-end: 0; }
+  @media (max-width: 30rem) {
+    .encounter-group > summary { padding-inline: 0.75rem; }
+    .group-body { padding-inline: 0.75rem; }
+  }
 </style>

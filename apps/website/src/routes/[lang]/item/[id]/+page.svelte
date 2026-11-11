@@ -23,7 +23,7 @@
       <ItemIcon identifier={data.identifier} />
       <span class="identity-name"><Localized text={data.name} /></span>
     </h1>
-    <dl class="properties">
+    <dl class="identity-meta">
       <dt>{t(lang, "identity.number")}</dt>
       <dd>{data.itemId}</dd>
     </dl>
@@ -32,7 +32,7 @@
   <section aria-labelledby="effects-heading" aria-describedby="effects-scope">
     <h2 id="effects-heading">{t(lang, "effect.heading")}</h2>
     <dl class="definitions effect-copy">
-      <div class="effect-summary detail-panel">
+      <div class="effect-summary">
         <dt>{t(lang, "effect.short")}</dt>
         <dd class="source-text">
           {#if data.shortEffect}
@@ -109,22 +109,19 @@
     overflow-wrap: anywhere;
   }
 
+  .identity-meta { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; margin-block: 0.75rem 0; color: var(--muted); font-size: var(--data-label-size); }
+  .identity-meta dd { margin: 0; font-variant-numeric: tabular-nums; }
+
   .effect-copy {
     display: grid;
-    gap: 0.5rem;
+    gap: 1.5rem;
     max-width: var(--measure);
     margin-block: 1rem;
   }
-  .effect-copy > div {
-    min-width: 0;
-    padding: var(--data-padding);
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
-  }
+  .effect-copy > div { min-width: 0; }
 
   .effect-copy dt {
+    color: var(--muted);
     font-size: var(--data-label-size);
     font-weight: 600;
   }
@@ -134,17 +131,12 @@
     line-height: 1.6;
   }
 
-  .effect-copy > .effect-summary {
-    border-inline-start-color: var(--accent);
-  }
-
   .effect-summary dd {
+    font-size: 1.0625rem;
     font-weight: 600;
   }
 
-  .description-table table {
-    table-layout: fixed;
-  }
+  .description-table table { min-width: 28rem; }
 
   .description-table th,
   .description-table td {

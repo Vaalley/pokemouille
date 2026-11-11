@@ -389,21 +389,18 @@
 <style>
   .page-heading p { max-width: var(--measure); }
   .scope-notes {
-    margin-block: 1.25rem;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
+    max-width: var(--measure);
+    margin-block: 1.25rem 2rem;
+    padding-block: 1rem;
+    border-block: var(--border-width) solid var(--border);
   }
   .scope-title { margin: 0; font-size: var(--data-label-size); font-weight: 600; }
   .scope-notes .note { margin-block: 0.5rem 0; }
   .scope-notes .legality { color: var(--page-text); font-weight: 600; }
   .picker-panel {
     min-width: 0;
-    padding: var(--data-padding);
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
+    padding-block: 0.25rem 1.25rem;
+    border-block-end: var(--border-width) solid var(--border);
   }
   .picker-panel h2 { margin-block: 0 0.75rem; }
   .filters { margin-block-end: 0.25rem; }
@@ -412,11 +409,7 @@
   .filter-field small, .selection-limit { font-size: 0.875rem; color: var(--muted); }
   .selection-limit { margin-block: 0.5rem 0.75rem; }
   .selection-limit.at-limit {
-    padding: 0.5rem 0.75rem;
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--accent);
-    border-radius: 0;
-    background: var(--surface);
+    padding-block: 0.25rem;
     color: var(--page-text);
     font-weight: 600;
   }
@@ -430,18 +423,17 @@
     width: 100%;
     min-height: 2.75rem;
     padding: 0.375rem 0.625rem;
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-control);
     background: var(--surface);
     text-align: start;
     cursor: pointer;
   }
-  .suggestions button:not(:disabled):hover { border-inline-start-color: var(--accent); background: var(--accent-soft); }
-  .suggestions button:disabled { color: var(--muted); background: var(--surface-muted); border-inline-start-style: dashed; cursor: default; }
+  .suggestions button:not(:disabled):hover { border-color: var(--accent); background: var(--accent-soft); }
+  .suggestions button:disabled { color: var(--muted); background: var(--surface-muted); border-style: dashed; cursor: default; }
   .move-name { min-width: 0; overflow-wrap: anywhere; }
   .suggestion-action { margin-inline-start: auto; flex-shrink: 0; font-size: 0.75rem; font-weight: 700; }
-  .selection-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.375rem 1rem; margin-block-start: 1rem; }
+  .selection-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.375rem 1rem; margin-block-start: 1.25rem; padding-block-start: 1rem; border-block-start: 1px solid var(--border); }
   .selection-heading h3 { margin: 0; font-size: 1rem; }
   .clear-button, .retry-button {
     min-height: 2.75rem;
@@ -459,10 +451,9 @@
     max-width: 100%;
     min-width: 0;
     padding-inline-start: 0.625rem;
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--accent);
-    border-radius: 0;
-    background: var(--surface);
+    border: var(--border-width) solid var(--accent);
+    border-radius: var(--radius-control);
+    background: var(--accent-soft);
   }
   .selected a { display: inline-flex; align-items: center; gap: 0.375rem; min-width: 0; min-height: 2.75rem; }
   .selected button {
@@ -478,40 +469,39 @@
     cursor: pointer;
   }
   .selected button:hover { background: var(--surface); }
-  .empty-selection { margin-block-end: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface); color: var(--muted); }
-  .results-panel { min-width: 0; margin-block-start: 1.75rem; }
+  .empty-selection { margin-block-end: 0; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); color: var(--muted); }
+  .results-panel { min-width: 0; margin-block-start: 2rem; }
   .results-panel h2 { margin-block-end: 0.75rem; }
-  .state-message { padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); overflow-wrap: anywhere; }
+  .state-message { max-width: var(--measure); padding-block: 1rem; border-block: var(--border-width) solid var(--border); overflow-wrap: anywhere; }
   .state-message p { margin-block: 0 0.75rem; }
-  .error-message { border-color: var(--border-strong); border-inline-start-color: var(--accent); }
-  .result-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.375rem 1rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
+  .error-message { border-color: var(--border-strong); }
+  .result-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; padding-block: 0.75rem 1rem; border-block-end: var(--border-width) solid var(--border); }
   .result-summary p { margin: 0; overflow-wrap: anywhere; }
   .matching-count { font-weight: 700; font-size: 1.125rem; font-variant-numeric: tabular-nums; }
   .game-context { font-size: var(--data-label-size); color: var(--muted); }
   .game-context strong { color: var(--page-text); }
-  .per-move { display: flex; flex-wrap: wrap; gap: 0.375rem 0.75rem; }
-  .per-move li { display: grid; gap: 0.25rem; align-content: start; max-width: 100%; padding: var(--data-padding); background: var(--surface-muted); border-inline-start: var(--data-rule) solid var(--border-strong); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
+  .per-move { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0 1.5rem; }
+  .per-move li { display: grid; gap: 0.375rem; align-content: start; min-width: 0; padding-block: 0.75rem; border-block-end: 1px solid var(--border); font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .per-move strong { color: var(--accent); font-variant-numeric: tabular-nums; }
   .table-help { margin-block-end: 0.5rem; }
-  .table-scroll { min-width: 0; border: 0; border-block: var(--border-width) solid var(--border); border-radius: 0; background: var(--surface); }
-  table { width: 100%; border-collapse: collapse; }
+  .table-scroll { position: relative; min-width: 0; max-width: 100%; max-height: min(48rem, 80dvh); overflow: auto; overscroll-behavior: contain; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); isolation: isolate; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; }
   caption { padding: 0.75rem; text-align: start; font-weight: 600; }
   th, td { padding: 0.625rem 0.75rem; vertical-align: top; border-block-end: var(--border-width) solid var(--border); }
-  thead th { background: var(--surface-muted); text-align: start; font-size: var(--data-label-size); font-weight: 600; }
-  th[scope="row"] { min-width: 11rem; max-width: 16rem; font-weight: normal; }
+  thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-muted); text-align: start; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
+  thead th:first-child { left: 0; z-index: 3; }
+  th[scope="row"] { position: sticky; left: 0; z-index: 1; min-width: 11rem; max-width: 16rem; background: var(--surface); border-inline-end: 1px solid var(--border); font-weight: normal; }
   th[scope="row"] a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; overflow-wrap: anywhere; }
   .detail { display: block; padding-inline-start: 3rem; font-size: 0.75rem; color: var(--muted); }
   .detail code { white-space: normal; overflow-wrap: anywhere; }
   .methods { margin: 0; display: grid; gap: 0.5rem; }
-  .methods li { display: grid; gap: 0.125rem; padding-inline-start: 0.5rem; border-inline-start: var(--data-rule) solid var(--border-strong); overflow-wrap: anywhere; }
+  .methods li { display: grid; gap: 0.125rem; overflow-wrap: anywhere; }
   .method-name { font-size: var(--data-label-size); font-weight: 600; }
   .method-level { color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
   td { min-width: 10rem; }
   tbody tr:last-child :is(th, td) { border-block-end: 0; }
-  tbody tr:hover { background: var(--accent-soft); }
+  tbody tr:hover th[scope="row"], tbody tr:hover td { background: var(--accent-soft); }
   @media (max-width: 30rem) {
-    .picker-panel { padding: 0.75rem; }
-    .scope-notes { padding: 0.75rem; }
     .selected { display: grid; }
     .selected li { justify-content: space-between; }
     .per-move { display: grid; }

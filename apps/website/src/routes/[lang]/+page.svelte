@@ -125,8 +125,10 @@
   <title>{dexName} | {t(data.lang, "site.name")}</title>
 </svelte:head>
 
-<h1>{dexName}</h1>
-<p>{home(data.lang, "intro")}</p>
+<header class="catalogue-header">
+  <h1>{dexName}</h1>
+  <p>{home(data.lang, "intro")}</p>
+</header>
 
 <form class="catalogue-filters" onsubmit={(event) => event.preventDefault()} aria-label={home(data.lang, "filters")} aria-describedby="{id}-scope">
   <div class="primary-filters">
@@ -324,7 +326,7 @@
     aria-sort={current ? (display.order === "asc" ? "ascending" : "descending") : undefined}>
     <button type="button" class="sort-button" onclick={() => sortBy(sort)}>
       {#if typeof label === "string"}{label}{:else}<Localized text={label} />{/if}
-      <span class="sort-indicator" aria-hidden="true">{current ? (display.order === "asc" ? "▲" : "▼") : ""}</span>
+      <span class="sort-indicator" aria-hidden="true">{current ? (display.order === "asc" ? "▲" : "▼") : "↕"}</span>
     </button>
   </th>
 {/snippet}
@@ -375,19 +377,21 @@
 {/snippet}
 
 {#if !mounted}
-  <p role="status">{home(data.lang, "loading")}</p>
+  <p class="catalogue-state" role="status">{home(data.lang, "loading")}</p>
   <noscript>
     <p>{home(data.lang, "javascript")}</p>
     {@render speciesList(data.catalogue.species, t(data.lang, "home.listLabel"))}
   </noscript>
 {:else if dexSelection.status === "waiting"}
-  <p role="status">{dex(data.lang, "loading")}</p>
+  <p class="catalogue-state" role="status">{dex(data.lang, "loading")}</p>
 {:else if dexSelection.status === "invalid"}
-  <p id="{id}-dex-error" role="alert">{dex(data.lang, "invalid", { dex: invalidDexName })}</p>
-  <button type="button" onclick={() => update({ dex: null })}>{dex(data.lang, "reset")}</button>
+  <div class="catalogue-state">
+    <p id="{id}-dex-error" role="alert">{dex(data.lang, "invalid", { dex: invalidDexName })}</p>
+    <button type="button" onclick={() => update({ dex: null })}>{dex(data.lang, "reset")}</button>
+  </div>
 {:else}
   {#if species.length === 0}
-    <p>{home(data.lang, "empty")}</p>
+    <p class="catalogue-state" role="status">{home(data.lang, "empty")}</p>
   {:else if display.view === "table"}
     {@render speciesTable(species)}
   {:else}
@@ -402,52 +406,60 @@
 {/if}
 
 <style>
-  .catalogue-filters { display: grid; gap: 0.75rem; margin-block: 1.25rem 1rem; }
-  .primary-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 0.75rem; align-items: end; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .advanced-filters { padding: 0.375rem 0.75rem; border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); min-width: 0; }
-  .advanced-filters > summary { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; list-style: none; }
+  .catalogue-header { margin-block-end: 1.5rem; }
+  .catalogue-header h1 { margin-block: 0 0.375rem; font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.15; overflow-wrap: anywhere; }
+  .catalogue-header p { max-width: 65ch; margin: 0; color: var(--muted); line-height: 1.5; }
+  .catalogue-filters { display: grid; min-width: 0; gap: 0; margin-block: 0 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  .primary-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 1rem; align-items: end; }
+  .filter-field { min-width: 0; align-content: end; }
+  .filter-field label { line-height: 1.4; overflow-wrap: anywhere; }
+  .advanced-filters { min-width: 0; margin-block-start: 0.75rem; border-block-start: 1px solid var(--border); }
+  .advanced-filters > summary { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding-block-start: 0.25rem; cursor: pointer; list-style: none; }
   .advanced-filters > summary::-webkit-details-marker { display: none; }
-  .advanced-filters > summary::after { content: ""; width: 0.45rem; height: 0.45rem; margin-inline: auto 0.25rem; border-inline-end: var(--border-width) solid currentColor; border-block-end: var(--border-width) solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
+  .advanced-filters > summary::after { content: ""; width: 0.45rem; height: 0.45rem; margin-inline: auto 0.25rem; border-inline-end: 1px solid currentColor; border-block-end: 1px solid currentColor; transform: translateY(-0.125rem) rotate(45deg); }
   .advanced-filters[open] > summary::after { transform: translateY(0.125rem) rotate(225deg); }
-  .advanced-filters[open] { border-inline-start-color: var(--accent); }
   .filter-field label, .advanced-filters > summary { font-size: var(--data-label-size); font-weight: 600; }
-  .filter-count { padding: 0.1rem 0.5rem; background: var(--accent-soft); color: var(--accent); border-inline-start: var(--data-rule) solid var(--accent); font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .advanced-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0.75rem; margin-block: 0.75rem; }
-  .catalogue-filters :is(input, select), .toolbar-fields select { min-width: 0; width: 100%; min-height: 2.75rem; padding: 0.6rem 0.75rem; border: var(--border-width) solid var(--border-strong); background: var(--surface); color: var(--page-text); font: inherit; }
-  .results-summary { flex: 1 1 18rem; min-width: 0; display: grid; gap: 0.625rem; }
-  .active-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
-  .active-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; min-width: 0; }
+  .filter-count { min-width: 1.5rem; padding: 0.125rem 0.375rem; border-radius: var(--radius-control); background: var(--accent-soft); color: var(--accent); text-align: center; font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .advanced-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; margin-block: 0.75rem 1rem; }
+  .catalogue-filters :is(input, select), .toolbar-fields select { min-width: 0; width: 100%; min-height: 2.75rem; padding: 0.6rem 0.75rem; border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface); color: var(--page-text); font: inherit; }
+  .catalogue-filters :is(input, select):disabled, .toolbar-fields select:disabled { background: var(--surface-muted); color: var(--muted); cursor: not-allowed; }
+  .results-summary { flex: 1 1 15rem; min-width: 0; display: grid; gap: 0.5rem; }
+  .active-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem 0.5rem; }
+  .active-filters { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0; padding: 0; list-style: none; min-width: 0; }
   .active-filters li { min-width: 0; max-width: 100%; }
-  .active-filter-bar button { min-height: 2.75rem; padding: 0.375rem 0.625rem; border: 0; border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); color: var(--page-text); font: inherit; cursor: pointer; }
+  .active-filter-bar button { min-height: 2.75rem; padding: 0.375rem 0.625rem; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--surface); color: var(--page-text); font: inherit; font-size: var(--data-label-size); cursor: pointer; }
   .active-filter-bar > button { border-color: transparent; background: transparent; color: var(--link); text-decoration: underline; text-underline-offset: 0.2em; }
   .active-filter-bar button:hover { border-color: var(--accent); }
-  .filter-chip { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; border-radius: 0; text-align: start; overflow-wrap: anywhere; }
+  .filter-chip { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; text-align: start; overflow-wrap: anywhere; }
   .filter-chip > span:first-child { min-width: 0; }
   .filter-chip > span:last-child { color: var(--accent); font-size: 1.25rem; line-height: 1; }
-  .results-toolbar { display: flex; flex-wrap: wrap; align-items: start; gap: 0.75rem 1.25rem; margin-block: 1rem; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
-  .results-toolbar .result-count { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .toolbar-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; width: min(100%, 34rem); }
+  .results-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 0.75rem 1.5rem; margin-block: 1rem; }
+  .results-toolbar .result-count { margin: 0; font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .toolbar-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; gap: 0.625rem; width: min(100%, 33rem); }
+  .toolbar-fields select { font-size: 0.875rem; }
   @media (max-width: 40rem) {
-    .primary-filters { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
-    .results-toolbar { padding: 0.75rem; gap: 0.75rem; }
-    .toolbar-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+    .catalogue-header { margin-block-end: 1rem; }
+    .catalogue-filters { padding: 0.75rem; }
+    .primary-filters { grid-template-columns: minmax(0, 1fr); gap: 0.625rem; }
+    .advanced-fields { gap: 0.75rem; }
+    .results-toolbar { gap: 0.625rem; }
+    .results-summary { flex-basis: 100%; }
+    .toolbar-fields { width: 100%; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 0.625rem; }
     .toolbar-fields .filter-field:first-child { grid-column: 1 / -1; }
-    .toolbar-fields select { font-size: 0.875rem; }
   }
-  .pokemon-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem; }
+  .pokemon-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem; margin-block: 0; }
   .pokemon-cards > li { min-width: 0; }
   .pokemon-cards .pokemon-card {
     display: grid;
-    grid-template-columns: 4rem minmax(0, 1fr);
+    grid-template-columns: 3.5rem minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
     align-items: start;
     gap: 0.25rem 0.75rem;
     height: 100%;
-    padding: var(--data-padding);
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
+    padding: 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
     color: var(--page-text);
     text-decoration: none;
   }
@@ -456,9 +468,8 @@
     place-items: center;
     grid-row: 1 / 4;
     align-self: center;
-    width: 4rem;
-    height: 4rem;
-    background: var(--surface);
+    width: 3.5rem;
+    height: 3.5rem;
   }
   .pokemon-card-icon :global(.pokemon-icon) { transform: scale(1.5); }
   .pokemon-cards .species-number {
@@ -470,23 +481,36 @@
     font-variant-numeric: tabular-nums;
     line-height: 1.4;
   }
-  .pokemon-card-name { min-width: 0; font-size: 1.125rem; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
-  .pokemon-cards .pokemon-card > .pokemon-card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; min-width: 0; text-decoration: none; }
-  .pokemon-card:is(:hover, :focus-visible) { border-inline-start-color: var(--accent); background: var(--accent-soft); }
+  .pokemon-card-name { min-width: 0; font-size: 1.0625rem; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
+  .pokemon-cards .pokemon-card > .pokemon-card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; min-width: 0; margin-block-start: 0.125rem; text-decoration: none; }
+  .pokemon-card:is(:hover, :focus-visible) { border-color: var(--accent); background: var(--accent-soft); }
   .pokemon-card:is(:hover, :focus-visible) .pokemon-card-name { text-decoration: underline; text-underline-offset: 0.2em; }
   .pokemon-card:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
-  .note p { margin-block: 0.25rem; }
-  .species-table { width: 100%; }
-  .species-table :is(th, td) { vertical-align: middle; border-block-end: var(--border-width) solid var(--border); }
-  .species-table th[scope="row"] { min-width: 9rem; font-weight: 600; }
-  .species-table thead th { white-space: nowrap; background: var(--surface-muted); font-size: var(--data-label-size); }
+  .note { max-width: 75ch; color: var(--muted); font-size: var(--data-label-size); line-height: 1.5; }
+  .note p { margin-block: 0.375rem; }
+  .catalogue-state { margin-block: 1rem 0; padding-block: 1.5rem; border-block: 1px solid var(--border); color: var(--muted); line-height: 1.6; overflow-wrap: anywhere; }
+  .catalogue-state p { max-width: 65ch; margin-block: 0 0.75rem; }
+  .catalogue-state button { min-height: 2.75rem; padding: 0.5rem 0.75rem; }
+  .table-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border: 1px solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
+  .table-scroll:focus-visible { outline-offset: 3px; }
+  .species-table { width: 100%; min-width: 62rem; border-collapse: separate; border-spacing: 0; }
+  .species-table caption { padding: 0.75rem; border-block-end: 1px solid var(--border); color: var(--muted); }
+  .species-table :is(th, td) { padding: 0.5rem 0.75rem; vertical-align: middle; border-block-end: 1px solid var(--border); }
+  .species-table th[scope="row"] { min-width: 10rem; max-width: 16rem; font-weight: 600; overflow-wrap: anywhere; }
+  .species-table th[scope="row"] a { display: inline-flex; align-items: center; min-height: 2.75rem; line-height: 1.4; }
+  .species-table thead th { background: var(--surface-muted); font-size: var(--data-label-size); line-height: 1.4; }
+  .species-table .numeric { text-align: end; font-variant-numeric: tabular-nums; }
+  .species-table td.numeric { white-space: nowrap; }
+  .species-table tbody tr:is(:hover, :focus-within) > * { background: var(--accent-soft); }
   .species-table tbody tr:last-child > * { border-block-end: 0; }
   .sort-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: space-between;
+    gap: 0.375rem;
+    width: 100%;
     min-height: 2.75rem;
-    padding: 0;
+    padding: 0.25rem 0;
     border: 0;
     background: none;
     color: inherit;
@@ -495,6 +519,10 @@
     text-align: inherit;
     cursor: pointer;
   }
-  .sort-indicator { display: inline-block; min-width: 1ch; font-size: 0.75em; }
-  .types { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .numeric .sort-button { justify-content: flex-end; }
+  .sort-button:is(:hover, :focus-visible) { color: var(--accent); }
+  .sort-button:focus-visible { outline-offset: 2px; }
+  .sort-indicator { flex: 0 0 auto; min-width: 1ch; color: var(--muted); font-size: 0.75em; }
+  th[aria-sort] .sort-indicator { color: var(--accent); }
+  .types { display: flex; flex-wrap: wrap; gap: 0.25rem; min-width: 8rem; }
 </style>

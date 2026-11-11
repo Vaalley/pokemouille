@@ -72,10 +72,12 @@
 
 <style>
   section { min-width: 0; }
-  .game-context { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); font-size: var(--data-label-size); }
-  .evolution-families { display: grid; gap: 0.75rem; }
-  .evolution-family { min-width: 0; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
-  summary { min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-size: var(--data-label-size); font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
-  details[open] > summary { border-inline-start-color: var(--accent); border-block-end: var(--border-width) solid var(--border); }
-  .family-body { min-width: 0; padding: 0 0.75rem 0.75rem; }
+  .game-context { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; margin-block: 1rem; color: var(--muted); font-size: var(--data-label-size); }
+  .game-context strong { color: var(--page-text); font-weight: 600; }
+  .evolution-families { display: grid; }
+  .evolution-family { min-width: 0; border-block-end: 1px solid var(--border); }
+  summary { min-height: 2.75rem; padding: 0.875rem 0.25rem; font-size: var(--data-label-size); font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+  summary:hover { color: var(--accent); }
+  details[open] > summary { margin-block-end: 0.5rem; }
+  .family-body { min-width: 0; padding: 0 0.25rem 1.25rem; }
 </style>

@@ -1,40 +1,42 @@
 /* Shared layout, typography, link styling, and functional Bits UI data-* rules. */
 
-/* Warm paper, botanical teal and deep green ink. Explicit preferences override the OS
-   before first paint; light-dark() keeps every shared token in the same scheme. */
+/* Neutral canvas and violet signal, with explicit saved themes applied before paint.
+   light-dark() also keeps the automatic preference in sync with the OS. */
 :root {
   color-scheme: light dark;
   accent-color: var(--accent);
-  --border: light-dark(#d5ddd4, #3a4b41);
-  --border-strong: light-dark(#7e9184, #647c6d);
+  --border: light-dark(#dad8e2, #2b2b33);
+  /* Interactive boundaries stay distinct from the quieter decorative rules. */
+  --border-strong: light-dark(#797382, #797887);
   --measure: 75ch;
-  --font-body: "Atkinson Hyperlegible Next", system-ui, sans-serif;
-  --font-heading: "Bricolage Grotesque", system-ui, sans-serif;
-  --radius-panel: 8px;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-display: "Pixelify Sans", system-ui, sans-serif;
+  --radius-panel: 6px;
   --radius-control: 4px;
   --radius-pill: 999px;
-  --border-width: 2px;
+  --border-width: 1px;
   --data-rule: 0.1875rem;
   --data-label-size: 0.8125rem;
   --data-padding: 0.625rem 0.75rem;
-  --page-background: light-dark(#f5f4ee, #17211e);
-  --page-text: light-dark(#27352f, #e7ece5);
-  --surface: light-dark(#fffefa, #202d28);
-  --surface-muted: light-dark(#ecefe6, #293831);
-  --muted: light-dark(#5b6b61, #aabbb0);
-  --accent: light-dark(#276b5d, #8bc5ac);
-  --accent-hover: light-dark(#1e5449, #add9c3);
-  --accent-soft: light-dark(#e3eee6, #2a4438);
-  --focus-ring: light-dark(#247668, #90c9af);
-  --link: light-dark(#216455, #9bcdb5);
-  --link-visited: light-dark(#645779, #c6b7d7);
+  --page-background: light-dark(#f7f7fa, #0d0d10);
+  --page-text: light-dark(#19181e, #f0eff5);
+  --surface: light-dark(#ffffff, #111115);
+  --surface-muted: light-dark(#efedf5, #19191f);
+  --muted: light-dark(#625f6c, #aaa9b5);
+  --accent: light-dark(#7042c5, #bfa3ff);
+  --accent-hover: light-dark(#57309e, #dccaff);
+  --accent-soft: light-dark(#e8e0f7, #292336);
+  --focus-ring: light-dark(#7042c5, #bfa3ff);
+  --link: light-dark(#6337b1, #c9b2fa);
+  --link-visited: light-dark(#754f83, #cfb5d9);
   /* Rarity badges: Legendary gold and Mythical violet, readable on either background. */
   --legendary: light-dark(#795000, #f2c55c);
   --legendary-background: light-dark(#fff4d6, color-mix(in srgb, #f2c55c 14%, var(--surface)));
   --mythical: light-dark(#7041a0, #d2b6f2);
   --mythical-background: light-dark(#f2eaff, color-mix(in srgb, #d2b6f2 14%, var(--surface)));
   --overlay: light-dark(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.6));
-  --popover-shadow: 0 0.5rem 1.5rem light-dark(rgb(25 48 38 / 0.12), rgb(0 0 0 / 0.35));
+  --popover-shadow: 0 0.75rem 2rem light-dark(rgb(25 24 30 / 0.12), rgb(0 0 0 / 0.4));
 }
 
 :root[data-theme="light"] {
@@ -50,54 +52,54 @@
   color-scheme: dark;
 }
 
-/* Keep the original dark palette's luminance hierarchy; only the hue changes.
-   :where keeps system-colour overrides below authoritative in forced-colour mode. */
+/* Saved tinted themes share the neutral theme's near-black hierarchy.
+   :where keeps forced-colour system overrides authoritative. */
 :root:where([data-theme="dark-red"]) {
-  --page-background: #241b1c;
-  --page-text: #eee7e5;
-  --surface: #302426;
-  --surface-muted: #3c2e30;
-  --muted: #c2b0b1;
-  --border: #514043;
-  --border-strong: #92767b;
-  --accent: #dca3a4;
-  --accent-hover: #efc0be;
-  --accent-soft: #4b3338;
-  --focus-ring: #e7a9ac;
-  --link: #e5b1b0;
-  --link-visited: #d0b6da;
+  --page-background: #130e11;
+  --page-text: #f3edf0;
+  --surface: #1a1317;
+  --surface-muted: #241b20;
+  --muted: #bfb0b8;
+  --border: #382a32;
+  --border-strong: #a08290;
+  --accent: #e6a5b7;
+  --accent-hover: #f4c3d0;
+  --accent-soft: #38232e;
+  --focus-ring: #e6a5b7;
+  --link: #edb4c4;
+  --link-visited: #d3b6e0;
 }
 
 :root:where([data-theme="dark-blue"]) {
-  --page-background: #1a1f29;
-  --page-text: #e5e9f0;
-  --surface: #232c38;
-  --surface-muted: #2c3847;
-  --muted: #adbbce;
-  --border: #3c4a60;
-  --border-strong: #70829d;
-  --accent: #9ebce5;
-  --accent-hover: #c0d5f1;
-  --accent-soft: #30435f;
-  --focus-ring: #a8c5ed;
-  --link: #b0c9ed;
-  --link-visited: #c8b8df;
+  --page-background: #0d1017;
+  --page-text: #edf0f7;
+  --surface: #121823;
+  --surface-muted: #1b2330;
+  --muted: #b0bace;
+  --border: #2a3547;
+  --border-strong: #8494b2;
+  --accent: #a6bfff;
+  --accent-hover: #c7d6ff;
+  --accent-soft: #243149;
+  --focus-ring: #a6bfff;
+  --link: #b7cbff;
+  --link-visited: #cbb9ec;
 }
 
 :root:where([data-theme="dark-yellow"]) {
-  --page-background: #232119;
-  --page-text: #eeebe1;
-  --surface: #302d22;
-  --surface-muted: #3b3729;
-  --muted: #c0baa6;
-  --border: #514c39;
-  --border-strong: #8b8264;
-  --accent: #d6c184;
-  --accent-hover: #ecdaa7;
-  --accent-soft: #49412b;
-  --focus-ring: #dfcc93;
-  --link: #e0cc95;
-  --link-visited: #cbbada;
+  --page-background: #13110d;
+  --page-text: #f3f0e7;
+  --surface: #1b1811;
+  --surface-muted: #262217;
+  --muted: #c3bba4;
+  --border: #3b3424;
+  --border-strong: #a39672;
+  --accent: #e0c889;
+  --accent-hover: #f1dfac;
+  --accent-soft: #39301d;
+  --focus-ring: #e0c889;
+  --link: #e8d399;
+  --link-visited: #d1bbdc;
 }
 
 *,
@@ -116,6 +118,8 @@ body {
   background: var(--page-background);
   color: var(--page-text);
   font-family: var(--font-body);
+  font-size: 1rem;
+  font-optical-sizing: auto;
   line-height: 1.5;
 }
 
@@ -189,7 +193,7 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: var(--surface);
+  color: var(--page-background);
 }
 
 :where(button, input, select, textarea, [data-select-trigger]) {
@@ -197,6 +201,11 @@ body {
   color: var(--page-text);
   background: var(--surface);
   border: var(--border-width) solid var(--border-strong);
+}
+
+::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 :where(button, [data-select-trigger], summary):not(:disabled):hover {
@@ -226,19 +235,21 @@ a:any-link:is(:hover, :focus-visible) {
 
 /* Navigation reads as navigation; prose and data links stay underlined. */
 .site-name:any-link,
+.primary-navigation a:any-link,
 .browse-navigation a:any-link {
   color: inherit;
   text-decoration-line: none;
 }
 
-.site-name:any-link,
+.primary-navigation a[aria-current],
 .browse-navigation a[aria-current] {
   color: var(--accent);
 }
 
 .site-name:any-link:is(:hover, :focus-visible),
-.browse-navigation a:any-link:is(:hover, :focus-visible, [aria-current]) {
-  text-decoration-line: underline;
+.primary-navigation a:any-link:is(:hover, :focus-visible),
+.browse-navigation a:any-link:is(:hover, :focus-visible) {
+  color: var(--accent-hover);
 }
 
 @media (forced-colors: active) {
@@ -269,13 +280,13 @@ a:any-link:is(:hover, :focus-visible) {
 .site-bar,
 main,
 .noscript-notice {
-  max-width: 72rem;
+  max-width: 90rem;
   margin-inline: auto;
-  padding-inline: 1rem;
+  padding-inline: clamp(1rem, 3.5vw, 3rem);
 }
 
 main {
-  padding-block: 1.5rem 4rem;
+  padding-block: clamp(1.5rem, 4vw, 3rem) 4rem;
 }
 
 img {
@@ -337,23 +348,26 @@ main:focus {
   white-space: nowrap;
 }
 
-/* Typography rhythm: headings group with the content that follows them. */
+/* Inter handles reading and data; expressive display type is opt-in at identity. */
 h1,
 h2,
 h3 {
   font-family: var(--font-heading);
   font-optical-sizing: auto;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
 }
 
 h1 {
   margin-block: 0 0.5rem;
-  font-size: 2rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.035em;
 }
 
 main h2 {
-  margin-block: 2.5rem 0.75rem;
+  margin-block: 2.5rem 1rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.035em;
 }
 
 main h3 {
@@ -381,29 +395,71 @@ main p {
   font-size: 0.875rem;
 }
 
-/* Primary navigation stays visible on desktop; display preferences live in Settings. */
+/* One quiet desktop row; secondary destinations retain their native disclosure. */
 .site-header {
   border-block-end: var(--border-width) solid var(--border);
-  background: var(--surface);
+  background: var(--page-background);
 }
 
 .site-bar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1rem;
-  padding-block: 0.75rem;
+  gap: clamp(0.75rem, 1.8vw, 2rem);
+  min-height: 5.5rem;
+  padding-block: 1rem;
 }
 
 .site-name {
-  margin-inline-end: auto;
-  font-size: 1.25rem;
-  font-weight: bold;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 0.15rem;
+  min-height: 2.75rem;
+  padding-block: 0.25rem;
+  font-family: var(--font-heading);
+  font-size: 1.4375rem;
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.site-mark {
+  color: var(--accent);
 }
 
 .desktop-navigation {
-  order: 5;
-  flex-basis: 100%;
+  min-width: 0;
+}
+
+.primary-navigation > .inline-list {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.primary-navigation > .inline-list > li > a,
+.more-menu > summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.625rem;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.primary-navigation > .inline-list > li > a[aria-current],
+.more-menu > summary.current {
+  color: var(--page-text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.6rem;
 }
 
 .mobile-browse {
@@ -423,18 +479,18 @@ main p {
   overflow-wrap: anywhere;
   min-height: 2.75rem;
   padding: 0.5rem 0.75rem;
-  border: 0;
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  border-radius: 0;
-  background: var(--surface-muted);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
   color: var(--page-text);
   font: inherit;
+  font-size: 0.875rem;
   cursor: pointer;
   list-style: none;
 }
 
 .header-disclosure[open] > summary {
-  border-inline-start-color: var(--accent);
+  border-color: var(--accent);
   background: var(--accent-soft);
 }
 
@@ -462,14 +518,59 @@ main p {
   right: 0;
   z-index: 30;
   width: min(22rem, calc(100vw - 2rem));
-  max-height: calc(100dvh - 9rem);
+  max-height: calc(100dvh - 8rem);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1rem;
-  border: var(--border-width) solid var(--border);
+  border: var(--border-width) solid var(--border-strong);
   border-radius: var(--radius-panel);
   background: var(--surface);
   color: var(--page-text);
   box-shadow: var(--popover-shadow);
+}
+
+.more-menu > summary {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+
+.more-menu > summary:is(:hover, :focus-visible),
+.more-menu[open] > summary {
+  color: var(--page-text);
+  background: var(--surface-muted);
+  border-color: transparent;
+}
+
+.more-navigation {
+  width: min(16rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+}
+
+.more-navigation .inline-list {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.more-navigation a:any-link {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-control);
+  color: var(--muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.more-navigation a:any-link:is(:hover, :focus-visible, [aria-current]) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.more-navigation a[aria-current] {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .settings-panel > :is(.game-selector, .language-selector, .sprite-selector, .theme-selector) {
@@ -495,22 +596,25 @@ main p {
 }
 
 .browse-navigation .inline-list {
-  gap: 0.375rem;
+  gap: 0.25rem;
 }
 
 .browse-navigation a {
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
-  padding: 0.4rem 0.75rem;
-  border-inline-start: var(--data-rule) solid var(--border);
-  background: var(--surface-muted);
+  padding: 0.65rem 0.875rem;
+  border-block-end: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.9375rem;
 }
 
 .browse-navigation a[aria-current] {
-  border-inline-start-color: var(--accent);
-  background: var(--accent-soft);
-  font-weight: 600;
+  border-block-end-color: var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 650;
 }
 
 .inline-list {
@@ -537,24 +641,46 @@ main p {
 
 .search-trigger {
   display: inline-flex;
+  flex: 0 1 16rem;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  overflow-wrap: anywhere;
-  min-width: 14rem;
-  /* 44px touch target (WCAG 2.5.5); this is the only search entry point on touch devices. */
+  gap: 0.625rem;
+  min-width: 10rem;
+  margin-inline-start: auto;
+  /* Search remains a full 44px target, including on touch devices. */
   min-height: 2.75rem;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   border: var(--border-width) solid var(--border-strong);
   border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--page-text);
+  background: var(--surface-muted);
+  color: var(--muted);
   font: inherit;
+  font-size: 0.875rem;
+  text-align: start;
   cursor: pointer;
 }
 
+.search-trigger-icon {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+}
+
+.search-trigger-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .search-trigger kbd {
-  font-size: 0.8125rem;
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--muted);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 /* Detail page title block: kind/number, then the name, then one line of context. */
@@ -579,22 +705,30 @@ main p {
   min-width: 0;
 }
 .resource-detail > .page-header {
-  padding: 1.25rem;
-  border: 0;
-  border-inline-start: var(--data-rule) solid var(--accent);
-  border-radius: 0;
-  background: var(--surface);
+  padding-block-end: 0.5rem;
 }
 .resource-detail > .page-header h1 {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
-  gap: 0.75rem;
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  gap: 0.875rem;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  line-height: 1.15;
 }
 .resource-detail > .page-header h1 > :last-child {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+.resource-detail > .page-header .properties {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.375rem 0.75rem;
+  margin-block: 1rem 0;
+}
+.resource-detail > .page-header .properties :is(dt, dd) {
+  padding: 0;
+  border: 0;
 }
 .resource-detail > section {
   min-width: 0;
@@ -608,18 +742,14 @@ main p {
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 2rem 2.5rem;
 }
 .detail-grid > * {
   min-width: 0;
 }
 .detail-panel {
   min-width: 0;
-  padding: 0.75rem;
-  border: 0;
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  border-radius: 0;
-  background: var(--surface-muted);
+  padding-block: 0.5rem;
 }
 .detail-panel > :is(h2, h3) {
   margin-block: 0 0.75rem;
@@ -634,7 +764,7 @@ main p {
   overscroll-behavior: contain;
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-control);
-  background: var(--surface);
+  background: transparent;
 }
 .detail-table table {
   width: 100%;
@@ -655,6 +785,9 @@ main p {
 .detail-table caption {
   padding: 0.75rem;
 }
+.detail-table tbody tr:is(:hover, :focus-within) {
+  background: var(--accent-soft);
+}
 @media (max-width: 48rem) {
   .detail-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -665,74 +798,72 @@ main p {
   font-size: 0.875rem;
 }
 
-/* History-style label/value strips: labels first, values on a shared quiet surface. */
+/* Quiet label/value rows share an edge, not a shaded strip. */
 .properties {
   display: grid;
   grid-template-columns: fit-content(40%) minmax(0, 1fr);
-  gap: 0.375rem 0;
+  gap: 0;
   margin-block: 0.75rem;
 }
 
 .properties dt {
-  padding: 0.625rem 0.75rem;
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  background: var(--surface-muted);
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-block-end: var(--border-width) solid var(--border);
+  color: var(--muted);
   font-size: var(--data-label-size);
-  font-weight: 600;
+  font-weight: 400;
   overflow-wrap: anywhere;
 }
 
 .properties dd {
   min-width: 0;
   margin: 0;
-  padding: 0.625rem 0.75rem;
-  background: var(--surface-muted);
-  font-weight: 600;
+  padding: 0.75rem 0;
+  border-block-end: var(--border-width) solid var(--border);
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
 
-/* Short labelled figures laid out as a strip (move power, accuracy…). */
+/* Labelled figures stay open; value alignment supplies the grouping. */
 .figures {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
-  gap: 0.375rem;
+  gap: 0.5rem 2rem;
   margin-block: 1rem;
 }
 
 .figures > div {
   min-width: 0;
-  padding: var(--data-padding);
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  background: var(--surface-muted);
+  padding: 0.75rem 0;
+  border-block-end: var(--border-width) solid var(--border);
 }
 
 .figures dt {
+  color: var(--muted);
   font-size: var(--data-label-size);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .figures dd {
   margin: 0.125rem 0 0;
-  font-size: 1.125rem;
+  font-size: 1.625rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 /* Stacked label/value pairs for longer text (effects, descriptions). */
 .definitions dt {
-  padding: 0.5rem 0.75rem 0;
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  background: var(--surface-muted);
+  padding: 0;
+  color: var(--muted);
   font-size: var(--data-label-size);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .definitions dd {
   max-width: var(--measure);
-  margin: 0 0 0.375rem;
-  padding: 0.25rem 0.75rem 0.625rem;
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  background: var(--surface-muted);
+  margin: 0.375rem 0 1.5rem;
+  padding: 0;
+  line-height: 1.75;
 }
 
 table {
@@ -1192,10 +1323,9 @@ button:disabled {
 [data-tabs-trigger] {
   min-height: 2.75rem;
   padding: 0.5rem 0.75rem;
-  border: 0;
-  border-inline-start: var(--data-rule) solid var(--border-strong);
-  border-radius: 0;
-  background: var(--surface-muted);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
   color: var(--page-text);
 }
 
@@ -1205,6 +1335,7 @@ button:disabled {
   background: var(--accent-soft);
   color: var(--accent);
   text-decoration: none;
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 [data-meter-root] {
@@ -1221,17 +1352,20 @@ button:disabled {
   background: var(--accent);
 }
 
-@media (max-width: 56rem) {
+/* Collapse before localized navigation labels compete with search and settings. */
+@media (max-width: 72rem) {
   .site-bar {
     position: relative;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: 0.75rem;
+    min-height: 4.5rem;
+    padding-block: 0.75rem;
   }
 
   .site-name {
-    margin-inline-end: 0;
     min-width: 0;
-    overflow-wrap: anywhere;
+    font-size: 1.3125rem;
   }
 
   .desktop-navigation {
@@ -1250,6 +1384,7 @@ button:disabled {
     right: 1rem;
     width: calc(100% - 2rem);
     max-width: 22rem;
+    max-height: calc(100dvh - 8rem);
   }
 
   .mobile-browse .header-panel {
@@ -1263,16 +1398,31 @@ button:disabled {
     gap: 0.125rem;
   }
 
-  .mobile-browse a {
+  .mobile-browse a:any-link {
     display: flex;
     align-items: center;
     min-height: 2.75rem;
-    padding-inline: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 0;
     border-radius: var(--radius-control);
+    color: var(--page-text);
+    text-decoration: none;
+  }
+
+  .mobile-browse a:any-link:is(:hover, :focus-visible, [aria-current]) {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .mobile-browse a[aria-current] {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
   .search-trigger {
     min-width: 0;
+    width: 100%;
+    margin-inline-start: 0;
     gap: 0.5rem;
   }
 
@@ -1281,9 +1431,49 @@ button:disabled {
   }
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 48rem) {
   .site-bar {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.5rem;
+  }
+
+  .site-name {
+    grid-column: 1 / -1;
+  }
+
+  .header-disclosure > summary {
+    padding-inline: 0.625rem;
+  }
+
+  .header-panel {
+    max-height: calc(100dvh - 11rem);
+  }
+}
+
+@media (max-width: 30rem) {
+  .site-bar {
+    grid-template-columns: 2.75rem repeat(2, minmax(0, 1fr));
+  }
+
+  .search-trigger {
+    grid-column: auto;
+    width: 2.75rem;
+    padding-inline: 0;
+    justify-content: center;
+  }
+
+  .search-trigger-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .header-panel {
+    max-height: max(2.75rem, calc(100dvh - 11rem));
   }
 }
 

@@ -52,7 +52,7 @@
 
 {#snippet label()}
   {#if type}
-    <img src={asset(`/type-icons/${type.icon}.svg` as AssetPath)} alt="" width="18" height="18" />
+    <img src={asset(`type-icons/${type.icon}.svg` as AssetPath)} alt="" width="18" height="18" />
   {/if}
   <span class="type-name"><Localized text={name} /></span>
 {/snippet}

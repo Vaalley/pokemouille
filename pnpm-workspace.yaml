@@ -14,38 +14,38 @@ allowBuilds:
 catalogMode: prefer
 
 catalog:
-  "@cloudflare/workers-types": ^5.20261023.1
+  "@cloudflare/workers-types": ^5.20261110.1
   "@internationalized/date": ^3.12.4
-  "@types/node": ^26.6.5
+  "@types/node": ^26.6.6
   "@types/pngjs": ^6.0.5
-  bits-ui: ^2.20.2
+  bits-ui: ^2.21.0
   pngjs: ^7.0.0
-  # SvelteKit 3.1 and svelte-check 4.7 require the TypeScript 6 compiler API.
-  typescript: ^6.0.3
-  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
-  vite-plus: 1.4.0
-  wrangler: ^4.152.0
+  # SvelteKit 3.2 and svelte-check 4.7 require the TypeScript 6 compiler API.
+  typescript: ~6.0.3
+  vite: npm:@voidzero-dev/vite-plus-core@1.6.0
+  vite-plus: 1.6.0
+  wrangler: ^4.160.1
 overrides:
   vite@*: "catalog:"
-  # Used APIs are unchanged; runed 0.38 updates its optional Kit peer to v3.
-  bits-ui@2.20.2>runed: 0.38.0
-  svelte-toolbelt@0.10.6>runed: 0.38.0
+  # runed 0.38 supports the SvelteKit 3 optional peer used by this workspace.
+  bits-ui@2.21.0>runed: 0.38.0
+  svelte-toolbelt@0.10.7>runed: 0.38.0
 peerDependencyRules:
   allowAny:
     - vite
   allowedVersions:
     vite: "*"
 minimumReleaseAgeExclude:
-  - "@cloudflare/workers-types@5.20261023.1"
-  - "@voidzero-dev/vite-plus-core@1.4.0"
-  - "@voidzero-dev/vite-plus-darwin-arm64@1.4.0"
-  - "@voidzero-dev/vite-plus-darwin-x64@1.4.0"
-  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.4.0"
-  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.4.0"
-  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.4.0"
-  - "@voidzero-dev/vite-plus-linux-x64-musl@1.4.0"
-  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.4.0"
-  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.4.0"
-  - bits-ui@2.20.2
-  - runed@0.38.0
-  - vite-plus@1.4.0
+  - "@voidzero-dev/vite-plus-core@1.6.0"
+  - "@voidzero-dev/vite-plus-darwin-arm64@1.6.0"
+  - "@voidzero-dev/vite-plus-darwin-x64@1.6.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.6.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.6.0"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.6.0"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@1.6.0"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.6.0"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.6.0"
+  - vite-plus@1.6.0
+  - bits-ui@2.21.0
+  - miniflare@5.20261110.1-beta
+  - wrangler@4.160.1

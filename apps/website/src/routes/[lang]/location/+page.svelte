@@ -112,29 +112,31 @@
 {/if}
 
 <style>
-  .directory-header { max-width: var(--measure); margin-block-end: 1.5rem; }
-  .directory-header h1 { margin-block-end: 0.5rem; }
-  .search-panel { padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  .directory-header { max-width: var(--measure); margin-block-end: 2rem; }
+  .directory-header h1 { margin-block-end: 0.75rem; }
+  .directory-header p { color: var(--muted); }
+  .search-panel { padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-panel); background: var(--surface); }
   .filters { margin-block: 0 0.75rem; align-items: start; }
   .filter-field { grid-template-rows: auto auto auto; }
-  .filter-field label { font-size: var(--data-label-size); font-weight: 600; }
+  .filter-field label { font-size: var(--data-label-size); font-weight: 500; }
   .filters button { align-self: start; margin-block-start: 1.85rem; }
   .search-help { margin: 0; }
-  .search-panel > .note { margin-block: 0; }
-  .result-count { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; padding-block: 0.5rem; overflow-wrap: anywhere; }
-  .result-count strong { color: var(--page-text); font-weight: 600; }
+  .search-panel > .note { margin-block: 0; max-width: var(--measure); }
+  .result-count { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin-block: 1.5rem; overflow-wrap: anywhere; }
+  .result-count strong { color: var(--page-text); font-weight: 500; }
   .active-query { min-width: 0; }
-  .region { margin-block-start: 1.75rem; min-width: 0; }
-  .region-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .region-heading h2 { margin: 0; font-size: 1.125rem; overflow-wrap: anywhere; }
-  .region-count { margin: 0; color: var(--muted); font-size: var(--data-label-size); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .location-list { list-style: none; padding: 0; margin-block: 0.5rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0.375rem; }
+  .region { margin-block-start: 2.5rem; min-width: 0; }
+  .region-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.375rem 1rem; padding-block-end: 0.75rem; border-block-end: 1px solid var(--border); }
+  .region-heading h2 { margin: 0; font-size: 1.25rem; overflow-wrap: anywhere; }
+  .region-count { margin: 0; color: var(--muted); font-size: var(--data-label-size); font-variant-numeric: tabular-nums; }
+  .location-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 0 1.5rem; }
   .location-list li { min-width: 0; }
-  .location-list a { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; min-height: 2.75rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); font-weight: 600; }
-  .location-list a:hover { border-inline-start-color: var(--accent); background: var(--accent-soft); }
+  .location-list a:any-link { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; min-height: 2.75rem; padding-block: 0.75rem; border-block-end: 1px solid var(--border); color: var(--page-text); font-weight: 500; text-decoration: none; }
+  .location-list a:is(:hover, :focus-visible) > :first-child { text-decoration: underline; text-underline-offset: 0.25em; }
+  .location-list a:is(:hover, :focus-visible) .location-arrow { color: var(--accent); }
   .location-list a > :first-child { min-width: 0; overflow-wrap: anywhere; }
   .location-arrow { flex: 0 0 auto; color: var(--muted); }
-  .empty-state { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .empty-state { padding: 1.25rem; border: 1px dashed var(--border-strong); border-radius: var(--radius-panel); }
   .empty-state h2 { margin-block: 0 0.5rem; font-size: 1.125rem; }
   .empty-state p { margin: 0; max-width: var(--measure); }
   @media (max-width: 30rem) {

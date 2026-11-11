@@ -188,8 +188,7 @@
 <style>
   .compare-picker { min-width: 0; }
   .compare-picker .filters { margin: 0 0 0.25rem; }
-  .filter-field { gap: 0.375rem; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .filter-field:focus-within { border-inline-start-color: var(--accent); }
+  .filter-field { min-width: 0; gap: 0.375rem; }
   .filter-field :global(label) { font-size: var(--data-label-size); font-weight: 600; }
   .compare-picker :global(input) {
     width: 100%;
@@ -230,17 +229,19 @@
     margin-block: 0.375rem;
     padding: 0.5rem 0.625rem;
     min-height: 4rem;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
+    border: 1px solid transparent;
+    border-block-end-color: var(--border);
+    border-radius: var(--radius-control);
+    background: transparent;
     cursor: pointer;
   }
-  :global(.compare-results [data-command-item]:not([data-disabled]):is([data-selected], :hover)) { border-inline-start-color: var(--accent); background: var(--accent-soft); }
+  :global(.compare-results [data-command-item]:not([data-disabled]):is([data-selected], :hover)) { border-color: var(--accent); background: var(--accent-soft); }
   :global(.compare-results [data-command-item][data-disabled]) {
     cursor: default;
     color: var(--muted);
   }
-  :global(.compare-results [data-command-item][data-disabled]) { border-inline-start-style: dashed; }
+  :global(.compare-results [data-command-item][data-disabled]) { border-block-end-style: dashed; }
   @media (forced-colors: active) {
-    :global(.compare-results [data-command-item]:not([data-disabled])[data-selected]) { border-inline-start-color: Highlight; outline: 1px solid Highlight; outline-offset: -1px; }
+    :global(.compare-results [data-command-item]:not([data-disabled])[data-selected]) { outline: 2px solid Highlight; outline-offset: -2px; }
   }
 </style>

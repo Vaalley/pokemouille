@@ -138,22 +138,25 @@
 </section>
 
 <style>
-  section { min-width: 0; }
-  table { width: 100%; border-collapse: collapse; }
-  caption { margin-block-end: 0.625rem; text-align: start; color: var(--muted); font-size: var(--data-label-size); }
-  thead th { font-size: var(--data-label-size); font-weight: 600; }
+  section { min-width: 0; overflow-wrap: anywhere; }
+  h2 { margin-block: 0 1rem; }
+  table { width: 100%; border-collapse: collapse; text-align: start; }
+  th { text-align: start; }
+  caption { padding-block-end: 0.75rem; text-align: start; color: var(--muted); font-size: 0.875rem; line-height: 1.5; }
+  thead th { padding-block-end: 0.625rem; color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
   .stat-summary {
     --stat-color: var(--accent);
     table-layout: fixed;
   }
   .stat-summary th, .stat-summary td {
     vertical-align: middle;
-    padding-block: 0.5rem;
-    padding-inline-end: 0.5rem;
+    padding-block: 0.625rem;
+    padding-inline-end: 0.75rem;
+    border-block-end: 1px solid var(--border);
   }
   .stat-summary th:first-child { width: 30%; overflow-wrap: anywhere; }
-  .stat-summary .numeric { width: 16%; padding-inline-end: 0; }
-  .stat-summary tbody th { font-size: var(--data-label-size); font-weight: 600; }
+  .stat-summary .numeric { width: 16%; padding-inline-end: 0; text-align: end; }
+  .stat-summary tbody th { font-size: 0.875rem; font-weight: 600; }
   .stat-summary tbody .numeric { font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat-summary tr[data-stat="1"] { --stat-color: light-dark(#ab565c, #d68b91); }
   .stat-summary tr[data-stat="2"] { --stat-color: light-dark(#a76b35, #d4a16f); }
@@ -165,50 +168,52 @@
   .base { width: 54%; }
   .stat-measure {
     display: grid;
-    grid-template-columns: 3ch minmax(1.5rem, 1fr);
+    grid-template-columns: 4ch minmax(0, 1fr);
     align-items: center;
-    gap: 0.625rem;
-    font-size: 1.125rem;
-  }
-  .stat-measure {
-    padding: 0.5rem 0.625rem;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
+    gap: 0.75rem;
+    min-width: 0;
   }
   .value {
     display: inline-block;
-    min-width: 3ch;
-    font-size: 1.125rem;
+    min-width: 4ch;
+    font-size: 1rem;
     font-weight: 700;
     text-align: end;
     font-variant-numeric: tabular-nums;
   }
   .stat-measure :global([data-meter-root]) {
     width: 100%;
-    height: 0.625rem;
+    height: 0.5rem;
+    overflow: hidden;
     border: none;
-    background: var(--surface);
+    border-radius: var(--radius-control);
+    background: var(--surface-muted);
   }
   .stat-measure .meter-fill { background: var(--stat-color); }
   tfoot th, tfoot td {
-    padding-block-start: 0.75rem;
+    padding-block-start: 0.875rem;
     border-block-end: none;
     font-weight: 700;
   }
-  tfoot .base .value { padding: 0.5rem 0.625rem; border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); }
   .calculated-ranges {
-    margin-block-start: 1.5rem;
-    padding-block-start: 1.25rem;
-    border-block-start: var(--border-width) solid var(--border);
+    margin-block-start: 1.75rem;
   }
-  .calculated-ranges h3 { margin-block: 0 0.625rem; font-size: 1rem; }
-  .ranges-scroll { max-width: 100%; overflow-x: auto; border: var(--border-width) solid var(--border); border-radius: var(--radius-control); }
+  .calculated-ranges h3 { margin-block: 0 0.75rem; font-size: 1.0625rem; }
+  .ranges-scroll { max-width: 100%; overflow-x: auto; }
   .ranges-scroll:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
   .ranges { min-width: 24rem; }
-  .ranges th, .ranges td { padding: 0.625rem 0.75rem; border-block-end: var(--border-width) solid var(--border); }
+  .ranges th, .ranges td { padding: 0.625rem 0.5rem; border-block-end: 1px solid var(--border); }
+  .ranges th:first-child { padding-inline-start: 0; }
+  .ranges .numeric { text-align: end; }
   .ranges td { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .ranges tbody th { font-size: var(--data-label-size); font-weight: 600; }
-  .ranges tbody tr:last-child > * { border-block-end: none; }
+  .ranges tbody th { font-size: 0.875rem; font-weight: 600; }
+  .note { margin-block: 0.75rem 0; line-height: 1.6; }
+  @media (max-width: 30rem) {
+    .stat-summary th, .stat-summary td { padding-inline-end: 0.5rem; }
+    .stat-summary th:first-child { width: 34%; }
+    .base { width: 50%; }
+    .stat-measure { gap: 0.375rem; }
+  }
   @media (forced-colors: active) {
     .stat-measure :global([data-meter-root]) { border: var(--border-width) solid CanvasText; }
     .stat-measure .meter-fill { background: CanvasText; }

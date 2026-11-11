@@ -28,20 +28,19 @@
   <header class="page-header">
     <p class="kicker">{t(lang, "number", { id: data.id })}</p>
     <h1><MoveIcon typeId={data.typeId} /><span><Localized text={data.name} /></span></h1>
-    <p>{t(lang, "generation", { generation: data.generationId })}</p>
+    <p class="introduced">{t(lang, "generation", { generation: data.generationId })}</p>
   </header>
 
   <section aria-labelledby="overview-heading" aria-describedby="move-scope">
     <h2 id="overview-heading">{t(lang, "overview")}</h2>
     <p class="note" id="move-scope">{t(lang, "scope")}</p>
-    <dl class="move-identity">
-      <div>
-        <dt>{t(lang, "type")}</dt>
-        <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
-      </div>
-      <div><dt>{t(lang, "category")}</dt><dd>{category}</dd></div>
+    <dl class="properties move-identity">
+      <dt>{t(lang, "type")}</dt>
+      <dd>{#if data.type}<TypeBadge typeId={data.typeId} name={data.type} />{:else}{t(lang, "missing")}{/if}</dd>
+      <dt>{t(lang, "category")}</dt>
+      <dd>{category}</dd>
     </dl>
-    <dl class="move-figures">
+    <dl class="figures">
       <div><dt>{t(lang, "power")}</dt><dd>{data.power ?? t(lang, "variable")}</dd></div>
       <div><dt>{t(lang, "accuracy")}</dt><dd>{data.accuracy === null ? t(lang, "variable") : `${data.accuracy}%`}</dd></div>
       <div><dt>{t(lang, "pp")}</dt><dd>{data.pp ?? t(lang, "variable")}</dd></div>
@@ -82,38 +81,12 @@
 </article>
 
 <style>
-  .move-identity {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-block: 1rem;
-  }
-  .move-identity > div { flex: 1 1 10rem; min-width: 0; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .move-identity dt, .move-figures dt { color: var(--muted); font-size: var(--data-label-size); font-weight: 600; }
-  .move-identity dd { margin: 0.25rem 0 0; font-weight: 600; }
-  .move-figures {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
-    gap: 0.5rem;
-    margin-block: 0;
-  }
-  .move-figures > div {
-    min-width: 0;
-    padding: var(--data-padding);
-    border: 0;
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    border-radius: 0;
-    background: var(--surface-muted);
-  }
-  .move-figures dd {
-    margin: 0.375rem 0 0;
-    font-size: 1.125rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
-  }
-  .effect-summary { max-width: var(--measure); padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--accent); background: var(--surface-muted); font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .effect-text { max-width: var(--measure); padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .introduced { color: var(--muted); font-size: var(--data-label-size); }
+  .move-identity { max-width: 30rem; align-items: stretch; margin-block: 1rem 1.5rem; }
+  .move-identity dd { display: flex; align-items: center; }
+  .effect-summary, .effect-text { max-width: var(--measure); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .effect-summary { margin-block: 1rem; font-size: 1.0625rem; font-weight: 600; line-height: 1.65; }
+  .effect-text { margin-block: 1rem 0; line-height: 1.75; }
   .move-descriptions thead th { font-size: var(--data-label-size); font-weight: 600; }
   .move-descriptions tbody th { font-weight: 600; }
   .move-descriptions th[scope="row"] { min-width: 8rem; width: 28%; }

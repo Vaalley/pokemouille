@@ -15,11 +15,11 @@
     "proper-lockfile": "^4.1.2"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^7.4.6",
-    "@graphql-codegen/typescript-operations": "^6.1.10",
+    "@graphql-codegen/cli": "^8.0.0",
+    "@graphql-codegen/typescript-operations": "^7.0.1",
     "@types/node": "catalog:",
     "@types/proper-lockfile": "^4.1.4",
-    "graphql": "^17.0.2",
+    "graphql": "^17.1.0",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }

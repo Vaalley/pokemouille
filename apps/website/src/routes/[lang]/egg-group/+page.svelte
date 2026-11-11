@@ -34,15 +34,16 @@
 </nav>
 
 <style>
-  h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
-  .group-count { padding-inline: 0.5rem; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); color: var(--muted); font: 600 1rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
-  .source-notes { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); margin-block-end: 1rem; }
+  .page-header { padding-block-end: 1.25rem; border-block-end: 1px solid var(--border); }
+  h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.75rem; overflow-wrap: anywhere; }
+  .group-count { color: var(--muted); font: 500 1rem/1.6 var(--font-body); font-variant-numeric: tabular-nums; }
+  .source-notes { max-width: var(--measure); margin-block: 1rem 1.75rem; }
   .source-notes p { margin: 0; }
   .group-directory { min-width: 0; }
-  ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.5rem; padding: 0; margin: 0; list-style: none; }
-  li { min-width: 0; }
-  a { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 2.75rem; height: 100%; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); font-weight: 600; overflow-wrap: anywhere; }
-  a:hover { background: var(--accent-soft); border-inline-start-color: var(--accent); }
+  ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); column-gap: 2rem; padding: 0; margin: 0; list-style: none; }
+  li { min-width: 0; border-block-end: 1px solid var(--border); }
+  a { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 3.25rem; height: 100%; padding: 0.75rem 0.25rem; font-weight: 600; overflow-wrap: anywhere; }
+  a:hover { background: var(--accent-soft); }
   a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
   .arrow { flex-shrink: 0; color: var(--muted); }
 </style>

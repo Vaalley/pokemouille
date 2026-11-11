@@ -120,7 +120,11 @@
   }}
 >
   <Dialog.Trigger class="search-trigger" aria-keyshortcuts={shortcut?.keys}>
-    {t(lang, "search.label")}
+    <svg class="search-trigger-icon" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5" />
+      <path d="m12.5 12.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <span class="search-trigger-label">{t(lang, "search.label")}</span>
     {#if shortcut}<kbd aria-hidden="true">{shortcut.label}</kbd>{/if}
   </Dialog.Trigger>
   {#if Content}
@@ -183,14 +187,11 @@
 </Dialog.Root>
 
 <style>
-  :global(.search-trigger) { min-height: 2.75rem; padding: var(--data-padding); border: var(--border-width) solid var(--border); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface-muted); color: var(--page-text); font-weight: 600; text-align: start; }
-  :global(.search-trigger:is(:hover, :focus-visible)) { border-inline-start-color: var(--accent); background: var(--accent-soft); }
   .search-dialog-header { padding-block-end: 0.625rem; border-block-end: var(--border-width) solid var(--border); }
   .search-dialog-header :global([data-dialog-title]) { font-size: 1rem; font-weight: 650; }
-  .search-field { padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
-  .search-field:focus-within { border-inline-start-color: var(--accent); }
+  .search-field { padding: 0; }
   .search-field label { font-size: var(--data-label-size); font-weight: 600; }
   .search-field input { min-height: 2.75rem; background: var(--surface); }
-  .search-dialog-body > .search-feedback { flex: 0 0 auto; align-items: start; justify-content: start; padding: var(--data-padding); border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; text-align: start; }
+  .search-dialog-body > .search-feedback { padding: 1rem; border-radius: var(--radius-control); }
   .search-status { font-size: var(--data-label-size); }
 </style>

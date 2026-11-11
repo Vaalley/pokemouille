@@ -78,8 +78,10 @@
 
 <svelte:head><title>{t(data.lang, "heading")} | Pokémouille</title></svelte:head>
 <p><a href={resolve(typesHref(data.lang, [], selectedVersion()) as PathnameWithSearchOrHash)}>{t(data.lang, "back")}</a></p>
-<h1>{t(data.lang, "heading")}</h1>
-<p>{t(data.lang, "intro")}</p>
+<header class="tool-heading">
+  <h1>{t(data.lang, "heading")}</h1>
+  <p>{t(data.lang, "intro")}</p>
+</header>
 <form class="selection-panel" onsubmit={(event) => event.preventDefault()} aria-label={t(data.lang, "heading")}>
   <fieldset class="attack-types">
     <legend>{t(data.lang, "attackLegend")}</legend>
@@ -90,7 +92,7 @@
           <input type="checkbox" name="attack" value={type.id} {checked}
             disabled={!mounted || !generation || (!checked && !isIntroduced(type.id, generation))}
             onchange={(event) => toggle(type.id, event.currentTarget.checked)} />
-          <img src={asset(`/type-icons/${type.identifier}.svg` as AssetPath)} alt="" width="22" height="22" />
+          <img src={asset(`type-icons/${type.identifier}.svg` as AssetPath)} alt="" width="22" height="22" />
           <span><Localized text={name(type.id)} /></span>
         </label>
       {/each}
@@ -209,7 +211,7 @@
             {#each chartTypes as type (type.id)}
               <th scope="col" class:selected={selection.ids.includes(type.id)}>
                 <span class="attack-head">
-                  <img src={asset(`/type-icons/${type.identifier}.svg` as AssetPath)} alt="" width="22" height="22" />
+                  <img src={asset(`type-icons/${type.identifier}.svg` as AssetPath)} alt="" width="22" height="22" />
                   <span><Localized text={name(type.id)} /></span>
                 </span>
               </th>
@@ -239,27 +241,28 @@
 {/if}
 
 <style>
-  .selection-panel { min-width: 0; margin-block: 1.5rem; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
+  .tool-heading p { max-width: var(--measure); }
+  .selection-panel { min-width: 0; margin-block: 1.5rem 2rem; padding: 1.25rem; border: var(--border-width) solid var(--border); border-radius: var(--radius-panel); }
   .attack-types { min-width: 0; margin: 0; padding: 0; border: 0; }
   legend { max-width: 100%; padding: 0; margin-block-end: 0.75rem; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .attack-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); gap: 0.4rem; }
   .attack-options label, .toggle { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; cursor: pointer; }
-  .attack-options label { min-width: 0; padding: 0.4rem 0.5rem; border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface); border-radius: 0; font-size: var(--data-label-size); font-weight: 600; }
+  .attack-options label { min-width: 0; padding: 0.5rem 0.625rem; border: 1px solid var(--border-strong); background: var(--surface); border-radius: var(--radius-control); font-size: var(--data-label-size); font-weight: 600; }
   .attack-options label > span { min-width: 0; overflow-wrap: anywhere; }
   .attack-options label > img { flex: 0 0 22px; }
-  .attack-options label.chosen { border-inline-start-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .attack-options label.chosen { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .attack-options label:not(:has(input:disabled)):hover { border-color: var(--accent); }
   .attack-options label:has(input:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
-  .attack-options label:has(input:disabled) { color: var(--muted); border-inline-start-style: dashed; cursor: not-allowed; }
+  .attack-options label:has(input:disabled) { color: var(--muted); border-style: dashed; cursor: not-allowed; }
   input[type="checkbox"] { flex: 0 0 1.25rem; width: 1.25rem; height: 1.25rem; margin: 0; }
   .selection-panel .filters { margin: 1rem 0 0; }
   .filters button { max-width: 100%; }
-  .result-panel { min-width: 0; margin-block: 1.5rem; padding-block-start: 0.75rem; border-block-start: var(--border-width) solid var(--border); }
+  .result-panel { min-width: 0; margin-block: 2rem; padding-block-start: 1rem; border-block-start: var(--border-width) solid var(--border); }
   .result-panel > h2 { margin-block: 0 0.75rem; font-size: 1.25rem; overflow-wrap: anywhere; }
   .result-panel > h3 { overflow-wrap: anywhere; }
   .result-panel > .note { margin-block: 0 1rem; }
-  .figures { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 0.5rem; }
-  .figures > div { min-width: 0; padding: var(--data-padding); border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
-  .figures > div[data-effect="weak"] { border-inline-start-color: var(--accent); }
+  .figures { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 0 1.25rem; }
+  .figures > div { min-width: 0; padding-block: 0.875rem; border-block-end: 1px solid var(--border); }
   .figures dt { font-size: var(--data-label-size); font-weight: 600; }
   .figures dd { font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
   .multiplier { display: inline-block; min-width: 3.25rem; padding: 0.1rem 0.4rem; border: 1px solid var(--border-strong); border-radius: 0; background: var(--surface); color: var(--page-text); font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: center; }
@@ -267,16 +270,15 @@
   [data-effect="resisted"] .multiplier { border-style: dashed; }
   [data-effect="immune"] .multiplier { border-width: 3px; border-style: double; font-weight: 700; }
   [data-effect="neutral"] .multiplier { border-color: transparent; background: transparent; color: var(--muted); }
-  details { margin-block: 0.5rem; border: 0; border-inline-start: var(--data-rule) solid var(--border-strong); border-radius: 0; background: var(--surface-muted); }
-  details[open] { border-inline-start-color: var(--accent); }
-  summary { min-height: 2.75rem; display: list-item; padding: var(--data-padding); cursor: pointer; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
+  details { margin: 0; border-block-end: 1px solid var(--border); }
+  summary { min-height: 2.75rem; display: list-item; padding: 0.75rem 0.25rem; cursor: pointer; font-size: var(--data-label-size); font-weight: 600; overflow-wrap: anywhere; }
   .bucket-label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.75rem; max-width: calc(100% - 1rem); vertical-align: middle; }
-  .species-list { margin: 0; padding: 0.375rem 0.75rem 0.75rem; border-block-start: var(--border-width) solid var(--border); list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.25rem 0.75rem; background: var(--surface); }
+  .species-list { margin: 0; padding: 0.375rem 0 0.875rem; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 0.25rem 0.75rem; }
   .species-list li, .species-list a > span { min-width: 0; }
   .species-list a { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.25rem; border-radius: var(--radius-control); overflow-wrap: anywhere; }
   .species-list a:hover { background: var(--accent-soft); }
   .combinations { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0; padding: 0; list-style: none; }
-  .combinations li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-width: 0; padding: 0.5rem 0.625rem; border-block-end: 1px solid var(--border); border-inline-start: var(--data-rule) solid var(--border-strong); background: var(--surface-muted); }
+  .combinations li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-width: 0; padding: 0.75rem 0; border-block-end: 1px solid var(--border); }
   .combinations .multiplier { margin-inline-start: auto; }
   .chart-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0; margin-block: 1rem; list-style: none; }
   .chart-legend li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.875rem; }
@@ -299,6 +301,11 @@
   .chart thead th.selected .attack-head { font-weight: 700; }
   .chart tbody tr:hover th[scope="row"] { background: var(--surface-muted); }
   @media (max-width: 30rem) {
+    .selection-panel { padding: 0.875rem; }
+    .attack-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .attack-options label { gap: 0.375rem; padding: 0.5rem 0.375rem; font-size: 0.75rem; }
+    .attack-options label > img { flex-basis: 1rem; width: 1rem; height: 1rem; }
+    .attack-options input[type="checkbox"] { flex-basis: 1rem; width: 1rem; height: 1rem; }
     .filters button { width: 100%; }
     .chart th:first-child { min-width: 6rem; width: 7rem; max-width: 7rem; }
     .chart th[scope="row"] a { max-width: 6rem; }

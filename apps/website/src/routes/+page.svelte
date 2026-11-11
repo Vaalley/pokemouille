@@ -46,27 +46,13 @@
 </main>
 
 <style>
-  main { padding-block-start: 3rem; }
-  nav { margin-block-start: 1.5rem; }
-  ul {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-    gap: 0.375rem;
-    max-width: 45rem;
-    padding: 0;
-    list-style: none;
-  }
-  a {
-    display: flex;
-    align-items: center;
-    min-height: 3rem;
-    padding: var(--data-padding);
-    border-inline-start: var(--data-rule) solid var(--border-strong);
-    background: var(--surface-muted);
-    font-weight: 600;
-  }
-  a:is(:hover, :focus-visible) {
-    border-inline-start-color: var(--accent);
-    background: var(--accent-soft);
-  }
+  main { padding-block: clamp(3rem, 12vh, 8rem); max-width: 52rem; }
+  h1 { font-size: clamp(2.25rem, 6vw, 4rem); letter-spacing: -0.045em; }
+  nav { margin-block-start: 2rem; }
+  nav p { color: var(--muted); max-width: var(--measure); line-height: 1.8; }
+  ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0 1.5rem; max-width: 45rem; padding: 0; list-style: none; }
+  a:any-link { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 3.5rem; padding-block: 0.875rem; border-block-end: 1px solid var(--border); color: var(--page-text); font-weight: 500; text-decoration: none; }
+  a::after { content: "→" / ""; color: var(--muted); }
+  a:is(:hover, :focus-visible) { text-decoration: underline; text-underline-offset: 0.25em; }
+  a:is(:hover, :focus-visible)::after { color: var(--accent); }
 </style>
