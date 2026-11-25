@@ -22,19 +22,14 @@ catalog:
   pngjs: ^7.0.0
   # SvelteKit 3.2 and svelte-check 4.7 require the TypeScript 6 compiler API.
   typescript: ~6.0.3
-  vite: npm:@voidzero-dev/vite-plus-core@1.6.0
-  vite-plus: 1.6.0
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8001
+  vite-plus: 1.8.0
   wrangler: ^4.160.1
 overrides:
   vite@*: "catalog:"
   # runed 0.38 supports the SvelteKit 3 optional peer used by this workspace.
   bits-ui@2.21.0>runed: 0.38.0
   svelte-toolbelt@0.10.7>runed: 0.38.0
-peerDependencyRules:
-  allowAny:
-    - vite
-  allowedVersions:
-    vite: "*"
 minimumReleaseAgeExclude:
   - "@voidzero-dev/vite-plus-core@1.6.0"
   - "@voidzero-dev/vite-plus-darwin-arm64@1.6.0"
