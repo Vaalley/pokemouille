@@ -187,10 +187,11 @@ describe("dataset revision retention", () => {
     const timestamps = new Map<string, Date>();
     const putJson = (key: string, value: unknown) =>
       store.put(key, new TextEncoder().encode(JSON.stringify(value)), "application/json");
-    const seedRevision = async (id: string, day: number) => {
+    const seedRevision = async (id: string, day: number, legacy = false) => {
       for (const key of revisionKeys(id)) {
-        await putJson(key, {});
-        timestamps.set(key, new Date(Date.UTC(2026, 10, day)));
+        const objectKey = legacy ? key.replace(/\/games\.json$/, "/references.json") : key;
+        await putJson(objectKey, {});
+        timestamps.set(objectKey, new Date(Date.UTC(2026, 10, day)));
       }
     };
 
@@ -237,7 +238,7 @@ describe("dataset revision retention", () => {
 
   it("keeps the live revision and two newer legacy uploads, across listing pages", async () => {
     const { store, objects, seedRevision, publish } = retentionStore();
-    await seedRevision(A, 2);
+    await seedRevision(A, 2, true);
     await seedRevision(B, 4);
     await seedRevision(C, 1);
     await seedRevision(D, 3);

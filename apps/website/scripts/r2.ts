@@ -240,14 +240,16 @@ export async function pruneRevisions(store: RevisionStore, deployed: string) {
       throw new Error("R2 deployed revision history is invalid");
     history = parsed;
   } else {
-    // Legacy revisions have no deploy history. Their immutable games file dates
-    // from the revision's first upload, even when a deploy reuses that revision.
+    // Immutable root files date from the first upload, even when a deploy reuses
+    // a revision. The oldest bucket layout predates the standalone games file.
     const dated = await Promise.all(
       revisions.map(async (revision) => {
-        const key = `${DATA_REVISIONS_PREFIX}${revision}/games.json`;
-        const uploaded = await store.uploaded(key);
+        const prefix = `${DATA_REVISIONS_PREFIX}${revision}/`;
+        const uploaded =
+          (await store.uploaded(`${prefix}games.json`)) ??
+          (await store.uploaded(`${prefix}references.json`));
         if (!uploaded || !Number.isFinite(uploaded.getTime()))
-          throw new Error(`Cannot determine upload date of ${key}`);
+          throw new Error(`Cannot determine upload date of dataset revision ${revision}`);
         return { revision, uploaded: uploaded.getTime() };
       }),
     );
