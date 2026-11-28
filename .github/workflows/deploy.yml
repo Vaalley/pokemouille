@@ -38,27 +38,29 @@ jobs:
           cache: true
 
       - name: Refresh dataset
+        id: refresh
         if: github.event_name == 'schedule' || inputs.refresh
+        shell: bash
         run: |
           node apps/website/scripts/r2.ts state-pull
           phase=$(node tools/data/src/cli.ts status --state-dir .data/state --out-dir apps/website/static/data | jq -r '.active.phase // "none"')
           fresh=""
           if [ "$phase" = complete ] || [ "$phase" = none ]; then fresh="--fresh"; fi
-          set +e
-          node tools/data/src/cli.ts refresh --state-dir .data/state --out-dir apps/website/static/data $fresh
-          code=$?
-          set -e
+          code=0
+          node tools/data/src/cli.ts refresh --state-dir .data/state --out-dir apps/website/static/data $fresh || code=$?
           # Persist cached responses and the rate ledger even when the refresh stopped early.
           node apps/website/scripts/r2.ts state-push
-          if [ "$code" -eq 2 ]; then
-            echo "::warning::Refresh incomplete (budget or cooldown); run this workflow again with refresh to resume."
-          elif [ "$code" -ne 0 ]; then
-            exit "$code"
-          fi
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          case "$code" in
+            0) ;;
+            1) echo "::warning::Dataset refresh failed; falling back to the last published dataset." ;;
+            2) echo "::warning::Dataset refresh incomplete; falling back to the last published dataset. Run Deploy with refresh enabled again after the cooldown or budget window to resume." ;;
+            *) exit "$code" ;;
+          esac
 
       # Without a successful refresh in this run, build the last published snapshot.
       - name: Download published dataset
-        if: hashFiles('apps/website/static/data/manifest.json') == ''
+        if: steps.refresh.outputs.exit_code != '0'
         run: node apps/website/scripts/r2.ts data-pull
 
       # Rebuild derived assets from the last published source data, including older
@@ -76,3 +78,41 @@ jobs:
 
       - name: Prune superseded dataset revisions
         run: node apps/website/scripts/r2.ts prune
+
+      - name: Verify retained dataset assets
+        run: node apps/website/scripts/r2.ts verify-retention
+
+      # Use native failed-run notifications without interrupting the last-good deployment.
+      - name: Check dataset refresh health
+        env:
+          REFRESH_EXIT_CODE: ${{ steps.refresh.outputs.exit_code }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+
+          const refreshCode = process.env.REFRESH_EXIT_CODE;
+          if (refreshCode === "1" || refreshCode === "2") {
+            const status = refreshCode === "2" ? "incomplete" : "failed";
+            console.error(`::error::Dataset refresh ${status}; deployed the last published dataset.`);
+            process.exitCode = 1;
+          }
+
+          const manifest = JSON.parse(readFileSync("apps/website/static/data/manifest.json", "utf8"));
+          const timestamp = manifest.source?.retrievalCompletedAt;
+          const completedAt = typeof timestamp === "string" ? Date.parse(timestamp) : NaN;
+          // Two weekly refresh intervals; offline republishing does not reset this timestamp.
+          const maxAgeDays = 14;
+          const now = Date.now();
+          if (!Number.isFinite(completedAt) || completedAt > now) {
+            console.error("::error::Invalid dataset freshness timestamp: source.retrievalCompletedAt.");
+            process.exitCode = 1;
+          } else if (now - completedAt > maxAgeDays * 86_400_000) {
+            const message = `Deployed dataset was last retrieved ${new Date(completedAt).toISOString()} (over ${maxAgeDays} days ago).`;
+            if (refreshCode) {
+              console.error(`::error::${message}`);
+              process.exitCode = 1;
+            } else {
+              console.warn(`::warning::${message}`);
+            }
+          }
+          NODE

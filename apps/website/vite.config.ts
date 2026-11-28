@@ -1,7 +1,8 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import adapter from "@sveltejs/adapter-static";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite-plus";
+import { createSitemap } from "./scripts/sitemap.ts";
 
 // The browser loads the dataset revision these pages are prerendered from, so it needs no
 // runtime manifest request. Restart the dev server after publishing a new revision.
@@ -26,13 +27,24 @@ function datasetRevision(): string | undefined {
   return revision;
 }
 const revision = datasetRevision();
+const outputDirectory = "build";
+const staticAdapter = adapter({ pages: outputDirectory, strict: true });
 
 export default defineConfig({
   define: revision ? { "import.meta.env.DATASET_REVISION": JSON.stringify(revision) } : {},
   plugins: [
     sveltekit({
       // Every localized species route is enumerated; no SPA fallback may hide a missing page.
-      adapter: adapter({ strict: true }),
+      adapter: {
+        ...staticAdapter,
+        async adapt(builder) {
+          await staticAdapter.adapt(builder);
+          writeFileSync(
+            `${outputDirectory}/sitemap.xml`,
+            createSitemap(builder.prerendered.pages.keys()),
+          );
+        },
+      },
       prerender: { handleHttpError: "fail", handleMissingId: "fail" },
     }),
   ],

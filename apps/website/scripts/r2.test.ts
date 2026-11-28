@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { pruneRevisions, sync, withRetry } from "./r2.ts";
+import { pruneRevisions, sync, verifyRetention, withRetry } from "./r2.ts";
 
 vi.mock("wrangler", () => ({ getPlatformProxy: vi.fn() }));
 
@@ -199,6 +199,7 @@ describe("dataset revision retention", () => {
       objects,
       seedRevision,
       publish: (id: string) => putJson("data/manifest.json", { datasetRevision: id }),
+      putJson,
       store: {
         ...store,
         uploaded: async (key: string) => timestamps.get(key) ?? null,
@@ -235,6 +236,58 @@ describe("dataset revision retention", () => {
       },
     };
   }
+
+  it("repairs missing learner and breeding files where the retained sources support them", async () => {
+    const { store, objects, putJson } = retentionStore();
+    const referencePath = (id: string) => `revisions/${id}/references.json`;
+    const speciesPath = (id: string) => `revisions/${id}/pokemon/1.json`;
+    for (const revision of [A, B]) {
+      await putJson(`data/${referencePath(revision)}`, {
+        moves: [{ id: 85 }],
+        learnMethods: [{ identifier: "egg", id: 2 }],
+        versionGroups: [],
+        ...(revision === A ? { eggGroups: [{ id: 1 }] } : {}),
+      });
+      await putJson(`data/${speciesPath(revision)}`, {
+        id: 1,
+        identifier: "bulbasaur",
+        generationId: 1,
+        names: [],
+        ...(revision === A ? { eggGroupIds: [1], genderRate: 1, isBaby: false } : {}),
+        varieties: [
+          {
+            id: 1,
+            identifier: "bulbasaur",
+            isDefault: true,
+            names: [],
+            forms: [],
+            learnsets: [{ moveId: 85, versionGroupId: 25, learnMethodId: 1, level: 9 }],
+          },
+        ],
+      });
+    }
+    await putJson("data/manifest.json", {
+      datasetRevision: A,
+      files: {
+        references: { path: referencePath(A), sha256: "unused" },
+        pokemon: { 1: { path: speciesPath(A), sha256: "unused" } },
+      },
+    });
+
+    await verifyRetention(store);
+
+    const read = (key: string): unknown => JSON.parse(new TextDecoder().decode(objects.get(key)));
+    for (const revision of [A, B]) {
+      expect(read(`learners/${revision}/85.json`)).toEqual({
+        moveId: 85,
+        pokemon: [[1, 1, null, 1, null]],
+        groups: { 25: [[0, 1, 9]] },
+      });
+    }
+    expect(read(`breeding/${A}/1.json`)).toMatchObject({ speciesId: 1, moves: [] });
+    expect(objects.has(`breeding/${B}/1.json`)).toBe(false);
+    expect(read(`data/revisions/${A}/rollback-files.json`)).toEqual(read("data/manifest.json"));
+  });
 
   it("keeps the live revision and two newer legacy uploads, across listing pages", async () => {
     const { store, objects, seedRevision, publish } = retentionStore();

@@ -15,6 +15,7 @@
   import { getGames } from "#lib/data/loader.ts";
   import { t } from "#lib/i18n/messages.ts";
   import { t as navigation } from "#lib/i18n/navigation.ts";
+  import { SITE_ORIGIN } from "#lib/site.ts";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
@@ -135,6 +136,10 @@
   }
 
 </script>
+
+<svelte:head>
+  <link rel="canonical" href={`${SITE_ORIGIN}${page.url.pathname}`} />
+</svelte:head>
 
 <a class="skip-link" href="#main">{t(data.lang, "site.skipToContent")}</a>
 

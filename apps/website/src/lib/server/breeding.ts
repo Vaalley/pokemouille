@@ -2,6 +2,7 @@ import type {
   DatasetManifest,
   NamedResource,
   ReferenceData,
+  SpeciesRecord,
   VersionGroup,
 } from "../../../../../packages/pokemon-data/src/index.ts";
 import { pokemonName } from "../../../../../packages/pokemon-data/src/resolve.ts";
@@ -24,14 +25,17 @@ interface BreedingIndex {
   sources: Map<string, MoveSource[]>;
 }
 
-/** One bounded, revision-aware server pass; full species/learnset records are discarded. */
-const getIndex = createSnapshotCache(async (manifest: DatasetManifest): Promise<BreedingIndex> => {
-  const refs = await readDataJson<ReferenceData>(manifest.files.references.path);
+/** One bounded, revision-aware pass; full species/learnset records are discarded. */
+export async function buildBreedingIndex(
+  revision: string,
+  refs: Pick<ReferenceData, "versionGroups" | "learnMethods" | "eggGroups">,
+  visitSpecies: (visit: (record: SpeciesRecord) => void) => Promise<void>,
+): Promise<BreedingIndex> {
   const groupOrders = new Map(refs.versionGroups.map((group) => [group.id, group.order]));
   const eggMethod = refs.learnMethods.find((method) => method.identifier === "egg")?.id;
   if (eggMethod === undefined) throw new Error("Missing egg learn method in published snapshot");
   const index: BreedingIndex = {
-    revision: manifest.datasetRevision,
+    revision,
     groups: refs.eggGroups,
     versionGroups: refs.versionGroups,
     members: new Map(),
@@ -39,7 +43,7 @@ const getIndex = createSnapshotCache(async (manifest: DatasetManifest): Promise<
     eggMoves: new Map(),
     sources: new Map(),
   };
-  await forEachSpecies(manifest, (record) => {
+  await visitSpecies((record) => {
     const varietyIds: number[] = [];
     const eggMoves = new Map<string, Set<number>>();
     for (const variety of record.varieties) {
@@ -96,7 +100,15 @@ const getIndex = createSnapshotCache(async (manifest: DatasetManifest): Promise<
   });
   for (const sources of index.sources.values()) sources.sort((a, b) => a.pokemonId - b.pokemonId);
   return index;
-});
+}
+
+const getIndex = createSnapshotCache(async (manifest: DatasetManifest) =>
+  buildBreedingIndex(
+    manifest.datasetRevision,
+    await readDataJson<ReferenceData>(manifest.files.references.path),
+    (visit) => forEachSpecies(manifest, visit),
+  ),
+);
 
 export async function getEggGroups() {
   const index = await getIndex();
@@ -111,13 +123,12 @@ export async function getEggGroupMembers(groupId: number) {
 }
 
 /** Emit only the requested species' egg-move relationships, never the global learnset index. */
-export async function getBreedingProjection(
+export function projectBreeding(
+  index: BreedingIndex,
   speciesId: number,
-  revision: string,
-): Promise<BreedingProjection | null> {
-  const index = await getIndex();
+): BreedingProjection | null {
   const ids = index.species.get(speciesId);
-  if (index.revision !== revision || !ids) return null;
+  if (!ids) return null;
   const targets = ids.map((id) => index.members.get(id)!);
   const members = new Map(targets.map((member) => [member.pokemonId, member]));
   const moves: BreedingProjection["moves"] = [];
@@ -148,4 +159,12 @@ export async function getBreedingProjection(
     members: [...members.values()].sort((a, b) => a.pokemonId - b.pokemonId),
     moves: moves.sort((a, b) => a.versionGroupId - b.versionGroupId || a.moveId - b.moveId),
   };
+}
+
+export async function getBreedingProjection(
+  speciesId: number,
+  revision: string,
+): Promise<BreedingProjection | null> {
+  const index = await getIndex();
+  return index.revision === revision ? projectBreeding(index, speciesId) : null;
 }

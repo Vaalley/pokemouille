@@ -285,9 +285,11 @@ The browser does not read the manifest. `apps/website/vite.config.ts` builds the
 
 The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the build has ~27k files, over the free plan's 20,000). Config: `apps/website/wrangler.jsonc`.
 
+`https://pokemouille.app` is the canonical origin. The build emits a sitemap from prerendered localized pages and advertises it in `robots.txt`. The Worker issues a path- and query-preserving 308 from the legacy `workers.dev` hostname. Workers Static Assets cannot select Worker-first routing by hostname, so this also invokes the Worker for custom-domain static requests before handing them to the assets binding.
+
 - **Pages and app code** are uploaded from `apps/website/build`. `static/_headers` marks `_app/immutable/*` immutable; everything else keeps the Workers default `public, max-age=0, must-revalidate` with an ETag.
 - **The dataset and derived JSON are not uploaded with the Worker** (`static/.assetsignore` excludes them). They live in R2 bucket `pokemouille-data` under `data/manifest.json`, `data/revisions/...`, `learners/<revision>/...` and `breeding/<revision>/...`. `apps/website/worker/index.ts` serves those keys and retained `_app/immutable/*` chunks when no static asset matches. The manifest is `no-cache` with ETag/304; immutable objects use the edge Cache API (a no-op on `*.workers.dev`, active on a custom domain).
-- **Retention:** After a successful production deploy, CI keeps the live dataset revision and the previous two distinct revisions, including each revision's learner and breeding JSON. On the first run, older revisions are ranked by their R2 upload dates; thereafter CI records successful deploy order. Tabs and Worker rollbacks that reference a pruned dataset can no longer fetch it. Retained `_app/immutable/*` chunks and the ingestion-state archive are not pruned.
+- **Retention:** After a successful production deploy, CI keeps the live dataset revision and the previous two distinct revisions. It verifies retained keys against each available publication manifest, archives the live manifest with its revision, and rebuilds missing learner and breeding JSON from that revision's source data where possible. Snapshots without a historical manifest or egg-group data are reported as not fully rollback-ready. Tabs and Worker rollbacks that reference a pruned dataset can no longer fetch it. Retained `_app/immutable/*` chunks and the ingestion-state archive are not pruned.
 
 `apps/website/scripts/r2.ts` moves files:
 
@@ -295,12 +297,13 @@ The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the 
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sync`                      | Uploads missing revision files, `_app/immutable/*`, learner and breeding JSON (never overwrites differing content), then `data/manifest.json` last. |
 | `prune`                     | After deploying the local build, deletes dataset and derived files outside the three retained revisions.                                            |
+| `verify-retention`          | After pruning, verifies retained files and backfills missing learner and breeding projections where supported.                                      |
 | `data-pull`                 | Downloads the files listed in the R2 manifest into `static/data`, verifying each SHA-256.                                                           |
 | `state-pull` / `state-push` | Restores / saves `.data/state` as `state/state.tar.gz` (not served by the Worker).                                                                  |
 
 Add `--local` to use Wrangler's local bucket instead of R2. Local Workers preview: `vp run website#build`, `node apps/website/scripts/r2.ts sync --local`, `vp run cf:dev`.
 
-**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, republishes derived assets offline, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker, and `prune` only after the Worker deploy succeeds. The weekly schedule (and manual runs with `refresh`) first restores `.data/state`, starts a `--fresh` refresh (or resumes an incomplete refresh), and saves state even when the refresh stops early; an incomplete refresh deploys the last-good dataset and warns.
+**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, republishes derived assets offline, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker, then `prune` and `verify-retention` only after deployment. The weekly schedule (and manual runs with `refresh`) restores ingestion state, starts a fresh retrieval or resumes an incomplete one, and saves state even when retrieval stops early. A failed or incomplete retrieval uses the last published dataset and fails the final health step after deployment, triggering subscribed GitHub Actions notifications. A published retrieval older than 14 days also fails that check on refresh runs; deploys without a refresh warn instead.
 
 One-time setup:
 

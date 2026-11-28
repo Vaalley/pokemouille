@@ -1,6 +1,7 @@
 // R2 transfers for the Cloudflare deployment (run from anywhere):
 //   node apps/website/scripts/r2.ts sync [--local]        upload dataset + retained app/derived assets, manifest last
 //   node apps/website/scripts/r2.ts prune [--local]       after deploy, keep three dataset revisions
+//   node apps/website/scripts/r2.ts verify-retention [--local]  check rollback assets and repair projections
 //   node apps/website/scripts/r2.ts data-pull [--local]   download the published snapshot to static/data
 //   node apps/website/scripts/r2.ts state-pull [--local]  restore .data/state from R2
 //   node apps/website/scripts/r2.ts state-push [--local]  save .data/state to R2
@@ -16,6 +17,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { getPlatformProxy } from "wrangler";
 import { DERIVED_DATA_PREFIXES, isDerivedDataKey } from "../derived-assets.ts";
+import type { ReferenceData, SpeciesRecord } from "../../../packages/pokemon-data/src/index.ts";
+import { projectMoveMembership, type RelatedPokemon } from "../src/lib/data/catalogue.ts";
+import { projectMoveLearners, type LearnerIdentity } from "../src/lib/data/moveset.ts";
+import { buildBreedingIndex, projectBreeding } from "../src/lib/server/breeding.ts";
+import { projectRelatedIdentity } from "../src/lib/server/catalogue.ts";
 
 const WEBSITE = fileURLToPath(new URL("..", import.meta.url));
 const ROOT = join(WEBSITE, "..", "..");
@@ -285,10 +291,7 @@ export async function pruneRevisions(store: RevisionStore, deployed: string) {
   console.log(`Retained ${keep.length} dataset revisions.`);
 }
 
-/** Downloads the published snapshot into static/data so CI builds need no ingestion state. */
-async function dataPull(store: Store) {
-  const manifest = await store.get("data/manifest.json");
-  if (!manifest) throw new Error("data/manifest.json is not in the bucket; run sync once first");
+function manifestAssets(manifest: Uint8Array) {
   const assets: { path: string; sha256: string }[] = [];
   const collect = (value: unknown): void => {
     if (typeof value !== "object" || value === null) return;
@@ -302,6 +305,14 @@ async function dataPull(store: Store) {
   if (typeof parsed !== "object" || parsed === null || !("files" in parsed))
     throw new Error("data/manifest.json has no files");
   collect(parsed.files);
+  return assets;
+}
+
+/** Downloads the published snapshot into static/data so CI builds need no ingestion state. */
+async function dataPull(store: Store) {
+  const manifest = await store.get("data/manifest.json");
+  if (!manifest) throw new Error("data/manifest.json is not in the bucket; run sync once first");
+  const assets = manifestAssets(manifest);
   await pool(assets, async ({ path, sha256 }) => {
     const body = await store.get(`data/${path}`);
     if (!body) throw new Error(`Manifest asset data/${path} is missing from the bucket`);
@@ -312,6 +323,118 @@ async function dataPull(store: Store) {
   });
   await writeFile(join(DATA_DIR, "manifest.json"), manifest);
   console.log(`Downloaded ${assets.length} dataset files and manifest.json.`);
+}
+
+/** Verifies retained keys and restores missing projections without changing dataset identities. */
+export async function verifyRetention(store: RevisionStore) {
+  const manifest = await store.get("data/manifest.json");
+  const live = readRevision(manifest);
+  const revisions = await listRevisions(store, DATA_REVISIONS_PREFIX);
+  if (!manifest || !revisions.includes(live)) throw new Error("Live dataset is missing from R2");
+
+  for (const revision of revisions) {
+    const root = `${DATA_REVISIONS_PREFIX}${revision}/`;
+    const inventoryKey = `${root}rollback-files.json`;
+    const [base, learners, breeding, references, archivedManifest] = await Promise.all([
+      listPrefix(store, root),
+      listPrefix(store, `learners/${revision}/`),
+      listPrefix(store, `breeding/${revision}/`),
+      store.get(`${root}references.json`),
+      revision === live ? manifest : store.get(inventoryKey),
+    ]);
+    if (!references) throw new Error(`Missing references for ${revision}`);
+    if (archivedManifest) {
+      const present = new Set(base);
+      for (const { path } of manifestAssets(archivedManifest)) {
+        if (!present.has(`data/${path}`)) throw new Error(`Rollback asset data/${path} is missing`);
+      }
+    }
+    const decoder = new TextDecoder();
+    const refs = JSON.parse(decoder.decode(references)) as ReferenceData;
+    const pokemonPrefix = `${root}pokemon/`;
+    const speciesFiles = base.filter(
+      (key) =>
+        key.startsWith(pokemonPrefix) && /^[1-9]\d*\.json$/.test(key.slice(pokemonPrefix.length)),
+    );
+    if (!speciesFiles.length || !refs.moves.length)
+      throw new Error(`No species or moves for ${revision}`);
+    const presentLearners = new Set(learners);
+    const missingLearners = new Set(
+      refs.moves
+        .map(({ id }) => id)
+        .filter((id) => !presentLearners.has(`learners/${revision}/${id}.json`)),
+    );
+    const presentBreeding = new Set(breeding);
+    const missingBreeding = speciesFiles
+      .map((key) => Number(key.slice(pokemonPrefix.length, -5)))
+      .filter((id) => !presentBreeding.has(`breeding/${revision}/${id}.json`));
+    const canBuildBreeding = Array.isArray(refs.eggGroups) && refs.eggGroups.length > 0;
+    if (!canBuildBreeding && archivedManifest)
+      throw new Error(`Missing breeding source data for ${revision}`);
+
+    if (missingLearners.size || (canBuildBreeding && missingBreeding.length)) {
+      const byMove = new Map<number, (LearnerIdentity & Pick<RelatedPokemon, "learnsets">)[]>();
+      const visitSpecies = (visit?: (record: SpeciesRecord) => void) =>
+        pool(speciesFiles, async (key) => {
+          const bytes = await store.get(key);
+          if (!bytes) throw new Error(`Missing ${key}`);
+          const record = JSON.parse(decoder.decode(bytes)) as SpeciesRecord;
+          if (key !== `${pokemonPrefix}${record.id}.json`)
+            throw new Error(`Species ID mismatch in ${key}`);
+          if (visit && !Array.isArray(record.eggGroupIds))
+            throw new Error(`Missing egg-group membership in ${key}`);
+          visit?.(record);
+          if (!missingLearners.size) return;
+          for (const variety of record.varieties) {
+            let identity: LearnerIdentity | undefined;
+            for (const [moveId, learnsets] of projectMoveMembership(variety.learnsets)) {
+              if (!missingLearners.has(moveId)) continue;
+              identity ??= projectRelatedIdentity(record, variety);
+              const row = { ...identity, learnsets };
+              const rows = byMove.get(moveId);
+              if (rows) rows.push(row);
+              else byMove.set(moveId, [row]);
+            }
+          }
+        });
+      const breedingIndex =
+        canBuildBreeding && missingBreeding.length
+          ? await buildBreedingIndex(revision, refs, visitSpecies)
+          : undefined;
+      if (!breedingIndex) await visitSpecies();
+      const encoder = new TextEncoder();
+      await pool([...missingLearners], async (id) => {
+        const rows = byMove.get(id) ?? [];
+        await store.put(
+          `learners/${revision}/${id}.json`,
+          encoder.encode(JSON.stringify(projectMoveLearners(id, rows))),
+          "application/json",
+        );
+      });
+      if (breedingIndex)
+        await pool(missingBreeding, async (id) => {
+          const projection = projectBreeding(breedingIndex, id);
+          if (!projection) throw new Error(`Missing breeding source for species ${id}`);
+          await store.put(
+            `breeding/${revision}/${id}.json`,
+            encoder.encode(JSON.stringify(projection)),
+            "application/json",
+          );
+        });
+    }
+
+    if (revision === live && !base.includes(inventoryKey))
+      await store.put(inventoryKey, Buffer.from(manifest), "application/json");
+    if (!archivedManifest)
+      console.warn(
+        `::warning::${revision} has no historical manifest; base completeness is unverified.`,
+      );
+    if (!canBuildBreeding && missingBreeding.length)
+      console.warn(
+        `::warning::${revision} predates egg-group data; breeding cannot be backfilled.`,
+      );
+    if (archivedManifest && canBuildBreeding) console.log(`${revision} is rollback-ready.`);
+  }
 }
 
 function tar(args: string[]) {
@@ -355,6 +478,7 @@ async function main() {
     sync,
     prune: async (store: RevisionStore) =>
       pruneRevisions(store, readRevision(await readFile(join(DATA_DIR, "manifest.json")))),
+    "verify-retention": verifyRetention,
     "data-pull": dataPull,
     "state-pull": statePull,
     "state-push": statePush,

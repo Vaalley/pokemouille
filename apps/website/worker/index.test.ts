@@ -63,6 +63,39 @@ function host(key = LEARNER, body = '{"moveId":85}') {
 
 afterEach(() => vi.unstubAllGlobals());
 
+it("redirects a legacy request without rewriting the encoded path or query", async () => {
+  const { get, assets, waitUntil } = host();
+  const request = new Request(
+    "https://pokemouille.vaaleyou.workers.dev//fr/pokemon/%2F/?q=a+b&q=%2B",
+    { method: "POST" },
+  );
+  const response = await worker.fetch(
+    request,
+    { DATA: { get }, ASSETS: { fetch: assets } },
+    { waitUntil },
+  );
+
+  expect(response.status).toBe(308);
+  expect(response.headers.get("location")).toBe(
+    "https://pokemouille.app//fr/pokemon/%2F/?q=a+b&q=%2B",
+  );
+  expect(assets).not.toHaveBeenCalled();
+  expect(get).not.toHaveBeenCalled();
+});
+
+it("serves a current immutable file from static assets without reading R2", async () => {
+  const { get, assets, waitUntil } = host();
+  const request = new Request("https://pokemouille.app/_app/immutable/entry/start.js");
+  const staticAsset = new Response("current");
+  assets.mockResolvedValueOnce(staticAsset);
+
+  await expect(
+    worker.fetch(request, { DATA: { get }, ASSETS: { fetch: assets } }, { waitUntil }),
+  ).resolves.toBe(staticAsset);
+  expect(assets).toHaveBeenCalledWith(request);
+  expect(get).not.toHaveBeenCalled();
+});
+
 describe.each([
   { key: LEARNER, prefix: "learners", body: '{"moveId":85}', payload: { moveId: 85 } },
   { key: BREEDING, prefix: "breeding", body: '{"speciesId":1}', payload: { speciesId: 1 } },
@@ -71,7 +104,7 @@ describe.each([
     const server = host(key, body);
     const response = await server.fetch(key);
     await Promise.all(server.pending);
-    expect(server.assets).not.toHaveBeenCalled();
+    expect(server.assets).toHaveBeenCalledOnce();
     expect(server.get).toHaveBeenCalledWith(key, { onlyIf: expect.any(Headers) });
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe(IMMUTABLE);

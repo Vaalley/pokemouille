@@ -8,6 +8,9 @@
   "assets": {
     "directory": "./build",
     "binding": "ASSETS",
+    // Both hostnames share this Worker. The redirect must run even for matching assets,
+    // and selective Worker-first patterns can match paths but not hostnames.
+    "run_worker_first": true,
   },
   "r2_buckets": [{ "binding": "DATA", "bucket_name": "pokemouille-data" }],
   "observability": { "enabled": true },
