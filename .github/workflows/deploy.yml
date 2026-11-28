@@ -60,7 +60,7 @@ jobs:
 
       # Without a successful refresh in this run, build the last published snapshot.
       - name: Download published dataset
-        if: steps.refresh.outputs.exit_code != '0'
+        if: steps.refresh.outcome == 'skipped' || steps.refresh.outputs.exit_code != '0'
         run: node apps/website/scripts/r2.ts data-pull
 
       # Rebuild derived assets from the last published source data, including older
