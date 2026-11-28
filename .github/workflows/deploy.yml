@@ -59,9 +59,23 @@ jobs:
           esac
 
       # Without a successful refresh in this run, build the last published snapshot.
-      - name: Download published dataset
+      - name: Read published dataset manifest
+        id: dataset
         if: steps.refresh.outcome == 'skipped' || steps.refresh.outputs.exit_code != '0'
-        run: node apps/website/scripts/r2.ts data-pull
+        run: |
+          node apps/website/scripts/r2.ts data-manifest
+          echo "revision=$(jq -r .datasetRevision apps/website/static/data/manifest.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore cached dataset revision
+        if: steps.dataset.outputs.revision != ''
+        uses: actions/cache@v5
+        with:
+          path: apps/website/static/data/revisions/${{ steps.dataset.outputs.revision }}
+          key: pokemouille-dataset-v1-${{ steps.dataset.outputs.revision }}
+
+      - name: Verify or download published dataset
+        if: steps.dataset.outputs.revision != ''
+        run: node apps/website/scripts/r2.ts data-pull --reuse-local
 
       # Rebuild derived assets from the last published source data, including older
       # R2 snapshots without current projections. No upstream requests or state needed.

@@ -1,8 +1,9 @@
+import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { pruneRevisions, sync, verifyRetention, withRetry } from "./r2.ts";
+import { dataPull, pruneRevisions, sync, verifyRetention, withRetry } from "./r2.ts";
 
 vi.mock("wrangler", () => ({ getPlatformProxy: vi.fn() }));
 
@@ -40,14 +41,22 @@ async function build(revision: string) {
 
 function bucket() {
   const objects = new Map<string, Uint8Array<ArrayBuffer>>();
+  const checksums = new Map<string, ArrayBuffer>();
   const writes: { key: string; contentType: string }[] = [];
   const store = {
-    size: async (key: string) => objects.get(key)?.byteLength ?? null,
-    get: async (key: string) => objects.get(key) ?? null,
-    put: vi.fn(async (key: string, body: Uint8Array<ArrayBuffer>, contentType: string) => {
-      objects.set(key, body);
-      writes.push({ key, contentType });
-    }),
+    head: async (key: string) => {
+      const body = objects.get(key);
+      return body ? { size: body.byteLength, sha256: checksums.get(key) } : null;
+    },
+    get: vi.fn(async (key: string) => objects.get(key) ?? null),
+    put: vi.fn(
+      async (key: string, body: Uint8Array<ArrayBuffer>, contentType: string, sha256?: string) => {
+        if (sha256) checksums.set(key, Uint8Array.from(Buffer.from(sha256, "hex")).buffer);
+        else checksums.delete(key);
+        objects.set(key, body);
+        writes.push({ key, contentType });
+      },
+    ),
     close: vi.fn(async () => {}),
   };
   return { store, objects, writes };
@@ -97,13 +106,39 @@ describe("retained asset sync", () => {
     });
   });
 
-  it("skips identical immutable derived files rather than overwriting them", async () => {
+  it("reuses matching R2 checksums without reading existing immutable bodies", async () => {
     const directories = await build(A);
     const { store, writes } = bucket();
     await sync(store, directories);
     writes.length = 0;
     await sync(store, directories);
     expect(writes).toEqual([{ key: "data/manifest.json", contentType: "application/json" }]);
+    expect(store.get).not.toHaveBeenCalled();
+  });
+
+  it("rejects a same-size checksum mismatch without reading or overwriting the object", async () => {
+    const directories = await build(A);
+    const { store, writes } = bucket();
+    await sync(store, directories);
+    writes.length = 0;
+    const key = `learners/${A}/85.json`;
+    await writeFile(join(directories.learners, A, "85.json"), '{"moveId":86}');
+
+    await expect(sync(store, directories)).rejects.toThrow(`Immutable object ${key} differs`);
+    expect(store.get).not.toHaveBeenCalled();
+    expect(writes).toEqual([]);
+  });
+
+  it("still compares bytes when a legacy object has no stored checksum", async () => {
+    const directories = await build(A);
+    const { store, objects, writes } = bucket();
+    const key = `learners/${A}/85.json`;
+    objects.set(key, new TextEncoder().encode('{"moveId":85}'));
+
+    await sync(store, directories);
+
+    expect(store.get).toHaveBeenCalledWith(key);
+    expect(writes.some((write) => write.key === key)).toBe(false);
   });
 
   it.each(["learners", "breeding"] as const)(
@@ -147,7 +182,38 @@ describe("retained asset sync", () => {
     await expect(sync(store, directories)).rejects.toThrow("Invalid immutable derived asset");
     expect(writes).toEqual([]);
   });
+});
 
+describe("published dataset cache", () => {
+  it("reuses only verified files and repairs missing or corrupted entries from R2", async () => {
+    const { data } = await build(A);
+    const { store, objects } = bucket();
+    const revisionPath = `revisions/${A}/`;
+    const files = Object.fromEntries(
+      ["valid", "corrupt", "missing"].map((name) => {
+        const path = `${revisionPath}${name}.json`;
+        const body = new TextEncoder().encode(JSON.stringify(name));
+        objects.set(`data/${path}`, body);
+        return [name, { path, sha256: createHash("sha256").update(body).digest("hex") }];
+      }),
+    );
+    const manifest = JSON.stringify({ datasetRevision: A, files });
+    await writeFile(join(data, "manifest.json"), manifest);
+    await writeFile(join(data, files.valid!.path), '"valid"');
+    await writeFile(join(data, files.corrupt!.path), '"wrong!!"');
+
+    await dataPull(store, { reuseLocal: true, dataDir: data });
+
+    expect(store.get.mock.calls.flat().sort()).toEqual(
+      [`data/${files.corrupt!.path}`, `data/${files.missing!.path}`].sort(),
+    );
+    expect(await readFile(join(data, files.corrupt!.path), "utf8")).toBe('"corrupt"');
+    expect(await readFile(join(data, files.missing!.path), "utf8")).toBe('"missing"');
+    expect(await readFile(join(data, "manifest.json"), "utf8")).toBe(manifest);
+  });
+});
+
+describe("static asset response headers", () => {
   it.each(["learners", "breeding"])(
     "gives current static %s assets immutable cache policy",
     async (prefix) => {

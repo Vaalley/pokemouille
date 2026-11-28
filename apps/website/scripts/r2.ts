@@ -2,7 +2,8 @@
 //   node apps/website/scripts/r2.ts sync [--local]        upload dataset + retained app/derived assets, manifest last
 //   node apps/website/scripts/r2.ts prune [--local]       after deploy, keep three dataset revisions
 //   node apps/website/scripts/r2.ts verify-retention [--local]  check rollback assets and repair projections
-//   node apps/website/scripts/r2.ts data-pull [--local]   download the published snapshot to static/data
+//   node apps/website/scripts/r2.ts data-manifest [--local]  download only the current manifest
+//   node apps/website/scripts/r2.ts data-pull [--local] [--reuse-local]  verify and restore dataset files
 //   node apps/website/scripts/r2.ts state-pull [--local]  restore .data/state from R2
 //   node apps/website/scripts/r2.ts state-push [--local]  save .data/state to R2
 // Remote mode reaches the real bucket through a Wrangler remote binding (`wrangler login`
@@ -12,7 +13,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, extname, join, relative, resolve, sep } from "node:path";
+import { dirname, extname, join, posix, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { getPlatformProxy } from "wrangler";
@@ -51,10 +52,14 @@ const CONTENT_TYPES: Record<string, string> = {
 };
 
 interface Store {
-  /** Byte size of an existing object, or null. */
-  size(key: string): Promise<number | null>;
+  head(key: string): Promise<{ size: number; sha256?: ArrayBuffer } | null>;
   get(key: string): Promise<Uint8Array | null>;
-  put(key: string, body: Uint8Array<ArrayBuffer>, contentType: string): Promise<void>;
+  put(
+    key: string,
+    body: Uint8Array<ArrayBuffer>,
+    contentType: string,
+    sha256?: string,
+  ): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -71,14 +76,18 @@ interface RevisionStore extends Pick<Store, "get" | "put"> {
 
 // The subset of the Workers R2Bucket binding used here (Node has no Workers globals).
 interface Bucket {
-  head(key: string): Promise<{ size: number; uploaded: Date } | null>;
+  head(key: string): Promise<{
+    size: number;
+    uploaded: Date;
+    checksums: { sha256?: ArrayBuffer };
+  } | null>;
   list: RevisionStore["list"];
   delete: RevisionStore["delete"];
   get(key: string): Promise<{ arrayBuffer(): Promise<ArrayBuffer> } | null>;
   put(
     key: string,
     body: Uint8Array,
-    options: { httpMetadata: { contentType: string } },
+    options: { httpMetadata: { contentType: string }; sha256?: string },
   ): Promise<unknown>;
 }
 
@@ -113,15 +122,19 @@ async function openStore(local: boolean): Promise<Store & RevisionStore> {
       : { environment: "r2sync", remoteBindings: true }),
   });
   return {
-    size: (key) => withRetry(`head ${key}`, async () => (await env.DATA.head(key))?.size ?? null),
+    head: (key) =>
+      withRetry(`head ${key}`, async () => {
+        const object = await env.DATA.head(key);
+        return object && { size: object.size, sha256: object.checksums.sha256 };
+      }),
     get: (key) =>
       withRetry(`get ${key}`, async () => {
         const object = await env.DATA.get(key);
         return object ? new Uint8Array(await object.arrayBuffer()) : null;
       }),
-    put: (key, body, contentType) =>
+    put: (key, body, contentType, sha256) =>
       withRetry(`put ${key}`, async () => {
-        await env.DATA.put(key, body, { httpMetadata: { contentType } });
+        await env.DATA.put(key, body, { httpMetadata: { contentType }, sha256 });
       }),
     uploaded: (key) =>
       withRetry(`head ${key}`, async () => (await env.DATA.head(key))?.uploaded ?? null),
@@ -151,15 +164,25 @@ async function uploadImmutable(store: Store, files: { key: string; path: string 
   let uploaded = 0;
   await pool(files, async ({ key, path }) => {
     const body = await readFile(path);
-    const existing = await store.size(key);
+    const existing = await store.head(key);
     if (existing !== null) {
-      if (existing === body.byteLength) {
-        const previous = await store.get(key);
-        if (previous && body.equals(previous)) return;
+      if (existing.size === body.byteLength) {
+        if (existing.sha256) {
+          if (createHash("sha256").update(body).digest().equals(Buffer.from(existing.sha256)))
+            return;
+        } else {
+          const previous = await store.get(key);
+          if (previous && body.equals(previous)) return;
+        }
       }
       throw new Error(`Immutable object ${key} differs in content; refusing to overwrite`);
     }
-    await store.put(key, body, CONTENT_TYPES[extname(key)] ?? "application/octet-stream");
+    await store.put(
+      key,
+      body,
+      CONTENT_TYPES[extname(key)] ?? "application/octet-stream",
+      createHash("sha256").update(body).digest("hex"),
+    );
     uploaded++;
   });
   return uploaded;
@@ -308,21 +331,48 @@ function manifestAssets(manifest: Uint8Array) {
   return assets;
 }
 
-/** Downloads the published snapshot into static/data so CI builds need no ingestion state. */
-async function dataPull(store: Store) {
+async function publishedManifest(store: Pick<Store, "get">) {
   const manifest = await store.get("data/manifest.json");
   if (!manifest) throw new Error("data/manifest.json is not in the bucket; run sync once first");
+  return manifest;
+}
+
+/** Verify every cached file against the freshly downloaded manifest before trusting it. */
+export async function dataPull(
+  store: Pick<Store, "get">,
+  { reuseLocal = false, dataDir = DATA_DIR } = {},
+) {
+  const manifestPath = join(dataDir, "manifest.json");
+  const manifest = reuseLocal ? await readFile(manifestPath) : await publishedManifest(store);
+  const prefix = `revisions/${readRevision(manifest)}/`;
   const assets = manifestAssets(manifest);
+  let reused = 0;
   await pool(assets, async ({ path, sha256 }) => {
+    if (!path.startsWith(prefix) || path !== posix.normalize(path) || path.includes("\\"))
+      throw new Error(`Invalid published asset path: ${path}`);
+    const target = join(dataDir, path);
+    if (reuseLocal) {
+      try {
+        const cached = await readFile(target);
+        if (createHash("sha256").update(cached).digest("hex") === sha256) {
+          reused++;
+          return;
+        }
+      } catch (error) {
+        if (!(error instanceof Error) || !("code" in error) || error.code !== "ENOENT") throw error;
+      }
+    }
     const body = await store.get(`data/${path}`);
     if (!body) throw new Error(`Manifest asset data/${path} is missing from the bucket`);
     if (createHash("sha256").update(body).digest("hex") !== sha256)
       throw new Error(`Manifest asset data/${path} does not match its SHA-256`);
-    await mkdir(dirname(join(DATA_DIR, path)), { recursive: true });
-    await writeFile(join(DATA_DIR, path), body);
+    await mkdir(dirname(target), { recursive: true });
+    await writeFile(target, body);
   });
-  await writeFile(join(DATA_DIR, "manifest.json"), manifest);
-  console.log(`Downloaded ${assets.length} dataset files and manifest.json.`);
+  if (!reuseLocal) await writeFile(manifestPath, manifest);
+  console.log(
+    `Verified ${assets.length} dataset files: reused ${reused}, downloaded ${assets.length - reused}.`,
+  );
 }
 
 /** Verifies retained keys and restores missing projections without changing dataset identities. */
@@ -472,21 +522,30 @@ async function statePush(store: Store) {
 async function main() {
   const { positionals, values } = parseArgs({
     allowPositionals: true,
-    options: { local: { type: "boolean", default: false } },
+    options: {
+      local: { type: "boolean", default: false },
+      "reuse-local": { type: "boolean", default: false },
+    },
   });
   const commands = {
     sync,
     prune: async (store: RevisionStore) =>
       pruneRevisions(store, readRevision(await readFile(join(DATA_DIR, "manifest.json")))),
     "verify-retention": verifyRetention,
-    "data-pull": dataPull,
+    "data-manifest": async (store: Store) => {
+      const manifest = await publishedManifest(store);
+      readRevision(manifest);
+      await mkdir(DATA_DIR, { recursive: true });
+      await writeFile(join(DATA_DIR, "manifest.json"), manifest);
+    },
+    "data-pull": (store: Store) => dataPull(store, { reuseLocal: values["reuse-local"] }),
     "state-pull": statePull,
     "state-push": statePush,
   };
   const command = commands[positionals[0] as keyof typeof commands];
   if (!command) {
     console.error(
-      `Usage: node apps/website/scripts/r2.ts <${Object.keys(commands).join("|")}> [--local]`,
+      `Usage: node apps/website/scripts/r2.ts <${Object.keys(commands).join("|")}> [--local] [--reuse-local]`,
     );
     process.exitCode = 1;
     return;

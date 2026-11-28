@@ -303,6 +303,10 @@ The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the 
 
 Add `--local` to use Wrangler's local bucket instead of R2. Local Workers preview: `vp run website#build`, `node apps/website/scripts/r2.ts sync --local`, `vp run cf:dev`.
 
+Production `sync` uploads new immutable files with R2-validated SHA-256 checksums. Later syncs compare the local hash to that stored checksum without downloading the body. Older objects without a SHA-256 still get a byte-for-byte comparison and are not rewritten just to add a checksum.
+
+On runs without a successful fresh snapshot, CI fetches the live manifest from R2 and restores only its immutable revision directory from GitHub Actions cache. `data-pull --reuse-local` rechecks each cached file against the manifest and downloads any missing or mismatched files. The mutable manifest and ingestion state are never cached.
+
 **CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, republishes derived assets offline, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker, then `prune` and `verify-retention` only after deployment. The weekly schedule (and manual runs with `refresh`) restores ingestion state, starts a fresh retrieval or resumes an incomplete one, and saves state even when retrieval stops early. A failed or incomplete retrieval uses the last published dataset and fails the final health step after deployment, triggering subscribed GitHub Actions notifications. A published retrieval older than 14 days also fails that check on refresh runs; deploys without a refresh warn instead.
 
 One-time setup:
