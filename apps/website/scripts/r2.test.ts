@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { sync, withRetry } from "./r2.ts";
+import { pruneRevisions, sync, withRetry } from "./r2.ts";
 
 vi.mock("wrangler", () => ({ getPlatformProxy: vi.fn() }));
 
@@ -167,6 +167,127 @@ describe("retained asset sync", () => {
     await expect(sync(store, directories)).rejects.toThrow("refusing to overwrite");
     expect(objects.get(key)).toBe(oldBody);
     expect(writes.some(({ key }) => key === "data/manifest.json")).toBe(false);
+  });
+});
+
+describe("dataset revision retention", () => {
+  const C = "c".repeat(64);
+  const D = "d".repeat(64);
+  const E = "e".repeat(64);
+  const revisionKeys = (id: string) => [
+    `data/revisions/${id}/games.json`,
+    `data/revisions/${id}/pokemon/1.json`,
+    `data/revisions/${id}/pokemon/2.json`,
+    `learners/${id}/85.json`,
+    `breeding/${id}/1.json`,
+  ];
+
+  function retentionStore() {
+    const { store, objects } = bucket();
+    const timestamps = new Map<string, Date>();
+    const putJson = (key: string, value: unknown) =>
+      store.put(key, new TextEncoder().encode(JSON.stringify(value)), "application/json");
+    const seedRevision = async (id: string, day: number) => {
+      for (const key of revisionKeys(id)) {
+        await putJson(key, {});
+        timestamps.set(key, new Date(Date.UTC(2026, 10, day)));
+      }
+    };
+
+    return {
+      objects,
+      seedRevision,
+      publish: (id: string) => putJson("data/manifest.json", { datasetRevision: id }),
+      store: {
+        ...store,
+        uploaded: async (key: string) => timestamps.get(key) ?? null,
+        list: async ({
+          prefix,
+          delimiter,
+          cursor,
+        }: {
+          prefix: string;
+          delimiter?: string;
+          cursor?: string;
+        }) => {
+          const entries = new Set<string>();
+          for (const key of objects.keys()) {
+            if (!key.startsWith(prefix)) continue;
+            const end = delimiter ? key.indexOf(delimiter, prefix.length) : -1;
+            entries.add(end === -1 ? key : key.slice(0, end + 1));
+          }
+          const sorted = [...entries].sort();
+          const offset = Number(cursor ?? 0);
+          const next = offset + 2;
+          const page = sorted.slice(offset, next);
+          const result = {
+            objects: page.filter((key) => !key.endsWith("/")).map((key) => ({ key })),
+            delimitedPrefixes: page.filter((key) => key.endsWith("/")),
+          };
+          return next < sorted.length
+            ? { ...result, truncated: true as const, cursor: String(next) }
+            : { ...result, truncated: false as const };
+        },
+        delete: async (keys: string[]) => {
+          for (const key of keys) objects.delete(key);
+        },
+      },
+    };
+  }
+
+  it("keeps the live revision and two newer legacy uploads, across listing pages", async () => {
+    const { store, objects, seedRevision, publish } = retentionStore();
+    await seedRevision(A, 2);
+    await seedRevision(B, 4);
+    await seedRevision(C, 1);
+    await seedRevision(D, 3);
+    await publish(C);
+    for (const key of [`_app/immutable/${A}.js`, "state/state.tar.gz", "learners/misc.json"])
+      await store.put(key, new Uint8Array(), "application/octet-stream");
+
+    await pruneRevisions(store, C);
+
+    expect([...objects.keys()].sort()).toEqual(
+      [
+        ...[B, C, D].flatMap(revisionKeys),
+        `_app/immutable/${A}.js`,
+        "state/state.tar.gz",
+        "state/deployed-revisions.json",
+        "data/manifest.json",
+        "learners/misc.json",
+      ].sort(),
+    );
+  });
+
+  it("retains distinct successful revisions, not abandoned uploads or repeat deploys", async () => {
+    const { store, objects, seedRevision, publish } = retentionStore();
+    for (const [day, id] of [A, B, C].entries()) await seedRevision(id, day + 1);
+    await publish(C);
+    await pruneRevisions(store, C);
+    await seedRevision(D, 4);
+    await publish(D); // Assets were published, but this build did not go live.
+    await seedRevision(E, 5);
+    await publish(E);
+    await pruneRevisions(store, E);
+    await pruneRevisions(store, E);
+
+    expect([...objects.keys()].filter((key) => key.includes("/revisions/")).sort()).toEqual(
+      [B, C, E]
+        .flatMap(revisionKeys)
+        .filter((key) => key.includes("/revisions/"))
+        .sort(),
+    );
+    expect(objects.has(`learners/${D}/85.json`)).toBe(false);
+  });
+
+  it("refuses to delete anything if the bucket manifest moved to a different revision", async () => {
+    const { store, objects, seedRevision, publish } = retentionStore();
+    for (const [day, id] of [A, B, C, D].entries()) await seedRevision(id, day + 1);
+    await publish(D);
+    const before = [...objects.keys()];
+
+    await expect(pruneRevisions(store, C)).rejects.toThrow("does not match the deployed");
+    expect([...objects.keys()]).toEqual(before);
   });
 });
 

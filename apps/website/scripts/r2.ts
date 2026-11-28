@@ -1,5 +1,6 @@
 // R2 transfers for the Cloudflare deployment (run from anywhere):
 //   node apps/website/scripts/r2.ts sync [--local]        upload dataset + retained app/derived assets, manifest last
+//   node apps/website/scripts/r2.ts prune [--local]       after deploy, keep three dataset revisions
 //   node apps/website/scripts/r2.ts data-pull [--local]   download the published snapshot to static/data
 //   node apps/website/scripts/r2.ts state-pull [--local]  restore .data/state from R2
 //   node apps/website/scripts/r2.ts state-push [--local]  save .data/state to R2
@@ -27,6 +28,10 @@ const DERIVED_DIRS = Object.fromEntries(
 const STATE_DIR = join(ROOT, ".data", "state");
 // Never served: the Worker only exposes the dataset, _app/immutable/* and pinned derived data.
 const STATE_KEY = "state/state.tar.gz";
+const REVISION_HISTORY_KEY = "state/deployed-revisions.json";
+const DATA_REVISIONS_PREFIX = "data/revisions/";
+const RETAINED_REVISIONS = 3;
+const REVISION_ID = /^[a-f0-9]{64}$/;
 const CONCURRENCY = 16;
 const ATTEMPTS = 5;
 
@@ -47,9 +52,22 @@ interface Store {
   close(): Promise<void>;
 }
 
+interface RevisionStore extends Pick<Store, "get" | "put"> {
+  uploaded(key: string): Promise<Date | null>;
+  list(options: { prefix: string; delimiter?: string; cursor?: string }): Promise<
+    {
+      objects: { key: string }[];
+      delimitedPrefixes: string[];
+    } & ({ truncated: false } | { truncated: true; cursor: string })
+  >;
+  delete(keys: string[]): Promise<void>;
+}
+
 // The subset of the Workers R2Bucket binding used here (Node has no Workers globals).
 interface Bucket {
-  head(key: string): Promise<{ size: number } | null>;
+  head(key: string): Promise<{ size: number; uploaded: Date } | null>;
+  list: RevisionStore["list"];
+  delete: RevisionStore["delete"];
   get(key: string): Promise<{ arrayBuffer(): Promise<ArrayBuffer> } | null>;
   put(
     key: string,
@@ -80,7 +98,7 @@ export async function withRetry<T>(
   }
 }
 
-async function openStore(local: boolean): Promise<Store> {
+async function openStore(local: boolean): Promise<Store & RevisionStore> {
   const { env, dispose } = await getPlatformProxy<{ DATA: Bucket }>({
     configPath: CONFIG,
     ...(local
@@ -99,6 +117,10 @@ async function openStore(local: boolean): Promise<Store> {
       withRetry(`put ${key}`, async () => {
         await env.DATA.put(key, body, { httpMetadata: { contentType } });
       }),
+    uploaded: (key) =>
+      withRetry(`head ${key}`, async () => (await env.DATA.head(key))?.uploaded ?? null),
+    list: (options) => withRetry(`list ${options.prefix}`, () => env.DATA.list(options)),
+    delete: (keys) => withRetry(`delete ${keys.length} objects`, () => env.DATA.delete(keys)),
     close: dispose,
   };
 }
@@ -144,7 +166,7 @@ export async function sync(
   const manifest = await readFile(join(directories.data, "manifest.json"));
   const files = [];
   for (const [dir, prefix] of [
-    [join(directories.data, "revisions"), "data/revisions/"],
+    [join(directories.data, "revisions"), DATA_REVISIONS_PREFIX],
     [directories.immutable, "_app/immutable/"],
     ...DERIVED_DATA_PREFIXES.map((prefix) => [directories[prefix], `${prefix}/`] as const),
   ] as const) {
@@ -162,6 +184,103 @@ export async function sync(
   // Publish the mutable pointer only after every file it references exists.
   await store.put("data/manifest.json", manifest, "application/json");
   console.log(`Uploaded ${uploaded} of ${files.length} immutable files, then data/manifest.json.`);
+}
+
+function readRevision(manifest: Uint8Array | null): string {
+  const parsed: unknown = manifest && JSON.parse(new TextDecoder().decode(manifest));
+  if (
+    typeof parsed !== "object" ||
+    parsed === null ||
+    !("datasetRevision" in parsed) ||
+    typeof parsed.datasetRevision !== "string" ||
+    !REVISION_ID.test(parsed.datasetRevision)
+  )
+    throw new Error("data/manifest.json has no valid dataset revision");
+  return parsed.datasetRevision;
+}
+
+async function listPrefix(store: RevisionStore, prefix: string, delimiter?: string) {
+  const entries: string[] = [];
+  let cursor: string | undefined;
+  do {
+    const page = await store.list({ prefix, delimiter, cursor });
+    if (delimiter) entries.push(...page.delimitedPrefixes);
+    else for (const { key } of page.objects) entries.push(key);
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+  return entries;
+}
+
+async function listRevisions(store: RevisionStore, prefix: string) {
+  return (await listPrefix(store, prefix, "/"))
+    .filter((key) => key.startsWith(prefix) && key.endsWith("/"))
+    .map((key) => key.slice(prefix.length, -1))
+    .filter((revision) => REVISION_ID.test(revision));
+}
+
+/** Call only after deploying the build whose manifest was published by sync. */
+export async function pruneRevisions(store: RevisionStore, deployed: string) {
+  if (readRevision(await store.get("data/manifest.json")) !== deployed)
+    throw new Error("Bucket manifest does not match the deployed dataset revision");
+
+  const revisions = await listRevisions(store, DATA_REVISIONS_PREFIX);
+  if (!revisions.includes(deployed)) throw new Error("Deployed dataset is missing from R2");
+
+  const saved = await store.get(REVISION_HISTORY_KEY);
+  let history: string[];
+  if (saved) {
+    const parsed: unknown = JSON.parse(new TextDecoder().decode(saved));
+    if (
+      !Array.isArray(parsed) ||
+      parsed.length < 1 ||
+      parsed.length > RETAINED_REVISIONS ||
+      !parsed.every((id): id is string => typeof id === "string" && REVISION_ID.test(id)) ||
+      new Set(parsed).size !== parsed.length
+    )
+      throw new Error("R2 deployed revision history is invalid");
+    history = parsed;
+  } else {
+    // Legacy revisions have no deploy history. Their immutable games file dates
+    // from the revision's first upload, even when a deploy reuses that revision.
+    const dated = await Promise.all(
+      revisions.map(async (revision) => {
+        const key = `${DATA_REVISIONS_PREFIX}${revision}/games.json`;
+        const uploaded = await store.uploaded(key);
+        if (!uploaded || !Number.isFinite(uploaded.getTime()))
+          throw new Error(`Cannot determine upload date of ${key}`);
+        return { revision, uploaded: uploaded.getTime() };
+      }),
+    );
+    history = dated.sort((a, b) => b.uploaded - a.uploaded).map(({ revision }) => revision);
+  }
+
+  const keep = [deployed, ...history.filter((revision) => revision !== deployed)].slice(
+    0,
+    RETAINED_REVISIONS,
+  );
+  if (keep.some((revision) => !revisions.includes(revision)))
+    throw new Error("A retained dataset revision is missing from R2");
+  // Write the keep set before deleting so an interrupted prune can safely resume.
+  if (!saved || keep.some((revision, i) => revision !== history[i]))
+    await store.put(
+      REVISION_HISTORY_KEY,
+      new TextEncoder().encode(JSON.stringify(keep)),
+      "application/json",
+    );
+
+  for (const prefix of [
+    ...DERIVED_DATA_PREFIXES.map((name) => `${name}/`),
+    DATA_REVISIONS_PREFIX,
+  ]) {
+    const candidates =
+      prefix === DATA_REVISIONS_PREFIX ? revisions : await listRevisions(store, prefix);
+    for (const revision of candidates) {
+      if (keep.includes(revision)) continue;
+      const keys = await listPrefix(store, `${prefix}${revision}/`);
+      for (let i = 0; i < keys.length; i += 1000) await store.delete(keys.slice(i, i + 1000));
+    }
+  }
+  console.log(`Retained ${keep.length} dataset revisions.`);
 }
 
 /** Downloads the published snapshot into static/data so CI builds need no ingestion state. */
@@ -232,6 +351,8 @@ async function main() {
   });
   const commands = {
     sync,
+    prune: async (store: RevisionStore) =>
+      pruneRevisions(store, readRevision(await readFile(join(DATA_DIR, "manifest.json")))),
     "data-pull": dataPull,
     "state-pull": statePull,
     "state-push": statePush,

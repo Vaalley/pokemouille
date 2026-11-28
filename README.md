@@ -287,19 +287,20 @@ The site runs as a Cloudflare Worker with static assets (Workers Paid plan: the 
 
 - **Pages and app code** are uploaded from `apps/website/build`. `static/_headers` marks `_app/immutable/*` immutable; everything else keeps the Workers default `public, max-age=0, must-revalidate` with an ETag.
 - **The dataset and derived JSON are not uploaded with the Worker** (`static/.assetsignore` excludes them). They live in R2 bucket `pokemouille-data` under `data/manifest.json`, `data/revisions/...`, `learners/<revision>/...` and `breeding/<revision>/...`. `apps/website/worker/index.ts` serves those keys and retained `_app/immutable/*` chunks when no static asset matches. The manifest is `no-cache` with ETag/304; immutable objects use the edge Cache API (a no-op on `*.workers.dev`, active on a custom domain).
-- **Retention:** R2 keeps every published revision, deployment's immutable chunks and derived learner/breeding JSON; nothing is garbage-collected. Storage planning must include all three.
+- **Retention:** After a successful production deploy, CI keeps the live dataset revision and the previous two distinct revisions, including each revision's learner and breeding JSON. On the first run, older revisions are ranked by their R2 upload dates; thereafter CI records successful deploy order. Tabs and Worker rollbacks that reference a pruned dataset can no longer fetch it. Retained `_app/immutable/*` chunks and the ingestion-state archive are not pruned.
 
 `apps/website/scripts/r2.ts` moves files:
 
 | Command                     | Effect                                                                                                                                              |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sync`                      | Uploads missing revision files, `_app/immutable/*`, learner and breeding JSON (never overwrites differing content), then `data/manifest.json` last. |
+| `prune`                     | After deploying the local build, deletes dataset and derived files outside the three retained revisions.                                            |
 | `data-pull`                 | Downloads the files listed in the R2 manifest into `static/data`, verifying each SHA-256.                                                           |
 | `state-pull` / `state-push` | Restores / saves `.data/state` as `state/state.tar.gz` (not served by the Worker).                                                                  |
 
 Add `--local` to use Wrangler's local bucket instead of R2. Local Workers preview: `vp run website#build`, `node apps/website/scripts/r2.ts sync --local`, `vp run cf:dev`.
 
-**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, republishes derived assets offline, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker. The weekly schedule (and manual runs with `refresh`) first restores `.data/state`, starts a `--fresh` refresh (or resumes an incomplete one), and saves state even when the refresh stops early; an incomplete refresh deploys the last-good dataset and warns.
+**CI** (`.github/workflows/deploy.yml`, one run at a time): on push to `main` it downloads the published dataset, republishes derived assets offline, builds, runs `sync`, then `vp run cf:deploy`. Order matters: files before the manifest, manifest before the Worker, and `prune` only after the Worker deploy succeeds. The weekly schedule (and manual runs with `refresh`) first restores `.data/state`, starts a `--fresh` refresh (or resumes an incomplete refresh), and saves state even when the refresh stops early; an incomplete refresh deploys the last-good dataset and warns.
 
 One-time setup:
 

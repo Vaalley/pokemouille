@@ -73,3 +73,6 @@ jobs:
       - run: node apps/website/scripts/r2.ts sync
 
       - run: vp run cf:deploy
+
+      - name: Prune superseded dataset revisions
+        run: node apps/website/scripts/r2.ts prune
